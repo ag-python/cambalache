@@ -22,8 +22,7 @@ ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history;
     old_values = None
     new_values = None
 
-    pk_columns = None
-    pk_columns_values = None
+    non_pk_columns = []
 
     for row in c.execute(f'PRAGMA table_info({table});'):
         col = row[1]
@@ -39,22 +38,18 @@ ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history;
             old_values += ', OLD.' + col
             new_values += ', NEW.' + col
 
-        if pk:
-            if pk_columns == None:
-                pk_columns = col
-                pk_columns_values = 'NEW.' + col
-            else:
-                pk_columns += ', ' + col
-                pk_columns_values += ', NEW.' + col
-
+        if not pk:
+            non_pk_columns.append(col)
 
     # Create history triggers
+    select_history_group_id = "(SELECT history_group_id FROM history_group WHERE history_group_id=(SELECT seq FROM sqlite_sequence WHERE name='history_group') AND done IS NULL)"
 
     # INSERT Trigger
     c.execute(f'''
 CREATE TRIGGER on_{table}_insert AFTER INSERT ON {table}
 BEGIN
-  INSERT INTO history (command, table_name) VALUES ('INSERT', '{table}');
+  INSERT INTO history (history_group_id, command, table_name)
+    VALUES ({select_history_group_id}, 'INSERT', '{table}');
   INSERT INTO history_{table} (history_id, {columns})
     VALUES (last_insert_rowid(), {new_values});
 END;
@@ -64,21 +59,22 @@ END;
     c.execute(f'''
 CREATE TRIGGER on_{table}_delete AFTER DELETE ON {table}
 BEGIN
-  INSERT INTO history (command, table_name) VALUES ('DELETE', '{table}');
+  INSERT INTO history (history_group_id, command, table_name)
+    VALUES ({select_history_group_id}, 'DELETE', '{table}');
   INSERT INTO history_{table} (history_id, {columns})
     VALUES (last_insert_rowid(), {old_values});
 END;
     ''')
 
-    # UPDATE Trigger
-    c.execute(f'''
-CREATE TRIGGER on_{table}_update AFTER UPDATE ON {table}
+    for column in non_pk_columns:
+        # UPDATE Trigger
+        c.execute(f'''
+CREATE TRIGGER on_{table}_update_{column} AFTER UPDATE OF {column} ON {table}
 BEGIN
-  INSERT INTO history (command, table_name) VALUES ('UPDATE', '{table}');
-  INSERT INTO history_{table} (history_id, {columns})
-    VALUES (last_insert_rowid(), {new_values});
+  INSERT INTO history (history_group_id, command, table_name, column_name, column_value)
+    VALUES ({select_history_group_id}, 'UPDATE', '{table}', '{column}', NEW.{column});
 END;
-    ''')
+        ''')
 
 
 def db_create_history_tables(conn):

@@ -195,11 +195,20 @@ CREATE TABLE interface_object (
  * history_* tables and triggers are auto generated to avoid copy/paste errors
  */
 
-/* Main history table */
+/* Main history tables */
+
+CREATE TABLE history_group (
+  history_group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  done BOOLEAN,
+  description TEXT
+);
 
 CREATE TABLE history (
   history_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  history_group_id INTEGER REFERENCES history_group,
   command TEXT,
-  table_name TEXT
+  table_name TEXT,
+  column_name TEXT,
+  column_value TEXT
 );
 

@@ -65,3 +65,17 @@ INSERT INTO interface (name, filename) VALUES ('Test UI', 'test.ui');
 
 INSERT INTO interface_object (interface_id, object_id) VALUES (1, 1);
 
+
+/* Test history */
+UPDATE object_property SET value ='Hello World 1' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
+UPDATE object_property SET value ='Hello World 2' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
+UPDATE object_property SET value ='Hello World 3' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
+
+INSERT INTO history_group (description) VALUES ('Group 1');
+
+UPDATE object_property SET value ='Hello World 4' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
+UPDATE object_property SET value ='Click Me 2' WHERE (object_id=4 AND owner_id='GtkButton' AND property_id='label');
+
+UPDATE history_group SET done=1 WHERE history_group_id=1;
+
+
