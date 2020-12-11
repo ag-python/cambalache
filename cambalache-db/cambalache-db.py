@@ -22,6 +22,7 @@ ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history ON
     old_values = None
     new_values = None
 
+    all_columns = []
     non_pk_columns = []
 
     for row in c.execute(f'PRAGMA table_info({table});'):
@@ -38,6 +39,7 @@ ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history ON
             old_values += ', OLD.' + col
             new_values += ', NEW.' + col
 
+        all_columns.append(col)
         if not pk:
             non_pk_columns.append(col)
 
@@ -66,13 +68,48 @@ BEGIN
 END;
     ''')
 
+    last_history_id = "(SELECT seq FROM sqlite_sequence WHERE name='history')"
+
     # UPDATE Trigger for each non PK column
     for column in non_pk_columns:
+        all_but_column = None
+        all_but_column_values = None
+
+        for col in all_columns:
+            if col != column:
+                if all_but_column == None:
+                    all_but_column = col
+                    all_but_column_values = 'NEW.' + col
+                else:
+                    all_but_column += ', ' + col
+                    all_but_column_values += ', NEW.' + col
+
         c.execute(f'''
 CREATE TRIGGER on_{table}_update_{column} AFTER UPDATE OF {column} ON {table}
+WHEN
+  (SELECT history_group_id, command, table_name FROM history WHERE history_id = {last_history_id})
+    IS NOT ({select_history_group_id}, 'UPDATE', '{table}')
+    OR
+  (SELECT {all_but_column} FROM history_{table} WHERE history_id = {last_history_id})
+    IS NOT ({all_but_column_values})
 BEGIN
-  INSERT INTO history (history_group_id, command, table_name, column_name, column_value)
-    VALUES ({select_history_group_id}, 'UPDATE', '{table}', '{column}', NEW.{column});
+  INSERT INTO history (history_group_id, command, table_name)
+    VALUES ({select_history_group_id}, 'UPDATE', '{table}');
+  INSERT INTO history_{table} (history_id, {columns})
+    VALUES (last_insert_rowid(), {new_values});
+END;
+        ''')
+
+        c.execute(f'''
+CREATE TRIGGER on_{table}_update_{column}_compress AFTER UPDATE OF {column} ON {table}
+WHEN
+  (SELECT history_group_id, command, table_name FROM history WHERE history_id = {last_history_id})
+    IS ({select_history_group_id}, 'UPDATE', '{table}')
+    AND
+  (SELECT {all_but_column} FROM history_{table} WHERE history_id = {last_history_id})
+    IS ({all_but_column_values})
+BEGIN
+  UPDATE history_{table} SET {column}=NEW.{column} WHERE history_id = {last_history_id};
 END;
         ''')
 

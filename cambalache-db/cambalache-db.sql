@@ -207,8 +207,6 @@ CREATE TABLE history (
   history_id INTEGER PRIMARY KEY AUTOINCREMENT,
   history_group_id INTEGER REFERENCES history_group,
   command TEXT,
-  table_name TEXT,
-  column_name TEXT,
-  column_value TEXT
+  table_name TEXT
 );
 
