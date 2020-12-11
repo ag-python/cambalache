@@ -40,7 +40,6 @@ INSERT INTO type (type_id) VALUES
 
 /* Property
  *
- * TODO: Add check to make sure property:owner_id is not fundamental
  */
 CREATE TABLE property (
   owner_id TEXT REFERENCES type,
@@ -55,6 +54,7 @@ CREATE TABLE property (
   PRIMARY KEY(owner_id, property_id)
 );
 
+/* Check property:owner_id is not fundamental */
 CREATE TRIGGER property_check_owner_id BEFORE INSERT ON property
 BEGIN
    SELECT
@@ -114,7 +114,7 @@ CREATE TABLE object (
  *
  */
 CREATE TABLE object_property (
-  object_id INTEGER REFERENCES object,
+  object_id INTEGER REFERENCES object ON DELETE CASCADE,
   owner_id TEXT,
   property_id TEXT,
 
@@ -129,8 +129,8 @@ CREATE TABLE object_property (
  *
  */
 CREATE TABLE object_child_property (
-  object_id INTEGER REFERENCES object,
-  child_id INTEGER REFERENCES object,
+  object_id INTEGER REFERENCES object ON DELETE CASCADE,
+  child_id INTEGER REFERENCES object ON DELETE CASCADE,
   owner_id TEXT,
   property_id TEXT,
 
@@ -145,13 +145,13 @@ CREATE TABLE object_child_property (
  *
  */
 CREATE TABLE object_signal (
-  object_id INTEGER REFERENCES object,
+  object_id INTEGER REFERENCES object ON DELETE CASCADE,
   owner_id TEXT,
   signal_id TEXT,
 
   handler TEXT NOT NULL,
   detail TEXT,
-  user_data INTEGER REFERENCES object,
+  user_data INTEGER REFERENCES object ON DELETE SET NULL,
   swap BOOLEAN,
   after BOOLEAN,
   PRIMARY KEY(object_id, owner_id, signal_id),
@@ -180,8 +180,8 @@ CREATE TABLE interface (
  * TODO: check objects are toplevels (have no parent)
  */
 CREATE TABLE interface_object (
-  interface_id INTEGER REFERENCES interface,
-  object_id INTEGER REFERENCES object,
+  interface_id INTEGER REFERENCES interface ON DELETE CASCADE,
+  object_id INTEGER REFERENCES object ON DELETE CASCADE,
 
   template TEXT,
   PRIMARY KEY(interface_id, object_id)

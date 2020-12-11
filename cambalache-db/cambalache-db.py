@@ -11,10 +11,10 @@ import sqlite3
 
 
 def db_create_history_table(c, table):
-    # Create Table
+    # Create a history table to store data for INSERT and DELETE commands
     c.executescript(f'''
 CREATE TABLE history_{table} AS SELECT * FROM {table} WHERE 0;
-ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history;
+ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history ON DELETE CASCADE;
 ''')
 
     # Get table columns
@@ -66,8 +66,8 @@ BEGIN
 END;
     ''')
 
+    # UPDATE Trigger for each non PK column
     for column in non_pk_columns:
-        # UPDATE Trigger
         c.execute(f'''
 CREATE TRIGGER on_{table}_update_{column} AFTER UPDATE OF {column} ON {table}
 BEGIN

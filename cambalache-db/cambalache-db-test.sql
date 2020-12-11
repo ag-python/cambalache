@@ -46,20 +46,24 @@ INSERT INTO object (type_id, name, parent_id) VALUES
 ('GtkWindow', 'main', NULL),
 ('GtkBox', 'box', 1),
 ('GtkLabel', 'label', 2),
-('GtkButton', 'button', 2);
+('GtkButton', 'button', 2),
+('GtkButton', 'todelete', 2);
 
 INSERT INTO object_property (object_id, owner_id, property_id, value) VALUES
 (3, 'GtkLabel', 'label', 'Hello World'),
-(4, 'GtkButton', 'label', 'Click Me');
+(4, 'GtkButton', 'label', 'Click Me'),
+(5, 'GtkButton', 'label', 'Bye Bye World');
 
 INSERT INTO object_child_property (object_id, child_id, owner_id, property_id, value) VALUES
 (1, 3, 'GtkBox', 'position', 1),
 (1, 3, 'GtkBox', 'expand', 1),
 (1, 4, 'GtkBox', 'position', 2),
-(1, 4, 'GtkBox', 'fill', 0);
+(1, 4, 'GtkBox', 'fill', 0),
+(1, 5, 'GtkBox', 'position', 3);
 
 INSERT INTO object_signal (object_id, owner_id, signal_id, handler) VALUES
-(4, 'GtkButton', 'clicked', 'on_button_clicked');
+(4, 'GtkButton', 'clicked', 'on_button_clicked'),
+(5, 'GtkButton', 'clicked', 'on_todelete_clicked');
 
 INSERT INTO interface (name, filename) VALUES ('Test UI', 'test.ui');
 
@@ -71,11 +75,15 @@ UPDATE object_property SET value ='Hello World 1' WHERE (object_id=3 AND owner_i
 UPDATE object_property SET value ='Hello World 2' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
 UPDATE object_property SET value ='Hello World 3' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
 
+/* Push history group */
 INSERT INTO history_group (description) VALUES ('Group 1');
 
 UPDATE object_property SET value ='Hello World 4' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
 UPDATE object_property SET value ='Click Me 2' WHERE (object_id=4 AND owner_id='GtkButton' AND property_id='label');
 
+/* Pop history group */
 UPDATE history_group SET done=1 WHERE history_group_id=1;
 
+/* Delete an object, it should also delete all properties, signals, etc */
+DELETE FROM object WHERE name = 'todelete';
 
