@@ -17,6 +17,29 @@ CREATE TABLE license (
 ) WITHOUT ROWID;
 
 
+/* Catalog
+ *
+ * Support for different libraries
+ */
+CREATE TABLE catalog (
+  catalog_id TEXT PRIMARY KEY,
+  version TEXT NOT NULL,
+  targetable TEXT,
+  license_id TEXT REFERENCES license,
+  license_text TEXT
+) WITHOUT ROWID;
+
+
+/* Catalog dependecies
+ *
+ */
+CREATE TABLE catalog_dependency (
+  catalog_id TEXT REFERENCES catalog,
+  dependency_id TEXT REFERENCES catalog,
+  PRIMARY KEY(catalog_id, dependency_id)
+) WITHOUT ROWID;
+
+
 /* Type
  *
  * Base table to keep type information
@@ -25,6 +48,7 @@ CREATE TABLE type (
   type_id TEXT PRIMARY KEY,
 
   parent TEXT REFERENCES type,
+  catalog_id TEXT REFERENCES catalog,
   get_type TEXT,
   version TEXT,
   deprecated_version TEXT

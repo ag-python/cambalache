@@ -8,14 +8,17 @@
 
 /* Test model */
 
-INSERT INTO type (type_id, parent) VALUES
-('GtkWidget', 'object'),
-('GtkWindow', 'GtkWidget'),
-('GtkImage', 'GtkWidget'),
-('GtkBox', 'GtkWidget'),
-('GtkLabel', 'GtkWidget'),
-('GtkButton', 'GtkWidget'),
-('GtkToggleButton', 'GtkButton');
+INSERT INTO catalog (catalog_id, version) VALUES
+('gtk3', '3.24');
+
+INSERT INTO type (catalog_id, type_id, parent) VALUES
+('gtk3', 'GtkWidget', 'object'),
+('gtk3', 'GtkWindow', 'GtkWidget'),
+('gtk3', 'GtkImage', 'GtkWidget'),
+('gtk3', 'GtkBox', 'GtkWidget'),
+('gtk3', 'GtkLabel', 'GtkWidget'),
+('gtk3', 'GtkButton', 'GtkWidget'),
+('gtk3', 'GtkToggleButton', 'GtkButton');
 
 INSERT INTO property (owner_id, property_id, type_id) VALUES
 ('GtkWidget', 'name', 'string'),
