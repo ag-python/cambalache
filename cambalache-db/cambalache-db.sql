@@ -79,13 +79,13 @@ CREATE TABLE property (
 ) WITHOUT ROWID;
 
 /* Check property:owner_id is not fundamental */
-CREATE TRIGGER property_check_owner_id BEFORE INSERT ON property
+CREATE TRIGGER on_property_before_insert_check BEFORE INSERT ON property
 BEGIN
-   SELECT
-      CASE
-          WHEN (SELECT parent FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
-              RAISE (ABORT,'owner_id is not an object type')
-          END;
+  SELECT
+    CASE
+      WHEN (SELECT parent FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
+            RAISE (ABORT,'owner_id is not an object type')
+    END;
 END;
 
 
@@ -108,7 +108,6 @@ CREATE TABLE child_property (
 
 /* Signal
  *
- * TODO: Add check to make sure signal:owner_type is not fundamental
  */
 CREATE TABLE signal (
   owner_id TEXT REFERENCES type,
@@ -118,6 +117,16 @@ CREATE TABLE signal (
   deprecated_version TEXT,
   PRIMARY KEY(owner_id, signal_id)
 ) WITHOUT ROWID;
+
+/* Check signal:owner_id is not fundamental */
+CREATE TRIGGER on_signal_before_insert_check BEFORE INSERT ON signal
+BEGIN
+  SELECT
+    CASE
+      WHEN (SELECT parent FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
+            RAISE (ABORT,'owner_id is not an object type')
+    END;
+END;
 
 
 /** Project Data Model  **/
@@ -201,7 +210,6 @@ CREATE TABLE interface (
 
 /* Interface Object
  *
- * TODO: check objects are toplevels (have no parent)
  */
 CREATE TABLE interface_object (
   interface_id INTEGER REFERENCES interface ON DELETE CASCADE,
@@ -210,6 +218,17 @@ CREATE TABLE interface_object (
   template TEXT,
   PRIMARY KEY(interface_id, object_id)
 ) WITHOUT ROWID;
+
+/* Check objects are toplevels (have no parent) */
+CREATE TRIGGER on_interface_object_before_insert_check BEFORE INSERT ON interface_object
+BEGIN
+  SELECT
+    CASE
+      WHEN (SELECT parent_id FROM object WHERE object_id=NEW.object_id) IS NOT NULL THEN
+            RAISE (ABORT,'owner_id is not an object type')
+    END;
+END;
+
 
 /*
  * Implement undo/redo stack with triggers
