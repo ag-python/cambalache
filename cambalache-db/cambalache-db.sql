@@ -14,7 +14,7 @@ CREATE TABLE license (
   license_id TEXT PRIMARY KEY,
   name TEXT,
   license_text TEXT NOT NULL
-);
+) WITHOUT ROWID;
 
 
 /* Type
@@ -28,7 +28,7 @@ CREATE TABLE type (
   get_type TEXT,
   version TEXT,
   deprecated_version TEXT
-);
+) WITHOUT ROWID;
 
 
 /* Add fundamental types */
@@ -52,7 +52,7 @@ CREATE TABLE property (
   version TEXT,
   deprecated_version TEXT,
   PRIMARY KEY(owner_id, property_id)
-);
+) WITHOUT ROWID;
 
 /* Check property:owner_id is not fundamental */
 CREATE TRIGGER property_check_owner_id BEFORE INSERT ON property
@@ -79,7 +79,7 @@ CREATE TABLE child_property (
   version TEXT,
   deprecated_version TEXT,
   PRIMARY KEY(owner_id, property_id)
-);
+) WITHOUT ROWID;
 
 
 /* Signal
@@ -87,13 +87,13 @@ CREATE TABLE child_property (
  * TODO: Add check to make sure signal:owner_type is not fundamental
  */
 CREATE TABLE signal (
-  owner_id TEXT REFERENCES type(type_id),
+  owner_id TEXT REFERENCES type,
   signal_id TEXT NOT NULL,
 
   version TEXT,
   deprecated_version TEXT,
   PRIMARY KEY(owner_id, signal_id)
-);
+) WITHOUT ROWID;
 
 
 /** Project Data Model  **/
@@ -122,7 +122,7 @@ CREATE TABLE object_property (
   translatable BOOLEAN,
   PRIMARY KEY(object_id, owner_id, property_id),
   FOREIGN KEY(owner_id, property_id) REFERENCES property
-);
+) WITHOUT ROWID;
 
 
 /* Object Child Property
@@ -138,7 +138,7 @@ CREATE TABLE object_child_property (
   translatable BOOLEAN,
   PRIMARY KEY(object_id, child_id, owner_id, property_id),
   FOREIGN KEY(owner_id, property_id) REFERENCES child_property
-);
+) WITHOUT ROWID;
 
 
 /* Object Signal
@@ -156,7 +156,7 @@ CREATE TABLE object_signal (
   after BOOLEAN,
   PRIMARY KEY(object_id, owner_id, signal_id),
   FOREIGN KEY(owner_id, signal_id) REFERENCES signal
-);
+) WITHOUT ROWID;
 
 
 /* Interface
@@ -185,7 +185,7 @@ CREATE TABLE interface_object (
 
   template TEXT,
   PRIMARY KEY(interface_id, object_id)
-);
+) WITHOUT ROWID;
 
 /*
  * Implement undo/redo stack with triggers
