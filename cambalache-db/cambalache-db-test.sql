@@ -11,7 +11,7 @@
 INSERT INTO catalog (catalog_id, version) VALUES
 ('gtk3', '3.24');
 
-INSERT INTO type (catalog_id, type_id, parent) VALUES
+INSERT INTO type (catalog_id, type_id, parent_id) VALUES
 ('gtk3', 'GtkWidget', 'object'),
 ('gtk3', 'GtkWindow', 'GtkWidget'),
 ('gtk3', 'GtkImage', 'GtkWidget'),

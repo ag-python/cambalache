@@ -15,6 +15,7 @@ def db_create_history_table(c, table):
     c.executescript(f'''
 CREATE TABLE history_{table} AS SELECT * FROM {table} WHERE 0;
 ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history ON DELETE CASCADE;
+CREATE INDEX history_{table}_history_id_fk ON history_{table} (history_id);
 ''')
 
     # Get table columns

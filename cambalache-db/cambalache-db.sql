@@ -29,6 +29,8 @@ CREATE TABLE catalog (
   license_text TEXT
 ) WITHOUT ROWID;
 
+CREATE INDEX catalog_license_id_fk ON catalog (license_id);
+
 
 /* Catalog dependecies
  *
@@ -47,12 +49,15 @@ CREATE TABLE catalog_dependency (
 CREATE TABLE type (
   type_id TEXT PRIMARY KEY,
 
-  parent TEXT REFERENCES type,
+  parent_id TEXT REFERENCES type,
   catalog_id TEXT REFERENCES catalog,
   get_type TEXT,
   version TEXT,
   deprecated_version TEXT
 ) WITHOUT ROWID;
+
+CREATE INDEX type_parent_id_fk ON type (parent_id);
+CREATE INDEX type_catalog_id_fk ON type (catalog_id);
 
 
 /* Add fundamental types */
@@ -78,12 +83,14 @@ CREATE TABLE property (
   PRIMARY KEY(owner_id, property_id)
 ) WITHOUT ROWID;
 
+CREATE INDEX property_type_id_fk ON property (type_id);
+
 /* Check property:owner_id is not fundamental */
 CREATE TRIGGER on_property_before_insert_check BEFORE INSERT ON property
 BEGIN
   SELECT
     CASE
-      WHEN (SELECT parent FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
+      WHEN (SELECT parent_id FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
             RAISE (ABORT,'owner_id is not an object type')
     END;
 END;
@@ -105,6 +112,8 @@ CREATE TABLE child_property (
   PRIMARY KEY(owner_id, property_id)
 ) WITHOUT ROWID;
 
+CREATE INDEX child_property_type_id_fk ON child_property (type_id);
+
 
 /* Signal
  *
@@ -123,7 +132,7 @@ CREATE TRIGGER on_signal_before_insert_check BEFORE INSERT ON signal
 BEGIN
   SELECT
     CASE
-      WHEN (SELECT parent FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
+      WHEN (SELECT parent_id FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
             RAISE (ABORT,'owner_id is not an object type')
     END;
 END;
@@ -142,6 +151,8 @@ CREATE TABLE object (
   parent_id INTEGER REFERENCES object
 );
 
+CREATE INDEX object_type_id_fk ON object (type_id);
+
 
 /* Object Property
  *
@@ -156,6 +167,8 @@ CREATE TABLE object_property (
   PRIMARY KEY(object_id, owner_id, property_id),
   FOREIGN KEY(owner_id, property_id) REFERENCES property
 ) WITHOUT ROWID;
+
+CREATE INDEX object_property_property_fk ON object_property (owner_id, property_id);
 
 
 /* Object Child Property
@@ -172,6 +185,8 @@ CREATE TABLE object_child_property (
   PRIMARY KEY(object_id, child_id, owner_id, property_id),
   FOREIGN KEY(owner_id, property_id) REFERENCES child_property
 ) WITHOUT ROWID;
+
+CREATE INDEX object_child_property_child_property_fk ON object_child_property (owner_id, property_id);
 
 
 /* Object Signal
@@ -191,6 +206,8 @@ CREATE TABLE object_signal (
   FOREIGN KEY(owner_id, signal_id) REFERENCES signal
 ) WITHOUT ROWID;
 
+CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
+
 
 /* Interface
  *
@@ -206,6 +223,8 @@ CREATE TABLE interface (
   filename TEXT,
   translation_domain TEXT
 );
+
+CREATE INDEX interface_license_id_fk ON interface (license_id);
 
 
 /* Interface Object
@@ -253,3 +272,4 @@ CREATE TABLE history (
   table_name TEXT
 );
 
+CREATE INDEX history_history_group_id_fk ON history (history_group_id);
