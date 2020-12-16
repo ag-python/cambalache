@@ -13,12 +13,18 @@ INSERT INTO catalog (catalog_id, version) VALUES
 
 INSERT INTO type (catalog_id, type_id, parent_id) VALUES
 ('gtk3', 'GtkWidget', 'object'),
+('gtk3', 'GtkBuildable', 'interface'),
+('gtk3', 'GtkActionable', 'interface'),
 ('gtk3', 'GtkWindow', 'GtkWidget'),
 ('gtk3', 'GtkImage', 'GtkWidget'),
 ('gtk3', 'GtkBox', 'GtkWidget'),
 ('gtk3', 'GtkLabel', 'GtkWidget'),
 ('gtk3', 'GtkButton', 'GtkWidget'),
 ('gtk3', 'GtkToggleButton', 'GtkButton');
+
+INSERT INTO type_iface (type_id, iface_id) VALUES
+('GtkWidget', 'GtkBuildable'),
+('GtkButton', 'GtkActionable');
 
 INSERT INTO property (owner_id, property_id, type_id) VALUES
 ('GtkWidget', 'name', 'string'),
@@ -70,9 +76,9 @@ INSERT INTO object_signal (object_id, owner_id, signal_id, handler) VALUES
 (4, 'GtkButton', 'clicked', 'on_button_clicked'),
 (5, 'GtkButton', 'clicked', 'on_todelete_clicked');
 
-INSERT INTO interface (name, filename) VALUES ('Test UI', 'test.ui');
+INSERT INTO ui (name, filename) VALUES ('Test UI', 'test.ui');
 
-INSERT INTO interface_object (interface_id, object_id) VALUES (1, 1);
+INSERT INTO ui_object (ui_id, object_id) VALUES (1, 1);
 
 
 /* Test history */
@@ -93,4 +99,5 @@ UPDATE history_group SET done=1 WHERE history_group_id=1;
 
 /* Delete an object, it should also delete all properties, signals, etc */
 DELETE FROM object WHERE name = 'todelete';
+
 

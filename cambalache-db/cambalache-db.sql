@@ -59,12 +59,44 @@ CREATE TABLE type (
 CREATE INDEX type_parent_id_fk ON type (parent_id);
 CREATE INDEX type_catalog_id_fk ON type (catalog_id);
 
+/* Type Interfaces
+ *
+ * Keep a list of interfaces implemented by type
+ */
+CREATE TABLE type_iface (
+  type_id TEXT,
+  iface_id TEXT REFERENCES type,
+  PRIMARY KEY(type_id, iface_id)
+) WITHOUT ROWID;
+
+
+/* Type Tree
+ *
+ * VIEW of ancestors and ifaces by type
+ */
+CREATE VIEW type_tree AS
+WITH RECURSIVE ancestor(type_id, generation, parent_id) AS (
+  SELECT type_id, 1, parent_id FROM type
+    WHERE parent_id IS NOT NULL AND parent_id != 'interface'
+  UNION ALL
+  SELECT ancestor.type_id, generation + 1, type.parent_id
+    FROM type JOIN ancestor ON type.type_id = ancestor.parent_id
+    WHERE type.parent_id IS NOT NULL
+)
+SELECT * FROM ancestor
+UNION
+SELECT ancestor.type_id, 0, type_iface.iface_id
+  FROM ancestor JOIN type_iface
+  WHERE ancestor.parent_id = type_iface.type_id
+ORDER BY type_id,generation;
+
 
 /* Add fundamental types */
 INSERT INTO type (type_id) VALUES
- ('char'), ('uchar'), ('boolean'), ('int'), ('uint'), ('long'), ('ulong'),
- ('int64'), ('uint64'), ('enum'), ('flags'), ('float'), ('double'), ('string'),
- ('pointer'), ('boxed'), ('param'), ('object'), ('gtype'), ('variant');
+ ('interface'), ('char'), ('uchar'), ('boolean'), ('int'), ('uint'), ('long'),
+ ('ulong'), ('int64'), ('uint64'), ('enum'), ('flags'), ('float'), ('double'),
+ ('string'), ('pointer'), ('boxed'), ('param'), ('object'), ('gtype'),
+ ('variant');
 
 
 /* Property
@@ -142,6 +174,7 @@ END;
 
 /* Object
  *
+ * TODO: check type_id is an object
  */
 CREATE TABLE object (
   object_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -156,6 +189,7 @@ CREATE INDEX object_type_id_fk ON object (type_id);
 
 /* Object Property
  *
+ * TODO: check owner_id is in object_id.type_id type tree
  */
 CREATE TABLE object_property (
   object_id INTEGER REFERENCES object ON DELETE CASCADE,
@@ -173,6 +207,7 @@ CREATE INDEX object_property_property_fk ON object_property (owner_id, property_
 
 /* Object Child Property
  *
+ * TODO: check owner_id is in object_id.type_id type tree
  */
 CREATE TABLE object_child_property (
   object_id INTEGER REFERENCES object ON DELETE CASCADE,
@@ -191,6 +226,7 @@ CREATE INDEX object_child_property_child_property_fk ON object_child_property (o
 
 /* Object Signal
  *
+ * TODO: check owner_id is in object_id.type_id type tree
  */
 CREATE TABLE object_signal (
   object_id INTEGER REFERENCES object ON DELETE CASCADE,
@@ -209,11 +245,11 @@ CREATE TABLE object_signal (
 CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
 
 
-/* Interface
+/* UI
  *
  */
-CREATE TABLE interface (
-  interface_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE ui (
+  ui_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
   name TEXT,
   description TEXT,
@@ -224,22 +260,22 @@ CREATE TABLE interface (
   translation_domain TEXT
 );
 
-CREATE INDEX interface_license_id_fk ON interface (license_id);
+CREATE INDEX ui_license_id_fk ON ui (license_id);
 
 
-/* Interface Object
+/* ui Object
  *
  */
-CREATE TABLE interface_object (
-  interface_id INTEGER REFERENCES interface ON DELETE CASCADE,
+CREATE TABLE ui_object (
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER REFERENCES object ON DELETE CASCADE,
 
   template TEXT,
-  PRIMARY KEY(interface_id, object_id)
+  PRIMARY KEY(ui_id, object_id)
 ) WITHOUT ROWID;
 
 /* Check objects are toplevels (have no parent) */
-CREATE TRIGGER on_interface_object_before_insert_check BEFORE INSERT ON interface_object
+CREATE TRIGGER on_ui_object_before_insert_check BEFORE INSERT ON ui_object
 BEGIN
   SELECT
     CASE

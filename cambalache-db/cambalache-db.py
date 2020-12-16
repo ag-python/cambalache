@@ -121,8 +121,8 @@ def db_create_history_tables(conn):
     db_create_history_table(c, 'object_property')
     db_create_history_table(c, 'object_child_property')
     db_create_history_table(c, 'object_signal')
-    db_create_history_table(c, 'interface')
-    db_create_history_table(c, 'interface_object')
+    db_create_history_table(c, 'ui')
+    db_create_history_table(c, 'ui_object')
     conn.commit()
 
 
