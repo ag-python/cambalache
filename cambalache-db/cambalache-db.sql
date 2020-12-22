@@ -59,6 +59,15 @@ CREATE TABLE type (
 CREATE INDEX type_parent_id_fk ON type (parent_id);
 CREATE INDEX type_catalog_id_fk ON type (catalog_id);
 
+
+/* Add fundamental types */
+INSERT INTO type (type_id) VALUES
+ ('object'), ('interface'), ('enum'), ('flags'), ('gchar'), ('guchar'),
+ ('gboolean'), ('gint'), ('guint'), ('glong'), ('gulong'), ('gint64'),
+ ('guint64'), ('gfloat'), ('gdouble'), ('utf8'), ('gpointer'), ('gboxed'),
+ ('gparam'), ('gtype'), ('gvariant');
+
+
 /* Type Interfaces
  *
  * Keep a list of interfaces implemented by type
@@ -70,6 +79,32 @@ CREATE TABLE type_iface (
 ) WITHOUT ROWID;
 
 
+/* Enumerations
+ *
+ */
+CREATE TABLE type_enum (
+  type_id TEXT REFERENCES type,
+  name TEXT,
+  value INTEGER,
+  identifier TEXT,
+  doc TEXT,
+  PRIMARY KEY(type_id, name)
+) WITHOUT ROWID;
+
+
+/* Flags
+ *
+ */
+CREATE TABLE type_flags (
+  type_id TEXT REFERENCES type,
+  name TEXT,
+  value INTEGER,
+  identifier TEXT,
+  doc TEXT,
+  PRIMARY KEY(type_id, name)
+) WITHOUT ROWID;
+
+
 /* Type Tree
  *
  * VIEW of ancestors and ifaces by type
@@ -77,7 +112,10 @@ CREATE TABLE type_iface (
 CREATE VIEW type_tree AS
 WITH RECURSIVE ancestor(type_id, generation, parent_id) AS (
   SELECT type_id, 1, parent_id FROM type
-    WHERE parent_id IS NOT NULL AND parent_id != 'interface'
+    WHERE parent_id IS NOT NULL AND
+          parent_id != 'interface' AND
+          parent_id != 'enum' AND
+          parent_id != 'flags'
   UNION ALL
   SELECT ancestor.type_id, generation + 1, type.parent_id
     FROM type JOIN ancestor ON type.type_id = ancestor.parent_id
@@ -89,14 +127,6 @@ SELECT ancestor.type_id, 0, type_iface.iface_id
   FROM ancestor JOIN type_iface
   WHERE ancestor.parent_id = type_iface.type_id
 ORDER BY type_id,generation;
-
-
-/* Add fundamental types */
-INSERT INTO type (type_id) VALUES
- ('interface'), ('char'), ('uchar'), ('boolean'), ('int'), ('uint'), ('long'),
- ('ulong'), ('int64'), ('uint64'), ('enum'), ('flags'), ('float'), ('double'),
- ('string'), ('pointer'), ('boxed'), ('param'), ('object'), ('gtype'),
- ('variant');
 
 
 /* Property
