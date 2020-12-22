@@ -34,27 +34,29 @@ class GirData:
         # Get <namespace/>
         namespace = root.find('namespace', nsmap)
 
-        # Save as module
-        self.ns_name = namespace.get('name')
-        self.ns_version = namespace.get('version')
-        self.ns_library = namespace.get('shared-library')
+        # Get module/name space data
+        self.name = namespace.get('name')
+        self.version = namespace.get('version')
+        self.shared_library = namespace.get('shared-library')
 
-        # Dictionary of all types to import
+        # Dictionary of all classes/types
         self.types = self._get_types(namespace)
 
-        # Dictionary of all enumerations to import
+        # Dictionary of all enumerations
         self.enumerations = self._get_enumerations(namespace)
 
-        # Dictionary of all flags to import
+        # Dictionary of all flags
         self.flags = self._get_flags(namespace)
 
-        # Dictionary of all interfaces to import
+        # Dictionary of all interfaces
         self.ifaces = self._get_ifaces(namespace)
 
+        # Types dependency graph
         types_deps = {}
         for gtype in self.types:
             types_deps[gtype] = { self.types[gtype]['parent'] }
 
+        # Types in topological order, to avoid FK errors
         self.sorted_types = toposort_flatten(types_deps)
 
     def _type_get_properties (self, element):
@@ -75,7 +77,7 @@ class GirData:
 
             # FIXME: Crappy test to see if types refers to an object
             if type_name[0].isupper():
-                type_name = self.ns_name + type_name
+                type_name = self.name + type_name
 
             retval[name] = {
                 'type': type_name,
@@ -105,7 +107,7 @@ class GirData:
         for child in element.iterfind('implements', nsmap):
             name = child.get('name')
             if name.find('.') < 0:
-                retval.append(self.ns_name + name)
+                retval.append(self.name + name)
 
         return retval
 
@@ -113,7 +115,7 @@ class GirData:
         parent = element.get('parent')
 
         if parent.find('.') < 0:
-            parent = self.ns_name + parent
+            parent = self.name + parent
 
         # Get version and deprecated-version from constructor if possible
         constructor = element.find('constructor', nsmap)
@@ -198,7 +200,7 @@ class GirData:
         def db_insert_enum_flags(conn, name, data):
             parent = data['parent']
             conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id) VALUES (?, ?, ?);",
-                         (self.ns_name, name, parent))
+                         (self.name, name, parent))
 
             members = data['members']
             for member in members:
@@ -210,7 +212,7 @@ class GirData:
         def db_insert_iface(conn, name, data):
             parent = data['parent']
             conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id) VALUES (?, ?, ?);",
-                         (self.ns_name, name, parent))
+                         (self.name, name, parent))
 
 
         def db_insert_type(conn, name, data):
@@ -219,8 +221,8 @@ class GirData:
             if parent.find('.') >= 0:
                 parent = 'object'
 
-            conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id, get_type, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?);",
-                         (self.ns_name, name, parent, data['get_type'], data['version'], data['deprecated_version']))
+            conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id, get_type, version, deprecated_version, abstract) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                         (self.name, name, parent, data['get_type'], data['version'], data['deprecated_version'], data['abstract']))
 
 
         def db_insert_type_data(conn, name, data):
@@ -230,7 +232,7 @@ class GirData:
                 prop_type = p['type']
 
                 # Ignore unknown types (Propably GBoxed)
-                if prop_type.startswith(self.ns_name) and prop_type not in self.types:
+                if prop_type.startswith(self.name) and prop_type not in self.types:
                     continue
 
                 conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, writable, construct_only, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?);",
@@ -247,8 +249,8 @@ class GirData:
                              (name, iface))
 
         # Import catalog
-        conn.execute(f"INSERT INTO catalog (catalog_id, version) VALUES (?, ?);",
-                     (self.ns_name, self.ns_version));
+        conn.execute(f"INSERT INTO catalog (catalog_id, version, shared_library) VALUES (?, ?, ?);",
+                     (self.name, self.version, self.shared_library));
 
         # Import ifaces
         for name in self.ifaces:

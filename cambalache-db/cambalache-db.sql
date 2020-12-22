@@ -25,6 +25,7 @@ CREATE TABLE catalog (
   catalog_id TEXT PRIMARY KEY,
   version TEXT NOT NULL,
   targetable TEXT,
+  shared_library TEXT,
   license_id TEXT REFERENCES license,
   license_text TEXT
 ) WITHOUT ROWID;
@@ -53,7 +54,8 @@ CREATE TABLE type (
   catalog_id TEXT REFERENCES catalog,
   get_type TEXT,
   version TEXT,
-  deprecated_version TEXT
+  deprecated_version TEXT,
+  abstract BOOLEAN
 ) WITHOUT ROWID;
 
 CREATE INDEX type_parent_id_fk ON type (parent_id);
