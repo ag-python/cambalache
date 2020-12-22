@@ -8,46 +8,11 @@
 
 /* Test model */
 
-INSERT INTO catalog (catalog_id, version) VALUES
-('gtk3', '3.24');
-
-INSERT INTO type (catalog_id, type_id, parent_id) VALUES
-('gtk3', 'GtkWidget', 'object'),
-('gtk3', 'GtkBuildable', 'interface'),
-('gtk3', 'GtkActionable', 'interface'),
-('gtk3', 'GtkWindow', 'GtkWidget'),
-('gtk3', 'GtkImage', 'GtkWidget'),
-('gtk3', 'GtkBox', 'GtkWidget'),
-('gtk3', 'GtkLabel', 'GtkWidget'),
-('gtk3', 'GtkButton', 'GtkWidget'),
-('gtk3', 'GtkToggleButton', 'GtkButton');
-
-INSERT INTO type_iface (type_id, iface_id) VALUES
-('GtkWidget', 'GtkBuildable'),
-('GtkButton', 'GtkActionable');
-
-INSERT INTO property (owner_id, property_id, type_id) VALUES
-('GtkWidget', 'name', 'string'),
-('GtkWidget', 'parent', 'GtkWidget'),
-('GtkImage', 'file', 'string'),
-('GtkBox', 'orientation', 'enum'),
-('GtkLabel', 'label', 'string'),
-('GtkButton', 'label', 'string'),
-('GtkButton', 'image', 'GtkImage'),
-('GtkToggleButton', 'active', 'boolean');
-
+/* Child properties are not defined in Gir, need to get them from GType system */
 INSERT INTO child_property (owner_id, property_id, type_id) VALUES
-('GtkBox', 'position', 'int'),
-('GtkBox', 'expand', 'boolean'),
-('GtkBox', 'fill', 'boolean');
-
-
-INSERT INTO signal (owner_id, signal_id) VALUES
-('GtkWidget', 'event'),
-('GtkBox', 'add'),
-('GtkBox', 'remove'),
-('GtkButton', 'clicked'),
-('GtkToggleButton', 'toggled');
+('GtkBox', 'position', 'gint'),
+('GtkBox', 'expand', 'gboolean'),
+('GtkBox', 'fill', 'gboolean');
 
 /* Test Project */
 

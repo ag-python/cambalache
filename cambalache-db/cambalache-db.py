@@ -9,6 +9,7 @@
 import sys
 import sqlite3
 
+import gir
 
 def db_create_history_table(c, table):
     # Create a history table to store data for INSERT and DELETE commands
@@ -149,10 +150,14 @@ def db_create(filename):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"Ussage: {sys.argv[0]} database.sqlite")
+    if len(sys.argv) < 3:
+        print(f"Ussage: {sys.argv[0]} database.sqlite library.gir")
         exit()
 
     conn = db_create(sys.argv[1])
+
+    lib = gir.GirData(sys.argv[2])
+    lib.populate_db(conn)
+
     conn.commit()
     conn.close()
