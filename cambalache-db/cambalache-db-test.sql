@@ -53,16 +53,17 @@ UPDATE object_property SET value ='Hello World 3' WHERE (object_id=3 AND owner_i
 UPDATE object_property SET value ='Hola Mundo!!!' WHERE (object_id=6 AND owner_id='GtkLabel' AND property_id='label');
 
 /* Push history group */
-INSERT INTO history_group (description) VALUES ('Group 1');
+INSERT INTO history (command, data) VALUES ('PUSH', 'Update several props');
 
-UPDATE object_property SET value ='Hello World 4' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
-UPDATE object_property SET value ='Click Me 2' WHERE (object_id=4 AND owner_id='GtkButton' AND property_id='label');
 UPDATE object_property SET value ='Do not Click Me' WHERE (object_id=5 AND owner_id='GtkButton' AND property_id='label');
-
-/* Pop history group */
-UPDATE history_group SET done=1 WHERE history_group_id=1;
+UPDATE object_property SET value ='Hello World 4' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
 
 /* Delete an object, it should also delete all properties, signals, etc */
 DELETE FROM object WHERE name = 'todelete';
+
+UPDATE object_property SET value ='Click Me 2' WHERE (object_id=4 AND owner_id='GtkButton' AND property_id='label');
+
+/* Pop history group */
+INSERT INTO history (command) VALUES ('POP');
 
 

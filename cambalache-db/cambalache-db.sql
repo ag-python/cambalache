@@ -325,19 +325,28 @@ END;
  * history_* tables and triggers are auto generated to avoid copy/paste errors
  */
 
-/* Main history tables */
-
-CREATE TABLE history_group (
-  history_group_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  done BOOLEAN,
-  description TEXT
-);
+/* Main history table */
 
 CREATE TABLE history (
   history_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  history_group_id INTEGER REFERENCES history_group,
-  command TEXT,
-  table_name TEXT
+  command TEXT NOT NULL,
+  range_id INTEGER REFERENCES history,
+  data TEXT
 );
 
-CREATE INDEX history_history_group_id_fk ON history (history_group_id);
+/* This trigger will update PUSH/POP range and data automatically on POP */
+CREATE TRIGGER on_history_pop_insert AFTER INSERT ON history
+WHEN
+  NEW.command is 'POP'
+BEGIN
+/* Update range_id and data(message) from last PUSH command */
+  UPDATE history
+  SET (range_id, data)=(SELECT history_id, data FROM history WHERE command='PUSH' AND range_id IS NULL ORDER BY history_id DESC LIMIT 1)
+  WHERE history_id = NEW.history_id;
+
+/* Update range_id in last PUSH command */
+  UPDATE history
+  SET range_id=NEW.history_id
+  WHERE history_id=(SELECT range_id FROM history WHERE history_id = NEW.history_id);
+END;
+

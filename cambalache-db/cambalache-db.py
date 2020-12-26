@@ -11,7 +11,7 @@ import sqlite3
 
 import gir
 
-def db_create_history_table(c, table):
+def db_create_history_table(c, table, group_msg=None):
     # Create a history table to store data for INSERT and DELETE commands
     c.executescript(f'''
 CREATE TABLE history_{table} AS SELECT * FROM {table} WHERE 0;
@@ -45,28 +45,35 @@ CREATE INDEX history_{table}_history_id_fk ON history_{table} (history_id);
         if not pk:
             non_pk_columns.append(col)
 
-    # Create history triggers
-    select_history_group_id = "(SELECT history_group_id FROM history_group WHERE history_group_id=(SELECT seq FROM sqlite_sequence WHERE name='history_group') AND done IS NULL)"
-
     # INSERT Trigger
     c.execute(f'''
 CREATE TRIGGER on_{table}_insert AFTER INSERT ON {table}
 BEGIN
-  INSERT INTO history (history_group_id, command, table_name)
-    VALUES ({select_history_group_id}, 'INSERT', '{table}');
+  INSERT INTO history (command, data) VALUES ('INSERT', '{table}');
   INSERT INTO history_{table} (history_id, {columns})
     VALUES (last_insert_rowid(), {new_values});
 END;
     ''')
 
     # DELETE Trigger
+    if group_msg:
+        c.execute(f'''
+CREATE TRIGGER on_{table}_before_delete BEFORE DELETE ON {table}
+BEGIN
+  INSERT INTO history (command, data) VALUES ('PUSH', {group_msg});
+END;
+        ''')
+        pop = f"INSERT INTO history (command) VALUES ('POP');"
+    else:
+        pop = ''
+
     c.execute(f'''
 CREATE TRIGGER on_{table}_delete AFTER DELETE ON {table}
 BEGIN
-  INSERT INTO history (history_group_id, command, table_name)
-    VALUES ({select_history_group_id}, 'DELETE', '{table}');
+  INSERT INTO history (command, data) VALUES ('DELETE', '{table}');
   INSERT INTO history_{table} (history_id, {columns})
     VALUES (last_insert_rowid(), {old_values});
+  {pop}
 END;
     ''')
 
@@ -89,14 +96,13 @@ END;
         c.execute(f'''
 CREATE TRIGGER on_{table}_update_{column} AFTER UPDATE OF {column} ON {table}
 WHEN
-  (SELECT history_group_id, command, table_name FROM history WHERE history_id = {last_history_id})
-    IS NOT ({select_history_group_id}, 'UPDATE', '{table}')
+  (SELECT command, data FROM history WHERE history_id = {last_history_id})
+    IS NOT ('UPDATE', '{table}')
     OR
   (SELECT {all_but_column} FROM history_{table} WHERE history_id = {last_history_id})
     IS NOT ({all_but_column_values})
 BEGIN
-  INSERT INTO history (history_group_id, command, table_name)
-    VALUES ({select_history_group_id}, 'UPDATE', '{table}');
+  INSERT INTO history (command, data) VALUES ('UPDATE', '{table}');
   INSERT INTO history_{table} (history_id, {columns})
     VALUES (last_insert_rowid(), {new_values});
 END;
@@ -105,8 +111,8 @@ END;
         c.execute(f'''
 CREATE TRIGGER on_{table}_update_{column}_compress AFTER UPDATE OF {column} ON {table}
 WHEN
-  (SELECT history_group_id, command, table_name FROM history WHERE history_id = {last_history_id})
-    IS ({select_history_group_id}, 'UPDATE', '{table}')
+  (SELECT command, data FROM history WHERE history_id = {last_history_id})
+    IS ('UPDATE', '{table}')
     AND
   (SELECT {all_but_column} FROM history_{table} WHERE history_id = {last_history_id})
     IS ({all_but_column_values})
@@ -118,7 +124,8 @@ END;
 
 def db_create_history_tables(conn):
     c = conn.cursor()
-    db_create_history_table(c, 'object')
+    db_create_history_table(c, 'object',
+                            "printf('Delete object %s:%s', OLD.type_id, OLD.name)")
     db_create_history_table(c, 'object_property')
     db_create_history_table(c, 'object_child_property')
     db_create_history_table(c, 'object_signal')
