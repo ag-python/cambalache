@@ -55,7 +55,8 @@ CREATE TABLE type (
   get_type TEXT,
   version TEXT,
   deprecated_version TEXT,
-  abstract BOOLEAN
+  abstract BOOLEAN,
+  layout TEXT CHECK (layout IN ('manager', 'child'))
 ) WITHOUT ROWID;
 
 CREATE INDEX type_parent_id_fk ON type (parent_id);
@@ -64,10 +65,12 @@ CREATE INDEX type_catalog_id_fk ON type (catalog_id);
 
 /* Add fundamental types */
 INSERT INTO type (type_id) VALUES
- ('object'), ('interface'), ('enum'), ('flags'), ('gchar'), ('guchar'),
- ('gboolean'), ('gint'), ('guint'), ('glong'), ('gulong'), ('gint64'),
- ('guint64'), ('gfloat'), ('gdouble'), ('utf8'), ('gpointer'), ('gboxed'),
- ('gparam'), ('gtype'), ('gvariant');
+ ('object'), ('interface'), ('enum'), ('flags'), ('gtype'),
+ ('gchar'), ('guchar'), ('gchararray'),
+ ('gboolean'),
+ ('gint'), ('guint'), ('glong'), ('gulong'), ('gint64'), ('guint64'),
+ ('gfloat'), ('gdouble'),
+ ('gpointer'), ('gboxed'), ('gparam'), ('gvariant');
 
 
 /* Type Interfaces
@@ -115,6 +118,7 @@ CREATE VIEW type_tree AS
 WITH RECURSIVE ancestor(type_id, generation, parent_id) AS (
   SELECT type_id, 1, parent_id FROM type
     WHERE parent_id IS NOT NULL AND
+          layout IS NULL AND
           parent_id != 'interface' AND
           parent_id != 'enum' AND
           parent_id != 'flags'
@@ -158,25 +162,6 @@ BEGIN
             RAISE (ABORT,'owner_id is not an object type')
     END;
 END;
-
-
-/* Child Property
- *
- */
-CREATE TABLE child_property (
-  owner_id TEXT REFERENCES type,
-  property_id TEXT NOT NULL,
-
-  type_id TEXT REFERENCES type,
-  writable BOOLEAN,
-  construct_only BOOLEAN,
-  default_value TEXT,
-  version TEXT,
-  deprecated_version TEXT,
-  PRIMARY KEY(owner_id, property_id)
-) WITHOUT ROWID;
-
-CREATE INDEX child_property_type_id_fk ON child_property (type_id);
 
 
 /* Signal
@@ -250,7 +235,7 @@ CREATE TABLE object_child_property (
   value TEXT,
   translatable BOOLEAN,
   PRIMARY KEY(object_id, child_id, owner_id, property_id),
-  FOREIGN KEY(owner_id, property_id) REFERENCES child_property
+  FOREIGN KEY(owner_id, property_id) REFERENCES property
 ) WITHOUT ROWID;
 
 CREATE INDEX object_child_property_child_property_fk ON object_child_property (owner_id, property_id);

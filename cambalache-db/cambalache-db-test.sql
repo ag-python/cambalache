@@ -6,19 +6,11 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  */
 
-/* Test model */
-
-/* Child properties are not defined in Gir, need to get them from GType system */
-INSERT INTO child_property (owner_id, property_id, type_id) VALUES
-('GtkBox', 'position', 'gint'),
-('GtkBox', 'expand', 'gboolean'),
-('GtkBox', 'fill', 'gboolean');
-
 /* Test Project */
 
 INSERT INTO object (type_id, name, parent_id) VALUES
 ('GtkWindow', 'main', NULL),
-('GtkBox', 'box', 1),
+('GtkGrid', 'grid', 1),
 ('GtkLabel', 'label', 2),
 ('GtkButton', 'button', 2),
 ('GtkButton', 'todelete', 2),
@@ -31,11 +23,12 @@ INSERT INTO object_property (object_id, owner_id, property_id, value) VALUES
 (6, 'GtkLabel', 'label', 'Hola Mundo');
 
 INSERT INTO object_child_property (object_id, child_id, owner_id, property_id, value) VALUES
-(1, 3, 'GtkBox', 'position', 1),
-(1, 3, 'GtkBox', 'expand', 1),
-(1, 4, 'GtkBox', 'position', 2),
-(1, 4, 'GtkBox', 'fill', 0),
-(1, 5, 'GtkBox', 'position', 3);
+(1, 3, 'GtkGridLayoutChild', 'column', 1),
+(1, 3, 'GtkGridLayoutChild', 'row', 1),
+(1, 4, 'GtkGridLayoutChild', 'column', 2),
+(1, 4, 'GtkGridLayoutChild', 'row', 1),
+(1, 5, 'GtkGridLayoutChild', 'column', 1),
+(1, 5, 'GtkGridLayoutChild', 'row', 2);
 
 INSERT INTO object_signal (object_id, owner_id, signal_id, handler) VALUES
 (4, 'GtkButton', 'clicked', 'on_button_clicked'),
