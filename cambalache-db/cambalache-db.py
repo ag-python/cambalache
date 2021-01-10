@@ -13,6 +13,7 @@ import sqlite3
 import gir
 
 from lxml import etree
+from lxml.builder import E
 
 
 def db_create_history_table(c, table, group_msg=None):
@@ -274,6 +275,69 @@ def db_import(conn, filename):
         conn.commit()
 
 
+def db_export_ui(conn, ui_id, filename):
+    def node_set(node, attr, val):
+        if val is not None:
+            node.set(attr, str(val))
+
+    def get_object(conn, object_id):
+        c = conn.cursor()
+        obj = E.object()
+
+        c.execute('SELECT type_id, name FROM object WHERE object_id=?;', (object_id,))
+        row = c.fetchone()
+        node_set(obj, 'class', row[0])
+        node_set(obj, 'id', row[1])
+
+        # Properties
+        for row in c.execute('SELECT value, property_id FROM object_property WHERE object_id=?;', (object_id,)):
+            obj.append(E.property(row[0], name=row[1]))
+
+        # Signals
+        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE object_id=user_data), swap, after FROM object_signal WHERE object_id=?;', (object_id,)):
+            node = E.signal(name=row[0], handler=row[1])
+            node_set(node, 'object', row[3])
+            node_set(node, 'swapped', row[4])
+            node_set(node, 'after', row[5])
+            obj.append(node)
+
+        # Children
+        for row in c.execute('SELECT object_id FROM object WHERE parent_id=?;', (object_id,)):
+            obj.append(E.child(get_object(conn, row[0])))
+
+        c.close()
+        return obj
+
+    c = conn.cursor()
+
+    node = E.interface()
+
+    # Iterate over toplovel objects
+    for row in c.execute('SELECT object_id, template FROM ui_object WHERE ui_id=?;',
+                         (ui_id,)):
+        child = get_object(conn, row[0])
+        node.append(child)
+
+    c.close()
+
+    # Dump xml to file
+    with open(filename, 'wb') as xml:
+        xml.write(etree.tostring(node,
+                                 pretty_print=True,
+                                 xml_declaration=True,
+                                 encoding='UTF-8'))
+        xml.close()
+
+
+def db_export(conn):
+    c = conn.cursor()
+
+    for row in c.execute('SELECT ui_id, filename FROM ui;'):
+        db_export_ui(conn, row[0], row[1] + '.test.ui')
+
+    c.close()
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(f"Ussage: {sys.argv[0]} database.sqlite library.gir")
@@ -284,8 +348,9 @@ if __name__ == "__main__":
     lib = gir.GirData(sys.argv[2])
     lib.populate_db(conn)
 
-    if sys.argv[3]:
+    if len(sys.argv) >= 4:
         db_import(conn, sys.argv[3])
+        conn.commit()
+        db_export(conn)
 
-    conn.commit()
     conn.close()
