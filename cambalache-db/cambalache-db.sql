@@ -118,7 +118,6 @@ CREATE VIEW type_tree AS
 WITH RECURSIVE ancestor(type_id, generation, parent_id) AS (
   SELECT type_id, 1, parent_id FROM type
     WHERE parent_id IS NOT NULL AND
-          layout IS NULL AND
           parent_id != 'interface' AND
           parent_id != 'enum' AND
           parent_id != 'flags'
@@ -255,9 +254,8 @@ CREATE TABLE object_signal (
   user_data INTEGER REFERENCES object ON DELETE SET NULL,
   swap BOOLEAN,
   after BOOLEAN,
-  PRIMARY KEY(object_id, owner_id, signal_id),
   FOREIGN KEY(owner_id, signal_id) REFERENCES signal
-) WITHOUT ROWID;
+);
 
 CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
 
