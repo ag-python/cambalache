@@ -6,10 +6,14 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 #
 
+import os
 import sys
 import sqlite3
 
 import gir
+
+from lxml import etree
+
 
 def db_create_history_table(c, table, group_msg=None):
     # Create a history table to store data for INSERT and DELETE commands
@@ -156,6 +160,120 @@ def db_create(filename):
     return conn
 
 
+def db_import_object(c, lib, ui_id, node, parent_id):
+    klass = node.get('class')
+    name = node.get('id')
+
+    # Insert object
+    c.execute("INSERT INTO object (type_id, name, parent_id) VALUES (?, ?, ?);",
+              (klass, name, parent_id))
+    object_id = c.lastrowid
+
+    # Insert object to ui
+    if ui_id:
+        c.execute("INSERT INTO ui_object (ui_id, object_id) VALUES (?, ?);",
+                  (ui_id, object_id))
+
+    # Properties
+    for prop in node.iterfind('property'):
+        property_id = prop.get('name')
+        translatable = prop.get('translatable', None)
+
+        # Find owner type for property
+        c.execute("SELECT owner_id FROM property WHERE property_id=? AND owner_id IN (SELECT parent_id FROM type_tree WHERE type_id=? UNION SELECT ?);",
+                  (property_id, klass, klass))
+        owner_id = c.fetchone()
+
+        # Insert property
+        if owner_id:
+            c.execute("INSERT INTO object_property (object_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?);",
+                      (object_id, owner_id[0], property_id, prop.text, translatable))
+        else:
+            print(f'Could not find owner type for {klass}:{property_id}')
+
+    # Signals
+    for signal in node.iterfind('signal'):
+        tokens = signal.get('name').split('::')
+
+        if len(tokens) > 1:
+            signal_id = tokens[0]
+            detail = tokens[1]
+        else:
+            signal_id = tokens[0]
+            detail = None
+
+        handler = signal.get('handler')
+        user_data = signal.get('object')
+        swap = signal.get('swapped')
+        after = signal.get('after')
+
+        # Find owner type for signal
+        c.execute("SELECT owner_id FROM signal WHERE signal_id=? AND owner_id IN (SELECT parent_id FROM type_tree WHERE type_id=? UNION SELECT ?);",
+                  (signal_id, klass, klass))
+        owner_id = c.fetchone()
+
+        # Insert signal
+        c.execute("INSERT INTO object_signal (object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE name=?), ?, ?);",
+                  (object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, user_data, swap, after))
+
+    # Children
+    for child in node.iterfind('child'):
+        obj = child.find('object')
+        if obj is not None:
+            db_import_object(c, lib, None, obj, object_id)
+
+    # Packing properties
+    if lib == 'gtk+':
+        # Gtk 3, packing props are sibling to <object>
+        packing = node.getnext()
+        if packing is not None and packing.tag != 'packing':
+            packing = None
+    elif lib == 'gtk':
+        # Gtk 4, layout props are children of <object>
+        packing = node.find('layout')
+
+    if parent_id and packing is not None:
+        c.execute("SELECT type_id FROM object WHERE object_id=?;", (parent_id, ))
+        parent_type = c.fetchone()
+
+        if parent_type is None:
+            return
+
+        if lib == 'gtk+':
+            # For Gtk 3 we fake a LayoutChild class for each GtkContainer
+            owner_id = f'Cambalache{parent_type[0]}LayoutChild'
+        elif lib == 'gtk':
+            # FIXME: Need to get layout-manager-type from class
+            owner_id = f'{parent_type[0]}LayoutChild'
+
+        for prop in packing.iterfind('property'):
+            property_id = prop.get('name')
+            translatable = prop.get('translatable', None)
+            c.execute("INSERT INTO object_child_property (object_id, child_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?);",
+                      (parent_id, object_id, owner_id, property_id, prop.text, translatable))
+
+
+def db_import(conn, filename):
+    c = conn.cursor()
+
+    c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
+              (os.path.basename(filename), filename))
+    ui_id = c.lastrowid
+
+    tree = etree.parse(filename)
+    root = tree.getroot()
+
+    requires = root.find('requires')
+    if requires is not None:
+        lib = requires.get('lib')
+    else:
+        raise Exception(f'{filename} does not have <requires>')
+
+    for child in root.iterfind('object'):
+        db_import_object(c, lib, ui_id, child, None)
+        conn.commit()
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(f"Ussage: {sys.argv[0]} database.sqlite library.gir")
@@ -165,6 +283,9 @@ if __name__ == "__main__":
 
     lib = gir.GirData(sys.argv[2])
     lib.populate_db(conn)
+
+    if sys.argv[3]:
+        db_import(conn, sys.argv[3])
 
     conn.commit()
     conn.close()
