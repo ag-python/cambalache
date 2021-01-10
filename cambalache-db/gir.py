@@ -202,7 +202,7 @@ class GirData:
         retval = {}
 
         for child in element.iterfind('virtual-method', nsmap):
-            name = child.get('name')
+            name = child.get('name').replace('_', '-')
             retval[name] = {
                 'version': child.get('version'),
                 'deprecated_version': child.get('deprecated-version'),
