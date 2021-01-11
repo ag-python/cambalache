@@ -284,11 +284,13 @@ def db_export_ui(conn, ui_id, filename):
         node_set(obj, 'id', row[1])
 
         # Properties
-        for row in c.execute('SELECT value, property_id FROM object_property WHERE object_id=?;', (object_id,)):
+        for row in c.execute('SELECT value, property_id FROM object_property WHERE object_id=?;',
+                             (object_id,)):
             obj.append(E.property(row[0], name=row[1]))
 
         # Signals
-        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE object_id=user_data), swap, after FROM object_signal WHERE object_id=?;', (object_id,)):
+        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE object_id=user_data), swap, after FROM object_signal WHERE object_id=?;',
+                             (object_id,)):
             node = E.signal(name=row[0], handler=row[1])
             node_set(node, 'object', row[3])
             node_set(node, 'swapped', row[4])
@@ -297,7 +299,21 @@ def db_export_ui(conn, ui_id, filename):
 
         # Children
         for row in c.execute('SELECT object_id FROM object WHERE parent_id=?;', (object_id,)):
-            obj.append(E.child(get_object(conn, row[0])))
+            child_id = row[0]
+            child = E.child(get_object(conn, child_id))
+
+            # Packing / Layout
+            layout = E.packing()
+            cc = conn.cursor()
+            for prop in cc.execute('SELECT value, property_id FROM object_child_property WHERE object_id=? AND child_id=?;',
+                                 (object_id, child_id)):
+                layout.append(E.property(prop[0], name=prop[1]))
+            cc.close()
+
+            if len(layout) > 0:
+                child.append(layout)
+
+            obj.append(child)
 
         c.close()
         return obj
