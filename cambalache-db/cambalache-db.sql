@@ -188,6 +188,24 @@ END;
 
 /** Project Data Model  **/
 
+
+/* UI
+ *
+ */
+CREATE TABLE ui (
+  ui_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+  name TEXT,
+  description TEXT,
+  copyright TEXT,
+  authors TEXT,
+  license_id TEXT REFERENCES license,
+  filename TEXT,
+  translation_domain TEXT
+);
+
+CREATE INDEX ui_license_id_fk ON ui (license_id);
+
 /* Object
  *
  * TODO: check type_id is an object
@@ -196,11 +214,25 @@ CREATE TABLE object (
   object_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
   type_id TEXT NOT NULL REFERENCES type,
-  name TEXT UNIQUE,
-  parent_id INTEGER REFERENCES object
+  name TEXT,
+  parent_id INTEGER REFERENCES object ON DELETE CASCADE,
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
+  CHECK (parent_id IS NULL OR ui_id IS NULL)
 );
 
 CREATE INDEX object_type_id_fk ON object (type_id);
+CREATE INDEX object_ui_id_fk ON object (ui_id);
+
+
+/* Object Template
+ *
+ * Only one template per UI is allowed
+ */
+CREATE TABLE object_template (
+  object_id INTEGER REFERENCES object,
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
+  PRIMARY KEY (object_id, ui_id)
+);
 
 
 /* Object Property
@@ -258,46 +290,6 @@ CREATE TABLE object_signal (
 );
 
 CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
-
-
-/* UI
- *
- */
-CREATE TABLE ui (
-  ui_id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-  name TEXT,
-  description TEXT,
-  copyright TEXT,
-  authors TEXT,
-  license_id TEXT REFERENCES license,
-  filename TEXT,
-  translation_domain TEXT
-);
-
-CREATE INDEX ui_license_id_fk ON ui (license_id);
-
-
-/* ui Object
- *
- */
-CREATE TABLE ui_object (
-  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
-  object_id INTEGER REFERENCES object ON DELETE CASCADE,
-
-  template TEXT,
-  PRIMARY KEY(ui_id, object_id)
-) WITHOUT ROWID;
-
-/* Check objects are toplevels (have no parent) */
-CREATE TRIGGER on_ui_object_before_insert_check BEFORE INSERT ON ui_object
-BEGIN
-  SELECT
-    CASE
-      WHEN (SELECT parent_id FROM object WHERE object_id=NEW.object_id) IS NOT NULL THEN
-            RAISE (ABORT,'owner_id is not an object type')
-    END;
-END;
 
 
 /*

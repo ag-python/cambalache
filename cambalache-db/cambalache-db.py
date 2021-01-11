@@ -129,13 +129,12 @@ END;
 
 def db_create_history_tables(conn):
     c = conn.cursor()
+    db_create_history_table(c, 'ui')
     db_create_history_table(c, 'object',
                             "printf('Delete object %s:%s', OLD.type_id, OLD.name)")
     db_create_history_table(c, 'object_property')
     db_create_history_table(c, 'object_child_property')
     db_create_history_table(c, 'object_signal')
-    db_create_history_table(c, 'ui')
-    db_create_history_table(c, 'ui_object')
     conn.commit()
 
 
@@ -166,14 +165,9 @@ def db_import_object(c, lib, ui_id, node, parent_id):
     name = node.get('id')
 
     # Insert object
-    c.execute("INSERT INTO object (type_id, name, parent_id) VALUES (?, ?, ?);",
-              (klass, name, parent_id))
+    c.execute("INSERT INTO object (type_id, name, parent_id, ui_id) VALUES (?, ?, ?, ?);",
+              (klass, name, parent_id, ui_id))
     object_id = c.lastrowid
-
-    # Insert object to ui
-    if ui_id:
-        c.execute("INSERT INTO ui_object (ui_id, object_id) VALUES (?, ?);",
-                  (ui_id, object_id))
 
     # Properties
     for prop in node.iterfind('property'):
@@ -313,7 +307,7 @@ def db_export_ui(conn, ui_id, filename):
     node = E.interface()
 
     # Iterate over toplovel objects
-    for row in c.execute('SELECT object_id, template FROM ui_object WHERE ui_id=?;',
+    for row in c.execute('SELECT object_id FROM object WHERE ui_id=?;',
                          (ui_id,)):
         child = get_object(conn, row[0])
         node.append(child)
