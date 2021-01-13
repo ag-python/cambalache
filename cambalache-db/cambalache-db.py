@@ -130,6 +130,7 @@ END;
 def db_create_history_tables(conn):
     c = conn.cursor()
     db_create_history_table(c, 'ui')
+    db_create_history_table(c, 'ui_library')
     db_create_history_table(c, 'object',
                             "printf('Delete object %s:%s', OLD.type_id, OLD.name)")
     db_create_history_table(c, 'object_property')
@@ -160,7 +161,7 @@ def db_create(filename):
     return conn
 
 
-def db_import_object(c, lib, ui_id, node, parent_id):
+def db_import_object(c, builder_ver, ui_id, node, parent_id):
     klass = node.get('class')
     name = node.get('id')
 
@@ -215,15 +216,15 @@ def db_import_object(c, lib, ui_id, node, parent_id):
     for child in node.iterfind('child'):
         obj = child.find('object')
         if obj is not None:
-            db_import_object(c, lib, None, obj, object_id)
+            db_import_object(c, builder_ver, None, obj, object_id)
 
     # Packing properties
-    if lib == 'gtk+':
+    if builder_ver == 3:
         # Gtk 3, packing props are sibling to <object>
         packing = node.getnext()
         if packing is not None and packing.tag != 'packing':
             packing = None
-    elif lib == 'gtk':
+    else:
         # Gtk 4, layout props are children of <object>
         packing = node.find('layout')
 
@@ -234,10 +235,10 @@ def db_import_object(c, lib, ui_id, node, parent_id):
         if parent_type is None:
             return
 
-        if lib == 'gtk+':
+        if builder_ver == 3:
             # For Gtk 3 we fake a LayoutChild class for each GtkContainer
             owner_id = f'Cambalache{parent_type[0]}LayoutChild'
-        elif lib == 'gtk':
+        else:
             # FIXME: Need to get layout-manager-type from class
             owner_id = f'{parent_type[0]}LayoutChild'
 
@@ -258,14 +259,20 @@ def db_import(conn, filename):
     tree = etree.parse(filename)
     root = tree.getroot()
 
-    requires = root.find('requires')
-    if requires is not None:
-        lib = requires.get('lib')
-    else:
-        raise Exception(f'{filename} does not have <requires>')
+    # Requires
+    builder_ver = 4
+    for req in root.iterfind('requires'):
+        lib = req.get('lib')
+        version = req.get('version')
+
+        if lib == 'gtk+':
+            builder_ver = 3;
+
+        c.execute("INSERT INTO ui_library (ui_id, library_id, version) VALUES (last_insert_rowid(), ?, ?);",
+                  (lib, version))
 
     for child in root.iterfind('object'):
-        db_import_object(c, lib, ui_id, child, None)
+        db_import_object(c, builder_ver, ui_id, child, None)
         conn.commit()
 
 
@@ -274,8 +281,9 @@ def db_export_ui(conn, ui_id, filename):
         if val is not None:
             node.set(attr, str(val))
 
-    def get_object(conn, object_id):
+    def get_object(conn, builder_ver, object_id):
         c = conn.cursor()
+        cc = conn.cursor()
         obj = E.object()
 
         c.execute('SELECT type_id, name FROM object WHERE object_id=?;', (object_id,))
@@ -300,32 +308,43 @@ def db_export_ui(conn, ui_id, filename):
         # Children
         for row in c.execute('SELECT object_id FROM object WHERE parent_id=?;', (object_id,)):
             child_id = row[0]
-            child = E.child(get_object(conn, child_id))
+            child_obj = get_object(conn, builder_ver, child_id)
+            child = E.child(child_obj)
 
             # Packing / Layout
-            layout = E.packing()
-            cc = conn.cursor()
+            layout = E('packing' if builder_ver == 3 else 'layout')
+
             for prop in cc.execute('SELECT value, property_id FROM object_child_property WHERE object_id=? AND child_id=?;',
                                  (object_id, child_id)):
                 layout.append(E.property(prop[0], name=prop[1]))
-            cc.close()
 
             if len(layout) > 0:
-                child.append(layout)
+                if builder_ver == 3:
+                    child.append(layout)
+                else:
+                    child_obj.append(layout)
 
             obj.append(child)
 
         c.close()
+        cc.close()
         return obj
 
     c = conn.cursor()
 
     node = E.interface()
 
+    # requires
+    builder_ver = 4
+    for row in c.execute('SELECT library_id, version FROM ui_library WHERE ui_id=?;', (ui_id,)):
+        node.append(E.requires(lib=row[0], version=row[1]))
+        if row[0] == 'gtk+':
+            builder_ver = 3;
+
     # Iterate over toplovel objects
     for row in c.execute('SELECT object_id FROM object WHERE ui_id=?;',
                          (ui_id,)):
-        child = get_object(conn, row[0])
+        child = get_object(conn, builder_ver, row[0])
         node.append(child)
 
     c.close()

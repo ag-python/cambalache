@@ -38,6 +38,7 @@ class GirData:
 
         # Get module/name space data
         self.name = namespace.get('name')
+        self.lib = self.name.lower()
         self.version = namespace.get('version')
         self.shared_library = namespace.get('shared-library')
 
@@ -62,6 +63,7 @@ class GirData:
 
         if self.name == 'Gtk':
             if self.version == '3.0':
+                self.lib = 'gtk+'
                 self._gtk3_init()
             if self.version == '4.0':
                 self._gtk4_init()
@@ -313,8 +315,8 @@ class GirData:
     def populate_db (self, conn):
         def db_insert_enum_flags(conn, name, data):
             parent = data['parent']
-            conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id) VALUES (?, ?, ?);",
-                         (self.name, name, parent))
+            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id) VALUES (?, ?, ?);",
+                         (self.lib, name, parent))
 
             members = data['members']
             for member in members:
@@ -325,8 +327,8 @@ class GirData:
 
         def db_insert_iface(conn, name, data):
             parent = data['parent']
-            conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id) VALUES (?, ?, ?);",
-                         (self.name, name, parent))
+            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id) VALUES (?, ?, ?);",
+                         (self.lib, name, parent))
 
 
         def db_insert_type(conn, name, data):
@@ -335,8 +337,8 @@ class GirData:
             if parent and parent.find('.') >= 0:
                 parent = 'object'
 
-            conn.execute(f"INSERT INTO type (catalog_id, type_id, parent_id, get_type, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                         (self.name, name, parent, data['get_type'], data['version'], data['deprecated_version'], data['abstract'], data['layout']))
+            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, get_type, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                         (self.lib, name, parent, data['get_type'], data['version'], data['deprecated_version'], data['abstract'], data['layout']))
 
 
         def db_insert_type_data(conn, name, data):
@@ -362,9 +364,13 @@ class GirData:
                 conn.execute(f"INSERT INTO type_iface (type_id, iface_id) VALUES (?, ?);",
                              (name, iface))
 
-        # Import catalog
-        conn.execute(f"INSERT INTO catalog (catalog_id, version, shared_library) VALUES (?, ?, ?);",
-                     (self.name, self.version, self.shared_library));
+        # Import library
+        conn.execute(f"INSERT INTO library (library_id, version, shared_library) VALUES (?, ?, ?);",
+                     (self.lib, self.version, self.shared_library));
+        major = self.mod.get_major_version()
+        for minor in range(0, self.mod.get_minor_version()+1, 2):
+            conn.execute(f"INSERT INTO library_version (library_id, version) VALUES (?, ?);",
+                         (self.lib, f"{major}.{minor}"));
 
         # Import ifaces
         for name in self.ifaces:

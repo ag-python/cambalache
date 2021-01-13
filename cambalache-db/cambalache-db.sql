@@ -17,29 +17,38 @@ CREATE TABLE license (
 ) WITHOUT ROWID;
 
 
-/* Catalog
+/* Library
  *
  * Support for different libraries
  */
-CREATE TABLE catalog (
-  catalog_id TEXT PRIMARY KEY,
+CREATE TABLE library (
+  library_id TEXT PRIMARY KEY,
   version TEXT NOT NULL,
-  targetable TEXT,
   shared_library TEXT,
   license_id TEXT REFERENCES license,
   license_text TEXT
 ) WITHOUT ROWID;
 
-CREATE INDEX catalog_license_id_fk ON catalog (license_id);
+CREATE INDEX library_license_id_fk ON library (license_id);
 
 
-/* Catalog dependecies
+/* Library dependecies
  *
  */
-CREATE TABLE catalog_dependency (
-  catalog_id TEXT REFERENCES catalog,
-  dependency_id TEXT REFERENCES catalog,
-  PRIMARY KEY(catalog_id, dependency_id)
+CREATE TABLE library_dependency (
+  library_id TEXT REFERENCES library,
+  dependency_id TEXT REFERENCES library,
+  PRIMARY KEY(library_id, dependency_id)
+) WITHOUT ROWID;
+
+
+/* Library targeteable versions
+ *
+ */
+CREATE TABLE library_version (
+  library_id TEXT REFERENCES library,
+  version TEXT,
+  PRIMARY KEY(library_id, version)
 ) WITHOUT ROWID;
 
 
@@ -51,7 +60,7 @@ CREATE TABLE type (
   type_id TEXT PRIMARY KEY,
 
   parent_id TEXT REFERENCES type,
-  catalog_id TEXT REFERENCES catalog,
+  library_id TEXT REFERENCES library,
   get_type TEXT,
   version TEXT,
   deprecated_version TEXT,
@@ -60,7 +69,7 @@ CREATE TABLE type (
 ) WITHOUT ROWID;
 
 CREATE INDEX type_parent_id_fk ON type (parent_id);
-CREATE INDEX type_catalog_id_fk ON type (catalog_id);
+CREATE INDEX type_library_id_fk ON type (library_id);
 
 
 /* Add fundamental types */
@@ -205,6 +214,19 @@ CREATE TABLE ui (
 );
 
 CREATE INDEX ui_license_id_fk ON ui (license_id);
+
+
+/* UI library version target
+ *
+ */
+CREATE TABLE ui_library (
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
+  library_id TEXT,
+  version TEXT,
+  PRIMARY KEY(ui_id, library_id),
+  FOREIGN KEY(library_id, version) REFERENCES library_version
+) WITHOUT ROWID;
+
 
 /* Object
  *
