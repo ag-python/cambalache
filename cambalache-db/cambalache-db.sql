@@ -204,12 +204,12 @@ END;
 CREATE TABLE ui (
   ui_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-  name TEXT,
+  name TEXT UNIQUE,
+  filename TEXT UNIQUE,
   description TEXT,
   copyright TEXT,
   authors TEXT,
   license_id TEXT REFERENCES license,
-  filename TEXT,
   translation_domain TEXT
 );
 
