@@ -25,6 +25,7 @@ BASE_SQL = _load_sql('cmb_base.sql')
 PROJECT_SQL = _load_sql('cmb_project.sql')
 HISTORY_SQL = _load_sql('cmb_history.sql')
 
+
 class CmbProject:
     def __init__(self):
         # DataModel is only used internally
@@ -204,9 +205,11 @@ class CmbProject:
         name = node.get('id')
 
         # Insert object
-        c.execute("INSERT INTO object (type_id, name, parent_id, ui_id) VALUES (?, ?, ?, ?);",
-                  (klass, name, parent_id, ui_id))
-        object_id = c.lastrowid
+        c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
+        object_id = c.fetchone()[0]
+
+        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
+                  (ui_id, object_id, klass, name, parent_id))
 
         # Properties
         for prop in node.iterfind('property'):
@@ -220,8 +223,8 @@ class CmbProject:
 
             # Insert property
             if owner_id:
-                c.execute("INSERT INTO object_property (object_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?);",
-                          (object_id, owner_id[0], property_id, prop.text, translatable))
+                c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?);",
+                          (ui_id, object_id, owner_id[0], property_id, prop.text, translatable))
             else:
                 print(f'Could not find owner type for {klass}:{property_id}')
 
@@ -247,14 +250,14 @@ class CmbProject:
             owner_id = c.fetchone()
 
             # Insert signal
-            c.execute("INSERT INTO object_signal (object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE name=?), ?, ?);",
-                      (object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, user_data, swap, after))
+            c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?);",
+                      (ui_id, object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, ui_id, user_data, swap, after))
 
         # Children
         for child in node.iterfind('child'):
             obj = child.find('object')
             if obj is not None:
-                self._import_object(builder_ver, None, obj, object_id)
+                self._import_object(builder_ver, ui_id, obj, object_id)
 
         # Packing properties
         if builder_ver == 3:
@@ -267,7 +270,7 @@ class CmbProject:
             packing = node.find('layout')
 
         if parent_id and packing is not None:
-            c.execute("SELECT type_id FROM object WHERE object_id=?;", (parent_id, ))
+            c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
             parent_type = c.fetchone()
 
             if parent_type is None:
@@ -283,8 +286,8 @@ class CmbProject:
             for prop in packing.iterfind('property'):
                 property_id = prop.get('name')
                 translatable = prop.get('translatable', None)
-                c.execute("INSERT INTO object_child_property (object_id, child_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?);",
-                          (parent_id, object_id, owner_id, property_id, prop.text, translatable))
+                c.execute("INSERT INTO object_child_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                          (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable))
         c.close()
 
     def import_file(self, filename, overwrite=False):
@@ -321,7 +324,7 @@ class CmbProject:
 
         c.close()
 
-    def _get_object(self, builder_ver, object_id):
+    def _get_object(self, builder_ver, ui_id, object_id):
         def node_set(node, attr, val):
             if val is not None:
                 node.set(attr, str(val))
@@ -330,18 +333,18 @@ class CmbProject:
         cc = self.conn.cursor()
         obj = E.object()
 
-        c.execute('SELECT type_id, name FROM object WHERE object_id=?;', (object_id,))
+        c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         row = c.fetchone()
         node_set(obj, 'class', row[0])
         node_set(obj, 'id', row[1])
 
         # Properties
-        for row in c.execute('SELECT value, property_id FROM object_property WHERE object_id=?;',
-                             (object_id,)):
+        for row in c.execute('SELECT value, property_id FROM object_property WHERE ui_id=? AND object_id=?;',
+                             (ui_id, object_id,)):
             obj.append(E.property(row[0], name=row[1]))
             # Signals
-        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE object_id=user_data), swap, after FROM object_signal WHERE object_id=?;',
-                             (object_id,)):
+        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after FROM object_signal WHERE ui_id=? AND object_id=?;',
+                             (ui_id, ui_id, object_id,)):
             node = E.signal(name=row[0], handler=row[1])
             node_set(node, 'object', row[3])
             node_set(node, 'swapped', row[4])
@@ -349,16 +352,16 @@ class CmbProject:
             obj.append(node)
 
         # Children
-        for row in c.execute('SELECT object_id FROM object WHERE parent_id=?;', (object_id,)):
+        for row in c.execute('SELECT object_id FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
             child_id = row[0]
-            child_obj = self._get_object(builder_ver, child_id)
+            child_obj = self._get_object(builder_ver, ui_id, child_id)
             child = E.child(child_obj)
 
             # Packing / Layout
             layout = E('packing' if builder_ver == 3 else 'layout')
 
-            for prop in cc.execute('SELECT value, property_id FROM object_child_property WHERE object_id=? AND child_id=?;',
-                                 (object_id, child_id)):
+            for prop in cc.execute('SELECT value, property_id FROM object_child_property WHERE ui_id=? AND object_id=? AND child_id=?;',
+                                 (ui_id, object_id, child_id)):
                 layout.append(E.property(prop[0], name=prop[1]))
 
             if len(layout) > 0:
@@ -387,9 +390,9 @@ class CmbProject:
                 builder_ver = 3;
 
         # Iterate over toplovel objects
-        for row in c.execute('SELECT object_id FROM object WHERE ui_id=?;',
+        for row in c.execute('SELECT object_id FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
-            child = self._get_object(builder_ver, row[0])
+            child = self._get_object(builder_ver, ui_id, row[0])
             node.append(child)
 
         c.close()
@@ -404,6 +407,15 @@ class CmbProject:
             fd.close()
 
     def export(self):
+        c = self.conn.cursor()
+
+        # FIXME: remove cmb suffix once we have full GtkBuilder support
+        for row in c.execute('SELECT ui_id, filename FROM ui;'):
+            self._export_ui(row[0], os.path.splitext(row[1])[0] + '.cmb.ui')
+
+        c.close()
+
+    def list_ui(self):
         c = self.conn.cursor()
 
         # FIXME: remove cmb suffix once we have full GtkBuilder support
