@@ -9,9 +9,16 @@
 import os
 import sys
 import sqlite3
+import gi
 
 from lxml import etree
 from lxml.builder import E
+
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject, Gtk
+
+from .cmb_object_tree import CmbObjectTree
+
 
 basedir = os.path.dirname(__file__) or '.'
 
@@ -26,10 +33,12 @@ PROJECT_SQL = _load_sql('cmb_project.sql')
 HISTORY_SQL = _load_sql('cmb_history.sql')
 
 
-class CmbProject:
+class CmbProject(GObject.GObject, Gtk.TreeModel):
     def __init__(self):
+        GObject.GObject.__init__(self)
+
         # DataModel is only used internally
-        self.conn = sqlite3.connect(":memory:")
+        self.conn = sqlite3.connect("cmb.sqlite")
 
         c = self.conn.cursor()
 
@@ -39,8 +48,20 @@ class CmbProject:
         # Create project tables
         c.executescript(PROJECT_SQL)
 
+        self._init_signals(c)
+
+        self._columns = self._get_columns(c, 'object')
+
+        # Create TreeModel store
+        self.store = CmbObjectTree(self, self._get_columns(c, 'object'))
+        self.store.connect('row-changed', lambda o, p, i: self.row_changed(p, i))
+        self.store.connect('row-changed', lambda o, p, i: self.row_inserted(p, i))
+        self.store.connect('row-changed', lambda o, p, i: self.row_has_child_toggled(p, i))
+        self.store.connect('row-changed', lambda o, p, d: self.row_deleted(p))
+        self.store.connect('row-changed', lambda o, p, i, n: self.rows_reordered(p, i, n))
+
         # Initialize history (Undo/Redo) tables
-        self._init_history()
+        self._init_history_and_triggers()
 
         # Load library support data
         self._load_libraries()
@@ -64,25 +85,80 @@ class CmbProject:
         self.conn.commit()
         c.close()
 
-    def _init_history(self):
+    def _get_columns(self, c, table):
+        columns = []
+
+        for row in c.execute(f'PRAGMA table_info({table});'):
+            col = row[1]
+            col_type =  row[2]
+            pk = row[5]
+
+            if col_type == 'INTEGER':
+                col_type = GObject.TYPE_INT
+            elif col_type == 'TEXT':
+                col_type = GObject.TYPE_STRING
+            elif col_type == 'BOOLEAN':
+                col_type = GObject.TYPE_BOOLEAN
+            else:
+                print('Error unknown type', col_type)
+
+            columns.append(col_type)
+        return columns
+
+    def _init_signals(self, c):
+        self._signal_params = {}
+
+        for table in ['ui', 'ui_library', 'object', 'object_property', 'object_child_property', 'object_signal']:
+            columns = self._get_columns(c, table)
+            table = table.replace('_', '-')
+            for action in ['added', 'removed', 'updated']:
+                signal = f'{table}-{action}'
+                self._signal_params[signal] = columns
+                GObject.signal_new(signal,
+                                   CmbProject,
+                                   GObject.SignalFlags.RUN_LAST,
+                                   None,
+                                   tuple(columns))
+
+    def _init_history_and_triggers(self):
         c = self.conn.cursor()
 
         # Create history main tables
         c.executescript(HISTORY_SQL)
 
         # Create history tables for each tracked table
-        self._create_history_table(c, 'ui')
-        self._create_history_table(c, 'ui_library')
-        self._create_history_table(c, 'object',
+        self._create_support_table(c, 'ui')
+        self._create_support_table(c, 'ui_library')
+        self._create_support_table(c, 'object',
                                    "printf('Delete object %s:%s', OLD.type_id, OLD.name)")
-        self._create_history_table(c, 'object_property')
-        self._create_history_table(c, 'object_child_property')
-        self._create_history_table(c, 'object_signal')
+        self._create_support_table(c, 'object_property')
+        self._create_support_table(c, 'object_child_property')
+        self._create_support_table(c, 'object_signal')
 
         self.conn.commit()
         c.close()
 
-    def _create_history_table(self, c, table, group_msg=None):
+    def _emit(self, signal, *args):
+        params = []
+        signal_params = self._signal_params[signal]
+
+        # Make sure there is no None parameter
+        for i in range(0, len(signal_params)):
+            arg = args[i]
+            if arg is not None:
+                params.append(arg)
+            else:
+                arg_type = signal_params[i]
+                if arg_type == GObject.TYPE_INT:
+                    params.append(0)
+                elif arg_type == GObject.TYPE_STRING:
+                    params.append('')
+                elif arg_type == GObject.TYPE_BOOLEAN:
+                    params.append(False)
+
+        self.emit(signal, *params)
+
+    def _create_support_table(self, c, table, group_msg=None):
         # Create a history table to store data for INSERT and DELETE commands
         c.executescript(f'''
     CREATE TABLE history_{table} AS SELECT * FROM {table} WHERE 0;
@@ -116,6 +192,18 @@ class CmbProject:
             if not pk:
                 non_pk_columns.append(col)
 
+        # Create notify callbacks, this is needed if we want to listen to events
+        # from another process using just sqlite
+        _table = table.replace('_', '-')
+        self.conn.create_function(f'_on_{table}_insert', len(all_columns),
+                                  lambda *args: self._emit(f'{_table}-added', *args))
+
+        self.conn.create_function(f'_on_{table}_delete', len(all_columns),
+                                  lambda *args: self._emit(f'{_table}-removed', *args))
+
+        self.conn.create_function(f'_on_{table}_update', len(all_columns),
+                                  lambda *args: self._emit(f'{_table}-updated', *args))
+
         # INSERT Trigger
         c.execute(f'''
     CREATE TRIGGER on_{table}_insert AFTER INSERT ON {table}
@@ -123,6 +211,7 @@ class CmbProject:
       INSERT INTO history (command, data) VALUES ('INSERT', '{table}');
       INSERT INTO history_{table} (history_id, {columns})
         VALUES (last_insert_rowid(), {new_values});
+      SELECT _on_{table}_insert({new_values});
     END;
         ''')
 
@@ -145,6 +234,14 @@ class CmbProject:
       INSERT INTO history_{table} (history_id, {columns})
         VALUES (last_insert_rowid(), {old_values});
       {pop}
+      SELECT _on_{table}_delete({old_values});
+    END;
+        ''')
+
+        c.execute(f'''
+    CREATE TRIGGER on_{table}_update AFTER UPDATE ON {table}
+    BEGIN
+      SELECT _on_{table}_update({new_values});
     END;
         ''')
 
@@ -415,14 +512,78 @@ class CmbProject:
 
         c.close()
 
-    def list_ui(self):
-        c = self.conn.cursor()
+    # GtkTreeModel iface
 
-        # FIXME: remove cmb suffix once we have full GtkBuilder support
-        for row in c.execute('SELECT ui_id, filename FROM ui;'):
-            self._export_ui(row[0], os.path.splitext(row[1])[0] + '.cmb.ui')
+    def do_get_iter(self, path):
+        # NOTE: We could implement TreeModel iface directly with sqlite using
+        # row_number() function and the object_id as the iter but it would be
+        # too intensive just to save some memory
+        # "SELECT * FROM (SELECT object_id, row_number() OVER (ORDER BY object_id) AS row_number FROM object WHERE ui_id=1 ORDER BY object_id) WHERE row_number=?;"
 
-        c.close()
+        retval = self.store.get_iter(path)
+        return (retval is not None, retval)
+
+    def do_iter_next(self, iter_):
+        retval = self.store.iter_next(iter_)
+
+        if retval is not None:
+            iter_.user_data = retval.user_data
+            iter_.user_data2 = retval.user_data2
+            iter_.user_data3 = retval.user_data3
+            return True
+        return False
+
+    def do_iter_previous(self, iter_):
+        retval = self.store.iter_previous(iter_)
+        if retval is not None:
+            iter_.user_data = retval.user_data
+            iter_.user_data2 = retval.user_data2
+            iter_.user_data3 = retval.user_data3
+            return True
+        return False
+
+    def do_iter_has_child(self, iter_):
+        return self.store.iter_has_child(iter_)
+
+    def do_iter_nth_child(self, iter_, n):
+        retval = self.store.iter_nth_child(iter_, n)
+        return (retval is not None, retval)
+
+    def do_iter_children(self, parent):
+        if parent is None:
+            retval = self.store.get_iter_first()
+            return (retval is not None, retval)
+        elif self.store.iter_has_child(parent):
+            retval = self.store.iter_children(parent)
+            return (True, retval)
+
+        return (False, None)
+
+    def do_iter_n_children(self, iter_):
+        return self.store.iter_n_children(iter_)
+
+    def do_iter_parent(self, child):
+        retval = self.store.iter_parent(child)
+        return (retval is not None, retval)
+
+    def do_get_path(self, iter_):
+        return self.store.get_path(iter_)
+
+    def do_get_value(self, iter_, column):
+        retval = self.store.get_value(iter_, column)
+        if retval is None and self.store.get_column_type(column) == GObject.TYPE_STRING:
+            return ''
+
+        return retval
+
+    def do_get_n_columns(self):
+        return self.store.get_n_columns()
+
+    def do_get_column_type(self, column):
+        return self.store.get_column_type(column)
+
+    def do_get_flags(self):
+        return self.store.get_flags()
 
 
 if __name__ == "__main__":
@@ -433,3 +594,28 @@ if __name__ == "__main__":
     project = CmbProject()
     project.import_file(sys.argv[1], True)
     project.export()
+
+    win = Gtk.Window(title="TreeModel Test")
+
+    treeview = Gtk.TreeView(model=project)
+
+    renderer = Gtk.CellRendererText()
+    column = Gtk.TreeViewColumn("UI ID", renderer, text=0)
+    treeview.append_column(column)
+
+    renderer = Gtk.CellRendererText()
+    column = Gtk.TreeViewColumn("Object ID", renderer, text=1)
+    treeview.append_column(column)
+
+    renderer = Gtk.CellRendererText()
+    column = Gtk.TreeViewColumn("Name", renderer, text=3)
+    treeview.append_column(column)
+
+    renderer = Gtk.CellRendererText()
+    column = Gtk.TreeViewColumn("Type", renderer, text=2)
+    treeview.append_column(column)
+
+    win.add(treeview)
+    win.show_all()
+
+    Gtk.main()
