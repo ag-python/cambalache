@@ -10,7 +10,7 @@ import os
 import sys
 import sqlite3
 
-import gir
+from utils import gir
 
 
 class CambalacheDb:
@@ -73,7 +73,7 @@ class CambalacheDb:
         c = self.conn.cursor()
 
         with open(filename, 'w') as fd:
-            for row in c.execute("SELECT name FROM sqlite_temp_master WHERE type = 'table';"):
+            for row in c.execute("SELECT name FROM sqlite_master WHERE type = 'table';"):
                 self._dump_table(fd, row[0])
             fd.close();
 
