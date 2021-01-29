@@ -123,7 +123,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._signal_params = {}
         self._table_columns = {}
 
-        for table in ['ui', 'ui_library', 'object', 'object_property', 'object_child_property', 'object_signal']:
+        for table in ['ui', 'ui_library', 'object', 'object_property', 'object_layout_property', 'object_signal']:
             columns = self._get_columns(c, table)
             self._table_columns[table] = columns
             table = table.replace('_', '-')
@@ -148,7 +148,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._create_support_table(c, 'object',
                                    "printf('Delete object %s:%s', OLD.type_id, OLD.name)")
         self._create_support_table(c, 'object_property')
-        self._create_support_table(c, 'object_child_property')
+        self._create_support_table(c, 'object_layout_property')
         self._create_support_table(c, 'object_signal')
 
         self.conn.commit()
@@ -399,7 +399,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             for prop in packing.iterfind('property'):
                 property_id = prop.get('name')
                 translatable = prop.get('translatable', None)
-                c.execute("INSERT INTO object_child_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?, ?);",
                           (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable))
         c.close()
 
@@ -473,7 +473,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             # Packing / Layout
             layout = E('packing' if builder_ver == 3 else 'layout')
 
-            for prop in cc.execute('SELECT value, property_id FROM object_child_property WHERE ui_id=? AND object_id=? AND child_id=?;',
+            for prop in cc.execute('SELECT value, property_id FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=?;',
                                  (ui_id, object_id, child_id)):
                 layout.append(E.property(prop[0], name=prop[1]))
 

@@ -83,7 +83,7 @@ CREATE INDEX object_property_property_fk ON object_property (owner_id, property_
  *
  * TODO: check owner_id is in object_id.type_id type tree
  */
-CREATE TABLE object_child_property (
+CREATE TABLE object_layout_property (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
   child_id INTEGER,
@@ -98,7 +98,7 @@ CREATE TABLE object_child_property (
   FOREIGN KEY(owner_id, property_id) REFERENCES property
 ) WITHOUT ROWID;
 
-CREATE INDEX object_child_property_child_property_fk ON object_child_property (owner_id, property_id);
+CREATE INDEX object_layout_property_child_property_fk ON object_layout_property (owner_id, property_id);
 
 
 /* Object Signal

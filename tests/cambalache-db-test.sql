@@ -22,7 +22,7 @@ INSERT INTO object_property (object_id, owner_id, property_id, value) VALUES
 (5, 'GtkButton', 'label', 'Bye Bye World'),
 (6, 'GtkLabel', 'label', 'Hola Mundo');
 
-INSERT INTO object_child_property (object_id, child_id, owner_id, property_id, value) VALUES
+INSERT INTO object_layout_property (object_id, child_id, owner_id, property_id, value) VALUES
 (1, 3, 'GtkGridLayoutChild', 'column', 1),
 (1, 3, 'GtkGridLayoutChild', 'row', 1),
 (1, 4, 'GtkGridLayoutChild', 'column', 2),
