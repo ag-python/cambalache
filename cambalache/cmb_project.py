@@ -17,7 +17,7 @@ from lxml.builder import E
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-from .cmb_object import CmbUI, CmbObject
+from .cmb_objects import CmbUI, CmbObject
 from .cmb_project_view import CmbProjectView
 
 
