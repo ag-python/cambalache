@@ -35,11 +35,16 @@ HISTORY_SQL = _load_sql('cmb_history.sql')
 
 
 class CmbProject(GObject.GObject, Gtk.TreeModel):
+    __gtype_name__ = 'CmbProject'
+
+    _signal_params = {}
+    _table_columns = {}
+
     def __init__(self):
         GObject.GObject.__init__(self)
 
         # DataModel is only used internally
-        self.conn = sqlite3.connect("cmb.sqlite")
+        self.conn = sqlite3.connect(":memory:")
 
         c = self.conn.cursor()
 
@@ -120,8 +125,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         return { 'names': columns, 'types': types, 'pks': pks }
 
     def _init_signals(self, c):
-        self._signal_params = {}
-        self._table_columns = {}
+        # Make sure we only initialize signals once
+        if (len(self._signal_params) > 0):
+            return
 
         for table in ['ui', 'ui_library', 'object', 'object_property', 'object_layout_property', 'object_signal']:
             columns = self._get_columns(c, table)
@@ -673,21 +679,3 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def do_get_flags(self):
         return self._store.get_flags()
 
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"Ussage: {sys.argv[0]} import.ui")
-        exit()
-
-    project = CmbProject()
-    project.import_file(sys.argv[1], True)
-    project.export()
-
-    win = Gtk.Window(title="TreeModel Test")
-
-    treeview = CmbProjectView(model=project)
-
-    win.add(treeview)
-    win.show_all()
-
-    Gtk.main()

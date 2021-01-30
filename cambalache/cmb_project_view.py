@@ -15,6 +15,7 @@ from .cmb_objects import CmbUI, CmbObject
 
 
 class CmbProjectView(Gtk.TreeView):
+    __gtype_name__ = 'CmbProjectView'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
