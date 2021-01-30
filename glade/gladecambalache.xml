@@ -1,0 +1,34 @@
+<!--
+
+Cambalache Glade plugin
+
+Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<glade-catalog name="gladecambalache" library="gladepython" depends="gtk+">
+ <init-function>glade_python_init</init-function>
+
+ <glade-widget-classes>
+   <glade-widget-class title="CmbProject" name="CmbProject" generic-name="cmbproject" toplevel="True"/>
+   <glade-widget-class title="CmbProjectView" name="CmbProjectView" generic-name="cmbprojectview"/>
+ </glade-widget-classes>
+
+ <glade-widget-group name="cambalache" title="Cambalache">
+   <glade-widget-class-ref name="CmbProject"/>
+   <glade-widget-class-ref name="CmbProjectView"/>
+ </glade-widget-group>
+</glade-catalog>

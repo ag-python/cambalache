@@ -1,0 +1,2 @@
+This module is meant to be loaded by Glade directly from Cambalache sources
+without having to install it.
