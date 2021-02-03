@@ -9,4 +9,3 @@ from .cmb_objects import *
 from .cmb_project import CmbProject
 from .cmb_project_view import CmbProjectView
 
-from gi.repository import GObject

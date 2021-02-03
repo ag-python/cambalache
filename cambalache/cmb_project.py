@@ -614,8 +614,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # too intensive just to save some memory
         # "SELECT * FROM (SELECT object_id, row_number() OVER (ORDER BY object_id) AS row_number FROM object WHERE ui_id=1 ORDER BY object_id) WHERE row_number=?;"
 
-        retval = self._store.get_iter(path)
-        return (retval is not None, retval)
+        try:
+            retval = self._store.get_iter(path)
+            return (retval is not None, retval)
+        except:
+            return (False, None)
 
     def do_iter_next(self, iter_):
         retval = self._store.iter_next(iter_)
