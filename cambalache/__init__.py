@@ -7,5 +7,5 @@
 
 from .cmb_objects import *
 from .cmb_project import CmbProject
-from .cmb_project_view import CmbProjectView
+from .cmb_tree_view import CmbTreeView
 

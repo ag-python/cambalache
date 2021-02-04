@@ -1,5 +1,5 @@
 #
-# CmbProjectView - Cambalache Project View
+# CmbTreeView - Cambalache Tree View
 #
 # Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
 #
@@ -14,8 +14,8 @@ from gi.repository import GObject, Gtk
 from .cmb_objects import CmbUI, CmbObject
 
 
-class CmbProjectView(Gtk.TreeView):
-    __gtype_name__ = 'CmbProjectView'
+class CmbTreeView(Gtk.TreeView):
+    __gtype_name__ = 'CmbTreeView'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
