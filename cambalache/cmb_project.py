@@ -415,7 +415,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         # Remove old UI
         if overwrite:
-            c.execute("DELETE FROM ui WHERE name=?;", (basename, ))
+            c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
         c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
                   (basename, filename))
@@ -532,6 +532,29 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             self._export_ui(row[0], os.path.splitext(row[1])[0] + '.cmb.ui')
 
         c.close()
+
+    def add_ui(self, filename):
+        basename = os.path.basename(filename)
+
+        self.conn.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
+                          (basename, filename))
+
+    def remove_ui(self, filename):
+        self.conn.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
+
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None):
+        c = self.conn.cursor()
+
+        # Insert object
+        c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
+        object_id = c.fetchone()[0]
+
+        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
+                  (ui_id, object_id, obj_type, name, parent_id))
+        c.close()
+
+    def remove_object(self, ui_id, object_id):
+        self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;", (ui_id, object_id))
 
     # Signal handlers
     def _get_object_from_args(self, table, args):
