@@ -225,9 +225,60 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.conn.create_function(f'_on_{table}_update', len(all_columns),
                                   lambda *args: self._emit(f'{_table}-updated', *args))
 
+        # Triggers will get executed for row that break foreign key contraint
+        # So we can not rely on getting notifications without making sure
+        # there wont be a FK constraint failure.
+        # FIXME: Only use rowid tables to be able to use update hook function
+        fkeys = {}
+        for row in c.execute(f'PRAGMA foreign_key_list({table});'):
+            fk_id = row[0]
+            key = fkeys.get(fk_id, None)
+
+            fk_table = row[2]
+            from_col = row[3]
+            to_col = row[4]
+
+            if to_col is None:
+                to_col = from_col
+
+            if key is None:
+                key = {
+                    'table': fk_table,
+                    'from': [from_col],
+                    'to': [to_col]
+                }
+            else:
+                key['from'].append(from_col)
+                key['to'].append(to_col)
+
+            fkeys[fk_id] = key
+
+
+        fk_check = ''
+        for key in fkeys:
+            if fk_check != '':
+                fk_check += '\n    AND\n    '
+            k = fkeys[key]
+            fk_table = k['table']
+            f = k['from']
+            to = k['to']
+
+            first_check=''
+            where=''
+            for i in range(0, len(to)):
+                if i > 0:
+                    where += ' AND '
+                    first_check += ' OR '
+                first_check += f'NEW.{f[i]} IS NULL'
+                where += f'{to[i]} = NEW.{f[i]}'
+
+            fk_check += f'({first_check} OR (SELECT EXISTS(SELECT 1 FROM {fk_table} WHERE {where})))'
+
         # INSERT Trigger
         c.execute(f'''
     CREATE TRIGGER on_{table}_insert AFTER INSERT ON {table}
+    WHEN
+        {fk_check}
     BEGIN
       INSERT INTO history (command, data) VALUES ('INSERT', '{table}');
       INSERT INTO history_{table} (history_id, {columns})
