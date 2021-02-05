@@ -545,7 +545,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         cc.close()
         return obj
 
-    def _export_ui(self, ui_id, filename):
+    def export_ui(self, ui_id, filename=None):
         c = self.conn.cursor()
 
         node = E.interface()
@@ -566,21 +566,28 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         c.close()
 
-        # Dump xml to file
-        with open(filename, 'wb') as fd:
-            tree = etree.ElementTree(node)
-            tree.write(fd,
-                       pretty_print=True,
-                       xml_declaration=True,
-                       encoding='UTF-8')
-            fd.close()
+        tree = etree.ElementTree(node)
+
+        if filename is not None:
+            # Dump xml to file
+            with open(filename, 'wb') as fd:
+                tree.write(fd,
+                           pretty_print=True,
+                           xml_declaration=True,
+                           encoding='UTF-8')
+                fd.close()
+        else:
+            return etree.tostring(tree,
+                                  pretty_print=True,
+                                  xml_declaration=True,
+                                  encoding='UTF-8')
 
     def export(self):
         c = self.conn.cursor()
 
         # FIXME: remove cmb suffix once we have full GtkBuilder support
         for row in c.execute('SELECT ui_id, filename FROM ui;'):
-            self._export_ui(row[0], os.path.splitext(row[1])[0] + '.cmb.ui')
+            self.export_ui(row[0], os.path.splitext(row[1])[0] + '.cmb.ui')
 
         c.close()
 
