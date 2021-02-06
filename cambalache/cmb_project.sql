@@ -21,7 +21,7 @@ CREATE TABLE ui (
   authors TEXT,
   license_id TEXT REFERENCES license,
   translation_domain TEXT,
-  FOREIGN KEY(ui_id, template_id) REFERENCES object ON DELETE SET NULL
+  FOREIGN KEY(ui_id, template_id) REFERENCES object(ui_id, object_id) ON DELETE SET NULL
 );
 
 CREATE INDEX ui_license_id_fk ON ui (license_id);

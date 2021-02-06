@@ -42,19 +42,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def __init__(self):
         GObject.GObject.__init__(self)
 
-        # DataModel is only used internally
-        self.conn = sqlite3.connect(":memory:")
-
-        c = self.conn.cursor()
-
-        # Create type system tables
-        c.executescript(BASE_SQL)
-
-        # Create project tables
-        c.executescript(PROJECT_SQL)
-
-        self._init_signals(c)
-
         # Create TreeModel store
         self._ui_id = {}
         self._object_id = {}
@@ -71,11 +58,26 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._store.connect('row-deleted', lambda o, p, d: self.row_deleted(p))
         self._store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
 
+        # DataModel is only used internally
+        self.conn = sqlite3.connect(":memory:")
+
+        c = self.conn.cursor()
+
+        # Create type system tables
+        c.executescript(BASE_SQL)
+
+        # Create project tables
+        c.executescript(PROJECT_SQL)
+
         # Initialize history (Undo/Redo) tables
         self._init_history_and_triggers()
 
         # Load library support data
         self._load_libraries()
+
+        # Init signals and update hooks
+        self._init_signals(c)
+        self._init_update_hooks()
 
         c.execute("PRAGMA foreign_keys = ON;")
 
@@ -131,15 +133,25 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         for table in ['ui', 'ui_library', 'object', 'object_property', 'object_layout_property', 'object_signal']:
             columns = self._get_columns(c, table)
             self._table_columns[table] = columns
-            table = table.replace('_', '-')
+            _table = table.replace('_', '-')
             for action in ['added', 'removed', 'updated']:
-                signal = f'{table}-{action}'
+                signal = f'{_table}-{action}'
                 self._signal_params[signal] = columns
                 GObject.signal_new(signal,
                                    CmbProject,
                                    GObject.SignalFlags.RUN_LAST,
                                    None,
                                    tuple(columns['types']))
+
+    def _init_update_hooks(self):
+        for table in self._table_columns:
+            columns = self._table_columns[table]
+
+            # Crate notify callbacks, this is needed if we want to listen to events
+            # from another process using just sqlite
+            n_columns = len(columns['types']) + 1
+            self.conn.create_function(f'_{table}_emit', n_columns,
+                                      getattr(self, f'_{table}_emit'))
 
     def _init_history_and_triggers(self):
         c = self.conn.cursor()
@@ -162,7 +174,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def _emit(self, signal, *args):
         params = []
         signal_params = self._signal_params[signal]['types']
-
         # Make sure there is no None parameter
         for i in range(0, len(signal_params)):
             arg = args[i]
@@ -179,7 +190,27 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.emit(signal, *params)
 
+    def _ui_emit(self, signal, *args):
+        self._emit(signal, *args)
+
+    def _ui_library_emit(self, signal, *args):
+        self._emit(signal, *args)
+
+    def _object_emit(self, signal, *args):
+        self._emit(signal, *args)
+
+    def _object_property_emit(self, signal, *args):
+        self._emit(signal, *args)
+
+    def _object_layout_property_emit(self, signal, *args):
+        self._emit(signal, *args)
+
+    def _object_signal_emit(self, signal, *args):
+        self._emit(signal, *args)
+
     def _create_support_table(self, c, table, group_msg=None):
+        _table = table.replace('_', '-')
+
         # Create a history table to store data for INSERT and DELETE commands
         c.executescript(f'''
     CREATE TABLE history_{table} AS SELECT * FROM {table} WHERE 0;
@@ -212,18 +243,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             all_columns.append(col)
             if not pk:
                 non_pk_columns.append(col)
-
-        # Create notify callbacks, this is needed if we want to listen to events
-        # from another process using just sqlite
-        _table = table.replace('_', '-')
-        self.conn.create_function(f'_on_{table}_insert', len(all_columns),
-                                  lambda *args: self._emit(f'{_table}-added', *args))
-
-        self.conn.create_function(f'_on_{table}_delete', len(all_columns),
-                                  lambda *args: self._emit(f'{_table}-removed', *args))
-
-        self.conn.create_function(f'_on_{table}_update', len(all_columns),
-                                  lambda *args: self._emit(f'{_table}-updated', *args))
 
         # Triggers will get executed for row that break foreign key contraint
         # So we can not rely on getting notifications without making sure
@@ -283,7 +302,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
       INSERT INTO history (command, data) VALUES ('INSERT', '{table}');
       INSERT INTO history_{table} (history_id, {columns})
         VALUES (last_insert_rowid(), {new_values});
-      SELECT _on_{table}_insert({new_values});
+      SELECT _{table}_emit('{_table}-added', {new_values});
     END;
         ''')
 
@@ -306,14 +325,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
       INSERT INTO history_{table} (history_id, {columns})
         VALUES (last_insert_rowid(), {old_values});
       {pop}
-      SELECT _on_{table}_delete({old_values});
+      SELECT _{table}_emit('{_table}-removed', {old_values});
     END;
         ''')
 
         c.execute(f'''
     CREATE TRIGGER on_{table}_update AFTER UPDATE ON {table}
     BEGIN
-      SELECT _on_{table}_update({new_values});
+      SELECT _{table}_emit('{_table}-updated', {new_values});
     END;
         ''')
 
@@ -596,9 +615,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.conn.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
                           (basename, filename))
+        self.conn.commit()
 
     def remove_ui(self, filename):
         self.conn.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
+        self.conn.commit()
 
     def add_object(self, ui_id, obj_type, name=None, parent_id=None):
         c = self.conn.cursor()
@@ -610,9 +631,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
                   (ui_id, object_id, obj_type, name, parent_id))
         c.close()
+        self.conn.commit()
 
     def remove_object(self, ui_id, object_id):
         self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;", (ui_id, object_id))
+        self.conn.commit()
 
     # Signal handlers
     def _get_object_from_args(self, table, args):
