@@ -36,7 +36,20 @@ HISTORY_SQL = _load_sql('cmb_history.sql')
 class CmbProject(GObject.GObject, Gtk.TreeModel):
     __gtype_name__ = 'CmbProject'
 
-    _signal_params = {}
+    __gsignals__ = {
+        'ui-added': (GObject.SIGNAL_RUN_FIRST, None,
+                     (CmbUI,)),
+
+        'ui-removed': (GObject.SIGNAL_RUN_FIRST, None,
+                       (CmbUI,)),
+
+        'object-added': (GObject.SIGNAL_RUN_FIRST, None,
+                         (CmbObject,)),
+
+        'object-removed': (GObject.SIGNAL_RUN_FIRST, None,
+                           (CmbObject,))
+    }
+
     _table_columns = {}
 
     def __init__(self):
@@ -75,9 +88,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Load library support data
         self._load_libraries()
 
-        # Init signals and update hooks
-        self._init_signals(c)
-        self._init_update_hooks()
+        # Init table columns meta data
+        self._init_table_columns(c)
 
         c.execute("PRAGMA foreign_keys = ON;")
 
@@ -98,60 +110,41 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.conn.commit()
         c.close()
 
-    def _get_columns(self, c, table):
-        columns = []
-        types = []
-        pks = []
-
-        for row in c.execute(f'PRAGMA table_info({table});'):
-            col = row[1]
-            col_type =  row[2]
-            pk = row[5]
-
-            if col_type == 'INTEGER':
-                col_type = GObject.TYPE_INT
-            elif col_type == 'TEXT':
-                col_type = GObject.TYPE_STRING
-            elif col_type == 'BOOLEAN':
-                col_type = GObject.TYPE_BOOLEAN
-            else:
-                print('Error unknown type', col_type)
-
-            columns.append(col)
-            types.append(col_type)
-
-            if pk:
-                pks.append(col)
-
-        return { 'names': columns, 'types': types, 'pks': pks }
-
-    def _init_signals(self, c):
-        # Make sure we only initialize signals once
-        if (len(self._signal_params) > 0):
+    def _init_table_columns(self, c):
+        # Make sure we only initialize this once
+        if (len(self._table_columns) > 0):
             return
 
         for table in ['ui', 'ui_library', 'object', 'object_property', 'object_layout_property', 'object_signal']:
-            columns = self._get_columns(c, table)
-            self._table_columns[table] = columns
-            _table = table.replace('_', '-')
-            for action in ['added', 'removed', 'updated']:
-                signal = f'{_table}-{action}'
-                self._signal_params[signal] = columns
-                GObject.signal_new(signal,
-                                   CmbProject,
-                                   GObject.SignalFlags.RUN_LAST,
-                                   None,
-                                   tuple(columns['types']))
+            columns = []
+            types = []
+            pks = []
 
-    def _init_update_hooks(self):
-        for table in self._table_columns:
-            columns = self._table_columns[table]
+            for row in c.execute(f'PRAGMA table_info({table});'):
+                col = row[1]
+                col_type =  row[2]
+                pk = row[5]
 
-            # Crate notify callbacks, this is needed if we want to listen to events
-            # from another process using just sqlite
-            n_columns = len(columns['types']) + 1
-            self.conn.create_function(f'_{table}_emit', n_columns,
-                                      getattr(self, f'_{table}_emit'))
+                if col_type == 'INTEGER':
+                    col_type = GObject.TYPE_INT
+                elif col_type == 'TEXT':
+                    col_type = GObject.TYPE_STRING
+                elif col_type == 'BOOLEAN':
+                    col_type = GObject.TYPE_BOOLEAN
+                else:
+                    print('Error unknown type', col_type)
+
+                columns.append(col)
+                types.append(col_type)
+
+                if pk:
+                    pks.append(col)
+
+            self._table_columns[table] = {
+                'names': columns,
+                'types': types,
+                'pks': pks
+            }
 
     def _init_history_and_triggers(self):
         c = self.conn.cursor()
@@ -170,43 +163,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.conn.commit()
         c.close()
-
-    def _emit(self, signal, *args):
-        params = []
-        signal_params = self._signal_params[signal]['types']
-        # Make sure there is no None parameter
-        for i in range(0, len(signal_params)):
-            arg = args[i]
-            if arg is not None:
-                params.append(arg)
-            else:
-                arg_type = signal_params[i]
-                if arg_type == GObject.TYPE_INT:
-                    params.append(0)
-                elif arg_type == GObject.TYPE_STRING:
-                    params.append('')
-                elif arg_type == GObject.TYPE_BOOLEAN:
-                    params.append(False)
-
-        self.emit(signal, *params)
-
-    def _ui_emit(self, signal, *args):
-        self._emit(signal, *args)
-
-    def _ui_library_emit(self, signal, *args):
-        self._emit(signal, *args)
-
-    def _object_emit(self, signal, *args):
-        self._emit(signal, *args)
-
-    def _object_property_emit(self, signal, *args):
-        self._emit(signal, *args)
-
-    def _object_layout_property_emit(self, signal, *args):
-        self._emit(signal, *args)
-
-    def _object_signal_emit(self, signal, *args):
-        self._emit(signal, *args)
 
     def _create_support_table(self, c, table, group_msg=None):
         _table = table.replace('_', '-')
@@ -244,65 +200,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if not pk:
                 non_pk_columns.append(col)
 
-        # Triggers will get executed for row that break foreign key contraint
-        # So we can not rely on getting notifications without making sure
-        # there wont be a FK constraint failure.
-        # FIXME: Only use rowid tables to be able to use update hook function
-        fkeys = {}
-        for row in c.execute(f'PRAGMA foreign_key_list({table});'):
-            fk_id = row[0]
-            key = fkeys.get(fk_id, None)
-
-            fk_table = row[2]
-            from_col = row[3]
-            to_col = row[4]
-
-            if to_col is None:
-                to_col = from_col
-
-            if key is None:
-                key = {
-                    'table': fk_table,
-                    'from': [from_col],
-                    'to': [to_col]
-                }
-            else:
-                key['from'].append(from_col)
-                key['to'].append(to_col)
-
-            fkeys[fk_id] = key
-
-
-        fk_check = ''
-        for key in fkeys:
-            if fk_check != '':
-                fk_check += '\n    AND\n    '
-            k = fkeys[key]
-            fk_table = k['table']
-            f = k['from']
-            to = k['to']
-
-            first_check=''
-            where=''
-            for i in range(0, len(to)):
-                if i > 0:
-                    where += ' AND '
-                    first_check += ' OR '
-                first_check += f'NEW.{f[i]} IS NULL'
-                where += f'{to[i]} = NEW.{f[i]}'
-
-            fk_check += f'({first_check} OR (SELECT EXISTS(SELECT 1 FROM {fk_table} WHERE {where})))'
-
         # INSERT Trigger
         c.execute(f'''
     CREATE TRIGGER on_{table}_insert AFTER INSERT ON {table}
-    WHEN
-        {fk_check}
     BEGIN
       INSERT INTO history (command, data) VALUES ('INSERT', '{table}');
       INSERT INTO history_{table} (history_id, {columns})
         VALUES (last_insert_rowid(), {new_values});
-      SELECT _{table}_emit('{_table}-added', {new_values});
     END;
         ''')
 
@@ -325,14 +229,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
       INSERT INTO history_{table} (history_id, {columns})
         VALUES (last_insert_rowid(), {old_values});
       {pop}
-      SELECT _{table}_emit('{_table}-removed', {old_values});
-    END;
-        ''')
-
-        c.execute(f'''
-    CREATE TRIGGER on_{table}_update AFTER UPDATE ON {table}
-    BEGIN
-      SELECT _{table}_emit('{_table}-updated', {new_values});
     END;
         ''')
 
@@ -393,11 +289,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         name = node.get('id')
 
         # Insert object
-        c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
-        object_id = c.fetchone()[0]
-
-        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
-                  (ui_id, object_id, klass, name, parent_id))
+        obj = self.add_object(ui_id, klass, name, parent_id)
+        object_id = obj.object_id
 
         # Properties
         for prop in node.iterfind('property'):
@@ -481,15 +374,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def import_file(self, filename, overwrite=False):
         c = self.conn.cursor()
 
-        basename = os.path.basename(filename)
-
         # Remove old UI
         if overwrite:
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
-        c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
-                  (basename, filename))
-        ui_id = c.lastrowid
+        ui = self.add_ui(filename)
 
         tree = etree.parse(filename)
         root = tree.getroot()
@@ -503,11 +392,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if lib == 'gtk+':
                 builder_ver = 3;
 
-            c.execute("INSERT INTO ui_library (ui_id, library_id, version) VALUES (last_insert_rowid(), ?, ?);",
-                      (lib, version))
+            c.execute("INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);",
+                      (ui.ui_id, lib, version))
 
         for child in root.iterfind('object'):
-            self._import_object(builder_ver, ui_id, child, None)
+            self._import_object(builder_ver, ui.ui_id, child, None)
             self.conn.commit()
 
         c.close()
@@ -613,101 +502,75 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def add_ui(self, filename):
         basename = os.path.basename(filename)
 
-        self.conn.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
-                          (basename, filename))
-        self.conn.commit()
+        try:
+            c = self.conn.cursor()
+            c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
+                              (basename, filename))
+            ui_id = c.lastrowid
+            c.close()
+            self.conn.commit()
+        except:
+            return None
+        else:
+            ui = CmbUI(ui_id=ui_id, name=basename, filename=filename)
+            self._ui_id[ui_id] = self._store.append(None, [ui])
+            self.emit('ui-added', ui)
+            return ui
 
-    def remove_ui(self, filename):
-        self.conn.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
-        self.conn.commit()
+    def remove_ui(self, ui):
+        try:
+            self.conn.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
+            self.conn.commit()
+        except:
+            pass
+        else:
+            iter_ = self._ui_id.pop(ui.ui_id, None)
+
+            if iter_ is not None:
+                self.emit('ui-removed', ui)
+                self._store.remove(iter_)
 
     def add_object(self, ui_id, obj_type, name=None, parent_id=None):
         c = self.conn.cursor()
 
-        # Insert object
-        c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
-        object_id = c.fetchone()[0]
+        try:
+            # Insert object
+            c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
+            object_id = c.fetchone()[0]
 
-        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
-                  (ui_id, object_id, obj_type, name, parent_id))
-        c.close()
-        self.conn.commit()
+            c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
+                      (ui_id, object_id, obj_type, name, parent_id))
+            c.close()
+            self.conn.commit()
+        except:
+            return None
+        else:
+            obj = CmbObject(ui_id=ui_id,
+                            object_id=object_id,
+                            type_id=obj_type,
+                            name=name or '',
+                            parent_id=parent_id or 0)
+
+            if obj.parent_id == 0:
+                parent = self._ui_id.get(obj.ui_id, None)
+            else:
+                parent = self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
+
+            self.emit('object-added', obj)
+            self._object_id[f'{obj.ui_id}.{obj.object_id}'] = self._store.append(parent, [obj])
+            return obj
 
     def remove_object(self, ui_id, object_id):
-        self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;", (ui_id, object_id))
-        self.conn.commit()
-
-    # Signal handlers
-    def _get_object_from_args(self, table, args):
-        columns = self._table_columns[table]
-
-        data = {}
-        i = 0
-
-        for c in columns['names']:
-            data[c] = args[i]
-            i += 1
-
-        return data
-
-    def _update_object(self, obj, table, args):
-        columns = self._table_columns[table]
-        pks = columns['pks']
-
-        i = 0
-        for c in columns['names']:
-            if c not in pks:
-                obj.set_property(c, args[i])
-            i += 1
-
-    def do_ui_added(self, *args):
-        ui = CmbUI(**self._get_object_from_args ('ui', args))
-        self._ui_id[ui.ui_id] = self._store.append(None, [ui])
-
-    def do_ui_removed(self, *args):
-        ui_id = args[0]
-        iter_ = self._ui_id.pop(ui_id, None)
-        if iter_ is not None:
-            self._store.remove(iter_)
-
-    def do_ui_updated(self, *args):
-        ui_id = args[0]
-
-        iter_ = self._ui_id.get(ui_id, None)
-        if iter_ is None:
-            return
-
-        ui = self._store.get_value(iter_, 0)
-        self._update_object(ui, 'ui', args)
-
-    def do_object_added(self, *args):
-        obj = CmbObject(**self._get_object_from_args ('object', args))
-
-        if obj.parent_id == 0:
-            parent = self._ui_id.get(obj.ui_id, None)
+        try:
+            self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;", (ui_id, object_id))
+            self.conn.commit()
+        except:
+            pass
         else:
-            parent = self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
-
-        self._object_id[f'{obj.ui_id}.{obj.object_id}'] = self._store.append(parent, [obj])
-
-    def do_object_removed(self, *args):
-        ui_id = args[0]
-        object_id = args[1]
-
-        iter_ = self._object_id.pop(f'{ui_id}.{object_id}', None)
-        if iter_ is not None:
-            self._store.remove(iter_)
-
-    def do_object_updated(self, *args):
-        ui_id = args[0]
-        object_id = args[1]
-
-        iter_ = self._object_id.get(f'{ui_id}.{object_id}', None)
-        if iter_ is None:
-            return
-
-        obj = self._store.get_value(iter_, 0)
-        self._update_object(obj, 'object', args)
+            iter_ = self._object_id.pop(f'{ui_id}.{object_id}', None)
+            if iter_ is not None:
+                self.emit('object-removed', obj)
+                self._store.remove(iter_)
 
     # GtkTreeModel iface
 
