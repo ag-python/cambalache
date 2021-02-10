@@ -8,4 +8,5 @@ from cambalache import *
 
 # Ensure types that we are going to use in Glade
 GObject.type_ensure(CmbProject)
-GObject.type_ensure(CmbProjectView)
+GObject.type_ensure(CmbView)
+GObject.type_ensure(CmbTreeView)
