@@ -18,7 +18,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
 from .cmb_objects import CmbUI, CmbObject
-
+from .cmb_list_store import CmbListStore
 
 basedir = os.path.dirname(__file__) or '.'
 
@@ -49,8 +49,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         'object-removed': (GObject.SIGNAL_RUN_FIRST, None,
                            (CmbObject,))
     }
-
-    _table_columns = {}
 
     def __init__(self):
         GObject.GObject.__init__(self)
@@ -88,8 +86,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Load library support data
         self._load_libraries()
 
-        # Init table columns meta data
-        self._init_table_columns(c)
+        # Init GtkListStore wrappers for different tables
+        self._init_list_stores()
 
         c.execute("PRAGMA foreign_keys = ON;")
 
@@ -110,41 +108,40 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.conn.commit()
         c.close()
 
-    def _init_table_columns(self, c):
-        # Make sure we only initialize this once
-        if (len(self._table_columns) > 0):
-            return
+    def _get_table_data(self, table):
+        c = self.conn.cursor()
 
-        for table in ['ui', 'ui_library', 'object', 'object_property', 'object_layout_property', 'object_signal']:
-            columns = []
-            types = []
-            pks = []
+        columns = []
+        types = []
+        pks = []
 
-            for row in c.execute(f'PRAGMA table_info({table});'):
-                col = row[1]
-                col_type =  row[2]
-                pk = row[5]
+        for row in c.execute(f'PRAGMA table_info({table});'):
+            col = row[1]
+            col_type =  row[2]
+            pk = row[5]
 
-                if col_type == 'INTEGER':
-                    col_type = GObject.TYPE_INT
-                elif col_type == 'TEXT':
-                    col_type = GObject.TYPE_STRING
-                elif col_type == 'BOOLEAN':
-                    col_type = GObject.TYPE_BOOLEAN
-                else:
-                    print('Error unknown type', col_type)
+            if col_type == 'INTEGER':
+                col_type = GObject.TYPE_INT
+            elif col_type == 'TEXT':
+                col_type = GObject.TYPE_STRING
+            elif col_type == 'BOOLEAN':
+                col_type = GObject.TYPE_BOOLEAN
+            else:
+                print('Error unknown type', col_type)
 
-                columns.append(col)
-                types.append(col_type)
+            columns.append(col)
+            types.append(col_type)
 
-                if pk:
-                    pks.append(col)
+            if pk:
+                pks.append(col)
 
-            self._table_columns[table] = {
-                'names': columns,
-                'types': types,
-                'pks': pks
-            }
+        c.close()
+
+        return {
+            'names': columns,
+            'types': types,
+            'pks': pks
+        }
 
     def _init_history_and_triggers(self):
         c = self.conn.cursor()
@@ -163,6 +160,16 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.conn.commit()
         c.close()
+
+    def _init_list_stores(self):
+        # Public List Stores
+        type_query = '''SELECT * FROM type
+                          WHERE
+                            parent_id IS NOT NULL AND
+                            parent_id NOT IN ('interface', 'enum', 'flags') AND
+                            layout IS NULL
+                          ORDER BY type_id;'''
+        self.type_list = CmbListStore(project=self, table='type', query=type_query)
 
     def _create_support_table(self, c, table, group_msg=None):
         _table = table.replace('_', '-')
