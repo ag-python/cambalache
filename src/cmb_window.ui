@@ -136,7 +136,16 @@
     <property name="show-numbers">True</property>
     <signal name="item-activated" handler="on_open_recent_action_item_activated" swapped="no"/>
   </object>
-  <object class="GtkEntryCompletion" id="type_entrycompletion"/>
+  <object class="GtkEntryCompletion" id="type_entrycompletion">
+    <property name="text-column">0</property>
+    <property name="inline-completion">True</property>
+    <child>
+      <object class="GtkCellRendererText"/>
+      <attributes>
+        <attribute name="text">0</attribute>
+      </attributes>
+    </child>
+  </object>
   <template class="CmbWindow" parent="GtkApplicationWindow">
     <property name="can-focus">False</property>
     <child>

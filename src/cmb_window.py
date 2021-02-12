@@ -30,6 +30,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     view = Gtk.Template.Child()
     tree_view = Gtk.Template.Child()
     type_entry = Gtk.Template.Child()
+    type_entrycompletion = Gtk.Template.Child()
 
     about_dialog = Gtk.Template.Child()
 
@@ -46,6 +47,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_project_notify(self, obj, pspec):
         self.view.project = self.project
         self.tree_view.props.model = self.project
+        self.type_entrycompletion.props.model = self.project.type_list if self.project else None
 
     @Gtk.Template.Callback('on_about_dialog_delete_event')
     def _on_about_dialog_delete_event(self, widget, event):
