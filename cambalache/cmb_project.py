@@ -50,8 +50,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                            (CmbObject,))
     }
 
-    def __init__(self):
-        GObject.GObject.__init__(self)
+    filename = GObject.Property(type=str)
+
+    def __init__(self, **kwargs):
+        GObject.GObject.__init__(self, **kwargs)
 
         # Create TreeModel store
         self._ui_id = {}
@@ -93,6 +95,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.conn.commit()
         c.close()
+
+        self.load(self.filename)
 
     def __del__(self):
         self.conn.commit()
@@ -284,11 +288,80 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             ''')
 
     def load(self, filename):
-        pass
+        self.filename = filename
 
-    def save(self, filename):
+        if filename is None or not os.path.isfile(filename):
+            return
+
+        c = self.conn.cursor()
+        cc = self.conn.cursor()
+
+        # TODO: implement own format instead of sql
+        with open(self.filename, 'r') as sql:
+            c.executescript(sql.read())
+
+        self.conn.commit()
+
+        # Populate tree view
+        for row in c.execute('SELECT ui_id, name, filename FROM ui;'):
+            ui_id = row[0]
+            self._add_ui(False, ui_id, row[1], row[2])
+
+            # Update UI objects
+            for obj in cc.execute('SELECT object_id, type_id, name, parent_id FROM object WHERE ui_id=?;', (ui_id, )):
+                 self._add_object(False, ui_id, obj[0], obj[1], obj[2], obj[3])
+
+        c.close()
+        cc.close()
+
+    def save(self):
+        def get_row(row):
+            r = '('
+            first = True
+
+            for c in row:
+                if first:
+                    first = False
+                else:
+                    r += ', '
+
+                if type(c)  == str:
+                    val = c.replace("'", "''")
+                    r += f"'{val}'"
+                elif c is None:
+                    r += 'NULL'
+                else:
+                    r += str(c)
+
+            r += ')'
+
+            return r
+
+        def _dump_table(fd, table):
+            c = self.conn.cursor()
+
+            c.execute(f"SELECT * FROM {table};")
+            row = c.fetchone()
+
+            if row is not None:
+                fd.write(f"INSERT INTO {table} VALUES\n")
+
+            while row is not None:
+                fd.write(get_row(row))
+                row = c.fetchone()
+                if row is not None:
+                    fd.write(',\n')
+                else:
+                    fd.write(';\n\n')
+
+            c.close()
+
         # TODO: create custom XML file format with all the data from project tables
-        pass
+        with open(self.filename, 'w') as fd:
+            for table in ['ui', 'ui_library', 'object', 'object_property',
+                          'object_layout_property', 'object_signal']:
+                _dump_table(fd, table)
+            fd.close();
 
     def _import_object(self, builder_ver, ui_id, node, parent_id):
         c = self.conn.cursor()
@@ -506,6 +579,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         c.close()
 
+    def _add_ui(self, emit, ui_id, name, filename):
+        ui = CmbUI(ui_id=ui_id, name=name, filename=filename)
+        self._ui_id[ui_id] = self._store.append(None, [ui])
+
+        if emit:
+            self.emit('ui-added', ui)
+
+        return ui
+
     def add_ui(self, filename):
         basename = os.path.basename(filename)
 
@@ -519,10 +601,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             return None
         else:
-            ui = CmbUI(ui_id=ui_id, name=basename, filename=filename)
-            self._ui_id[ui_id] = self._store.append(None, [ui])
-            self.emit('ui-added', ui)
-            return ui
+            return self._add_ui(True, ui_id, basename, filename)
 
     def remove_ui(self, ui):
         try:
@@ -536,6 +615,25 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if iter_ is not None:
                 self.emit('ui-removed', ui)
                 self._store.remove(iter_)
+
+    def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None):
+        obj = CmbObject(ui_id=ui_id,
+                        object_id=object_id,
+                        type_id=obj_type,
+                        name=name or '',
+                        parent_id=parent_id or 0)
+
+        if obj.parent_id == 0:
+            parent = self._ui_id.get(obj.ui_id, None)
+        else:
+            parent = self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
+
+        self._object_id[f'{obj.ui_id}.{obj.object_id}'] = self._store.append(parent, [obj])
+
+        if emit:
+            self.emit('object-added', obj)
+
+        return obj
 
     def add_object(self, ui_id, obj_type, name=None, parent_id=None):
         c = self.conn.cursor()
@@ -552,20 +650,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             return None
         else:
-            obj = CmbObject(ui_id=ui_id,
-                            object_id=object_id,
-                            type_id=obj_type,
-                            name=name or '',
-                            parent_id=parent_id or 0)
-
-            if obj.parent_id == 0:
-                parent = self._ui_id.get(obj.ui_id, None)
-            else:
-                parent = self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
-
-            self.emit('object-added', obj)
-            self._object_id[f'{obj.ui_id}.{obj.object_id}'] = self._store.append(parent, [obj])
-            return obj
+            return self._add_object(True, ui_id, object_id, obj_type, name, parent_id)
 
     def remove_object(self, ui_id, object_id):
         try:
