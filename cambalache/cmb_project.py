@@ -50,6 +50,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                            (CmbObject,))
     }
 
+    target_tk = GObject.Property(type=str)
     filename = GObject.Property(type=str)
 
     def __init__(self, **kwargs):
@@ -103,11 +104,16 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.conn.close()
 
     def _load_libraries(self):
+        if self.target_tk is None or len(self.target_tk) == 0:
+            return
+
         c = self.conn.cursor()
 
         # TODO: implement own format instead of sql
-        with open('gtk3.sql', 'r') as sql:
+        with open(os.path.join(basedir, self.target_tk + '.sql'), 'r') as sql:
             c.executescript(sql.read())
+
+        # TODO: Load all libraries that depend on self.target_tk
 
         self.conn.commit()
         c.close()
@@ -294,13 +300,26 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             return
 
         c = self.conn.cursor()
-        cc = self.conn.cursor()
 
         # TODO: implement own format instead of sql
         with open(self.filename, 'r') as sql:
+            cmb = sql.readline()
+
+            if cmb.startswith('/* Cambalache target=gtk-4.0 */'):
+                self.target_tk = 'gtk-4.0'
+            elif cmb.startswith('/* Cambalache target=gtk+-3.0 */'):
+                self.target_tk = 'gtk+-3.0'
+            else:
+                c.close()
+                raise Exception('Unknown file type')
+                return
+
+            self._load_libraries()
+
             c.executescript(sql.read())
 
         self.conn.commit()
+        cc = self.conn.cursor()
 
         # Populate tree view
         for row in c.execute('SELECT ui_id, name, filename FROM ui;'):
@@ -358,6 +377,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         # TODO: create custom XML file format with all the data from project tables
         with open(self.filename, 'w') as fd:
+            fd.write(f'/* Cambalache target={self.target_tk} */\n')
+
             for table in ['ui', 'ui_library', 'object', 'object_property',
                           'object_layout_property', 'object_signal']:
                 _dump_table(fd, table)
