@@ -11,7 +11,7 @@ import sys
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gio, Gtk
+from gi.repository import GLib, GObject, Gio, Gtk
 
 from cambalache import *
 
@@ -26,6 +26,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     open_button_box = Gtk.Template.Child()
     import_button_box = Gtk.Template.Child()
 
+    headerbar = Gtk.Template.Child()
     stack = Gtk.Template.Child()
 
     # Start screen
@@ -45,15 +46,13 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     about_dialog = Gtk.Template.Child()
 
-    project = GObject.Property(type=CmbProject)
-
     def __init__(self, **kwargs):
+        self._project = None
+
         super().__init__(**kwargs)
 
         self.open_button_box.props.homogeneous = False
         self.import_button_box.props.homogeneous = False
-
-        self.connect("notify::project", self._on_project_notify)
 
         for action in ['open', 'create_new', 'new',
                        'undo', 'redo',
@@ -65,10 +64,29 @@ class CmbWindow(Gtk.ApplicationWindow):
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self.add_action(gaction)
 
-    def _on_project_notify(self, obj, pspec):
-        self.view.project = self.project
-        self.tree_view.props.model = self.project
-        self.type_entrycompletion.props.model = self.project.type_list if self.project else None
+    @GObject.Property(type=CmbProject)
+    def project(self):
+        return self._project
+
+    @project.setter
+    def _set_project(self, project):
+        if self._project is not None:
+            self._project.disconnect_by_func(self._on_project_filename_notify)
+
+        self._project = project
+        self.view.project = project
+        self.tree_view.props.model = project
+        self.type_entrycompletion.props.model = self.project.type_list if project else None
+
+        if project is not None:
+            self._on_project_filename_notify(None, None)
+            self._project.connect("notify::filename", self._on_project_filename_notify)
+        else:
+            self.headerbar.set_subtitle(None)
+
+    def _on_project_filename_notify(self, obj, pspec):
+        path = self.project.filename.replace(GLib.get_home_dir(), '~')
+        self.headerbar.set_subtitle(path)
 
     @Gtk.Template.Callback('on_about_dialog_delete_event')
     def _on_about_dialog_delete_event(self, widget, event):
@@ -93,18 +111,32 @@ class CmbWindow(Gtk.ApplicationWindow):
             Gtk.ResponseType.OK,
         )
 
+        if self.project is not None:
+            dialog.select_filename(self.project.filename)
+
         return dialog
 
     def _on_open_activate(self, action, data):
         dialog = self._file_open_dialog_new("Choose file to open",
                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
-            self.project = CmbProject(filename=dialog.get_filename())
-            self.stack.set_visible_child_name('workspace')
+            try:
+                self.project = CmbProject(filename=dialog.get_filename())
+                self.stack.set_visible_child_name('workspace')
+            except Exception as e:
+                pass
+
         dialog.destroy()
 
     def _on_create_new_activate(self, action, data):
         self.stack.set_visible_child_name('new_project')
+        self.set_focus(self.np_name_entry)
+
+        home = GLib.get_home_dir()
+        projects = os.path.join(home, 'Projects')
+        directory = projects if os.path.isdir(projects) else home
+
+        self.np_location_chooser.select_filename(directory)
 
     def _on_new_activate(self, action, data):
         if self.project is not None:
@@ -113,8 +145,18 @@ class CmbWindow(Gtk.ApplicationWindow):
         name = self.np_name_entry.props.text
         location = self.np_location_chooser.get_filename() or '.'
 
+        if len(name) < 1:
+            self.set_focus(self.np_name_entry)
+            return
+
+        if self.np_gtk3_radiobutton.get_active():
+            target_tk='gtk+-3.0'
+        elif self.np_gtk4_radiobutton.get_active():
+            target_tk='gtk-4.0'
+
+        name, ext = os.path.splitext(name)
         filename = os.path.join(location, name + '.cmb')
-        self.project = CmbProject(filename=filename)
+        self.project = CmbProject(target_tk=target_tk, filename=filename)
         self.stack.set_visible_child_name('workspace')
 
     def _on_undo_activate(self, action, data):
