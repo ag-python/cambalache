@@ -12,7 +12,7 @@ import importlib
 
 # We need to use lxml to get access to nsmap
 from lxml import etree
-from toposort import toposort_flatten
+from .toposort import toposort_flatten
 from gi.repository import GObject
 
 # Global XML name space
