@@ -51,6 +51,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         super().__init__(**kwargs)
 
+        self._actions = {}
         self.open_button_box.props.homogeneous = False
         self.import_button_box.props.homogeneous = False
 
@@ -60,9 +61,12 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'add_ui', 'remove_ui',
                        'import', 'export',
                        'close', 'about']:
-            gaction= Gio.SimpleAction.new(action, None)
+            gaction = Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
+            self._actions[action] = gaction
             self.add_action(gaction)
+
+        self._update_actions()
 
     @GObject.Property(type=CmbProject)
     def project(self):
@@ -72,6 +76,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _set_project(self, project):
         if self._project is not None:
             self._project.disconnect_by_func(self._on_project_filename_notify)
+            self._project.disconnect_by_func(self._on_project_selection_changed)
 
         self._project = project
         self.view.project = project
@@ -81,8 +86,11 @@ class CmbWindow(Gtk.ApplicationWindow):
         if project is not None:
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
+            self._project.connect('selection-changed', self._on_project_selection_changed)
         else:
             self.headerbar.set_subtitle(None)
+
+        self._update_actions()
 
     def _on_project_filename_notify(self, obj, pspec):
         path = self.project.filename.replace(GLib.get_home_dir(), '~')
@@ -111,10 +119,31 @@ class CmbWindow(Gtk.ApplicationWindow):
             except Exception as e:
                 pass
 
+    def _update_action_remove_ui(self):
+        if self.project is not None:
+            selection = self.project.get_selection()
+            ui_selected = len(selection) > 0 and type(selection[0]) == CmbUI
+            self._actions['remove_ui'].set_enabled(ui_selected)
+
+    def _on_project_selection_changed(self, project):
+        self._update_action_remove_ui()
+
+    def _update_actions(self):
+        has_project = self.project is not None
+
+        for action in ['undo', 'redo',
+                       'save', 'save_as',
+                       'add_ui', 'remove_ui',
+                       'import', 'export',
+                       'close']:
+            self._actions[action].set_enabled(has_project)
+
+        self._update_action_remove_ui()
+
     def _file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
         dialog = Gtk.FileChooserDialog(
             title=title,
-            parent=self,
+         parent=self,
             action=action,
             filter=filter_obj
         )
@@ -194,7 +223,6 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.project.save()
 
         dialog.destroy()
-
 
     def _on_add_ui_activate(self, action, data):
         if self.project is None:
