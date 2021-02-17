@@ -28,7 +28,7 @@ class CmbView(Gtk.ScrolledWindow):
         self.add(text_view)
 
     def _update_view(self):
-        if self._project is not None:
+        if self._project is not None and self._ui_id > 0:
             ui = self._project.export_ui(self._ui_id)
             self.buffer.set_text(ui.decode('unicode_escape'))
             return
@@ -44,6 +44,9 @@ class CmbView(Gtk.ScrolledWindow):
             if self._ui_id != ui_id:
                 self._ui_id = ui_id
                 self._update_view()
+        elif self._ui_id > 0:
+            self._ui_id = 0
+            self._update_view()
 
     def _on_project_change(self, *args):
         self._update_view()
