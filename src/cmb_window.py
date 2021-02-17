@@ -95,7 +95,10 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback('on_type_entry_activate')
     def _on_type_entry_activate(self, entry):
-        self.project.add_object(1, entry.get_text())
+        selection = self.project.get_selection()
+
+        if len(selection) > 0:
+            self.project.add_object(selection[0].ui_id, entry.get_text())
 
     def _file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
         dialog = Gtk.FileChooserDialog(
@@ -181,7 +184,23 @@ class CmbWindow(Gtk.ApplicationWindow):
         dialog.destroy()
 
     def _on_remove_ui_activate(self, action, data):
-        print('_on_remove_ui_activate')
+        if self.project is None:
+            return
+
+        selection = self.project.get_selection()
+        if len(selection) > 0:
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                flags=0,
+                message_type=Gtk.MessageType.QUESTION,
+                buttons=Gtk.ButtonsType.YES_NO,
+                text=f"Do you want to delete selected UI?",
+            )
+
+            if dialog.run() == Gtk.ResponseType.YES:
+                self.project.remove_ui(selection[0])
+
+            dialog.destroy()
 
     def _on_import_activate(self, action, data):
         if self.project is None:
