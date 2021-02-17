@@ -15,7 +15,7 @@ from lxml import etree
 from lxml.builder import E
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gtk
+from gi.repository import GLib, GObject, Gtk
 
 from .cmb_objects import CmbUI, CmbObject
 from .cmb_list_store import CmbListStore
@@ -47,7 +47,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                          (CmbObject,)),
 
         'object-removed': (GObject.SIGNAL_RUN_FIRST, None,
-                           (CmbObject,))
+                           (CmbObject,)),
+
+        'selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
     target_tk = GObject.Property(type=str)
@@ -55,6 +57,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def __init__(self, **kwargs):
         GObject.GObject.__init__(self, **kwargs)
+
+        # Selection
+        self._selection = []
 
         # Create TreeModel store
         self._ui_id = {}
@@ -69,7 +74,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._store.connect('row-changed', lambda o, p, i: self.row_changed(p, i))
         self._store.connect('row-inserted', lambda o, p, i: self.row_inserted(p, i))
         self._store.connect('row-has-child-toggled', lambda o, p, i: self.row_has_child_toggled(p, i))
-        self._store.connect('row-deleted', lambda o, p, d: self.row_deleted(p))
+        self._store.connect('row-deleted', lambda o, p: self.row_deleted(p))
         self._store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
 
         # DataModel is only used internally
@@ -628,14 +633,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         try:
             self.conn.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
             self.conn.commit()
-        except:
-            pass
-        else:
+
             iter_ = self._ui_id.pop(ui.ui_id, None)
 
             if iter_ is not None:
-                self.emit('ui-removed', ui)
                 self._store.remove(iter_)
+                self.emit('ui-removed', ui)
+        except:
+            pass
 
     def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None):
         obj = CmbObject(ui_id=ui_id,
@@ -684,6 +689,26 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if iter_ is not None:
                 self.emit('object-removed', obj)
                 self._store.remove(iter_)
+
+    def get_selection(self):
+        return self._selection
+
+    def set_selection(self, selection):
+        if type(selection) != list:
+            return
+
+        for obj in selection:
+            if type(obj) != CmbUI and type(obj) != CmbObject:
+                return
+
+        self._selection = selection
+        self.emit('selection-changed')
+
+    def get_iter(self, obj):
+        if type(obj) == CmbObject:
+            return self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
+        elif type(obj) == CmbUI:
+            return self._UI_id.get(obj.ui_id, None)
 
     # GtkTreeModel iface
 
