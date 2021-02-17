@@ -19,6 +19,7 @@ class CmbView(Gtk.ScrolledWindow):
 
     def __init__(self, **kwargs):
         self._project = None
+        self._ui_id = 0
 
         super().__init__(**kwargs)
 
@@ -28,10 +29,21 @@ class CmbView(Gtk.ScrolledWindow):
 
     def _update_view(self):
         if self._project is not None:
-            ui = self._project.export_ui(1)
+            ui = self._project.export_ui(self._ui_id)
             self.buffer.set_text(ui.decode('unicode_escape'))
-        else:
-            self.buffer.set_text('')
+            return
+
+        self.buffer.set_text('')
+
+    def _on_project_selection_changed(self, project):
+        selection = project.get_selection()
+
+        if len(selection) > 0:
+            ui_id = selection[0].ui_id
+
+            if self._ui_id != ui_id:
+                self._ui_id = ui_id
+                self._update_view()
 
     def _on_project_change(self, *args):
         self._update_view()
@@ -44,12 +56,15 @@ class CmbView(Gtk.ScrolledWindow):
     def _set_project(self, project):
         if self._project is not None:
             self._project.disconnect_by_func(self._on_project_change)
+            self._project.disconnect_by_func(self._on_project_selection_changed)
 
         self._project = project
 
         self._update_view()
 
         if project is not None:
+            self._project.connect('selection-changed', self._on_project_selection_changed)
+
             for table in ['ui', 'object']:
                 table = table.replace('_', '-')
                 for action in ['added', 'removed']:
