@@ -20,12 +20,17 @@ class CmbTreeView(Gtk.TreeView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self._project = None
+        self._selection = self.get_selection()
+        self._selection.connect('changed', self._on_selection_changed)
         self.set_headers_visible (False)
 
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn('Object(Type)', renderer)
         column.set_cell_data_func(renderer, self._name_cell_data_func, None)
         self.append_column(column)
+
+        self.connect('notify::model', self._on_model_notify)
 
     def _name_cell_data_func(self, column, cell, model, iter_, data):
         obj = model.get_value(iter_, 0)
@@ -35,3 +40,32 @@ class CmbTreeView(Gtk.TreeView):
         elif type(obj) == CmbUI:
             cell.set_property('text', obj.filename)
 
+    def _on_model_notify(self, treeview, pspec):
+        if self._project is not None:
+            self._project.disconnect_by_func(self._on_project_selection_changed)
+
+        self._project = self.props.model
+
+        if self._project:
+            self._project.connect('selection-changed', self._on_project_selection_changed)
+
+    def _on_project_selection_changed(self, p):
+        project, _iter = self._selection.get_selected()
+        current = [project.get_value(_iter, 0)] if _iter is not None else []
+        selection = project.get_selection()
+
+        if selection == current:
+            return
+
+        if len(selection) > 0:
+            self._selection.select_iter(project.get_iter(selection[0]))
+        else:
+            self._selection.unselect_all()
+
+    def _on_selection_changed(self, selection):
+        project, _iter = selection.get_selected()
+
+
+        if _iter is not None:
+            obj = project.get_value(_iter, 0)
+            project.set_selection([obj])
