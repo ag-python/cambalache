@@ -100,6 +100,17 @@ class CmbWindow(Gtk.ApplicationWindow):
         if len(selection) > 0:
             self.project.add_object(selection[0].ui_id, entry.get_text())
 
+    @Gtk.Template.Callback('on_open_recent_action_item_activated')
+    def _on_open_recent_action_item_activated(self, recent):
+        uri = recent.get_current_uri()
+        if uri is not None:
+            try:
+                filename, host = GLib.filename_from_uri(uri)
+                self.project = CmbProject(filename=filename)
+                self.stack.set_visible_child_name('workspace')
+            except Exception as e:
+                pass
+
     def _file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
         dialog = Gtk.FileChooserDialog(
             title=title,
@@ -115,7 +126,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         )
 
         if self.project is not None:
-            dialog.select_filename(self.project.filename)
+            dialog.set_current_folder(os.path.dirname(self.project.filename))
 
         return dialog
 
@@ -139,7 +150,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         projects = os.path.join(home, 'Projects')
         directory = projects if os.path.isdir(projects) else home
 
-        self.np_location_chooser.select_filename(directory)
+        self.np_location_chooser.set_current_folder(directory)
 
     def _on_new_activate(self, action, data):
         if self.project is not None:
@@ -173,10 +184,23 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.project.save()
 
     def _on_save_as_activate(self, action, data):
-        print('_on_save_as_activate')
+        if self.project is None:
+            return
+
+        dialog = self._file_open_dialog_new("Choose a new file to save the project",
+                                            Gtk.FileChooserAction.SAVE)
+        if dialog.run() == Gtk.ResponseType.OK:
+            self.project.filename = dialog.get_filename()
+            self.project.save()
+
+        dialog.destroy()
+
 
     def _on_add_ui_activate(self, action, data):
-        dialog = self._file_open_dialog_new("Choose a file to save the project",
+        if self.project is None:
+            return
+
+        dialog = self._file_open_dialog_new("Choose a file name for the new UI",
                                             Gtk.FileChooserAction.SAVE)
         if dialog.run() == Gtk.ResponseType.OK:
             self.project.add_ui(dialog.get_filename())
