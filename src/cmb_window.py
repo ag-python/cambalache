@@ -87,6 +87,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
             self._project.connect('selection-changed', self._on_project_selection_changed)
+            self.type_entry.set_placeholder_text(project.target_tk)
         else:
             self.headerbar.set_subtitle(None)
 
