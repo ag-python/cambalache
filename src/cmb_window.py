@@ -107,7 +107,9 @@ class CmbWindow(Gtk.ApplicationWindow):
         selection = self.project.get_selection()
 
         if len(selection) > 0:
-            self.project.add_object(selection[0].ui_id, entry.get_text())
+            obj = selection[0]
+            parent_id = obj.object_id if type(obj) == CmbObject else None
+            self.project.add_object(obj.ui_id, entry.get_text(), parent_id=parent_id)
 
     @Gtk.Template.Callback('on_open_recent_action_item_activated')
     def _on_open_recent_action_item_activated(self, recent):
@@ -200,6 +202,21 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         name, ext = os.path.splitext(name)
         filename = os.path.join(location, name + '.cmb')
+
+        if os.path.exists(filename):
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                flags=0,
+                message_type=Gtk.MessageType.INFO,
+                buttons=Gtk.ButtonsType.OK,
+                text="File name already exists, choose a different name.",
+            )
+
+            dialog.run()
+            dialog.destroy()
+            self.set_focus(self.np_name_entry)
+            return
+
         self.project = CmbProject(target_tk=target_tk, filename=filename)
         self.stack.set_visible_child_name('workspace')
 
