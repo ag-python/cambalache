@@ -7,37 +7,33 @@
  */
 
 /* Test Project */
-
-INSERT INTO object (type_id, name, parent_id) VALUES
-('GtkWindow', 'main', NULL),
-('GtkGrid', 'grid', 1),
-('GtkLabel', 'label', 2),
-('GtkButton', 'button', 2),
-('GtkButton', 'todelete', 2),
-('GtkLabel', 'label2', NULL);
-
-INSERT INTO object_property (object_id, owner_id, property_id, value) VALUES
-(3, 'GtkLabel', 'label', 'Hello World'),
-(4, 'GtkButton', 'label', 'Click Me'),
-(5, 'GtkButton', 'label', 'Bye Bye World'),
-(6, 'GtkLabel', 'label', 'Hola Mundo');
-
-INSERT INTO object_layout_property (object_id, child_id, owner_id, property_id, value) VALUES
-(1, 3, 'GtkGridLayoutChild', 'column', 1),
-(1, 3, 'GtkGridLayoutChild', 'row', 1),
-(1, 4, 'GtkGridLayoutChild', 'column', 2),
-(1, 4, 'GtkGridLayoutChild', 'row', 1),
-(1, 5, 'GtkGridLayoutChild', 'column', 1),
-(1, 5, 'GtkGridLayoutChild', 'row', 2);
-
-INSERT INTO object_signal (object_id, owner_id, signal_id, handler) VALUES
-(4, 'GtkButton', 'clicked', 'on_button_clicked'),
-(5, 'GtkButton', 'clicked', 'on_todelete_clicked');
-
 INSERT INTO ui (name, filename) VALUES ('Test UI', 'test.ui');
 
-INSERT INTO ui_object (ui_id, object_id) VALUES (1, 1);
+INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES
+(1, 1, 'GtkWindow', 'main', NULL),
+(1, 2, 'GtkGrid', 'grid', 1),
+(1, 3, 'GtkLabel', 'label', 2),
+(1, 4, 'GtkButton', 'button', 2),
+(1, 5, 'GtkButton', 'todelete', 2),
+(1, 6, 'GtkLabel', 'label2', NULL);
 
+INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value) VALUES
+(1, 3, 'GtkLabel', 'label', 'Hello World'),
+(1, 4, 'GtkButton', 'label', 'Click Me'),
+(1, 5, 'GtkButton', 'label', 'Bye Bye World'),
+(1, 6, 'GtkLabel', 'label', 'Hola Mundo');
+
+INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES
+(1, 1, 3, 'GtkGridLayoutChild', 'column', 1),
+(1, 1, 3, 'GtkGridLayoutChild', 'row', 1),
+(1, 1, 4, 'GtkGridLayoutChild', 'column', 2),
+(1, 1, 4, 'GtkGridLayoutChild', 'row', 1),
+(1, 1, 5, 'GtkGridLayoutChild', 'column', 1),
+(1, 1, 5, 'GtkGridLayoutChild', 'row', 2);
+
+INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler) VALUES
+(1, 4, 'GtkButton', 'clicked', 'on_button_clicked'),
+(1, 5, 'GtkButton', 'clicked', 'on_todelete_clicked');
 
 /* Test history */
 UPDATE object_property SET value ='Hello World 1' WHERE (object_id=3 AND owner_id='GtkLabel' AND property_id='label');
