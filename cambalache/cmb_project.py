@@ -1,7 +1,7 @@
 #
 # CmbProject - Cambalache Project
 #
-# Copyright (C) 2020  Juan Pablo Ugarte - All Rights Reserved
+# Copyright (C) 2020-2021  Juan Pablo Ugarte - All Rights Reserved
 #
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 #
@@ -62,7 +62,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._selection = []
 
         # Create TreeModel store
-        self._ui_id = {}
         self._object_id = {}
 
         # Use a TreeStore to hold object tree instead of using SQL for every
@@ -76,6 +75,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._store.connect('row-has-child-toggled', lambda o, p, i: self.row_has_child_toggled(p, i))
         self._store.connect('row-deleted', lambda o, p: self.row_deleted(p))
         self._store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
+
+        self._history_commands = {}
+        self.history_index = -1
+        self.history_index_max = -1
 
         # DataModel is only used internally
         self.conn = sqlite3.connect(":memory:")
@@ -192,6 +195,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Create a history table to store data for INSERT and DELETE commands
         c.executescript(f'''
     CREATE TABLE history_{table} AS SELECT * FROM {table} WHERE 0;
+    ALTER TABLE history_{table} ADD COLUMN history_old BOOLEAN;
     ALTER TABLE history_{table} ADD COLUMN history_id INTERGER REFERENCES history ON DELETE CASCADE;
     CREATE INDEX history_{table}_history_id_fk ON history_{table} (history_id);
     ''')
@@ -202,7 +206,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         new_values = None
 
         all_columns = []
+        pk_columns = []
         non_pk_columns = []
+
+        # Use this flag to know if we should log history or not
+        history_is_enabled = "(SELECT value FROM global WHERE key='history_enabled')"
 
         for row in c.execute(f'PRAGMA table_info({table});'):
             col = row[1]
@@ -219,16 +227,36 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 new_values += ', NEW.' + col
 
             all_columns.append(col)
-            if not pk:
+            if pk:
+                pk_columns.append(col)
+            else:
                 non_pk_columns.append(col)
+
+        pkcolumns = None
+        for col in pk_columns:
+            if pkcolumns is None:
+                pkcolumns = col
+            else:
+                pkcolumns += ', ' + col
+
+        command = {
+            'PK': f"SELECT {pkcolumns} FROM history_{table} WHERE history_id=?;",
+            'COUNT': f"SELECT count(1) FROM {table} WHERE ({pkcolumns}) IS (SELECT {pkcolumns} FROM history_{table} WHERE history_id=?);",
+            'DATA': f"SELECT {columns} FROM history_{table} WHERE history_id=?;",
+            'DELETE': f"DELETE FROM {table} WHERE ({pkcolumns}) IS (SELECT {pkcolumns} FROM history_{table} WHERE history_id=?);",
+            'INSERT': f"INSERT INTO {table} ({columns}) SELECT {columns} FROM history_{table} WHERE history_id=?;"
+        }
+        self._history_commands[table] = command
 
         # INSERT Trigger
         c.execute(f'''
     CREATE TRIGGER on_{table}_insert AFTER INSERT ON {table}
+    WHEN
+      {history_is_enabled}
     BEGIN
       INSERT INTO history (command, data) VALUES ('INSERT', '{table}');
-      INSERT INTO history_{table} (history_id, {columns})
-        VALUES (last_insert_rowid(), {new_values});
+      INSERT INTO history_{table} (history_id, history_old, {columns})
+        VALUES (last_insert_rowid(), 0, {new_values});
     END;
         ''')
 
@@ -236,6 +264,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if group_msg:
             c.execute(f'''
     CREATE TRIGGER on_{table}_before_delete BEFORE DELETE ON {table}
+    WHEN
+      {history_is_enabled}
     BEGIN
       INSERT INTO history (command, data) VALUES ('PUSH', {group_msg});
     END;
@@ -246,10 +276,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         c.execute(f'''
     CREATE TRIGGER on_{table}_delete AFTER DELETE ON {table}
+    WHEN
+      {history_is_enabled}
     BEGIN
       INSERT INTO history (command, data) VALUES ('DELETE', '{table}');
-      INSERT INTO history_{table} (history_id, {columns})
-        VALUES (last_insert_rowid(), {old_values});
+      INSERT INTO history_{table} (history_id, history_old, {columns})
+        VALUES (last_insert_rowid(), 1, {old_values});
       {pop}
     END;
         ''')
@@ -273,6 +305,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute(f'''
     CREATE TRIGGER on_{table}_update_{column} AFTER UPDATE OF {column} ON {table}
     WHEN
+      {history_is_enabled} AND
       (SELECT command, data FROM history WHERE history_id = {last_history_id})
         IS NOT ('UPDATE', '{table}')
         OR
@@ -280,14 +313,16 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         IS NOT ({all_but_column_values})
     BEGIN
       INSERT INTO history (command, data) VALUES ('UPDATE', '{table}');
-      INSERT INTO history_{table} (history_id, {columns})
-        VALUES (last_insert_rowid(), {new_values});
+      INSERT INTO history_{table} (history_id, history_old, {columns})
+        VALUES (last_insert_rowid(), 1, {old_values}),
+               (last_insert_rowid(), 0, {new_values});
     END;
             ''')
 
             c.execute(f'''
     CREATE TRIGGER on_{table}_update_{column}_compress AFTER UPDATE OF {column} ON {table}
     WHEN
+      {history_is_enabled} AND
       (SELECT command, data FROM history WHERE history_id = {last_history_id})
         IS ('UPDATE', '{table}')
         AND
@@ -297,6 +332,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
       UPDATE history_{table} SET {column}=NEW.{column} WHERE history_id = {last_history_id};
     END;
             ''')
+
+    def _update_history_index(self):
+        if self.history_index < 0:
+            c = self.conn.cursor()
+            c.execute("SELECT seq FROM sqlite_sequence WHERE name='history';")
+            self.history_index = c.fetchone()[0]
+            self.history_index_max = self.history_index
+            c.close()
 
     def load(self, filename):
         self.filename = filename
@@ -327,13 +370,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         cc = self.conn.cursor()
 
         # Populate tree view
-        for row in c.execute('SELECT ui_id, name, filename FROM ui;'):
+        for row in c.execute('SELECT * FROM ui;'):
             ui_id = row[0]
-            self._add_ui(False, ui_id, row[1], row[2])
+            self._add_ui(False, *row)
 
             # Update UI objects
-            for obj in cc.execute('SELECT object_id, type_id, name, parent_id FROM object WHERE ui_id=?;', (ui_id, )):
-                 self._add_object(False, ui_id, obj[0], obj[1], obj[2], obj[3])
+            for obj in cc.execute('SELECT * FROM object WHERE ui_id=?;', (ui_id, )):
+                self._add_object(False, *obj)
+
+        self._update_history_index()
 
         c.close()
         cc.close()
@@ -605,9 +650,26 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         c.close()
 
-    def _add_ui(self, emit, ui_id, name, filename):
-        ui = CmbUI(ui_id=ui_id, name=name, filename=filename)
-        self._ui_id[ui_id] = self._store.append(None, [ui])
+    def _selection_remove(self, obj):
+        try:
+            self._selection.remove(obj)
+        except:
+            pass
+        else:
+            self.emit('selection-changed')
+
+    def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
+        ui = CmbUI(ui_id=ui_id,
+                   # template_id=template_id
+                   name=name,
+                   filename=filename,
+                   description=description,
+                   copyright=copyright,
+                   authors=authors,
+                   license_id=license_id,
+                   translation_domain=translation_domain)
+
+        self._object_id[ui_id] = self._store.append(None, [ui])
 
         if emit:
             self.emit('ui-added', ui)
@@ -627,18 +689,21 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             return None
         else:
-            return self._add_ui(True, ui_id, basename, filename)
+            return self._add_ui(True, ui_id, None, basename, filename, None, None, None, None, None)
+
+    def _remove_ui(self, ui):
+        iter_ = self._object_id.pop(ui.ui_id, None)
+
+        if iter_ is not None:
+            self._selection_remove(ui)
+            self._store.remove(iter_)
+            self.emit('ui-removed', ui)
 
     def remove_ui(self, ui):
         try:
             self.conn.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
             self.conn.commit()
-
-            iter_ = self._ui_id.pop(ui.ui_id, None)
-
-            if iter_ is not None:
-                self._store.remove(iter_)
-                self.emit('ui-removed', ui)
+            self._remove_ui(ui);
         except:
             pass
 
@@ -650,7 +715,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                         parent_id=parent_id or 0)
 
         if obj.parent_id == 0:
-            parent = self._ui_id.get(obj.ui_id, None)
+            parent = self._object_id.get(obj.ui_id, None)
         else:
             parent = self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
 
@@ -678,17 +743,22 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         else:
             return self._add_object(True, ui_id, object_id, obj_type, name, parent_id)
 
-    def remove_object(self, ui_id, object_id):
+    def _remove_object(self, obj):
+        iter_ = self._object_id.pop(f'{obj.ui_id}.{obj.object_id}', None)
+        if iter_ is not None:
+            self._selection_remove(obj)
+            self._store.remove(iter_)
+            self.emit('object-removed', obj)
+
+    def remove_object(self, obj):
         try:
-            self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;", (ui_id, object_id))
+            self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;",
+                              (obj.ui_id, obj.object_id))
             self.conn.commit()
         except:
             pass
         else:
-            iter_ = self._object_id.pop(f'{ui_id}.{object_id}', None)
-            if iter_ is not None:
-                self.emit('object-removed', obj)
-                self._store.remove(iter_)
+            self._remove_object(obj)
 
     def get_selection(self):
         return self._selection
@@ -708,7 +778,82 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if type(obj) == CmbObject:
             return self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
         elif type(obj) == CmbUI:
-            return self._UI_id.get(obj.ui_id, None)
+            return self._object_id.get(obj.ui_id, None)
+
+    def _get_object_by_id(self, ui_id, object_id = None):
+        key = f'{ui_id}.{object_id}' if object_id is not None else ui_id
+        _iter = self._object_id.get(key, None)
+        return self._store.get_value(_iter, 0)
+
+    def _undo_redo(self, _insert, _delete):
+        c = self.conn.cursor()
+        c.execute("UPDATE global SET value=0 WHERE key='history_enabled';")
+
+        history_index = self.history_index
+
+        # Get last command
+        c.execute("SELECT command, range_id, data FROM history WHERE history_id=?", (history_index, ))
+        command, range_id, data = c.fetchone()
+        commands = self._history_commands[data]
+
+        # Undo or Redo command
+        # TODO: catch sqlite errors and do something with it.
+        # probably nuke history data
+        if command == 'INSERT':
+            c.execute(commands[_insert], (history_index, ))
+        elif command == 'DELETE':
+            c.execute(commands[_delete], (history_index, ))
+        elif command == 'UPDATE':
+            pass
+        elif command == 'PUSH':
+            pass
+        elif command == 'POP':
+            pass
+        else:
+            print('Error unknown history command')
+
+        # Update tree model and emit signals
+        # We can not easily implement this using triggers because they are called
+        # even if the transaction is rollback because of a FK constraint
+        if command == 'INSERT' or command == 'DELETE':
+            c.execute(commands['PK'], (history_index, ))
+            pk = c.fetchone()
+
+            c.execute(commands['COUNT'], (history_index, ))
+            count = c.fetchone()
+
+            if count[0] == 0:
+                if data =='object' or data == 'ui':
+                    obj = self._get_object_by_id(pk[0], pk[1] if len(pk) > 1 else None)
+
+                    if data =='object':
+                        self._remove_object(obj)
+                    else:
+                        self._remove_ui(obj)
+            else:
+                c.execute(commands['DATA'], (history_index, ))
+                row = c.fetchone()
+                if data == 'ui':
+                    self._add_ui(True, *row)
+                elif data == 'object':
+                    self._add_object(True, *row)
+
+        c.execute("UPDATE global SET value=1 WHERE key='history_enabled';")
+        c.close()
+
+    def undo(self):
+        if self.history_index == 0:
+            return
+
+        self._undo_redo('DELETE', 'INSERT')
+        self.history_index -= 1
+
+    def redo(self):
+        if self.history_index >= self.history_index_max:
+            return
+
+        self.history_index += 1
+        self._undo_redo('INSERT', 'DELETE')
 
     # GtkTreeModel iface
 

@@ -6,6 +6,16 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  */
 
+/* Project global data
+ *
+ */
+
+CREATE TABLE global (
+  key TEXT PRIMARY KEY,
+  value TEXT
+) WITHOUT ROWID;
+
+INSERT INTO global VALUES('history_enabled', 1);
 
 /* UI
  *

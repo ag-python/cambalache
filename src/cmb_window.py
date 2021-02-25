@@ -119,8 +119,15 @@ class CmbWindow(Gtk.ApplicationWindow):
                 filename, host = GLib.filename_from_uri(uri)
                 self.project = CmbProject(filename=filename)
                 self.stack.set_visible_child_name('workspace')
+                self._update_actions()
             except Exception as e:
                 pass
+
+    def _update_action_undo_redo(self):
+        if self.project is not None:
+            self._actions['undo'].set_enabled(self.project.history_index > 0)
+            self._actions['redo'].set_enabled(self.project.history_index <
+                                              self.project.history_index_max)
 
     def _update_action_remove_ui(self):
         if self.project is not None:
@@ -142,6 +149,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._actions[action].set_enabled(has_project)
 
         self._update_action_remove_ui()
+        self._update_action_undo_redo()
 
     def _file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
         dialog = Gtk.FileChooserDialog(
@@ -169,6 +177,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             try:
                 self.project = CmbProject(filename=dialog.get_filename())
                 self.stack.set_visible_child_name('workspace')
+                self._update_actions()
             except Exception as e:
                 pass
 
@@ -221,10 +230,14 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.stack.set_visible_child_name('workspace')
 
     def _on_undo_activate(self, action, data):
-        print('_on_undo_activate')
+        if self.project is not None:
+            self.project.undo()
+            self._update_action_undo_redo()
 
     def _on_redo_activate(self, action, data):
-        print('_on_redo_activate')
+        if self.project is not None:
+            self.project.redo()
+            self._update_action_undo_redo()
 
     def _on_save_activate(self, action, data):
         if self.project is not None:
