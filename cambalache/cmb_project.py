@@ -18,7 +18,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
 from .cmb_objects import CmbUI, CmbObject
+from .cmb_objects_base import CmbPropertyInfo
 from .cmb_list_store import CmbListStore
+
 
 basedir = os.path.dirname(__file__) or '.'
 
@@ -49,6 +51,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         'object-removed': (GObject.SIGNAL_RUN_FIRST, None,
                            (CmbObject,)),
 
+        'object-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
+                                    (CmbObject, str)),
+
         'selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
@@ -57,6 +62,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def __init__(self, **kwargs):
         GObject.GObject.__init__(self, **kwargs)
+
+        # Property Information
+        self._property_info = {}
 
         # Selection
         self._selection = []
@@ -97,9 +105,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Load library support data
         self._load_libraries()
 
-        # Init GtkListStore wrappers for different tables
-        self._init_list_stores()
-
         c.execute("PRAGMA foreign_keys = ON;")
 
         self.conn.commit()
@@ -124,6 +129,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # TODO: Load all libraries that depend on self.target_tk
 
         self.conn.commit()
+
+        # Init GtkListStore wrappers for different tables
+        self._init_list_stores()
+
+        self._init_property_info(c)
+
         c.close()
 
     def _get_table_data(self, table):
@@ -188,6 +199,19 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                             layout IS NULL
                           ORDER BY type_id;'''
         self.type_list = CmbListStore(project=self, table='type', query=type_query)
+
+    def _init_property_info(self, c):
+        owner_id = None
+        props = None
+
+        for row in c.execute("SELECT * FROM property ORDER BY owner_id, property_id;"):
+            if owner_id != row[0]:
+                owner_id = row[0]
+                props = {}
+                self._property_info[owner_id] = props
+
+            property_id = row[1]
+            props[property_id] = CmbPropertyInfo.from_row(self, *row)
 
     def _create_support_table(self, c, table, group_msg=None):
         _table = table.replace('_', '-')
@@ -337,7 +361,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if self.history_index < 0:
             c = self.conn.cursor()
             c.execute("SELECT seq FROM sqlite_sequence WHERE name='history';")
-            self.history_index = c.fetchone()[0]
+            row = c.fetchone()
+
+            if row is not None:
+                self.history_index = row[0]
+            else:
+                self.history_index = -1
+
             self.history_index_max = self.history_index
             c.close()
 
@@ -424,6 +454,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                     fd.write(';\n\n')
 
             c.close()
+
+        self.conn.commit()
 
         # TODO: create custom XML file format with all the data from project tables
         with open(self.filename, 'w') as fd:
@@ -569,8 +601,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Properties
         for row in c.execute('SELECT value, property_id FROM object_property WHERE ui_id=? AND object_id=?;',
                              (ui_id, object_id,)):
+            val, name = row
             obj.append(E.property(row[0], name=row[1]))
-            # Signals
+
+        # Signals
         for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after FROM object_signal WHERE ui_id=? AND object_id=?;',
                              (ui_id, ui_id, object_id,)):
             node = E.signal(name=row[0], handler=row[1])
@@ -659,8 +693,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             self.emit('selection-changed')
 
     def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
-        ui = CmbUI(ui_id=ui_id,
-                   # template_id=template_id
+        ui = CmbUI(project=self,
+                   ui_id=ui_id,
+                   template_id=0,
                    name=name,
                    filename=filename,
                    description=description,
@@ -708,7 +743,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             pass
 
     def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None):
-        obj = CmbObject(ui_id=ui_id,
+        obj = CmbObject(project=self,
+                        ui_id=ui_id,
                         object_id=object_id,
                         type_id=obj_type,
                         name=name or '',
@@ -854,6 +890,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.history_index += 1
         self._undo_redo('INSERT', 'DELETE')
+
+    def get_type_properties(self, name):
+        return self._property_info.get(name, None)
+
+    def _object_property_changed(self, ui_id, object_id, prop):
+        self.emit('object-property-changed',
+                  self._get_object_by_id(ui_id, object_id),
+                  prop)
 
     # GtkTreeModel iface
 
