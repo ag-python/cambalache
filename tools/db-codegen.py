@@ -27,14 +27,12 @@ class CambalacheDb:
 
         self.conn.commit()
 
-    def load(self, filename):
-        with open(filename, 'r') as sql:
-            self.conn.executescript(sql.read())
-
     def _dump_table(self, fd, table, klass):
         c = self.conn.cursor()
 
-        fd.write(f"\n\nclass {klass}(GObject.GObject):\n")
+        fd.write(f"\n\nclass {klass}(CmbBase):\n")
+
+        columns = []
 
         for row in c.execute(f'PRAGMA table_info({table});'):
             default = None
@@ -62,7 +60,17 @@ class CambalacheDb:
 
             fd.write(")\n")
 
+            columns.append(col)
+
         fd.write("\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n")
+
+        all_columns = ''
+        all_columns_assign = ''
+        for col in columns:
+            all_columns += ', ' + col
+            all_columns_assign += f',\n                   {col}={col}'
+
+        fd.write(f"\n    @classmethod\n    def from_row(cls, project{all_columns}):\n        return cls(project=project{all_columns_assign})\n")
 
         c.close()
 
@@ -79,6 +87,7 @@ class CambalacheDb:
 
 import gi
 from gi.repository import GObject
+from .cmb_base import *
 """)
 
             # Base Objects
@@ -88,7 +97,7 @@ from gi.repository import GObject
 
             # Project Objects
             self._dump_table(fd, 'ui', 'CmbBaseUI')
-            self._dump_table(fd, 'object_property', 'CmbProperty')
+            self._dump_table(fd, 'object_property', 'CmbBaseProperty')
             self._dump_table(fd, 'object_layout_property', 'CmbLayoutProperty')
             self._dump_table(fd, 'object_signal', 'CmbSignal')
             self._dump_table(fd, 'object', 'CmbBaseObject')
@@ -96,10 +105,9 @@ from gi.repository import GObject
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print(f"Ussage: {sys.argv[0]} library.sql output.py")
+    if len(sys.argv) != 2:
+        print(f"Ussage: {sys.argv[0]} output.py")
         exit()
 
     db = CambalacheDb()
-    db.load(sys.argv[1])
-    db.dump(sys.argv[2])
+    db.dump(sys.argv[1])

@@ -9,9 +9,10 @@
 
 import gi
 from gi.repository import GObject
+from .cmb_base import *
 
 
-class CmbPropertyInfo(GObject.GObject):
+class CmbPropertyInfo(CmbBase):
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     property_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     type_id = GObject.Property(type=str)
@@ -24,8 +25,20 @@ class CmbPropertyInfo(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, owner_id, property_id, type_id, writable, construct_only, default_value, version, deprecated_version):
+        return cls(project=project,
+                   owner_id=owner_id,
+                   property_id=property_id,
+                   type_id=type_id,
+                   writable=writable,
+                   construct_only=construct_only,
+                   default_value=default_value,
+                   version=version,
+                   deprecated_version=deprecated_version)
 
-class CmbSignalInfo(GObject.GObject):
+
+class CmbSignalInfo(CmbBase):
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     signal_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     version = GObject.Property(type=str)
@@ -34,8 +47,16 @@ class CmbSignalInfo(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, owner_id, signal_id, version, deprecated_version):
+        return cls(project=project,
+                   owner_id=owner_id,
+                   signal_id=signal_id,
+                   version=version,
+                   deprecated_version=deprecated_version)
 
-class CmbBaseTypeInfo(GObject.GObject):
+
+class CmbBaseTypeInfo(CmbBase):
     type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     parent_id = GObject.Property(type=str)
     library_id = GObject.Property(type=str)
@@ -48,8 +69,20 @@ class CmbBaseTypeInfo(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, type_id, parent_id, library_id, get_type, version, deprecated_version, abstract, layout):
+        return cls(project=project,
+                   type_id=type_id,
+                   parent_id=parent_id,
+                   library_id=library_id,
+                   get_type=get_type,
+                   version=version,
+                   deprecated_version=deprecated_version,
+                   abstract=abstract,
+                   layout=layout)
 
-class CmbBaseUI(GObject.GObject):
+
+class CmbBaseUI(CmbBase):
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     template_id = GObject.Property(type=int)
     name = GObject.Property(type=str)
@@ -63,8 +96,21 @@ class CmbBaseUI(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
+        return cls(project=project,
+                   ui_id=ui_id,
+                   template_id=template_id,
+                   name=name,
+                   filename=filename,
+                   description=description,
+                   copyright=copyright,
+                   authors=authors,
+                   license_id=license_id,
+                   translation_domain=translation_domain)
 
-class CmbProperty(GObject.GObject):
+
+class CmbBaseProperty(CmbBase):
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -75,8 +121,18 @@ class CmbProperty(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable):
+        return cls(project=project,
+                   ui_id=ui_id,
+                   object_id=object_id,
+                   owner_id=owner_id,
+                   property_id=property_id,
+                   value=value,
+                   translatable=translatable)
 
-class CmbLayoutProperty(GObject.GObject):
+
+class CmbLayoutProperty(CmbBase):
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     child_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -88,8 +144,19 @@ class CmbLayoutProperty(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, ui_id, object_id, child_id, owner_id, property_id, value, translatable):
+        return cls(project=project,
+                   ui_id=ui_id,
+                   object_id=object_id,
+                   child_id=child_id,
+                   owner_id=owner_id,
+                   property_id=property_id,
+                   value=value,
+                   translatable=translatable)
 
-class CmbSignal(GObject.GObject):
+
+class CmbSignal(CmbBase):
     ui_id = GObject.Property(type=int)
     object_id = GObject.Property(type=int)
     owner_id = GObject.Property(type=str)
@@ -103,8 +170,21 @@ class CmbSignal(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_row(cls, project, ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after):
+        return cls(project=project,
+                   ui_id=ui_id,
+                   object_id=object_id,
+                   owner_id=owner_id,
+                   signal_id=signal_id,
+                   handler=handler,
+                   detail=detail,
+                   user_data=user_data,
+                   swap=swap,
+                   after=after)
 
-class CmbBaseObject(GObject.GObject):
+
+class CmbBaseObject(CmbBase):
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     type_id = GObject.Property(type=str)
@@ -113,3 +193,12 @@ class CmbBaseObject(GObject.GObject):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id):
+        return cls(project=project,
+                   ui_id=ui_id,
+                   object_id=object_id,
+                   type_id=type_id,
+                   name=name,
+                   parent_id=parent_id)
