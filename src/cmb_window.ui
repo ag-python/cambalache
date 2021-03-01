@@ -662,10 +662,9 @@
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="CmbObjectEditor" id="object_editor">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Properties</property>
                               </object>
                             </child>
                           </object>

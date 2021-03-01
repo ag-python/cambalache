@@ -43,6 +43,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     tree_view = Gtk.Template.Child()
     type_entry = Gtk.Template.Child()
     type_entrycompletion = Gtk.Template.Child()
+    object_editor = Gtk.Template.Child()
 
     about_dialog = Gtk.Template.Child()
 
@@ -136,7 +137,9 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._actions['remove_ui'].set_enabled(ui_selected)
 
     def _on_project_selection_changed(self, project):
+        sel = project.get_selection()
         self._update_action_remove_ui()
+        self.object_editor.object = sel[0] if len(sel) > 0 and type(sel[0]) == CmbObject else None
 
     def _update_actions(self):
         has_project = self.project is not None
