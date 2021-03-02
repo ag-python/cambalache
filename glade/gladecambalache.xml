@@ -26,11 +26,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
    <glade-widget-class title="CmbProject" name="CmbProject" generic-name="cmbproject" toplevel="True"/>
    <glade-widget-class title="CmbTreeView" name="CmbTreeView" generic-name="cmbtreeview"/>
    <glade-widget-class title="CmbView" name="CmbView" generic-name="cmbview"/>
+   <glade-widget-class title="CmbObjectEditor" name="CmbObjectEditor" generic-name="cmbobjecteditor"/>
  </glade-widget-classes>
 
  <glade-widget-group name="cambalache" title="Cambalache">
    <glade-widget-class-ref name="CmbProject"/>
    <glade-widget-class-ref name="CmbView"/>
    <glade-widget-class-ref name="CmbTreeView"/>
+   <glade-widget-class-ref name="CmbObjectEditor"/>
  </glade-widget-group>
 </glade-catalog>
