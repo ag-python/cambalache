@@ -20,6 +20,10 @@ from cambalache import *
 class CmbWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'CmbWindow'
 
+    __gsignals__ = {
+        'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str)),
+    }
+
     open_filter = Gtk.Template.Child()
     import_filter = Gtk.Template.Child()
 
@@ -116,22 +120,29 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_open_recent_action_item_activated(self, recent):
         uri = recent.get_current_uri()
         if uri is not None:
-            try:
-                filename, host = GLib.filename_from_uri(uri)
-                self.project = CmbProject(filename=filename)
-                self.stack.set_visible_child_name('workspace')
-                self._update_actions()
-            except Exception as e:
-                pass
+            filename, host = GLib.filename_from_uri(uri)
+            self.emit('open-project', filename, None)
+
+    @Gtk.Template.Callback('on_np_cancel_button_clicked')
+    def _on_np_cancel_button_clicked(self, button):
+        self._set_page('workspace' if self.project is not None else 'cambalache')
+
+    def _is_project_visible(self):
+        page = self.stack.get_visible_child_name()
+        return self.project is not None and page == 'workspace'
+
+    def _set_page(self, page):
+        self.stack.set_visible_child_name(page)
+        self._update_actions()
 
     def _update_action_undo_redo(self):
-        if self.project is not None:
+        if self._is_project_visible():
             self._actions['undo'].set_enabled(self.project.history_index > 0)
             self._actions['redo'].set_enabled(self.project.history_index <
                                               self.project.history_index_max)
 
     def _update_action_remove_ui(self):
-        if self.project is not None:
+        if self._is_project_visible():
             selection = self.project.get_selection()
             ui_selected = len(selection) > 0 and type(selection[0]) == CmbUI
             self._actions['remove_ui'].set_enabled(ui_selected)
@@ -142,7 +153,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.object_editor.object = sel[0] if len(sel) > 0 and type(sel[0]) == CmbObject else None
 
     def _update_actions(self):
-        has_project = self.project is not None
+        has_project = self._is_project_visible()
 
         for action in ['undo', 'redo',
                        'save', 'save_as',
@@ -173,24 +184,24 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         return dialog
 
-    def open_project(self, filename):
-        try:
-            self.project = CmbProject(filename=filename)
-            self.stack.set_visible_child_name('workspace')
-            self._update_actions()
-        except Exception as e:
-            pass
+    def open_project(self, filename, target_tk=None):
+#       try:
+        self.project = CmbProject(filename=filename, target_tk=target_tk)
+        self._set_page('workspace')
+        self._update_actions()
+#        except Exception as e:
+#            pass
 
     def _on_open_activate(self, action, data):
         dialog = self._file_open_dialog_new("Choose file to open",
                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
-            self.open_project(dialog.get_filename())
+            self.emit('open-project', dialog.get_filename(), None)
 
         dialog.destroy()
 
     def _on_create_new_activate(self, action, data):
-        self.stack.set_visible_child_name('new_project')
+        self._set_page('new_project')
         self.set_focus(self.np_name_entry)
 
         home = GLib.get_home_dir()
@@ -200,9 +211,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.np_location_chooser.set_current_folder(directory)
 
     def _on_new_activate(self, action, data):
-        if self.project is not None:
-            return
-
         name = self.np_name_entry.props.text
         location = self.np_location_chooser.get_filename() or '.'
 
@@ -232,8 +240,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.set_focus(self.np_name_entry)
             return
 
-        self.project = CmbProject(target_tk=target_tk, filename=filename)
-        self.stack.set_visible_child_name('workspace')
+        self.emit('open-project', filename, target_tk)
 
     def _on_undo_activate(self, action, data):
         if self.project is not None:
@@ -308,7 +315,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_close_activate(self, action, data):
         self.project = None
-        self.stack.set_visible_child_name('cambalache')
+        self._set_page('cambalache')
 
     def _on_about_activate(self, action, data):
         self.about_dialog.present()

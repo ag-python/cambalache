@@ -6,6 +6,7 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 #
 
+import os
 import gi
 
 gi.require_version('Gtk', '3.0')
@@ -38,7 +39,8 @@ class CmbTreeView(Gtk.TreeView):
         if type(obj) == CmbObject:
             cell.set_property('text', f'{obj.name}({obj.type_id})')
         elif type(obj) == CmbUI:
-            cell.set_property('text', obj.filename)
+            path = os.path.relpath(obj.filename, self._project.filename)
+            cell.set_property('text', path)
 
     def _on_model_notify(self, treeview, pspec):
         if self._project is not None:
