@@ -173,16 +173,19 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         return dialog
 
+    def open_project(self, filename):
+        try:
+            self.project = CmbProject(filename=filename)
+            self.stack.set_visible_child_name('workspace')
+            self._update_actions()
+        except Exception as e:
+            pass
+
     def _on_open_activate(self, action, data):
         dialog = self._file_open_dialog_new("Choose file to open",
                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
-            try:
-                self.project = CmbProject(filename=dialog.get_filename())
-                self.stack.set_visible_child_name('workspace')
-                self._update_actions()
-            except Exception as e:
-                pass
+            self.open_project(dialog.get_filename())
 
         dialog.destroy()
 
