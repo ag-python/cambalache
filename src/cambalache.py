@@ -20,9 +20,28 @@ from .cmb_window import CmbWindow
 
 class CmbApplication(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id='org.gnome.jpu.Cambalache',
-                         flags=Gio.ApplicationFlags.FLAGS_NONE)
-        self.window = None
+        super().__init__(application_id='ar.xjuan.Cambalache',
+                         flags=Gio.ApplicationFlags.HANDLES_OPEN)
+        self.windows = []
+
+    def do_open(self, files, nfiles, hint):
+        open_files = {}
+
+        for win in self.windows:
+            if win.project is not None and win.project.filename is not None:
+                open_files[win.project.filename] = win
+
+        for file in files:
+            path = file.get_path()
+
+            if path in open_files.keys():
+                open_files[path].present()
+            else:
+                window = CmbWindow(application=self)
+                window.present()
+                window.open_project(path)
+                self.windows.append(window)
+                open_files[path] = window
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -33,12 +52,16 @@ class CmbApplication(Gtk.Application):
             self.add_action(gaction)
 
     def do_activate(self):
-        if not self.window:
-            self.window = CmbWindow(application=self)
+        if len(self.windows) > 0:
+            return
 
-        self.window.present()
+        window = CmbWindow(application=self)
+        window.present()
+        self.windows.append(window)
 
     def _on_quit_activate(self, action, data):
+        for win in self.windows:
+            win.destroy()
         self.quit()
 
 
