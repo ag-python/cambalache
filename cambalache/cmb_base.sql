@@ -151,6 +151,8 @@ CREATE TABLE IF NOT EXISTS property (
   writable BOOLEAN,
   construct_only BOOLEAN,
   default_value TEXT,
+  minimum TEXT,
+  maximum TEXT,
   version TEXT,
   deprecated_version TEXT,
   PRIMARY KEY(owner_id, property_id)

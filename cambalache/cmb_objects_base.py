@@ -19,6 +19,8 @@ class CmbPropertyInfo(CmbBase):
     writable = GObject.Property(type=bool, default = False)
     construct_only = GObject.Property(type=bool, default = False)
     default_value = GObject.Property(type=str)
+    minimum = GObject.Property(type=str)
+    maximum = GObject.Property(type=str)
     version = GObject.Property(type=str)
     deprecated_version = GObject.Property(type=str)
 
@@ -26,7 +28,7 @@ class CmbPropertyInfo(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, owner_id, property_id, type_id, writable, construct_only, default_value, version, deprecated_version):
+    def from_row(cls, project, owner_id, property_id, type_id, writable, construct_only, default_value, minimum, maximum, version, deprecated_version):
         return cls(project=project,
                    owner_id=owner_id,
                    property_id=property_id,
@@ -34,6 +36,8 @@ class CmbPropertyInfo(CmbBase):
                    writable=writable,
                    construct_only=construct_only,
                    default_value=default_value,
+                   minimum=minimum,
+                   maximum=maximum,
                    version=version,
                    deprecated_version=deprecated_version)
 
