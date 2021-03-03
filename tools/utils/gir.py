@@ -89,7 +89,7 @@ class GirData:
 
         return False
 
-    def _container_list_child_properties(self, name):
+    def _get_instance_from_type(self, name):
         if name.startswith(self.name):
             parentClass = getattr(self.mod, name[len(self.name):])
         else:
@@ -99,13 +99,21 @@ class GirData:
             # Ensure class is instantiable
             class InstanceClass(parentClass):
                 pass
+            return InstanceClass() if InstanceClass is not None else None
 
-            instance = InstanceClass()
+    def _container_list_child_properties(self, name):
+        instance = self._get_instance_from_type(name)
+
+        if instance is not None:
             props = instance.list_child_properties()
-
             return props if len(props) > 0 else None
 
         return None
+
+    def _get_default_value_from_pspec(self, pspec):
+        if pspec.value_type == GObject.TYPE_BOOLEAN:
+            return 'True' if pspec.default_value != 0 else 'False'
+        return pspec.default_value
 
     def _gtk3_init(self):
         def get_properties (name, props):
@@ -127,6 +135,9 @@ class GirData:
                     'deprecated_version': None,
                     'writable': 1 if pspec.flags & GObject.ParamFlags.WRITABLE else None,
                     'construct': 1 if pspec.flags & GObject.ParamFlags.CONSTRUCT else None,
+                    'default_value': self._get_default_value_from_pspec(pspec),
+                    'minimum': pspec.minimum if hasattr(pspec, 'minimum') else None,
+                    'maximum': pspec.maximum if hasattr(pspec, 'maximum') else None
                 }
 
             return retval
@@ -167,8 +178,15 @@ class GirData:
             elif self._type_is_a(name, 'GtkLayoutChild'):
                 data['layout'] = 'child'
 
-    def _type_get_properties (self, element):
+    def _type_get_properties (self, element, instance):
         retval = {}
+        pspecs = {}
+
+        if instance is not None:
+            props = instance.list_properties()
+
+            for p in props:
+                pspecs[p.name] = p
 
         for child in element.iterfind('property', nsmap):
             name = child.get('name')
@@ -190,12 +208,18 @@ class GirData:
             if type_name == 'utf8':
                 type_name = 'gchararray'
 
+            # Property pspec
+            pspec = pspecs[name]
+
             retval[name] = {
                 'type': type_name,
                 'version': child.get('version'),
                 'deprecated_version': child.get('deprecated-version'),
                 'writable': child.get('writable'),
                 'construct': child.get('construct'),
+                'default_value': self._get_default_value_from_pspec(pspec),
+                'minimum': pspec.minimum if hasattr(pspec, 'minimum') else None,
+                'maximum': pspec.maximum if hasattr(pspec, 'maximum') else None
             }
 
         return retval
@@ -222,7 +246,7 @@ class GirData:
 
         return retval
 
-    def _get_type_data (self, element):
+    def _get_type_data (self, element, name):
         parent = element.get('parent')
 
         if parent and parent.find('.') < 0:
@@ -233,6 +257,8 @@ class GirData:
         if constructor is None:
             constructor = element
 
+        instance = self._get_instance_from_type(name)
+
         return {
             'parent': parent,
             'layout': None,
@@ -240,7 +266,7 @@ class GirData:
             'version': constructor.get('version'),
             'deprecated_version': constructor.get('deprecated-version'),
             'get_type': element.get(ns('glib','get-type')),
-            'properties': self._type_get_properties(element),
+            'properties': self._type_get_properties(element, instance),
             'signals': self._type_get_signals(element),
             'interfaces': self._type_get_interfaces(element)
         }
@@ -250,7 +276,7 @@ class GirData:
 
         for child in namespace.iterfind('class', nsmap):
             name = child.get(ns('glib','type-name'))
-            data = self._get_type_data(child)
+            data = self._get_type_data(child, name)
             if name and data is not None:
                 retval[name] = data
 
@@ -351,8 +377,8 @@ class GirData:
                 if prop_type.startswith(self.name) and prop_type not in self.types:
                     continue
 
-                conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, writable, construct_only, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                             (name, prop, prop_type, p['writable'], p['construct'] , p['version'], p['deprecated_version']))
+                conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, writable, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                             (name, prop, prop_type, p['writable'], p['construct'], p.get('default_value', None), p.get('minimum', None), p.get('maximum', None), p['version'], p['deprecated_version']))
 
             signals = data['signals']
             for signal in signals:

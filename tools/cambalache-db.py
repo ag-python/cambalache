@@ -77,9 +77,9 @@ class CambalacheDb:
 
             for row in c.execute("SELECT name FROM sqlite_master WHERE type = 'table';"):
                 self._dump_table(fd, row[0])
-            fd.close();
 
             fd.write("PRAGMA foreign_keys = ON;\n")
+            fd.close();
 
         c.close()
 
@@ -88,7 +88,6 @@ class CambalacheDb:
         lib.populate_db(self.conn)
         self.conn.commit()
 
-GtkContainerAccessible
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(f"Ussage: {sys.argv[0]} library.gir database.sqlite")
