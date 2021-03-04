@@ -18,6 +18,8 @@ class CmbUI(CmbBaseUI):
 
 
 class CmbProperty(CmbBaseProperty):
+    info = GObject.Property(type=CmbPropertyInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
     def __init__(self, **kwargs):
         self._init = True
         super().__init__(**kwargs)
@@ -31,13 +33,13 @@ class CmbProperty(CmbBaseProperty):
                                          self.owner_id,
                                          self.property_id))
         row = c.fetchone()
-        return row[0] if row is not None else None
+        return row[0] if row is not None else self.info.default_value
 
     @value.setter
     def _set_value(self, value):
         c = self.project.conn.cursor()
 
-        if value is None:
+        if value is None or value == self.info.default_value:
             c.execute("DELETE FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
                       (self.ui_id, self.object_id, self.owner_id, self.property_id))
         else:
@@ -63,7 +65,6 @@ class CmbObject(CmbBaseObject):
         super().__init__(**kwargs)
 
         self.properties = []
-        self.property_info = {}
         self.signals = []
 
         if self.project is None:
@@ -80,18 +81,15 @@ class CmbObject(CmbBaseObject):
 
         for property_name in property_info:
             info = property_info[property_name]
-            c.execute("SELECT value FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
-                       (self.ui_id, self.object_id, name, info.property_id))
-            val = c.fetchone()
+
             prop = CmbProperty(project=self.project,
                                ui_id=self.ui_id,
                                object_id=self.object_id,
                                owner_id=name,
                                property_id=info.property_id,
-                               value=val[0] if val is not None else None)
+                               info=info)
 
             self.properties.append(prop)
-            self.property_info[property_name] = info
 
         c.close()
 
