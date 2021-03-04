@@ -35,7 +35,7 @@ class CmbEntry(Gtk.Entry):
 class CmbSpinButton(Gtk.SpinButton):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect('notify::text', self._on_text_notify)
+        self.connect('notify::value', self._on_text_notify)
         self.props.halign=Gtk.Align.START
         self.props.numeric=True
         self.props.width_chars=8
@@ -45,11 +45,16 @@ class CmbSpinButton(Gtk.SpinButton):
 
     @GObject.property(type=str)
     def cmb_value(self):
-        return self.props.text if self.props.text != '' else None
+        # FIXME: value should always use C locale
+        if self.props.digits == 0:
+            return str(int(self.props.value))
+        else:
+            # NOTE: round() to avoid setting numbers like 0.7000000000000001
+            return str(round(self.props.value, 15))
 
     @cmb_value.setter
     def _set_value(self, value):
-        self.props.text = value if value is not None else ''
+        self.props.value = float(value)
 
 
 class CmbSwitch(Gtk.Switch):
@@ -97,7 +102,8 @@ class CmbObjectEditor(Gtk.Box):
         for prop in self._object.properties:
             if owner_id != prop.owner_id:
                 owner_id = prop.owner_id
-                expander = Gtk.Expander(label=owner_id,
+                expander = Gtk.Expander(label=f'<b>{owner_id}</b>',
+                                        use_markup=True,
                                         expanded=True)
                 grid = Gtk.Grid(hexpand=True,
                                 margin_start=16,
@@ -126,10 +132,10 @@ class CmbObjectEditor(Gtk.Box):
         self._update_view()
 
     def _create_editor_for_property(self, prop):
-        info = self._object.property_info.get(prop.property_id, None)
         editor = None
 
-        if info is not None:
+        if prop.info is not None:
+            info = prop.info
             type_id = info.type_id
 
             if type_id == 'gboolean':
@@ -137,17 +143,30 @@ class CmbObjectEditor(Gtk.Box):
             elif type_id == 'gchar' or type_id == 'guchar' or \
                  type_id == 'gint' or type_id == 'guint' or \
                  type_id == 'glong' or type_id == 'gulong' or \
-                 type_id == 'gint64' or type_id == 'guint64':
-                editor = CmbSpinButton(digits=0)
-            elif type_id == 'gfloat' or type_id == 'gdouble':
-                editor = CmbSpinButton(digits=4)
+                 type_id == 'gint64' or type_id == 'guint64'or \
+                 type_id == 'gfloat' or type_id == 'gdouble':
+
+                digits = 0
+                step_increment = 1
+
+                if type_id == 'gfloat' or type_id == 'gdouble':
+                    digits = 4
+                    step_increment = 0.1
+
+                adjustment = Gtk.Adjustment(lower=float(info.minimum),
+                                            upper=float(info.maximum),
+                                            step_increment=step_increment,
+                                            page_increment=10)
+
+                editor = CmbSpinButton(digits=digits,
+                                       adjustment=adjustment)
 
         if editor is None:
-            editor = CmbEntry(hexpand=True)
+            editor = CmbEntry(hexpand=True,
+                              placeholder_text=f'<{type_id}>')
 
         GObject.Object.bind_property(prop, 'value',
                                      editor, 'cmb-value',
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.BIDIRECTIONAL)
-
         return editor
