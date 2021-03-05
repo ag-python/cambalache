@@ -85,8 +85,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
 
         self._history_commands = {}
-        self.history_index = -1
-        self.history_index_max = -1
+        self._history_index = -1
 
         # DataModel is only used internally
         self.conn = sqlite3.connect(":memory:")
@@ -115,6 +114,25 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def __del__(self):
         self.conn.commit()
         self.conn.close()
+
+    @GObject.Property(type=int)
+    def history_index_max(self):
+        c = self.conn.execute("SELECT seq FROM sqlite_sequence WHERE name='history';")
+        row = c.fetchone()
+        return int(row[0]) if row is not None else 0
+
+    @GObject.Property(type=int)
+    def history_index(self):
+        if self._history_index < 0:
+            return self.history_index_max
+        return self._history_index
+
+    @history_index.setter
+    def _set_history_index(self, value):
+        if value == self.history_index_max:
+            value = -1
+
+        self._history_index = value
 
     def _load_libraries(self):
         if self.target_tk is None or len(self.target_tk) == 0:
@@ -357,20 +375,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     END;
             ''')
 
-    def _update_history_index(self):
-        if self.history_index < 0:
-            c = self.conn.cursor()
-            c.execute("SELECT seq FROM sqlite_sequence WHERE name='history';")
-            row = c.fetchone()
-
-            if row is not None:
-                self.history_index = row[0]
-            else:
-                self.history_index = -1
-
-            self.history_index_max = self.history_index
-            c.close()
-
     def load(self, filename):
         self.filename = filename
 
@@ -407,8 +411,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             # Update UI objects
             for obj in cc.execute('SELECT * FROM object WHERE ui_id=?;', (ui_id, )):
                 self._add_object(False, *obj)
-
-        self._update_history_index()
 
         c.close()
         cc.close()
@@ -821,6 +823,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         _iter = self._object_id.get(key, None)
         return self._store.get_value(_iter, 0)
 
+    def _undo_redo_property_notify(self, obj, owner_id, property_id):
+        # FIXME:use a dict instead of walking the array
+        for prop in obj.properties:
+            if prop.owner_id == owner_id and prop.property_id == property_id:
+                prop.notify('value')
+                self.emit('object-property-changed', obj, prop)
+
     def _undo_redo(self, _insert, _delete):
         c = self.conn.cursor()
         c.execute("UPDATE global SET value=0 WHERE key='history_enabled';")
@@ -864,8 +873,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
                     if data =='object':
                         self._remove_object(obj)
-                    else:
+                    elif data == 'ui':
                         self._remove_ui(obj)
+                elif data == 'object_property':
+                    obj = self._get_object_by_id(pk[0], pk[1])
+                    self._undo_redo_property_notify(obj, pk[2], pk[3])
             else:
                 c.execute(commands['DATA'], (history_index, ))
                 row = c.fetchone()
@@ -873,6 +885,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                     self._add_ui(True, *row)
                 elif data == 'object':
                     self._add_object(True, *row)
+                elif data == 'object_property':
+                    obj = self._get_object_by_id(pk[0], pk[1])
+                    self._undo_redo_property_notify(obj, pk[2], pk[3])
+
 
         c.execute("UPDATE global SET value=1 WHERE key='history_enabled';")
         c.close()
