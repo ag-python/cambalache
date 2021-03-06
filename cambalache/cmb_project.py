@@ -915,6 +915,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                   self._get_object_by_id(ui_id, object_id),
                   prop)
 
+    def db_backup(self, filename):
+        self.conn.commit()
+        bck = sqlite3.connect(filename)
+
+        with bck:
+            self.conn.backup(bck)
+
+        bck.close()
+
     # GtkTreeModel iface
 
     def do_get_iter(self, path):
