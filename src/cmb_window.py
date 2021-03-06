@@ -65,11 +65,19 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'save', 'save_as',
                        'add_ui', 'remove_ui',
                        'import', 'export',
-                       'close', 'about']:
+                       'close', 'debug', 'about']:
             gaction = Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self._actions[action] = gaction
             self.add_action(gaction)
+
+        self._sqlitebrowser = None
+        sqlitebrowser = GLib.find_program_in_path('sqlitebrowser')
+        if sqlitebrowser is not None:
+            info = Gio.app_info_create_from_commandline(sqlitebrowser,
+                                                        None,
+                                                        Gio.AppInfoCreateFlags.NONE)
+            self._sqlitebrowser = info
 
         self._update_actions()
 
@@ -159,11 +167,12 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'save', 'save_as',
                        'add_ui', 'remove_ui',
                        'import', 'export',
-                       'close']:
+                       'close', 'debug']:
             self._actions[action].set_enabled(has_project)
 
         self._update_action_remove_ui()
         self._update_action_undo_redo()
+        self._actions['debug'].set_enabled(has_project and self._sqlitebrowser is not None)
 
     def _file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
         dialog = Gtk.FileChooserDialog(
@@ -316,6 +325,14 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_close_activate(self, action, data):
         self.project = None
         self._set_page('cambalache')
+
+    def _on_debug_activate(self, action, data):
+        if self._sqlitebrowser is None:
+            return
+
+        filename = self.project.filename + '.db'
+        self.project.db_backup(filename)
+        self._sqlitebrowser.launch([Gio.File.new_for_path(filename)])
 
     def _on_about_activate(self, action, data):
         self.about_dialog.present()
