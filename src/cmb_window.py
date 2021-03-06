@@ -71,13 +71,8 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._actions[action] = gaction
             self.add_action(gaction)
 
-        self._sqlitebrowser = None
-        sqlitebrowser = GLib.find_program_in_path('sqlitebrowser')
-        if sqlitebrowser is not None:
-            info = Gio.app_info_create_from_commandline(sqlitebrowser,
-                                                        None,
-                                                        Gio.AppInfoCreateFlags.NONE)
-            self._sqlitebrowser = info
+        self._sqlitebrowser = GLib.find_program_in_path('sqlitebrowser')
+        self._sqlitebrowser_pid = None
 
         self._update_actions()
 
@@ -326,13 +321,24 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.project = None
         self._set_page('cambalache')
 
+    def _on_sqlitebrowser_exit(self, pid, status, data):
+        self._sqlitebrowser_pid = None
+
     def _on_debug_activate(self, action, data):
         if self._sqlitebrowser is None:
             return
 
         filename = self.project.filename + '.db'
         self.project.db_backup(filename)
-        self._sqlitebrowser.launch([Gio.File.new_for_path(filename)])
+
+        if self._sqlitebrowser_pid is not None:
+            return
+
+        pid, stdin, stdout, stderr = GLib.spawn_async([self._sqlitebrowser, filename],
+                                                      flags=GLib.SpawnFlags.DO_NOT_REAP_CHILD )
+        self._sqlitebrowser_pid = pid
+        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid,
+                             self._on_sqlitebrowser_exit, None)
 
     def _on_about_activate(self, action, data):
         self.about_dialog.present()
