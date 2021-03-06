@@ -371,7 +371,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
       (SELECT {all_but_column} FROM history_{table} WHERE history_id = {last_history_id})
         IS ({all_but_column_values})
     BEGIN
-      UPDATE history_{table} SET {column}=NEW.{column} WHERE history_id = {last_history_id};
+      UPDATE history_{table} SET {column}=NEW.{column} WHERE history_id = {last_history_id} AND history_old=0;
     END;
             ''')
 
