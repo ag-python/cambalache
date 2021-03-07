@@ -20,7 +20,9 @@ CREATE TABLE history (
   history_id INTEGER PRIMARY KEY AUTOINCREMENT,
   command TEXT NOT NULL,
   range_id INTEGER REFERENCES history,
-  data TEXT
+  table_name TEXT,
+  column_name TEXT,
+  message TEXT
 );
 
 /* This trigger will update PUSH/POP range and data automatically on POP */
@@ -28,9 +30,9 @@ CREATE TRIGGER on_history_pop_insert AFTER INSERT ON history
 WHEN
   NEW.command is 'POP'
 BEGIN
-/* Update range_id and data(message) from last PUSH command */
+/* Update range_id and message from last PUSH command */
   UPDATE history
-  SET (range_id, data)=(SELECT history_id, data FROM history WHERE command='PUSH' AND range_id IS NULL ORDER BY history_id DESC LIMIT 1)
+  SET (range_id, message)=(SELECT history_id, message FROM history WHERE command='PUSH' AND range_id IS NULL ORDER BY history_id DESC LIMIT 1)
   WHERE history_id = NEW.history_id;
 
 /* Update range_id in last PUSH command */
