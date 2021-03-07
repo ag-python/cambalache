@@ -812,9 +812,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._selection = selection
         self.emit('selection-changed')
 
-    def get_iter(self, obj):
+    def get_iter_from_object(self, obj):
         if type(obj) == CmbObject:
-            return self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
+            return self._object_id.get(f'{obj.ui_id}.{obj.object_id}', None)
         elif type(obj) == CmbUI:
             return self._object_id.get(obj.ui_id, None)
 

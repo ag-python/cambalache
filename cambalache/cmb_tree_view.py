@@ -60,7 +60,10 @@ class CmbTreeView(Gtk.TreeView):
             return
 
         if len(selection) > 0:
-            self._selection.select_iter(project.get_iter(selection[0]))
+            _iter = project.get_iter_from_object(selection[0])
+            path = project.get_path(_iter)
+            self.expand_to_path(path)
+            self._selection.select_iter(_iter)
         else:
             self._selection.unselect_all()
 
