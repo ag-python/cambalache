@@ -154,7 +154,7 @@ class GirData:
             properties = get_properties(name, props)
 
             if len(properties) > 0:
-                layout_types[f'Cambalache{name}LayoutChild'] = {
+                layout_types[f'{name}LayoutChild'] = {
                     'parent': 'object',
                     'layout': 'child',
                     'properties': properties,
