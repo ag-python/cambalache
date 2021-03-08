@@ -136,7 +136,7 @@ class CmbBaseProperty(CmbBase):
                    translatable=translatable)
 
 
-class CmbLayoutProperty(CmbBase):
+class CmbBaseLayoutProperty(CmbBase):
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     child_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)

@@ -98,7 +98,7 @@ from .cmb_base import *
             # Project Objects
             self._dump_table(fd, 'ui', 'CmbBaseUI')
             self._dump_table(fd, 'object_property', 'CmbBaseProperty')
-            self._dump_table(fd, 'object_layout_property', 'CmbLayoutProperty')
+            self._dump_table(fd, 'object_layout_property', 'CmbBaseLayoutProperty')
             self._dump_table(fd, 'object_signal', 'CmbSignal')
             self._dump_table(fd, 'object', 'CmbBaseObject')
             fd.close();
