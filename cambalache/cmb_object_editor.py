@@ -82,6 +82,10 @@ class CmbSwitch(Gtk.Switch):
 class CmbObjectEditor(Gtk.Box):
     __gtype_name__ = 'CmbObjectEditor'
 
+    layout = GObject.Property(type=bool,
+                              flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+                              default=False)
+
     def __init__(self, **kwargs):
         self._object = None
 
@@ -99,7 +103,9 @@ class CmbObjectEditor(Gtk.Box):
         owner_id = None
         grid = None
         i = 0
-        for prop in self._object.properties:
+
+        properties = self._object.layout if self.layout else self._object.properties
+        for prop in properties:
             if owner_id != prop.owner_id:
                 owner_id = prop.owner_id
                 expander = Gtk.Expander(label=f'<b>{owner_id}</b>',
