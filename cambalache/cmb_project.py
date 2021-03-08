@@ -17,7 +17,7 @@ from lxml.builder import E
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
-from .cmb_objects import CmbUI, CmbObject
+from .cmb_objects import CmbUI, CmbObject, CmbTypeInfo
 from .cmb_objects_base import CmbPropertyInfo
 from .cmb_list_store import CmbListStore
 
@@ -54,6 +54,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         'object-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
                                     (CmbObject, str)),
 
+        'object-layout-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
+                                           (CmbObject, CmbObject, str)),
+
         'selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
@@ -62,6 +65,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def __init__(self, **kwargs):
         GObject.GObject.__init__(self, **kwargs)
+
+        # Type Information
+        self._type_info = {}
 
         # Property Information
         self._property_info = {}
@@ -151,6 +157,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Init GtkListStore wrappers for different tables
         self._init_list_stores()
 
+        self._init_type_info(c)
+
         self._init_property_info(c)
 
         c.close()
@@ -217,6 +225,18 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                             layout IS NULL
                           ORDER BY type_id;'''
         self.type_list = CmbListStore(project=self, table='type', query=type_query)
+
+    def _init_type_info(self, c):
+        owner_id = None
+        props = None
+
+        for row in c.execute('''SELECT * FROM type
+                                  WHERE
+                                    parent_id IS NOT NULL AND
+                                    parent_id NOT IN ('interface', 'enum', 'flags')
+                                  ORDER BY type_id;'''):
+            type_id = row[0]
+            self._type_info[type_id] = CmbTypeInfo.from_row(self, *row)
 
     def _init_property_info(self, c):
         owner_id = None
@@ -746,7 +766,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                         object_id=object_id,
                         type_id=obj_type,
                         name=name or '',
-                        parent_id=parent_id or 0)
+                        parent_id=parent_id or 0,
+                        info=self._type_info[obj_type])
 
         if obj.parent_id == 0:
             parent = self._object_id.get(obj.ui_id, None)
@@ -824,7 +845,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         for prop in obj.properties:
             if prop.owner_id == owner_id and prop.property_id == property_id:
                 prop.notify('value')
-                self.emit('object-property-changed', obj, prop)
+                self.emit('object-property-changed', obj, property_id)
 
     def _undo_redo(self, undo):
         c = self.conn.cursor()
@@ -917,6 +938,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def _object_property_changed(self, ui_id, object_id, prop):
         self.emit('object-property-changed',
                   self._get_object_by_id(ui_id, object_id),
+                  prop)
+
+    def _object_layout_property_changed(self, ui_id, object_id, child_id, prop):
+        self.emit('object-layout-property-changed',
+                  self._get_object_by_id(ui_id, object_id),
+                  self._get_object_by_id(ui_id, child_id),
                   prop)
 
     def db_backup(self, filename):
