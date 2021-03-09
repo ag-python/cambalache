@@ -230,13 +230,26 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         owner_id = None
         props = None
 
+        # Dictionary with all the types hierarchy
+        type_hierarchy = {}
+        type_id = None
+        hierarchy = None
+        for row in c.execute('SELECT type_id, parent_id FROM type_tree;'):
+            if type_id != row[0]:
+                type_id = row[0]
+                hierarchy = []
+                type_hierarchy[type_id] = hierarchy
+            hierarchy.append(row[1])
+
         for row in c.execute('''SELECT * FROM type
                                   WHERE
                                     parent_id IS NOT NULL AND
                                     parent_id NOT IN ('interface', 'enum', 'flags')
                                   ORDER BY type_id;'''):
             type_id = row[0]
-            self._type_info[type_id] = CmbTypeInfo.from_row(self, *row)
+            info = CmbTypeInfo.from_row(self, *row)
+            info.hierarchy = type_hierarchy[type_id]
+            self._type_info[type_id] = info
 
     def _init_property_info(self, c):
         owner_id = None

@@ -109,14 +109,8 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
 
 class CmbTypeInfo(CmbBaseTypeInfo):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
         self.hierarchy = []
-        c = self.project.conn.cursor()
-        for row in c.execute('SELECT parent_id FROM type_tree WHERE type_id=?',
-                             (self.type_id, )):
-            self.hierarchy.append(row[0])
-        c.close()
+        super().__init__(**kwargs)
 
 
 class CmbObject(CmbBaseObject):
