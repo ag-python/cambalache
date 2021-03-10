@@ -853,12 +853,17 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         _iter = self._object_id.get(key, None)
         return self._store.get_value(_iter, 0)
 
-    def _undo_redo_property_notify(self, obj, owner_id, property_id):
+    def _undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
         # FIXME:use a dict instead of walking the array
-        for prop in obj.properties:
-            if prop.owner_id == owner_id and prop.property_id == property_id:
-                prop.notify('value')
-                self.emit('object-property-changed', obj, property_id)
+        properties = obj.layout if layout else obj.properties
+        for p in properties:
+            if p.owner_id == owner_id and p.property_id == property_id:
+                p.notify(prop)
+                if layout:
+                    parent = self._get_object_by_id(obj.ui_id, obj.parent_id)
+                    self.emit('object-layout-property-changed', parent, obj, property_id)
+                else:
+                    self.emit('object-property-changed', obj, property_id)
 
     def _undo_redo(self, undo):
         c = self.conn.cursor()
@@ -895,38 +900,38 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.execute(commands['PK'], (history_index, ))
         pk = c.fetchone()
 
-        if command == 'INSERT' or command == 'DELETE':
-            c.execute(commands['COUNT'], (history_index, ))
-            count = c.fetchone()
+        if command == 'UPDATE':
+            if table == 'object_property':
+                obj = self._get_object_by_id(pk[0], pk[1])
+                self._undo_redo_property_notify(obj, False, column, pk[2], pk[3])
+            elif table == 'object_layout_property':
+                child = self._get_object_by_id(pk[0], pk[2])
+                self._undo_redo_property_notify(child, True, column, pk[3], pk[4])
+        elif command == 'INSERT' or command == 'DELETE':
+            if table == 'object_property':
+                obj = self._get_object_by_id(pk[0], pk[1])
+                self._undo_redo_property_notify(obj, False, 'value', pk[2], pk[3])
+            elif table == 'object_layout_property':
+                child = self._get_object_by_id(pk[0], pk[2])
+                self._undo_redo_property_notify(child, True, 'value', pk[3], pk[4])
+            elif table =='object' or table == 'ui':
+                c.execute(commands['COUNT'], (history_index, ))
+                count = c.fetchone()
 
-            if count[0] == 0:
-                if table =='object' or table == 'ui':
+                if count[0] == 0:
                     obj = self._get_object_by_id(pk[0], pk[1] if len(pk) > 1 else None)
 
                     if table =='object':
                         self._remove_object(obj)
                     elif table == 'ui':
                         self._remove_ui(obj)
-                elif table == 'object_property':
-                    obj = self._get_object_by_id(pk[0], pk[1])
-                    self._undo_redo_property_notify(obj, pk[2], pk[3])
-            else:
-                c.execute(commands['DATA'], (history_index, ))
-                row = c.fetchone()
-                if table == 'ui':
-                    self._add_ui(True, *row)
-                elif table == 'object':
-                    self._add_object(True, *row)
-                elif table == 'object_property':
-                    obj = self._get_object_by_id(pk[0], pk[1])
-                    self._undo_redo_property_notify(obj, pk[2], pk[3])
-        elif command == 'UPDATE':
-            if table == 'object_property':
-                obj = self._get_object_by_id(pk[0], pk[1])
-                for prop in obj.properties:
-                    if prop.owner_id == pk[2] and prop.property_id == pk[3]:
-                        self._object_property_changed(prop.ui_id, prop.object_id, prop.property_id)
-                        prop.notify(column)
+                else:
+                    c.execute(commands['DATA'], (history_index, ))
+                    row = c.fetchone()
+                    if table == 'ui':
+                        self._add_ui(True, *row)
+                    elif table == 'object':
+                        self._add_object(True, *row)
 
         c.execute("UPDATE global SET value=TRUE WHERE key='history_enabled';")
         c.close()

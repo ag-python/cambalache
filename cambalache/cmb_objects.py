@@ -73,7 +73,7 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
         c = self.project.conn.execute("SELECT value FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=? AND owner_id=? AND property_id=?;",
                                         (self.ui_id,
                                          self.object_id,
-                                         self.object_id,
+                                         self.child_id,
                                          self.owner_id,
                                          self.property_id))
         row = c.fetchone()
