@@ -750,6 +750,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
                               (basename, filename))
             ui_id = c.lastrowid
+
+            token = self.target_tk.split('-')
+
+            c.execute('INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);',
+                      (ui_id, token[0], token[1]))
             c.close()
             self.conn.commit()
         except:
