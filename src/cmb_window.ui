@@ -291,10 +291,6 @@
                   <object class="GtkEntry" id="np_name_entry">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="has-focus">True</property>
-                    <property name="is-focus">True</property>
-                    <property name="can-default">True</property>
-                    <property name="has-default">True</property>
                     <property name="width-chars">32</property>
                     <property name="placeholder-text" translatable="yes">&lt;project basename&gt;</property>
                     <property name="input-purpose">alpha</property>
@@ -517,79 +513,6 @@
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="spacing">4</property>
-                        <child>
-                          <object class="GtkButtonBox">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="border-width">4</property>
-                            <property name="homogeneous">True</property>
-                            <property name="layout-style">expand</property>
-                            <child>
-                              <object class="GtkButton">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="tooltip-text" translatable="yes">Add new UI to project</property>
-                                <property name="action-name">win.add_ui</property>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="icon-name">list-add-symbolic</property>
-                                  </object>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkButton">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="tooltip-text" translatable="yes">Remove UI from project</property>
-                                <property name="action-name">win.remove_ui</property>
-                                <property name="use-underline">True</property>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="icon-name">list-remove-symbolic</property>
-                                  </object>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
@@ -910,7 +833,27 @@
             <property name="can-focus">False</property>
           </object>
           <packing>
-            <property name="position">6</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">Add new UI to project</property>
+            <property name="action-name">win.add_ui</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">list-add-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+            <property name="position">5</property>
           </packing>
         </child>
         <child>
@@ -963,7 +906,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">7</property>
+            <property name="position">8</property>
           </packing>
         </child>
       </object>

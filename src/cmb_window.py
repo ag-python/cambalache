@@ -22,6 +22,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     __gsignals__ = {
         'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str)),
+        'cmb-action': (GObject.SIGNAL_RUN_LAST | GObject.SIGNAL_ACTION, None, (str, )),
     }
 
     open_filter = Gtk.Template.Child()
@@ -64,7 +65,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         for action in ['open', 'create_new', 'new',
                        'undo', 'redo',
                        'save', 'save_as',
-                       'add_ui', 'remove_ui',
+                       'add_ui', 'delete',
                        'import', 'export',
                        'close', 'debug', 'about']:
             gaction = Gio.SimpleAction.new(action, None)
@@ -96,6 +97,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
             self._project.connect('selection-changed', self._on_project_selection_changed)
+            self._project.connect('ui-added', self._on_project_ui_added)
             self.type_entry.set_placeholder_text(project.target_tk)
         else:
             self.headerbar.set_subtitle(None)
@@ -144,16 +146,23 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._actions['undo'].set_enabled(self.project.history_index > 0)
             self._actions['redo'].set_enabled(self.project.history_index <
                                               self.project.history_index_max)
+        else:
+            self._actions['undo'].set_enabled(False)
+            self._actions['redo'].set_enabled(False)
 
-    def _update_action_remove_ui(self):
+    def _update_action_delete(self):
         if self._is_project_visible():
-            selection = self.project.get_selection()
-            ui_selected = len(selection) > 0 and type(selection[0]) == CmbUI
-            self._actions['remove_ui'].set_enabled(ui_selected)
+            sel = self.project.get_selection()
+            self._actions['delete'].set_enabled(len(sel) > 0 if sel is not None else False)
+        else:
+            self._actions['delete'].set_enabled(False)
+
+    def _on_project_ui_added(self, project, ui):
+        self._update_action_undo_redo()
 
     def _on_project_selection_changed(self, project):
         sel = project.get_selection()
-        self._update_action_remove_ui()
+        self._update_action_delete()
         obj = sel[0] if len(sel) > 0 and type(sel[0]) == CmbObject else None
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
@@ -163,12 +172,12 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         for action in ['undo', 'redo',
                        'save', 'save_as',
-                       'add_ui', 'remove_ui',
+                       'add_ui', 'delete',
                        'import', 'export',
                        'close', 'debug']:
             self._actions[action].set_enabled(has_project)
 
-        self._update_action_remove_ui()
+        self._update_action_delete()
         self._update_action_undo_redo()
         self._actions['debug'].set_enabled(has_project and self._sqlitebrowser is not None)
 
@@ -192,12 +201,21 @@ class CmbWindow(Gtk.ApplicationWindow):
         return dialog
 
     def open_project(self, filename, target_tk=None):
-#       try:
-        self.project = CmbProject(filename=filename, target_tk=target_tk)
-        self._set_page('workspace')
-        self._update_actions()
-#        except Exception as e:
-#            pass
+        try:
+            self.project = CmbProject(filename=filename, target_tk=target_tk)
+            self._set_page('workspace')
+            self._update_actions()
+        except Exception as e:
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                flags=0,
+                message_type=Gtk.MessageType.INFO,
+                buttons=Gtk.ButtonsType.OK,
+                text=f'Error loading {filename}'
+            )
+
+            dialog.run()
+            dialog.destroy()
 
     def _on_open_activate(self, action, data):
         dialog = self._file_open_dialog_new("Choose file to open",
@@ -286,24 +304,27 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         dialog.destroy()
 
-    def _on_remove_ui_activate(self, action, data):
+    def _on_delete_activate(self, action, data):
         if self.project is None:
             return
 
         selection = self.project.get_selection()
-        if len(selection) > 0:
-            dialog = Gtk.MessageDialog(
-                transient_for=self,
-                flags=0,
-                message_type=Gtk.MessageType.QUESTION,
-                buttons=Gtk.ButtonsType.YES_NO,
-                text=f"Do you want to delete selected UI?",
-            )
+        for obj in selection:
+            if type(obj) == CmbUI:
+                dialog = Gtk.MessageDialog(
+                    transient_for=self,
+                    flags=0,
+                    message_type=Gtk.MessageType.QUESTION,
+                    buttons=Gtk.ButtonsType.YES_NO,
+                    text=f"Do you want to delete selected UI?",
+                )
 
-            if dialog.run() == Gtk.ResponseType.YES:
-                self.project.remove_ui(selection[0])
+                if dialog.run() == Gtk.ResponseType.YES:
+                    self.project.remove_ui(obj)
 
-            dialog.destroy()
+                dialog.destroy()
+            elif type(obj) == CmbObject:
+                self.project.remove_object(obj)
 
     def _on_import_activate(self, action, data):
         if self.project is None:
@@ -346,3 +367,8 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_about_activate(self, action, data):
         self.about_dialog.present()
 
+    def do_cmb_action(self, action):
+        self._actions[action].activate()
+
+
+Gtk.WidgetClass.set_css_name(CmbWindow, 'CmbWindow')
