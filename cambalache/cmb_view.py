@@ -34,6 +34,7 @@ class CmbView(Gtk.ScrolledWindow):
             return
 
         self.buffer.set_text('')
+        self._ui_id = 0
 
     def _on_project_selection_changed(self, project):
         selection = project.get_selection()
