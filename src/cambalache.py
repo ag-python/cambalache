@@ -10,12 +10,15 @@ import os
 import sys
 import gi
 
+gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio
+from gi.repository import Gdk, Gtk, Gio
 
 from cambalache import *
 
 from .cmb_window import CmbWindow
+
+basedir = os.path.dirname(__file__) or '.'
 
 
 class CmbApplication(Gtk.Application):
@@ -51,6 +54,14 @@ class CmbApplication(Gtk.Application):
             gaction= Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self.add_action(gaction)
+
+        provider = Gtk.CssProvider()
+        provider.load_from_path(os.path.join(basedir, 'cambalache.css'))
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
     def do_activate(self):
         if self.props.active_window is None:
