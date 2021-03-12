@@ -709,9 +709,16 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def export(self):
         c = self.conn.cursor()
 
+        dirname = os.path.dirname(self.filename)
+
         # FIXME: remove cmb suffix once we have full GtkBuilder support
         for row in c.execute('SELECT ui_id, filename FROM ui;'):
-            self.export_ui(row[0], os.path.splitext(row[1])[0] + '.cmb.ui')
+            filename = os.path.splitext(row[1])[0] + '.cmb.ui'
+
+            if os.path.isabs(filename):
+                self.export_ui(row[0], filename)
+            else:
+                self.export_ui(row[0], os.path.join(dirname, filename))
 
         c.close()
 
@@ -744,11 +751,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def add_ui(self, filename):
         basename = os.path.basename(filename)
-
+        dirname = os.path.dirname(self.filename)
+        relpath = os.path.relpath(filename, dirname)
         try:
+
             c = self.conn.cursor()
             c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
-                              (basename, filename))
+                      (basename, relpath))
             ui_id = c.lastrowid
 
             token = self.target_tk.split('-')
@@ -760,7 +769,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             return None
         else:
-            return self._add_ui(True, ui_id, None, basename, filename, None, None, None, None, None)
+            return self._add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None)
 
     def _remove_ui(self, ui):
         iter_ = self._object_id.pop(ui.ui_id, None)

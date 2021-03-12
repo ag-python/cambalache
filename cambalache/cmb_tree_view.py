@@ -39,8 +39,7 @@ class CmbTreeView(Gtk.TreeView):
         if type(obj) == CmbObject:
             cell.set_property('text', f'{obj.name}({obj.type_id})')
         elif type(obj) == CmbUI:
-            path = os.path.relpath(obj.filename, self._project.filename)
-            cell.set_property('text', path)
+            cell.set_property('text', obj.filename)
 
     def _on_model_notify(self, treeview, pspec):
         if self._project is not None:
