@@ -376,7 +376,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute(f'''
     CREATE TRIGGER on_{table}_update_{column} AFTER UPDATE OF {column} ON {table}
     WHEN
-      {history_is_enabled} AND
+      NEW.{column} IS NOT OLD.{column} AND {history_is_enabled} AND
       ((SELECT command, table_name, column_name FROM history WHERE history_id = {last_history_id})
          IS NOT ('UPDATE', '{table}', '{column}')
          OR
@@ -393,7 +393,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute(f'''
     CREATE TRIGGER on_{table}_update_{column}_compress AFTER UPDATE OF {column} ON {table}
     WHEN
-      {history_is_enabled} AND
+      NEW.{column} IS NOT OLD.{column} AND {history_is_enabled} AND
       ((SELECT command, table_name, column_name FROM history WHERE history_id = {last_history_id})
          IS ('UPDATE', '{table}', '{column}')
          AND
@@ -733,7 +733,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
         ui = CmbUI(project=self,
                    ui_id=ui_id,
-                   template_id=0,
+                   template_id=template_id if template_id is not None else 0,
                    name=name,
                    filename=filename,
                    description=description,
@@ -792,8 +792,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                         ui_id=ui_id,
                         object_id=object_id,
                         type_id=obj_type,
-                        name=name or '',
-                        parent_id=parent_id or 0,
+                        name=name,
+                        parent_id=parent_id if parent_id is not None else 0,
                         info=self._type_info[obj_type])
 
         if obj.parent_id == 0:
