@@ -37,7 +37,8 @@ class CmbTreeView(Gtk.TreeView):
         obj = model.get_value(iter_, 0)
 
         if type(obj) == CmbObject:
-            cell.set_property('text', f'{obj.name}({obj.type_id})')
+            name = obj.name or ''
+            cell.set_property('text', f'{name}({obj.type_id})')
         elif type(obj) == CmbUI:
             cell.set_property('text', obj.filename)
 
