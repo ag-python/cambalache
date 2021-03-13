@@ -95,11 +95,13 @@ class GirData:
         else:
             parentClass = getattr(self.mod, name)
 
-        if parentClass is not None:
+        gtype = GObject.type_from_name(name)
+        if GObject.type_is_a(gtype, GObject.GObject) and parentClass is not None:
             # Ensure class is instantiable
             class InstanceClass(parentClass):
                 pass
             return InstanceClass() if InstanceClass is not None else None
+        return None
 
     def _container_list_child_properties(self, name):
         instance = self._get_instance_from_type(name)
@@ -111,6 +113,9 @@ class GirData:
         return None
 
     def _get_default_value_from_pspec(self, pspec):
+        if pspec is None:
+            return None
+
         if pspec.value_type == GObject.TYPE_BOOLEAN:
             return 'True' if pspec.default_value != 0 else 'False'
         return pspec.default_value
@@ -209,7 +214,7 @@ class GirData:
                 type_name = 'gchararray'
 
             # Property pspec
-            pspec = pspecs[name]
+            pspec = pspecs.get(name, None)
 
             retval[name] = {
                 'type': type_name,
@@ -257,7 +262,16 @@ class GirData:
         if constructor is None:
             constructor = element
 
-        instance = self._get_instance_from_type(name)
+        # FIXME: add a way to skip some classes or have the right data to initialize to avoid aborting
+        if name != 'GtkActivateAction' and \
+           name != 'GtkMnemonicAction' and \
+           name != 'GtkNamedAction' and \
+           name != 'GtkNeverTrigger' and \
+           name != 'GtkNothingAction' and \
+           name != 'GtkSignalAction'    :
+            instance = self._get_instance_from_type(name)
+        else:
+            instance = None
 
         return {
             'parent': parent,
