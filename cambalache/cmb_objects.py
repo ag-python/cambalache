@@ -16,6 +16,17 @@ class CmbUI(CmbBaseUI):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @GObject.Property(type=int)
+    def template_id(self):
+        retval = self.db_get('SELECT template_id FROM ui WHERE (ui_id) IS (?);',
+                             (self.ui_id, ))
+        return retval if retval is not None else 0
+
+    @template_id.setter
+    def _set_template_id(self, value):
+        self.db_set('UPDATE ui SET template_id=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value if value != 0 else None)
+
 
 class CmbProperty(CmbBaseProperty):
     info = GObject.Property(type=CmbPropertyInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -170,14 +181,18 @@ class CmbObject(CmbBaseObject):
 
     @GObject.Property(type=int)
     def parent_id(self):
-        return self._parent_id
+        retval = self.db_get('SELECT parent_id FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                             (self.ui_id, self.object_id, ))
+        return retval if retval is not None else 0
 
     @parent_id.setter
-    def _set_parent_id(self, parent_id):
-        self._parent_id = parent_id
+    def _set_parent_id(self, value):
+        self.db_set('UPDATE object SET parent_id=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ),
+                    value if value != 0 else None)
 
-        if parent_id > 0:
-            parent = self.project._get_object_by_id(self.ui_id, parent_id)
+        if value > 0:
+            parent = self.project._get_object_by_id(self.ui_id, value)
             self._populate_layout_properties(f'{parent.type_id}LayoutChild')
         else:
             self.layout = []
