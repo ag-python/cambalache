@@ -13,16 +13,10 @@ from .cmb_base import *
 
 
 class CmbPropertyInfo(CmbBase):
+    __gtype_name__ = 'CmbPropertyInfo'
+
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     property_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    type_id = GObject.Property(type=str)
-    writable = GObject.Property(type=bool, default = False)
-    construct_only = GObject.Property(type=bool, default = False)
-    default_value = GObject.Property(type=str)
-    minimum = GObject.Property(type=str)
-    maximum = GObject.Property(type=str)
-    version = GObject.Property(type=str)
-    deprecated_version = GObject.Property(type=str)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -31,22 +25,94 @@ class CmbPropertyInfo(CmbBase):
     def from_row(cls, project, owner_id, property_id, type_id, writable, construct_only, default_value, minimum, maximum, version, deprecated_version):
         return cls(project=project,
                    owner_id=owner_id,
-                   property_id=property_id,
-                   type_id=type_id,
-                   writable=writable,
-                   construct_only=construct_only,
-                   default_value=default_value,
-                   minimum=minimum,
-                   maximum=maximum,
-                   version=version,
-                   deprecated_version=deprecated_version)
+                   property_id=property_id)
+
+    @GObject.Property(type=str)
+    def type_id(self):
+        return self.db_get('SELECT type_id FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @type_id.setter
+    def _set_type_id(self, value):
+        self.db_set('UPDATE property SET type_id=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=bool, default = False)
+    def writable(self):
+        return self.db_get('SELECT writable FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @writable.setter
+    def _set_writable(self, value):
+        self.db_set('UPDATE property SET writable=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=bool, default = False)
+    def construct_only(self):
+        return self.db_get('SELECT construct_only FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @construct_only.setter
+    def _set_construct_only(self, value):
+        self.db_set('UPDATE property SET construct_only=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def default_value(self):
+        return self.db_get('SELECT default_value FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @default_value.setter
+    def _set_default_value(self, value):
+        self.db_set('UPDATE property SET default_value=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def minimum(self):
+        return self.db_get('SELECT minimum FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @minimum.setter
+    def _set_minimum(self, value):
+        self.db_set('UPDATE property SET minimum=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def maximum(self):
+        return self.db_get('SELECT maximum FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @maximum.setter
+    def _set_maximum(self, value):
+        self.db_set('UPDATE property SET maximum=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def version(self):
+        return self.db_get('SELECT version FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @version.setter
+    def _set_version(self, value):
+        self.db_set('UPDATE property SET version=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def deprecated_version(self):
+        return self.db_get('SELECT deprecated_version FROM property WHERE (owner_id, property_id) IS (?, ?);',
+                           (self.owner_id, self.property_id, ))
+
+    @deprecated_version.setter
+    def _set_deprecated_version(self, value):
+        self.db_set('UPDATE property SET deprecated_version=? WHERE (owner_id, property_id) IS (?, ?);',
+                    (self.owner_id, self.property_id, ), value)
 
 
 class CmbSignalInfo(CmbBase):
+    __gtype_name__ = 'CmbSignalInfo'
+
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     signal_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    version = GObject.Property(type=str)
-    deprecated_version = GObject.Property(type=str)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -55,20 +121,33 @@ class CmbSignalInfo(CmbBase):
     def from_row(cls, project, owner_id, signal_id, version, deprecated_version):
         return cls(project=project,
                    owner_id=owner_id,
-                   signal_id=signal_id,
-                   version=version,
-                   deprecated_version=deprecated_version)
+                   signal_id=signal_id)
+
+    @GObject.Property(type=str)
+    def version(self):
+        return self.db_get('SELECT version FROM signal WHERE (owner_id, signal_id) IS (?, ?);',
+                           (self.owner_id, self.signal_id, ))
+
+    @version.setter
+    def _set_version(self, value):
+        self.db_set('UPDATE signal SET version=? WHERE (owner_id, signal_id) IS (?, ?);',
+                    (self.owner_id, self.signal_id, ), value)
+
+    @GObject.Property(type=str)
+    def deprecated_version(self):
+        return self.db_get('SELECT deprecated_version FROM signal WHERE (owner_id, signal_id) IS (?, ?);',
+                           (self.owner_id, self.signal_id, ))
+
+    @deprecated_version.setter
+    def _set_deprecated_version(self, value):
+        self.db_set('UPDATE signal SET deprecated_version=? WHERE (owner_id, signal_id) IS (?, ?);',
+                    (self.owner_id, self.signal_id, ), value)
 
 
 class CmbBaseTypeInfo(CmbBase):
+    __gtype_name__ = 'CmbBaseTypeInfo'
+
     type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    parent_id = GObject.Property(type=str)
-    library_id = GObject.Property(type=str)
-    get_type = GObject.Property(type=str)
-    version = GObject.Property(type=str)
-    deprecated_version = GObject.Property(type=str)
-    abstract = GObject.Property(type=bool, default = False)
-    layout = GObject.Property(type=str)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -76,26 +155,83 @@ class CmbBaseTypeInfo(CmbBase):
     @classmethod
     def from_row(cls, project, type_id, parent_id, library_id, get_type, version, deprecated_version, abstract, layout):
         return cls(project=project,
-                   type_id=type_id,
-                   parent_id=parent_id,
-                   library_id=library_id,
-                   get_type=get_type,
-                   version=version,
-                   deprecated_version=deprecated_version,
-                   abstract=abstract,
-                   layout=layout)
+                   type_id=type_id)
+
+    @GObject.Property(type=str)
+    def parent_id(self):
+        return self.db_get('SELECT parent_id FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @parent_id.setter
+    def _set_parent_id(self, value):
+        self.db_set('UPDATE type SET parent_id=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
+
+    @GObject.Property(type=str)
+    def library_id(self):
+        return self.db_get('SELECT library_id FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @library_id.setter
+    def _set_library_id(self, value):
+        self.db_set('UPDATE type SET library_id=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
+
+    @GObject.Property(type=str)
+    def get_type(self):
+        return self.db_get('SELECT get_type FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @get_type.setter
+    def _set_get_type(self, value):
+        self.db_set('UPDATE type SET get_type=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
+
+    @GObject.Property(type=str)
+    def version(self):
+        return self.db_get('SELECT version FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @version.setter
+    def _set_version(self, value):
+        self.db_set('UPDATE type SET version=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
+
+    @GObject.Property(type=str)
+    def deprecated_version(self):
+        return self.db_get('SELECT deprecated_version FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @deprecated_version.setter
+    def _set_deprecated_version(self, value):
+        self.db_set('UPDATE type SET deprecated_version=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
+
+    @GObject.Property(type=bool, default = False)
+    def abstract(self):
+        return self.db_get('SELECT abstract FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @abstract.setter
+    def _set_abstract(self, value):
+        self.db_set('UPDATE type SET abstract=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
+
+    @GObject.Property(type=str)
+    def layout(self):
+        return self.db_get('SELECT layout FROM type WHERE (type_id) IS (?);',
+                           (self.type_id, ))
+
+    @layout.setter
+    def _set_layout(self, value):
+        self.db_set('UPDATE type SET layout=? WHERE (type_id) IS (?);',
+                    (self.type_id, ), value)
 
 
 class CmbBaseUI(CmbBase):
+    __gtype_name__ = 'CmbBaseUI'
+
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    template_id = GObject.Property(type=int)
-    name = GObject.Property(type=str)
-    filename = GObject.Property(type=str)
-    description = GObject.Property(type=str)
-    copyright = GObject.Property(type=str)
-    authors = GObject.Property(type=str)
-    license_id = GObject.Property(type=str)
-    translation_domain = GObject.Property(type=str)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -103,24 +239,96 @@ class CmbBaseUI(CmbBase):
     @classmethod
     def from_row(cls, project, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
         return cls(project=project,
-                   ui_id=ui_id,
-                   template_id=template_id,
-                   name=name,
-                   filename=filename,
-                   description=description,
-                   copyright=copyright,
-                   authors=authors,
-                   license_id=license_id,
-                   translation_domain=translation_domain)
+                   ui_id=ui_id)
+
+    @GObject.Property(type=int)
+    def template_id(self):
+        return self.db_get('SELECT template_id FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @template_id.setter
+    def _set_template_id(self, value):
+        self.db_set('UPDATE ui SET template_id=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def name(self):
+        return self.db_get('SELECT name FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @name.setter
+    def _set_name(self, value):
+        self.db_set('UPDATE ui SET name=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def filename(self):
+        return self.db_get('SELECT filename FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @filename.setter
+    def _set_filename(self, value):
+        self.db_set('UPDATE ui SET filename=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def description(self):
+        return self.db_get('SELECT description FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @description.setter
+    def _set_description(self, value):
+        self.db_set('UPDATE ui SET description=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def copyright(self):
+        return self.db_get('SELECT copyright FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @copyright.setter
+    def _set_copyright(self, value):
+        self.db_set('UPDATE ui SET copyright=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def authors(self):
+        return self.db_get('SELECT authors FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @authors.setter
+    def _set_authors(self, value):
+        self.db_set('UPDATE ui SET authors=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def license_id(self):
+        return self.db_get('SELECT license_id FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @license_id.setter
+    def _set_license_id(self, value):
+        self.db_set('UPDATE ui SET license_id=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def translation_domain(self):
+        return self.db_get('SELECT translation_domain FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @translation_domain.setter
+    def _set_translation_domain(self, value):
+        self.db_set('UPDATE ui SET translation_domain=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
 
 
 class CmbBaseProperty(CmbBase):
+    __gtype_name__ = 'CmbBaseProperty'
+
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     property_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    value = GObject.Property(type=str)
-    translatable = GObject.Property(type=bool, default = False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -131,19 +339,37 @@ class CmbBaseProperty(CmbBase):
                    ui_id=ui_id,
                    object_id=object_id,
                    owner_id=owner_id,
-                   property_id=property_id,
-                   value=value,
-                   translatable=translatable)
+                   property_id=property_id)
+
+    @GObject.Property(type=str)
+    def value(self):
+        return self.db_get('SELECT value FROM object_property WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.property_id, ))
+
+    @value.setter
+    def _set_value(self, value):
+        self.db_set('UPDATE object_property SET value=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=bool, default = False)
+    def translatable(self):
+        return self.db_get('SELECT translatable FROM object_property WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.property_id, ))
+
+    @translatable.setter
+    def _set_translatable(self, value):
+        self.db_set('UPDATE object_property SET translatable=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
 
 
 class CmbBaseLayoutProperty(CmbBase):
+    __gtype_name__ = 'CmbBaseLayoutProperty'
+
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     child_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     property_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    value = GObject.Property(type=str)
-    translatable = GObject.Property(type=bool, default = False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -155,45 +381,136 @@ class CmbBaseLayoutProperty(CmbBase):
                    object_id=object_id,
                    child_id=child_id,
                    owner_id=owner_id,
-                   property_id=property_id,
-                   value=value,
-                   translatable=translatable)
+                   property_id=property_id)
+
+    @GObject.Property(type=str)
+    def value(self):
+        return self.db_get('SELECT value FROM object_layout_property WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ))
+
+    @value.setter
+    def _set_value(self, value):
+        self.db_set('UPDATE object_layout_property SET value=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=bool, default = False)
+    def translatable(self):
+        return self.db_get('SELECT translatable FROM object_layout_property WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ))
+
+    @translatable.setter
+    def _set_translatable(self, value):
+        self.db_set('UPDATE object_layout_property SET translatable=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
 
 
 class CmbSignal(CmbBase):
-    ui_id = GObject.Property(type=int)
-    object_id = GObject.Property(type=int)
-    owner_id = GObject.Property(type=str)
-    signal_id = GObject.Property(type=str)
-    handler = GObject.Property(type=str)
-    detail = GObject.Property(type=str)
-    user_data = GObject.Property(type=int)
-    swap = GObject.Property(type=bool, default = False)
-    after = GObject.Property(type=bool, default = False)
+    __gtype_name__ = 'CmbSignal'
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @classmethod
     def from_row(cls, project, ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after):
-        return cls(project=project,
-                   ui_id=ui_id,
-                   object_id=object_id,
-                   owner_id=owner_id,
-                   signal_id=signal_id,
-                   handler=handler,
-                   detail=detail,
-                   user_data=user_data,
-                   swap=swap,
-                   after=after)
+        return cls(project=project)
+
+    @GObject.Property(type=int)
+    def ui_id(self):
+        return self.db_get('SELECT ui_id FROM object_signal WHERE () IS ();',
+                           ())
+
+    @ui_id.setter
+    def _set_ui_id(self, value):
+        self.db_set('UPDATE object_signal SET ui_id=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=int)
+    def object_id(self):
+        return self.db_get('SELECT object_id FROM object_signal WHERE () IS ();',
+                           ())
+
+    @object_id.setter
+    def _set_object_id(self, value):
+        self.db_set('UPDATE object_signal SET object_id=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=str)
+    def owner_id(self):
+        return self.db_get('SELECT owner_id FROM object_signal WHERE () IS ();',
+                           ())
+
+    @owner_id.setter
+    def _set_owner_id(self, value):
+        self.db_set('UPDATE object_signal SET owner_id=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=str)
+    def signal_id(self):
+        return self.db_get('SELECT signal_id FROM object_signal WHERE () IS ();',
+                           ())
+
+    @signal_id.setter
+    def _set_signal_id(self, value):
+        self.db_set('UPDATE object_signal SET signal_id=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=str)
+    def handler(self):
+        return self.db_get('SELECT handler FROM object_signal WHERE () IS ();',
+                           ())
+
+    @handler.setter
+    def _set_handler(self, value):
+        self.db_set('UPDATE object_signal SET handler=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=str)
+    def detail(self):
+        return self.db_get('SELECT detail FROM object_signal WHERE () IS ();',
+                           ())
+
+    @detail.setter
+    def _set_detail(self, value):
+        self.db_set('UPDATE object_signal SET detail=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=int)
+    def user_data(self):
+        return self.db_get('SELECT user_data FROM object_signal WHERE () IS ();',
+                           ())
+
+    @user_data.setter
+    def _set_user_data(self, value):
+        self.db_set('UPDATE object_signal SET user_data=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=bool, default = False)
+    def swap(self):
+        return self.db_get('SELECT swap FROM object_signal WHERE () IS ();',
+                           ())
+
+    @swap.setter
+    def _set_swap(self, value):
+        self.db_set('UPDATE object_signal SET swap=? WHERE () IS ();',
+                    (), value)
+
+    @GObject.Property(type=bool, default = False)
+    def after(self):
+        return self.db_get('SELECT after FROM object_signal WHERE () IS ();',
+                           ())
+
+    @after.setter
+    def _set_after(self, value):
+        self.db_set('UPDATE object_signal SET after=? WHERE () IS ();',
+                    (), value)
 
 
 class CmbBaseObject(CmbBase):
+    __gtype_name__ = 'CmbBaseObject'
+
     ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    type_id = GObject.Property(type=str)
-    name = GObject.Property(type=str)
-    parent_id = GObject.Property(type=int)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -202,7 +519,34 @@ class CmbBaseObject(CmbBase):
     def from_row(cls, project, ui_id, object_id, type_id, name, parent_id):
         return cls(project=project,
                    ui_id=ui_id,
-                   object_id=object_id,
-                   type_id=type_id,
-                   name=name,
-                   parent_id=parent_id)
+                   object_id=object_id)
+
+    @GObject.Property(type=str)
+    def type_id(self):
+        return self.db_get('SELECT type_id FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @type_id.setter
+    def _set_type_id(self, value):
+        self.db_set('UPDATE object SET type_id=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=str)
+    def name(self):
+        return self.db_get('SELECT name FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @name.setter
+    def _set_name(self, value):
+        self.db_set('UPDATE object SET name=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=int)
+    def parent_id(self):
+        return self.db_get('SELECT parent_id FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @parent_id.setter
+    def _set_parent_id(self, value):
+        self.db_set('UPDATE object SET parent_id=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)

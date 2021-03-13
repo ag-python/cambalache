@@ -27,15 +27,11 @@ class CambalacheDb:
 
         self.conn.commit()
 
-    def _dump_table(self, fd, table, klass):
+    def _get_table_data(self, table):
         c = self.conn.cursor()
-
-        fd.write(f"\n\nclass {klass}(CmbBase):\n")
-
         columns = []
 
         for row in c.execute(f'PRAGMA table_info({table});'):
-            default = None
             col = row[1]
             col_type =  row[2]
             pk = row[5]
@@ -46,31 +42,80 @@ class CambalacheDb:
                 col_type = 'str'
             elif col_type == 'BOOLEAN':
                 col_type = 'bool'
-                default = 'False'
             else:
                 print('Error unknown type', col_type)
 
-            fd.write(f"    {col} = GObject.Property(type={col_type}")
+            columns.append({
+                'name': col,
+                'type': col_type,
+                'pk': pk
+            })
 
-            if pk:
-                fd.write(f", flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY")
+        c.close()
 
-            if default is not None:
-                fd.write(f", default = {default}")
+        return columns
+
+    def _dump_table(self, fd, table, klass):
+        c = self.conn.cursor()
+        columns = self._get_table_data(table)
+
+        fd.write(f"\n\nclass {klass}(CmbBase):\n")
+        fd.write(f"    __gtype_name__ = '{klass}'\n\n")
+
+        # PKs
+        all_pk_columns = ''
+        pks = []
+        for col in columns:
+            if not col['pk']:
+                continue
+
+            fd.write(f"    {col['name']} = GObject.Property(type={col['type']}")
+            fd.write(f", flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY")
+
+            if col['type'] == 'bool':
+                fd.write(f", default = False")
 
             fd.write(")\n")
 
-            columns.append(col)
-
-        fd.write("\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n")
+            pks.append(col['name'])
+            all_pk_columns += f"self.{col['name']}, "
 
         all_columns = ''
         all_columns_assign = ''
         for col in columns:
-            all_columns += ', ' + col
-            all_columns_assign += f',\n                   {col}={col}'
+            all_columns += ', ' + col['name']
+            if not col['pk']:
+                continue
+            all_columns_assign += f",\n                   {col['name']}={col['name']}"
 
-        fd.write(f"\n    @classmethod\n    def from_row(cls, project{all_columns}):\n        return cls(project=project{all_columns_assign})\n")
+        _pk_columns = f"({', '.join(pks)})"
+        _pk_values = f"({', '.join(['?' for i in range(len(pks))])})"
+
+        # Init
+        fd.write("\n    def __init__(self, **kwargs):\n")
+        fd.write("        super().__init__(**kwargs)\n")
+
+        # Class from_row()
+        fd.write(f"\n    @classmethod\n")
+        fd.write(f"    def from_row(cls, project{all_columns}):\n")
+        fd.write(f"        return cls(project=project{all_columns_assign})\n")
+
+        for col in columns:
+            if col['pk']:
+                continue
+
+            fd.write(f"\n    @GObject.Property(type={col['type']}")
+            if col['type'] == 'bool':
+                fd.write(f", default = False")
+            fd.write(")\n")
+            fd.write(f"    def {col['name']}(self):\n")
+            fd.write(f"        return self.db_get('SELECT {col['name']} FROM {table} WHERE {_pk_columns} IS {_pk_values};',\n")
+            fd.write(f"                           ({all_pk_columns}))\n")
+
+            fd.write(f"\n    @{col['name']}.setter\n")
+            fd.write(f"    def _set_{col['name']}(self, value):\n")
+            fd.write(f"        self.db_set('UPDATE {table} SET {col['name']}=? WHERE {_pk_columns} IS {_pk_values};',\n")
+            fd.write(f"                    ({all_pk_columns}), value)\n")
 
         c.close()
 

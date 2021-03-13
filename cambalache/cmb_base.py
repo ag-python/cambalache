@@ -16,3 +16,14 @@ class CmbBase(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def db_get(self, query, pk):
+        c = self.project.conn.cursor()
+        c.execute(query, pk)
+        row = c.fetchone()
+        c.close()
+        return row[0] if row is not None else None
+
+    def db_set(self, query, pk, value):
+        c = self.project.conn.cursor()
+        c.execute(query, (value, ) + pk)
+        c.close()
