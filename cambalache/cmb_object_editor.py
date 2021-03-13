@@ -93,6 +93,20 @@ class CmbObjectEditor(Gtk.Box):
 
         self.props.orientation = Gtk.Orientation.VERTICAL
 
+    def _create_id_editor(self):
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
+                      spacing=6)
+        box.add(Gtk.Label(label='Object Id:'))
+
+        entry = CmbEntry()
+        GObject.Object.bind_property(self._object, 'name',
+                                     entry, 'cmb-value',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL)
+
+        box.pack_start(entry, True, True, 0)
+        return box
+
     def _update_view(self):
         for child in self.get_children():
             self.remove(child)
@@ -100,10 +114,15 @@ class CmbObjectEditor(Gtk.Box):
         if self._object is None:
             return
 
+        # ID
+        if not self.layout:
+            self.add(self._create_id_editor())
+
         owner_id = None
         grid = None
         i = 0
 
+        # Properties
         properties = self._object.layout if self.layout else self._object.properties
         for prop in properties:
             if owner_id != prop.owner_id:
