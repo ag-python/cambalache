@@ -922,7 +922,7 @@
     <property name="license" translatable="yes">This application is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied.</property>
     <property name="authors">Juan Pablo Ugarte</property>
-    <property name="logo-icon-name">image-missing</property>
+    <property name="logo">images/cmb.svg</property>
     <property name="license-type">custom</property>
     <signal name="delete-event" handler="on_about_dialog_delete_event" swapped="no"/>
     <child internal-child="vbox">
