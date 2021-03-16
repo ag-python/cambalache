@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/ar/xjuan/Cambalache">
+    <file>cmb_base.sql</file>
+    <file>cmb_project.sql</file>
+    <file>cmb_history.sql</file>
+    <file>gtk+-3.0.sql</file>
+    <file>gtk-4.0.sql</file>
+  </gresource>
+</gresources>

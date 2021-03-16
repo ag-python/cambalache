@@ -15,25 +15,18 @@ from lxml import etree
 from lxml.builder import E
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gtk
+from gi.repository import Gio, GLib, GObject, Gtk
 
 from .cmb_objects import CmbUI, CmbObject, CmbTypeInfo
 from .cmb_objects_base import CmbPropertyInfo
 from .cmb_list_store import CmbListStore
+from .config import *
 
-
-basedir = os.path.dirname(__file__) or '.'
-
-def _load_sql(filename):
-    with open(os.path.join(basedir, filename), 'r') as sql:
-        retval = sql.read()
-        sql.close()
-    return retval
-
-BASE_SQL = _load_sql('cmb_base.sql')
-PROJECT_SQL = _load_sql('cmb_project.sql')
-HISTORY_SQL = _load_sql('cmb_history.sql')
-
+BASE_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_base.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
+PROJECT_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_project.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
+HISTORY_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_history.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
+GTK3_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gtk+-3.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
+GTK4_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gtk-4.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
 
 class CmbProject(GObject.GObject, Gtk.TreeModel):
     __gtype_name__ = 'CmbProject'
@@ -147,8 +140,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c = self.conn.cursor()
 
         # TODO: implement own format instead of sql
-        with open(os.path.join(basedir, self.target_tk + '.sql'), 'r') as sql:
-            c.executescript(sql.read())
+        if self.target_tk == 'gtk+-3.0':
+            c.executescript(GTK3_SQL)
+        elif self.target_tk == 'gtk-4.0':
+            c.executescript(GTK4_SQL)
 
         # TODO: Load all libraries that depend on self.target_tk
 
@@ -673,7 +668,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c = self.conn.cursor()
 
         node = E.interface()
-        node.addprevious(etree.Comment(" Created with Cambalache prototype "))
+        node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
 
         # requires
         builder_ver = 4

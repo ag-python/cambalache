@@ -16,7 +16,7 @@ from gi.repository import GLib, GObject, Gio, Gtk
 from cambalache import *
 
 
-@Gtk.Template(filename='src/cmb_window.ui')
+@Gtk.Template(resource_path='/ar/xjuan/Cambalache/App/cmb_window.ui')
 class CmbWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'CmbWindow'
 
@@ -77,6 +77,9 @@ class CmbWindow(Gtk.ApplicationWindow):
         self._sqlitebrowser_pid = None
 
         self._update_actions()
+
+        self.version_label.props.label = config.VERSION
+        self.about_dialog.props.version = config.VERSION
 
     @GObject.Property(type=CmbProject)
     def project(self):
@@ -213,6 +216,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                 buttons=Gtk.ButtonsType.OK,
                 text=f'Error loading {filename}'
             )
+            print(e)
 
             dialog.run()
             dialog.destroy()

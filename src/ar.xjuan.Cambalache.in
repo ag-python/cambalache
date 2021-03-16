@@ -1,0 +1,23 @@
+#!@PYTHON@
+#
+# Cambalache UI Maker
+#
+# Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
+#
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+#
+
+import os
+import sys
+import signal
+
+pythondir = '@pythondir@'
+
+sys.path.insert(1, pythondir)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+from cambalache.app import CmbApplication
+
+if __name__ == '__main__':
+    app = CmbApplication()
+    app.run(sys.argv)

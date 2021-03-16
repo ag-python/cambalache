@@ -1,5 +1,5 @@
 #
-# Cambalache UI Maker
+# Cambalache Application
 #
 # Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
 #
@@ -56,7 +56,7 @@ class CmbApplication(Gtk.Application):
             self.add_action(gaction)
 
         provider = Gtk.CssProvider()
-        provider.load_from_path(os.path.join(basedir, 'cambalache.css'))
+        provider.load_from_resource('/ar/xjuan/Cambalache/App/cambalache.css')
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(),
             provider,
@@ -77,8 +77,6 @@ class CmbApplication(Gtk.Application):
         self.quit()
 
 
-if __name__ == "__main__":
-    # FIXME: we need this to load template resources
-    os.chdir(os.path.dirname(__file__))
+if __name__ == '__main__':
     app = CmbApplication()
     app.run(sys.argv)
