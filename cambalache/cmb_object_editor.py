@@ -10,7 +10,7 @@ import io
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gtk
+from gi.repository import GLib, GObject, Gtk
 
 from .cmb_objects import CmbObject
 
@@ -156,6 +156,28 @@ class CmbObjectEditor(Gtk.Box):
         self._object = obj
         self._update_view()
 
+    def _get_min_max_for_type(self, type_id):
+        if type_id == 'gchar':
+            return (GLib.MININT8, GLib.MAXINT8)
+        elif type_id == 'guchar':
+            return (0, GLib.MAXUINT8)
+        elif type_id == 'gint':
+            return (GLib.MININT, GLib.MAXINT)
+        elif type_id == 'guint':
+            return (0, GLib.MAXUINT)
+        elif type_id == 'glong':
+            return (GLib.MINLONG, GLib.MAXLONG)
+        elif type_id == 'gulong':
+            return (0, GLib.MAXULONG)
+        elif type_id == 'gint64':
+            return (GLib.MININT64, GLib.MAXINT64)
+        elif type_id == 'guint64':
+            return (0, GLib.MAXUINT64)
+        elif type_id == 'gfloat':
+            return (GLib.MINFLOAT, GLib.MAXFLOAT)
+        elif type_id == 'gdouble':
+            return (GLib.MINDOUBLE, GLib.MAXDOUBLE)
+
     def _create_editor_for_property(self, prop):
         editor = None
 
@@ -173,13 +195,18 @@ class CmbObjectEditor(Gtk.Box):
 
                 digits = 0
                 step_increment = 1
+                minimum, maximum = self._get_min_max_for_type(type_id)
+                if info.minimum is not None:
+                    minimum = info.minimum
+                if info.maximum is not None:
+                    maximum = info.maximum
 
                 if type_id == 'gfloat' or type_id == 'gdouble':
                     digits = 4
                     step_increment = 0.1
 
-                adjustment = Gtk.Adjustment(lower=float(info.minimum),
-                                            upper=float(info.maximum),
+                adjustment = Gtk.Adjustment(lower=float(minimum),
+                                            upper=float(maximum),
                                             step_increment=step_increment,
                                             page_increment=10)
 
