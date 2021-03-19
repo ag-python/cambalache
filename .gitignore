@@ -1,1 +1,6 @@
 *.pyc
+cambalache/cambalache.gresource
+cambalache/config.py
+src/cambalache_app.gresource
+src/config.py
+
