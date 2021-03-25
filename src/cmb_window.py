@@ -9,6 +9,7 @@
 import os
 import sys
 import gi
+import traceback
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gio, Gtk
@@ -50,6 +51,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     type_entrycompletion = Gtk.Template.Child()
     object_editor = Gtk.Template.Child()
     object_layout_editor = Gtk.Template.Child()
+    signal_editor = Gtk.Template.Child()
 
     about_dialog = Gtk.Template.Child()
 
@@ -169,6 +171,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         obj = sel[0] if len(sel) > 0 and type(sel[0]) == CmbObject else None
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
+        self.signal_editor.object = obj
 
     def _update_actions(self):
         has_project = self._is_project_visible()
@@ -216,7 +219,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                 buttons=Gtk.ButtonsType.OK,
                 text=f'Error loading {filename}'
             )
-            print(e)
+            print(traceback.format_exc())
 
             dialog.run()
             dialog.destroy()
