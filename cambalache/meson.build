@@ -28,6 +28,7 @@ install_data([
     'cmb_view.pyc',
     'cmb_object_editor.pyc',
     'cmb_project.pyc',
+    'cmb_signal_editor.pyc',
     '__init__.pyc'
     ],
     install_dir: moduledir)

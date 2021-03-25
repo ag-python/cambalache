@@ -6,5 +6,6 @@
     <file>cmb_history.sql</file>
     <file>gtk+-3.0.sql</file>
     <file>gtk-4.0.sql</file>
+    <file>cmb_signal_editor.ui</file>
   </gresource>
 </gresources>
