@@ -18,7 +18,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 
 from .cmb_objects import CmbUI, CmbObject, CmbTypeInfo
-from .cmb_objects_base import CmbPropertyInfo
+from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
 
@@ -49,6 +49,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         'object-layout-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
                                            (CmbObject, CmbObject, str)),
+
+        'object-signal-added': (GObject.SIGNAL_RUN_FIRST, None,
+                                (CmbObject, CmbSignal)),
+
+        'object-signal-removed': (GObject.SIGNAL_RUN_FIRST, None,
+                                  (CmbObject, CmbSignal)),
 
         'selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
@@ -236,6 +242,17 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 type_hierarchy[type_id] = hierarchy
             hierarchy.append(row[1])
 
+        # Dictionary with all the type signals
+        type_signals = {}
+        owner_id = None
+        signals = None
+        for row in c.execute('SELECT * FROM signal ORDER BY owner_id, signal_id;'):
+            if owner_id != row[0]:
+                owner_id = row[0]
+                signals = []
+                type_signals[owner_id] = signals
+            signals.append(CmbSignalInfo.from_row(self, *row))
+
         for row in c.execute('''SELECT * FROM type
                                   WHERE
                                     parent_id IS NOT NULL AND
@@ -243,7 +260,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                                   ORDER BY type_id;'''):
             type_id = row[0]
             info = CmbTypeInfo.from_row(self, *row)
-            info.hierarchy = type_hierarchy[type_id]
+            info.hierarchy = type_hierarchy.get(type_id, [])
+            info.signals = type_signals.get(type_id, [])
             self._type_info[type_id] = info
 
     def _init_property_info(self, c):
@@ -972,6 +990,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                   self._get_object_by_id(ui_id, object_id),
                   self._get_object_by_id(ui_id, child_id),
                   prop)
+
+    def _object_signal_removed(self, obj, signal):
+        self.emit('object-signal-removed', obj, signal)
+
+    def _object_signal_added(self, obj, signal):
+        self.emit('object-signal-added', obj, signal)
 
     def db_backup(self, filename):
         self.conn.commit()
