@@ -55,7 +55,7 @@ class CambalacheDb:
 
         return columns
 
-    def _dump_table(self, fd, table, klass):
+    def dump_table(self, fd, table, klass, mutable=False):
         c = self.conn.cursor()
         columns = self._get_table_data(table)
 
@@ -66,7 +66,7 @@ class CambalacheDb:
         all_pk_columns = ''
         pks = []
         for col in columns:
-            if not col['pk']:
+            if mutable and not col['pk']:
                 continue
 
             fd.write(f"    {col['name']} = GObject.Property(type={col['type']}")
@@ -84,7 +84,7 @@ class CambalacheDb:
         all_columns_assign = ''
         for col in columns:
             all_columns += ', ' + col['name']
-            if not col['pk']:
+            if mutable and not col['pk']:
                 continue
             all_columns_assign += f",\n                   {col['name']}={col['name']}"
 
@@ -100,22 +100,23 @@ class CambalacheDb:
         fd.write(f"    def from_row(cls, project{all_columns}):\n")
         fd.write(f"        return cls(project=project{all_columns_assign})\n")
 
-        for col in columns:
-            if col['pk']:
-                continue
+        if mutable:
+            for col in columns:
+                if col['pk']:
+                    continue
 
-            fd.write(f"\n    @GObject.Property(type={col['type']}")
-            if col['type'] == 'bool':
-                fd.write(f", default = False")
-            fd.write(")\n")
-            fd.write(f"    def {col['name']}(self):\n")
-            fd.write(f"        return self.db_get('SELECT {col['name']} FROM {table} WHERE {_pk_columns} IS {_pk_values};',\n")
-            fd.write(f"                           ({all_pk_columns}))\n")
+                fd.write(f"\n    @GObject.Property(type={col['type']}")
+                if col['type'] == 'bool':
+                    fd.write(f", default = False")
+                fd.write(")\n")
+                fd.write(f"    def {col['name']}(self):\n")
+                fd.write(f"        return self.db_get('SELECT {col['name']} FROM {table} WHERE {_pk_columns} IS {_pk_values};',\n")
+                fd.write(f"                           ({all_pk_columns}))\n")
 
-            fd.write(f"\n    @{col['name']}.setter\n")
-            fd.write(f"    def _set_{col['name']}(self, value):\n")
-            fd.write(f"        self.db_set('UPDATE {table} SET {col['name']}=? WHERE {_pk_columns} IS {_pk_values};',\n")
-            fd.write(f"                    ({all_pk_columns}), value)\n")
+                fd.write(f"\n    @{col['name']}.setter\n")
+                fd.write(f"    def _set_{col['name']}(self, value):\n")
+                fd.write(f"        self.db_set('UPDATE {table} SET {col['name']}=? WHERE {_pk_columns} IS {_pk_values};',\n")
+                fd.write(f"                    ({all_pk_columns}), value)\n")
 
         c.close()
 
@@ -136,16 +137,21 @@ from .cmb_base import *
 """)
 
             # Base Objects
-            self._dump_table(fd, 'property', 'CmbPropertyInfo')
-            self._dump_table(fd, 'signal', 'CmbSignalInfo')
-            self._dump_table(fd, 'type', 'CmbBaseTypeInfo')
+            self.dump_table(fd, 'property', 'CmbPropertyInfo')
+            self.dump_table(fd, 'signal', 'CmbSignalInfo')
+            self.dump_table(fd, 'type', 'CmbBaseTypeInfo')
 
             # Project Objects
-            self._dump_table(fd, 'ui', 'CmbBaseUI')
-            self._dump_table(fd, 'object_property', 'CmbBaseProperty')
-            self._dump_table(fd, 'object_layout_property', 'CmbBaseLayoutProperty')
-            self._dump_table(fd, 'object_signal', 'CmbSignal')
-            self._dump_table(fd, 'object', 'CmbBaseObject')
+            self.dump_table(fd, 'ui', 'CmbBaseUI',
+                            mutable=True)
+            self.dump_table(fd, 'object_property', 'CmbBaseProperty',
+                            mutable=True)
+            self.dump_table(fd, 'object_layout_property', 'CmbBaseLayoutProperty',
+                            mutable=True)
+            self.dump_table(fd, 'object_signal', 'CmbSignal',
+                            mutable=True)
+            self.dump_table(fd, 'object', 'CmbBaseObject',
+                            mutable=True)
             fd.close();
 
 
