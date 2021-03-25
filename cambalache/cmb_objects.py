@@ -121,11 +121,18 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
 class CmbTypeInfo(CmbBaseTypeInfo):
     def __init__(self, **kwargs):
         self.hierarchy = []
+        self.signals = []
         super().__init__(**kwargs)
 
 
 class CmbObject(CmbBaseObject):
     info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    __gsignals__ = {
+        'signal-added': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, )),
+
+        'signal-removed': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, ))
+    }
 
     def __init__(self, **kwargs):
         self.properties = []
@@ -197,3 +204,44 @@ class CmbObject(CmbBaseObject):
         else:
             self.layout = []
 
+    def add_signal(self, owner_id, signal_id, handler, detail=None, user_data=None, swap=None, after=None):
+        try:
+            c = self.project.conn.cursor()
+            c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                      (self.ui_id, self.object_id, owner_id, signal_id, handler, detail, user_data, swap, after))
+            signal_pk = c.lastrowid
+            c.close()
+            self.project.conn.commit()
+        except Exception as e:
+            print('add_signal', e)
+            return None
+        else:
+            signal = CmbSignal(project=self.project,
+                               signal_pk=signal_pk,
+                               ui_id=self.ui_id,
+                               object_id=self.object_id,
+                               owner_id=owner_id,
+                               signal_id=signal_id,
+                               handler=handler,
+                               detail=detail,
+                               user_data=0,
+                               swap=swap,
+                               after=after)
+            self.signals.append(signal)
+            self.emit('signal-added', signal)
+            self.project._object_signal_added(self, signal)
+            return signal
+
+    def remove_signal(self, signal):
+        try:
+            self.project.conn.execute("DELETE FROM object_signal WHERE signal_pk=?;",
+                                      (signal.signal_pk, ))
+            self.project.conn.commit()
+        except Exception as e:
+            print('remove_signal', e)
+            return False
+        else:
+            self.signals.remove(signal)
+            self.emit('signal-removed', signal)
+            self.project._object_signal_removed(self, signal)
+            return True
