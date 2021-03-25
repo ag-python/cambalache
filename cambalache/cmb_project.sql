@@ -116,6 +116,7 @@ CREATE INDEX object_layout_property_child_property_fk ON object_layout_property 
  * TODO: check owner_id is in object_id.type_id type tree
  */
 CREATE TABLE object_signal (
+  signal_pk INTEGER PRIMARY KEY AUTOINCREMENT,
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
   owner_id TEXT,
@@ -127,9 +128,9 @@ CREATE TABLE object_signal (
   swap BOOLEAN,
   after BOOLEAN,
   FOREIGN KEY(ui_id, object_id) REFERENCES object ON DELETE CASCADE,
-  FOREIGN KEY(ui_id, user_data) REFERENCES object(ui_id, object_id) ON DELETE SET NULL,
   FOREIGN KEY(owner_id, signal_id) REFERENCES signal
 );
 
+CREATE INDEX object_signal_object_fk ON object (ui_id, object_id);
 CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
 
