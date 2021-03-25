@@ -71,7 +71,7 @@ class CmbView(Gtk.ScrolledWindow):
             self._project.connect('object-property-changed', self._on_project_change)
             self._project.connect('object-layout-property-changed', self._on_project_change)
 
-            for table in ['ui', 'object']:
+            for table in ['ui', 'object', 'object-signal']:
                 table = table.replace('_', '-')
                 for action in ['added', 'removed']:
                     self._project.connect( f'{table}-{action}', self._on_project_change)
