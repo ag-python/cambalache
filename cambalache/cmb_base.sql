@@ -180,6 +180,7 @@ CREATE TABLE IF NOT EXISTS signal (
 
   version TEXT,
   deprecated_version TEXT,
+  detailed BOOLEAN,
   PRIMARY KEY(owner_id, signal_id)
 ) WITHOUT ROWID;
 

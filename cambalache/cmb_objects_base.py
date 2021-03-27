@@ -51,17 +51,19 @@ class CmbSignalInfo(CmbBase):
     signal_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     deprecated_version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    detailed = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, owner_id, signal_id, version, deprecated_version):
+    def from_row(cls, project, owner_id, signal_id, version, deprecated_version, detailed):
         return cls(project=project,
                    owner_id=owner_id,
                    signal_id=signal_id,
                    version=version,
-                   deprecated_version=deprecated_version)
+                   deprecated_version=deprecated_version,
+                   detailed=detailed)
 
 
 class CmbBaseTypeInfo(CmbBase):
