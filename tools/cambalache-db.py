@@ -87,12 +87,14 @@ class CambalacheDb:
         lib = gir.GirData(girfile)
         lib.populate_db(self.conn)
         self.conn.commit()
+        return lib
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    nargs = len(sys.argv)
+    if nargs < 3:
         print(f"Ussage: {sys.argv[0]} library.gir database.sqlite")
         exit()
 
     db = CambalacheDb()
-    db.populate_from_gir(sys.argv[1])
+    lib = db.populate_from_gir(sys.argv[1])
     db.dump(sys.argv[2])

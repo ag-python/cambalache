@@ -26,6 +26,9 @@ def ns(namespace, name):
 class GirData:
 
     def __init__(self, gir_file):
+
+        self._instances = {}
+
         tree = etree.parse(gir_file)
         root = tree.getroot()
 
@@ -38,6 +41,7 @@ class GirData:
 
         # Get module/name space data
         self.name = namespace.get('name')
+        self.prefix = namespace.get(ns('c', 'identifier-prefixes'))
         self.lib = self.name.lower()
         self.version = namespace.get('version')
         self.shared_library = namespace.get('shared-library')
@@ -49,17 +53,34 @@ class GirData:
         except ValueError:
             print(f"Oops! Could not load {self.name} {self.version} module")
 
+        types = None
+        skip_types = []
+        if self.name == 'GObject':
+            types = ['GObject', 'GBinding', 'GBindingFlags']
+            skip_types = ['GBinding']
+        elif self.name == 'Gtk':
+            if self.version == '3.0':
+                pass
+            elif self.version == '4.0':
+                skip_types = ['GtkActivateAction',
+                              'GtkMnemonicAction',
+                              'GtkNamedAction',
+                              'GtkNeverTrigger',
+                              'GtkNothingAction',
+                              'GtkSignalAction',
+                              'GtkPrintJob']
+
         # Dictionary of all classes/types
-        self.types = self._get_types(namespace)
+        self.types = self._get_types(namespace, types, skip_types)
 
         # Dictionary of all enumerations
-        self.enumerations = self._get_enumerations(namespace)
+        self.enumerations = self._get_enumerations(namespace, types)
 
         # Dictionary of all flags
-        self.flags = self._get_flags(namespace)
+        self.flags = self._get_flags(namespace, types)
 
         # Dictionary of all interfaces
-        self.ifaces = self._get_ifaces(namespace)
+        self.ifaces = self._get_ifaces(namespace, types)
 
         if self.name == 'Gtk':
             if self.version == '3.0':
@@ -90,18 +111,32 @@ class GirData:
         return False
 
     def _get_instance_from_type(self, name):
-        if name.startswith(self.name):
-            parentClass = getattr(self.mod, name[len(self.name):])
+        retval = self._instances.get(name, None)
+
+        if retval is not None:
+            return retval
+
+        if name.startswith(self.prefix):
+            InstanceClass = getattr(self.mod, name[len(self.prefix):], None)
         else:
-            parentClass = getattr(self.mod, name)
+            InstanceClass = getattr(self.mod, name, None)
 
         gtype = GObject.type_from_name(name)
-        if GObject.type_is_a(gtype, GObject.GObject) and parentClass is not None:
-            # Ensure class is instantiable
-            class InstanceClass(parentClass):
-                pass
-            return InstanceClass() if InstanceClass is not None else None
-        return None
+        if InstanceClass is not None and GObject.type_is_a(gtype, GObject.GObject):
+            if GObject.type_test_flags(gtype, GObject.TypeFlags.ABSTRACT):
+                # Ensure class is instantiable
+                class ChildClass(InstanceClass):
+                    pass
+                if ChildClass is not None:
+                    retval = ChildClass()
+            else:
+                retval = InstanceClass()
+
+        # keep the instance for later
+        if retval is not None:
+            self._instances[name] = retval
+
+        return retval
 
     def _container_list_child_properties(self, name):
         instance = self._get_instance_from_type(name)
@@ -203,7 +238,7 @@ class GirData:
             type_name = type.get('name')
 
             # FIXME: Ignore types defined in other NS for now
-            if type_name.find('.') >= 0:
+            if type_name is None or type_name.find('.') >= 0:
                 continue
 
             # FIXME: Crappy test to see if types refers to an object
@@ -232,11 +267,12 @@ class GirData:
     def _type_get_signals (self, element):
         retval = {}
 
-        for child in element.iterfind('virtual-method', nsmap):
+        for child in element.iterfind(ns('glib', 'signal')):
             name = child.get('name').replace('_', '-')
             retval[name] = {
                 'version': child.get('version'),
                 'deprecated_version': child.get('deprecated-version'),
+                'detailed': child.get('detailed'),
             }
 
         return retval
@@ -251,24 +287,22 @@ class GirData:
 
         return retval
 
-    def _get_type_data (self, element, name):
+    def _get_type_data (self, element, name, use_instance=True):
         parent = element.get('parent')
 
         if parent and parent.find('.') < 0:
-            parent = self.name + parent
+            parent = self.prefix + parent
+        elif parent is None:
+            parent = 'object'
+        else:
+            parent = 'GObject'
 
         # Get version and deprecated-version from constructor if possible
         constructor = element.find('constructor', nsmap)
         if constructor is None:
             constructor = element
 
-        # FIXME: add a way to skip some classes or have the right data to initialize to avoid aborting
-        if name != 'GtkActivateAction' and \
-           name != 'GtkMnemonicAction' and \
-           name != 'GtkNamedAction' and \
-           name != 'GtkNeverTrigger' and \
-           name != 'GtkNothingAction' and \
-           name != 'GtkSignalAction'    :
+        if use_instance:
             instance = self._get_instance_from_type(name)
         else:
             instance = None
@@ -285,23 +319,25 @@ class GirData:
             'interfaces': self._type_get_interfaces(element)
         }
 
-    def _get_types (self, namespace):
+    def _get_types (self, namespace, types=None, skip_types=[]):
         retval = {}
 
         for child in namespace.iterfind('class', nsmap):
             name = child.get(ns('glib','type-name'))
-            data = self._get_type_data(child, name)
-            if name and data is not None:
-                retval[name] = data
+
+            if name and (types is None or name in types):
+                data = self._get_type_data(child, name, not name in skip_types)
+                if name and data is not None:
+                    retval[name] = data
 
         return retval
 
-    def _get_enumerations (self, namespace):
+    def _get_enumerations (self, namespace, types=None):
         retval = {}
 
         for child in namespace.iterfind('enumeration', nsmap):
             name = child.get(ns('glib','type-name'))
-            if name:
+            if name and (types is None or name in types):
                 retval[name] = {
                     'parent': 'enum',
                     'members': self._enum_flags_get_members(child)
@@ -327,12 +363,12 @@ class GirData:
 
         return retval
 
-    def _get_flags (self, namespace):
+    def _get_flags (self, namespace, types=None):
         retval = {}
 
         for child in namespace.iterfind('bitfield', nsmap):
             name = child.get(ns('glib','type-name'))
-            if name:
+            if name and (types is None or name in types):
                 retval[name] = {
                     'parent': 'flags',
                     'members': self._enum_flags_get_members(child)
@@ -340,12 +376,12 @@ class GirData:
 
         return retval
 
-    def _get_ifaces (self, namespace):
+    def _get_ifaces (self, namespace, types=None):
         retval = {}
 
         for child in namespace.iterfind('interface', nsmap):
             name = child.get(ns('glib','type-name'))
-            if name:
+            if name and (types is None or name in types):
                 retval[name] = {
                     'parent': 'interface',
                 }
@@ -397,8 +433,8 @@ class GirData:
             signals = data['signals']
             for signal in signals:
                 s = signals[signal]
-                conn.execute(f"INSERT INTO signal (owner_id, signal_id, version, deprecated_version) VALUES (?, ?, ?, ?);",
-                             (name, signal, s['version'], s['deprecated_version']))
+                conn.execute(f"INSERT INTO signal (owner_id, signal_id, version, deprecated_version, detailed) VALUES (?, ?, ?, ?, ?);",
+                             (name, signal, s['version'], s['deprecated_version'], s['detailed']))
 
             for iface in data['interfaces']:
                 conn.execute(f"INSERT INTO type_iface (type_id, iface_id) VALUES (?, ?);",
@@ -407,10 +443,12 @@ class GirData:
         # Import library
         conn.execute(f"INSERT INTO library (library_id, version, shared_library) VALUES (?, ?, ?);",
                      (self.lib, self.version, self.shared_library));
-        major = self.mod.get_major_version()
-        for minor in range(0, self.mod.get_minor_version()+1, 2):
-            conn.execute(f"INSERT INTO library_version (library_id, version) VALUES (?, ?);",
-                         (self.lib, f"{major}.{minor}"));
+
+        if hasattr(self.mod, 'get_major_version'):
+            major = self.mod.get_major_version()
+            for minor in range(0, self.mod.get_minor_version()+1, 2):
+                conn.execute(f"INSERT INTO library_version (library_id, version) VALUES (?, ?);",
+                             (self.lib, f"{major}.{minor}"));
 
         # Import ifaces
         for name in self.ifaces:
