@@ -52,9 +52,13 @@
             </child>
             <child>
               <object class="GtkTreeViewColumn" id="signal_id_column">
+                <property name="resizable">True</property>
+                <property name="min-width">64</property>
                 <property name="title" translatable="yes">Signal</property>
                 <child>
-                  <object class="GtkCellRendererText" id="signal_id"/>
+                  <object class="GtkCellRendererText" id="signal_id">
+                    <signal name="edited" handler="on_detail_edited" swapped="no"/>
+                  </object>
                   <attributes>
                     <attribute name="text">2</attribute>
                   </attributes>
@@ -62,22 +66,9 @@
               </object>
             </child>
             <child>
-              <object class="GtkTreeViewColumn" id="detail_column">
-                <property name="title" translatable="yes">Detail</property>
-                <child>
-                  <object class="GtkCellRendererText" id="detail">
-                    <property name="editable">True</property>
-                    <property name="placeholder-text">&lt;detail&gt;</property>
-                    <signal name="edited" handler="on_detail_edited" swapped="no"/>
-                  </object>
-                  <attributes>
-                    <attribute name="text">3</attribute>
-                  </attributes>
-                </child>
-              </object>
-            </child>
-            <child>
               <object class="GtkTreeViewColumn" id="handler_column">
+                <property name="resizable">True</property>
+                <property name="min-width">64</property>
                 <property name="title" translatable="yes">Handler</property>
                 <property name="expand">True</property>
                 <child>

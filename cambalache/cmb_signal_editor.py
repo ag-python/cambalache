@@ -35,8 +35,8 @@ class CmbSignalEditor(Gtk.Box):
     treeview = Gtk.Template.Child()
     treestore = Gtk.Template.Child()
 
-    detail_column = Gtk.Template.Child()
-    detail = Gtk.Template.Child()
+    signal_id_column = Gtk.Template.Child()
+    signal_id = Gtk.Template.Child()
     handler_column = Gtk.Template.Child()
     handler = Gtk.Template.Child()
     user_data_column = Gtk.Template.Child()
@@ -50,9 +50,9 @@ class CmbSignalEditor(Gtk.Box):
         self._object = None
         super().__init__(**kwargs)
 
-        self.detail_column.set_cell_data_func(self.detail,
-                                              self._data_func,
-                                              Col.DETAIL.value)
+        self.signal_id_column.set_cell_data_func(self.signal_id,
+                                                 self._signal_id_data_func,
+                                                 None)
         self.handler_column.set_cell_data_func(self.handler,
                                                self._data_func,
                                                Col.HANDLER.value)
@@ -65,9 +65,6 @@ class CmbSignalEditor(Gtk.Box):
         self.after_column.set_cell_data_func(self.after,
                                              self._data_func,
                                              Col.AFTER.value)
-
-        # TODO: add detail info to signal table and finish support for it
-        self.detail_column.props.visible = False
 
     @GObject.property(type=CmbObject)
     def object(self):
@@ -111,11 +108,15 @@ class CmbSignalEditor(Gtk.Box):
 
         if signal is not None:
             if len(new_text) > 0:
-                signal.detail = new_text
-                self.treestore[iter_][Col.DETAIL.value] = signal.detail
+                tokens = new_text.split('::')
+                if len(tokens) == 2 and len(tokens[1]) > 0:
+                    signal.detail = tokens[1]
+                else:
+                    signal.detail = None
             else:
                 signal.detail = None
-                self.treestore[iter_][Col.DETAIL.value] = ''
+
+            self.treestore[iter_][Col.DETAIL.value] = signal.detail
 
     @Gtk.Template.Callback('on_user_data_edited')
     def _on_user_data_edited(self, renderer, path, new_text):
@@ -219,12 +220,25 @@ class CmbSignalEditor(Gtk.Box):
         for signal in self._object.signals:
             self._on_signal_added(self._object, signal)
 
+    def _signal_id_data_func(self, tree_column, cell, tree_model, iter_, column):
+        info = tree_model[iter_][Col.INFO.value]
+        signal_id = tree_model[iter_][Col.SIGNAL_ID.value]
+
+        if info is not None and info.detailed:
+            detail = tree_model[iter_][Col.DETAIL.value]
+            signal = tree_model[iter_][Col.SIGNAL.value]
+
+            cell.props.editable = False if signal is None else True
+            cell.props.text = f'{signal_id}::{detail}' if detail is not None else signal_id
+        else:
+            cell.props.editable = False
+            cell.props.text = signal_id
+
     def _data_func(self, tree_column, cell, tree_model, iter_, column):
         info = tree_model[iter_][Col.INFO.value]
         signal = tree_model[iter_][Col.SIGNAL.value]
 
-        # TODO: handle detail properly once we have all the data
-        if info is None or column == Col.DETAIL.value:
+        if info is None:
             cell.props.visible = False
             return
 
