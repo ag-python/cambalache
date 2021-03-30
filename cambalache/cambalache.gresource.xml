@@ -4,6 +4,7 @@
     <file>cmb_base.sql</file>
     <file>cmb_project.sql</file>
     <file>cmb_history.sql</file>
+    <file>gobject-2.0.sql</file>
     <file>gtk+-3.0.sql</file>
     <file>gtk-4.0.sql</file>
     <file>cmb_signal_editor.ui</file>

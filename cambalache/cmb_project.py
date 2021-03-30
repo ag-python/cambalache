@@ -25,6 +25,7 @@ from .config import *
 BASE_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_base.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
 PROJECT_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_project.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
 HISTORY_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_history.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
+GOBJECT_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gobject-2.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
 GTK3_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gtk+-3.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
 GTK4_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gtk-4.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
 
@@ -147,8 +148,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         # TODO: implement own format instead of sql
         if self.target_tk == 'gtk+-3.0':
+            c.executescript(GOBJECT_SQL)
             c.executescript(GTK3_SQL)
         elif self.target_tk == 'gtk-4.0':
+            c.executescript(GOBJECT_SQL)
             c.executescript(GTK4_SQL)
 
         # TODO: Load all libraries that depend on self.target_tk
