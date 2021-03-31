@@ -654,10 +654,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Signals
         for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after FROM object_signal WHERE ui_id=? AND object_id=?;',
                              (ui_id, ui_id, object_id,)):
-            node = E.signal(name=row[0], handler=row[1])
-            node_set(node, 'object', row[3])
-            node_set(node, 'swapped', row[4])
-            node_set(node, 'after', row[5])
+            signal_id, handler, detail, data, swap, after = row
+            name = f'{signal_id}::{detail}' if detail is not None else signal_id
+            node = E.signal(name=name, handler=handler)
+            node_set(node, 'object', data)
+            if swap:
+                node_set(node, 'swapped', 'yes')
+            if after:
+                node_set(node, 'after', 'yes')
             obj.append(node)
 
         # Children
