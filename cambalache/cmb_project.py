@@ -941,6 +941,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             elif table == 'object_layout_property':
                 child = self._get_object_by_id(pk[0], pk[2])
                 self._undo_redo_property_notify(child, True, column, pk[3], pk[4])
+            elif table == 'object_signal':
+                pass
         elif command == 'INSERT' or command == 'DELETE':
             if table == 'object_property':
                 obj = self._get_object_by_id(pk[0], pk[1])
@@ -966,6 +968,22 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                         self._add_ui(True, *row)
                     elif table == 'object':
                         self._add_object(True, *row)
+            elif table == 'object_signal':
+                c.execute(commands['COUNT'], (history_index, ))
+                count = c.fetchone()
+
+                c.execute(commands['DATA'], (history_index, ))
+                row = c.fetchone()
+
+                obj = self._get_object_by_id(row[1], row[2])
+
+                if count[0] == 0:
+                    for signal in obj.signals:
+                        if signal.signal_pk == row[0]:
+                            obj._remove_signal(signal)
+                            break
+                else:
+                    obj._add_signal(row[0], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
 
         c.execute("UPDATE global SET value=TRUE WHERE key='history_enabled';")
         c.close()

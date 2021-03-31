@@ -204,7 +204,25 @@ class CmbObject(CmbBaseObject):
         else:
             self.layout = []
 
-    def add_signal(self, owner_id, signal_id, handler, detail=None, user_data=None, swap=None, after=None):
+    def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
+        signal = CmbSignal(project=self.project,
+                           signal_pk=signal_pk,
+                           ui_id=self.ui_id,
+                           object_id=self.object_id,
+                           owner_id=owner_id,
+                           signal_id=signal_id,
+                           handler=handler,
+                           detail=detail,
+                           user_data=user_data,
+                           swap=swap,
+                           after=after)
+        self.signals.append(signal)
+        self.emit('signal-added', signal)
+        self.project._object_signal_added(self, signal)
+
+        return signal
+
+    def add_signal(self, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         try:
             c = self.project.conn.cursor()
             c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
@@ -216,21 +234,19 @@ class CmbObject(CmbBaseObject):
             print('add_signal', e)
             return None
         else:
-            signal = CmbSignal(project=self.project,
-                               signal_pk=signal_pk,
-                               ui_id=self.ui_id,
-                               object_id=self.object_id,
-                               owner_id=owner_id,
-                               signal_id=signal_id,
-                               handler=handler,
-                               detail=detail,
-                               user_data=0,
-                               swap=swap,
-                               after=after)
-            self.signals.append(signal)
-            self.emit('signal-added', signal)
-            self.project._object_signal_added(self, signal)
-            return signal
+            return self._add_signal(signal_pk,
+                                    owner_id,
+                                    signal_id,
+                                    handler,
+                                    detail=detail,
+                                    user_data=user_data,
+                                    swap=swap,
+                                    after=after)
+
+    def _remove_signal(self, signal):
+        self.signals.remove(signal)
+        self.emit('signal-removed', signal)
+        self.project._object_signal_removed(self, signal)
 
     def remove_signal(self, signal):
         try:
@@ -241,7 +257,5 @@ class CmbObject(CmbBaseObject):
             print('remove_signal', e)
             return False
         else:
-            self.signals.remove(signal)
-            self.emit('signal-removed', signal)
-            self.project._object_signal_removed(self, signal)
+            self._remove_signal(signal)
             return True
