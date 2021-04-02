@@ -68,11 +68,5 @@ class CmbView(Gtk.ScrolledWindow):
 
         if project is not None:
             self._project.connect('selection-changed', self._on_project_selection_changed)
-            self._project.connect('object-property-changed', self._on_project_change)
-            self._project.connect('object-layout-property-changed', self._on_project_change)
-
-            for table in ['ui', 'object', 'object-signal']:
-                table = table.replace('_', '-')
-                for action in ['added', 'removed']:
-                    self._project.connect( f'{table}-{action}', self._on_project_change)
+            self._project.connect('changed', self._on_project_change)
 
