@@ -92,6 +92,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self._project is not None:
             self._project.disconnect_by_func(self._on_project_filename_notify)
             self._project.disconnect_by_func(self._on_project_selection_changed)
+            self._project.disconnect_by_func(self._on_project_changed)
 
         self._project = project
         self.view.project = project
@@ -102,7 +103,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
             self._project.connect('selection-changed', self._on_project_selection_changed)
-            self._project.connect('ui-added', self._on_project_ui_added)
+            self._project.connect('changed', self._on_project_changed)
             self.type_entry.set_placeholder_text(project.target_tk)
         else:
             self.headerbar.set_subtitle(None)
@@ -148,9 +149,10 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _update_action_undo_redo(self):
         if self._is_project_visible():
-            self._actions['undo'].set_enabled(self.project.history_index > 0)
-            self._actions['redo'].set_enabled(self.project.history_index <
-                                              self.project.history_index_max)
+            history_index = self.project.history_index
+            history_index_max = self.project.history_index_max
+            self._actions['undo'].set_enabled(history_index > 0)
+            self._actions['redo'].set_enabled(history_index < history_index_max)
         else:
             self._actions['undo'].set_enabled(False)
             self._actions['redo'].set_enabled(False)
@@ -162,7 +164,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         else:
             self._actions['delete'].set_enabled(False)
 
-    def _on_project_ui_added(self, project, ui):
+    def _on_project_changed(self, project):
         self._update_action_undo_redo()
 
     def _on_project_selection_changed(self, project):
