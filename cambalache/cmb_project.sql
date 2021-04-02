@@ -15,8 +15,6 @@ CREATE TABLE global (
   value TEXT
 ) WITHOUT ROWID;
 
-INSERT INTO global VALUES('history_enabled', TRUE);
-
 /* UI
  *
  */

@@ -14,10 +14,13 @@
  * history_* tables and triggers are auto generated to avoid copy/paste errors
  */
 
+INSERT INTO global VALUES('history_enabled', TRUE);
+INSERT INTO global VALUES('history_index', -1);
+
 /* Main history table */
 
 CREATE TABLE history (
-  history_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  history_id INTEGER PRIMARY KEY,
   command TEXT NOT NULL,
   range_id INTEGER REFERENCES history,
   table_name TEXT,
