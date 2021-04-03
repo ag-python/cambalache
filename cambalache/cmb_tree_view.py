@@ -32,6 +32,7 @@ class CmbTreeView(Gtk.TreeView):
         self.append_column(column)
 
         self.connect('notify::model', self._on_model_notify)
+        self.connect('row-activated', self._on_row_activated)
 
     def _name_cell_data_func(self, column, cell, model, iter_, data):
         obj = model.get_value(iter_, 0)
@@ -50,6 +51,12 @@ class CmbTreeView(Gtk.TreeView):
 
         if self._project:
             self._project.connect('selection-changed', self._on_project_selection_changed)
+
+    def _on_row_activated(self, view, path, column):
+        if self.row_expanded(path):
+            self.collapse_row(path)
+        else:
+            self.expand_row(path, True)
 
     def _on_project_selection_changed(self, p):
         project, _iter = self._selection.get_selected()
