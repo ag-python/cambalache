@@ -309,7 +309,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         dialog = self._file_open_dialog_new("Choose a file name for the new UI",
                                             Gtk.FileChooserAction.SAVE)
         if dialog.run() == Gtk.ResponseType.OK:
-            self.project.add_ui(dialog.get_filename())
+            ui = self.project.add_ui(dialog.get_filename())
+            self.project.set_selection([ui])
 
         dialog.destroy()
 
