@@ -65,6 +65,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     target_tk = GObject.Property(type=str)
     filename = GObject.Property(type=str)
 
+    undo_msg = GObject.Property(type=str)
+    redo_msg = GObject.Property(type=str)
+
     def __init__(self, **kwargs):
         GObject.GObject.__init__(self, **kwargs)
 
@@ -131,12 +134,24 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def _set_data(self, key, value):
         self.conn.execute("UPDATE global SET value=? WHERE key=?;", (value, key))
 
+    @GObject.Property(type=bool, default=False)
+    def history_enabled(self):
+        return bool(self._get_data('history_enabled'))
+
+    @history_enabled.setter
+    def _set_history_enabled(self, value):
+        self._set_data('history_enabled', value)
+
     @GObject.Property(type=int)
     def history_index_max(self):
         c = self.conn.execute("SELECT MAX(history_id) FROM history;")
         row = c.fetchone()
         c.close()
-        return int(row[0]) if row is not None else None
+
+        if row is None or row[0] is None:
+            return 0
+
+        return int(row[0])
 
     @GObject.Property(type=int)
     def history_index(self):
@@ -225,8 +240,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Create history tables for each tracked table
         self._create_support_table(c, 'ui')
         self._create_support_table(c, 'ui_library')
-        self._create_support_table(c, 'object',
-                                   "printf('Delete object %s:%s', OLD.type_id, OLD.name)")
+        self._create_support_table(c, 'object')
         self._create_support_table(c, 'object_property')
         self._create_support_table(c, 'object_layout_property')
         self._create_support_table(c, 'object_signal')
@@ -294,7 +308,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             property_id = row[1]
             props[property_id] = CmbPropertyInfo.from_row(self, *row)
 
-    def _create_support_table(self, c, table, group_msg=None):
+    def _create_support_table(self, c, table):
         _table = table.replace('_', '-')
 
         # Create a history table to store data for INSERT and DELETE commands
@@ -370,21 +384,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     END;
         ''')
 
-        # DELETE Trigger
-        if group_msg:
-            c.execute(f'''
-    CREATE TRIGGER on_{table}_before_delete BEFORE DELETE ON {table}
-    WHEN
-      {history_is_enabled}
-    BEGIN
-      {clear_history};
-      INSERT INTO history (history_id, command, message) VALUES ({history_next_seq}, 'PUSH', {group_msg});
-    END;
-            ''')
-            pop = f"INSERT INTO history (history_id, command) VALUES ({history_next_seq},'POP');"
-        else:
-            pop = ''
-
         c.execute(f'''
     CREATE TRIGGER on_{table}_delete AFTER DELETE ON {table}
     WHEN
@@ -394,7 +393,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
       INSERT INTO history (history_id, command, table_name) VALUES ({history_next_seq}, 'DELETE', '{table}');
       INSERT INTO history_{table} (history_id, history_old, {columns})
         VALUES (last_insert_rowid(), 1, {old_values});
-      {pop}
     END;
         ''')
 
@@ -465,7 +463,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             self._load_libraries()
 
+            self.history_enabled = False
             c.executescript(sql.read())
+            self.history_enabled = True
 
         self.conn.commit()
         cc = self.conn.cursor()
@@ -624,13 +624,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.close()
 
     def import_file(self, filename, overwrite=False):
+        self.history_push(f'Import file "{filename}"')
+
         c = self.conn.cursor()
 
         # Remove old UI
         if overwrite:
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
-
-        ui = self.add_ui(filename)
 
         tree = etree.parse(filename)
         root = tree.getroot()
@@ -644,14 +644,18 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if lib == 'gtk+':
                 builder_ver = 3;
 
-            c.execute("INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);",
-                      (ui.ui_id, lib, version))
+            if lib == 'gtk' or lib == 'gtk+':
+                self.target_tk = f'{lib}-{version}'
+
+        ui = self.add_ui(filename)
 
         for child in root.iterfind('object'):
             self._import_object(builder_ver, ui.ui_id, child, None)
             self.conn.commit()
 
         c.close()
+
+        self.history_pop()
 
     def _get_object(self, builder_ver, ui_id, object_id):
         def node_set(node, attr, val):
@@ -823,7 +827,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def remove_ui(self, ui):
         try:
+            self.history_push(f'Remove UI "{ui.name}"')
             self.conn.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
+            self.history_pop()
             self.conn.commit()
             self._remove_ui(ui);
         except:
@@ -876,8 +882,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def remove_object(self, obj):
         try:
+            name = obj.name if obj.name is not None else obj.type_id
+            self.history_push(f'Remove object {name}')
             self.conn.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;",
                               (obj.ui_id, obj.object_id))
+            self.history_pop()
             self.conn.commit()
         except:
             pass
@@ -921,7 +930,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 else:
                     self.emit('object-property-changed', obj, property_id)
 
-    def _get_last_command(self, history_index):
+    def _get_history_command(self, history_index):
         c = self.conn.cursor()
         c.execute("SELECT command, range_id, table_name, column_name FROM history WHERE history_id=?", (history_index, ))
         retval = c.fetchone()
@@ -932,7 +941,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c = self.conn.cursor()
 
         # Get last command
-        command, range_id, table, column = self._get_last_command(self.history_index)
+        command, range_id, table, column = self._get_history_command(self.history_index)
 
         if table is not None:
             commands = self._history_commands[table]
@@ -1026,9 +1035,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def _undo_redo(self, undo):
         c = self.conn.cursor()
-        c.execute("UPDATE global SET value=FALSE WHERE key='history_enabled';")
 
-        command, range_id, table, column = self._get_last_command(self.history_index)
+        self.history_enabled = False
+
+        command, range_id, table, column = self._get_history_command(self.history_index)
 
         if command == 'POP':
             if undo:
@@ -1049,8 +1059,106 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             # Undo / Redo in DB
             self._undo_redo_do(undo)
 
-        c.execute("UPDATE global SET value=TRUE WHERE key='history_enabled';")
+        self.history_enabled = True
         c.close()
+
+    def get_undo_redo_msg(self):
+        c = self.conn.cursor()
+
+        def get_msg_vars(table, index):
+            retval = {
+                'ui': '',
+                'obj': '',
+                'prop': '',
+                'value': ''
+            }
+
+            commands = self._history_commands[table]
+            c.execute(commands['DATA'], (index, ))
+            data = c.fetchone()
+
+            if data is None:
+                return retval
+
+            if table == 'ui':
+                retval['ui'] = data[3]
+            else:
+                if table == 'object_signal':
+                    ui_id = data[1]
+                    object_id = data[2]
+                else:
+                    ui_id = data[0]
+                    object_id = data[1]
+
+                if table == 'object':
+                    retval['obj'] = data[3] if data[3] is not None else data[2]
+                else:
+                    c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?', (ui_id, object_id))
+                    row = c.fetchone()
+                    if row is not None:
+                        type_id, name = row
+                        retval['obj'] = name if name is not None else type_id
+
+                if table == 'object_property':
+                    retval['prop'] = data[3]
+                    retval['value'] = data[4]
+                elif table == 'object_layout_property':
+                    retval['prop'] = data[4]
+                    retval['value'] = data[5]
+                elif table == 'object_signal':
+                    retval['signal'] = data[4]
+
+            return retval
+
+        def get_msg(index):
+            c.execute("SELECT command, range_id, table_name, column_name, message FROM history WHERE history_id=?", (index, ))
+            cmd = c.fetchone()
+            if cmd is None:
+                return None
+            command, range_id, table, column, message = cmd
+
+            if message is not None:
+                return message
+
+            msg = {
+                'ui': {
+                    'INSERT': 'Create UI {ui}',
+                    'DELETE': 'Remove UI {ui}',
+                    'UPDATE': 'Update UI {ui}'
+                },
+                'object': {
+                    'INSERT': 'Create object {obj}',
+                    'DELETE': 'Remove object {obj}',
+                    'UPDATE': 'Update object {obj}'
+                },
+                'object_property': {
+                    'INSERT': 'Set property "{prop}" of {obj} to {value}',
+                    'DELETE': 'Unset property "{prop}" of {obj}',
+                    'UPDATE': 'Update property "{prop}" of {obj} to {value}'
+                },
+                'object_layout_property': {
+                    'INSERT': 'Set layout property "{prop}" of {obj} to {value}',
+                    'DELETE': 'Unset layout property "{prop}" of {obj}',
+                    'UPDATE': 'Update layout property "{prop}" of {obj} to {value}'
+                },
+                'object_signal': {
+                    'INSERT': 'Add {signal} signal to {obj}',
+                    'DELETE': 'Remove {signal} signal from {obj}',
+                    'UPDATE': 'Update {signal} signal of {obj}'
+                },
+            }.get(table, {}).get(command, None)
+
+            if msg is not None:
+                msg = msg.format(**get_msg_vars(table, index))
+
+            return msg
+
+        undo_msg = get_msg(self.history_index)
+        redo_msg = get_msg(self.history_index + 1)
+
+        c.close()
+
+        return (undo_msg, redo_msg)
 
     def undo(self):
         if self.history_index == 0:
@@ -1094,6 +1202,21 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             self.conn.backup(bck)
 
         bck.close()
+
+    def history_push(self, message):
+        if not self.history_enabled:
+            return
+
+        self.conn.execute("INSERT INTO history (history_id, command, message) VALUES (?, 'PUSH', ?)",
+                          (self.history_index_max + 1, message))
+
+    def history_pop(self):
+        if not self.history_enabled:
+            return
+
+        self.conn.execute("INSERT INTO history (history_id, command) VALUES (?, 'POP')",
+                          (self.history_index_max + 1, ))
+        self.emit('changed')
 
     # Default handlers
     def do_ui_added(self, ui):
