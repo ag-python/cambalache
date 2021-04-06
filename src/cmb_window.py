@@ -33,6 +33,8 @@ class CmbWindow(Gtk.ApplicationWindow):
     import_button_box = Gtk.Template.Child()
 
     headerbar = Gtk.Template.Child()
+    undo_button = Gtk.Template.Child()
+    redo_button = Gtk.Template.Child()
     stack = Gtk.Template.Child()
 
     # Start screen
@@ -149,6 +151,10 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _update_action_undo_redo(self):
         if self._is_project_visible():
+            undo_msg, redo_msg = self.project.get_undo_redo_msg()
+            self.undo_button.set_tooltip_text(f'Undo: {undo_msg}' if undo_msg is not None else None)
+            self.redo_button.set_tooltip_text(f'Redo: {redo_msg}' if redo_msg is not None else None)
+
             history_index = self.project.history_index
             history_index_max = self.project.history_index_max
             self._actions['undo'].set_enabled(history_index > 0)
