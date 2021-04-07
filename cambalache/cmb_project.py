@@ -253,6 +253,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         type_query = '''SELECT * FROM type
                           WHERE
                             parent_id IS NOT NULL AND
+                            abstract IS NOT True AND
                             parent_id NOT IN ('interface', 'enum', 'flags') AND
                             layout IS NULL
                           ORDER BY type_id;'''
