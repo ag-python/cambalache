@@ -800,7 +800,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         dirname = os.path.dirname(self.filename)
         relpath = os.path.relpath(filename, dirname)
         try:
-
+            self.history_push(f"Add UI {basename}")
             c = self.conn.cursor()
             c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
                       (basename, relpath))
@@ -811,6 +811,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute('INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);',
                       (ui_id, token[0], token[1]))
             c.close()
+            self.history_pop()
             self.conn.commit()
         except:
             return None
