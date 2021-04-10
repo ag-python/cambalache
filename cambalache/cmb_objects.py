@@ -123,16 +123,19 @@ class CmbTypeInfo(CmbBaseTypeInfo):
         self.hierarchy = []
         self.signals = []
         super().__init__(**kwargs)
-        self._init_enum()
 
-    def _init_enum(self):
-        if self.parent_id != 'enum':
-            return
+        if self.parent_id == 'enum':
+            self.enum = self._init_enum_flags('enum')
+        elif self.parent_id == 'flags':
+            self.flags = self._init_enum_flags('flags')
 
-        self.enum = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
+    def _init_enum_flags(self, name):
+        retval = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_INT)
 
-        for row in self.project.conn.execute('SELECT name, nick FROM type_enum WHERE type_id=?', (self.type_id,)):
-            self.enum.append(row)
+        for row in self.project.conn.execute(f'SELECT name, nick, value FROM type_{name} WHERE type_id=?', (self.type_id,)):
+            retval.append(row)
+
+        return retval
 
 
 class CmbObject(CmbBaseObject):
