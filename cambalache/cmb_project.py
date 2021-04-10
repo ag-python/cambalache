@@ -287,8 +287,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         for row in c.execute('''SELECT * FROM type
                                   WHERE
-                                    parent_id IS NOT NULL AND
-                                    parent_id NOT IN ('interface', 'enum', 'flags')
+                                    parent_id IS NOT NULL
                                   ORDER BY type_id;'''):
             type_id = row[0]
             info = CmbTypeInfo.from_row(self, *row)
