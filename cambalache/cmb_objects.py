@@ -7,7 +7,7 @@
 #
 
 import gi
-from gi.repository import GObject
+from gi.repository import GObject, Gtk
 
 from .cmb_objects_base import *
 
@@ -123,6 +123,16 @@ class CmbTypeInfo(CmbBaseTypeInfo):
         self.hierarchy = []
         self.signals = []
         super().__init__(**kwargs)
+        self._init_enum()
+
+    def _init_enum(self):
+        if self.parent_id != 'enum':
+            return
+
+        self.enum = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
+
+        for row in self.project.conn.execute('SELECT name, nick FROM type_enum WHERE type_id=?', (self.type_id,)):
+            self.enum.append(row)
 
 
 class CmbObject(CmbBaseObject):
