@@ -12,7 +12,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
-from .cmb_objects import CmbObject
+from .cmb_objects import CmbObject, CmbTypeInfo
 
 
 class CmbEntry(Gtk.Entry):
@@ -100,6 +100,93 @@ class CmbComboBox(Gtk.ComboBox):
     @cmb_value.setter
     def _set_value(self, value):
         self.props.active_id = value
+
+
+class CmbFlagsEntry(Gtk.Entry):
+    info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    id_column = GObject.Property(type=int, default = 0, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    text_column = GObject.Property(type=int, default = 1, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    value_column = GObject.Property(type=int, default = 2, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.props.editable = False
+        self.props.secondary_icon_name = 'document-edit-symbolic'
+
+        self.connect('icon-release', self._on_icon_release)
+
+        self._init_popover()
+
+    def _init_popover(self):
+        self.flags = {}
+        self._checks = {}
+        self._popover = Gtk.Popover(relative_to=self)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box.pack_start(Gtk.Label(label=f'<b>{self.info.type_id}</b>',
+                                 use_markup=True),
+                       False, True, 4)
+        box.pack_start(Gtk.Separator(), False, False, 0)
+        sw = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER,
+                                propagate_natural_height=True,
+                                max_content_height=360)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        sw.add(vbox)
+        box.pack_start(sw, True, True, 0)
+
+        for row in self.info.flags:
+            flag = row[self.text_column]
+            flag_id =  row[self.id_column]
+
+            check = Gtk.CheckButton(label=flag)
+            check.connect('toggled', self._on_check_toggled, flag_id)
+            vbox.pack_start(check, False, True, 4)
+            self._checks[flag_id] = check
+
+        box.show_all()
+        self._popover.add(box)
+
+    def _on_check_toggled(self, check, flag_id):
+        self.flags[flag_id] = check.props.active
+        self.props.text = self._to_string()
+        self.notify('cmb-value')
+
+    def _on_icon_release(self, obj, pos, event):
+        self._popover.popup()
+
+    def _to_string(self):
+        retval = None
+        for row in self.info.flags:
+            flag_id = row[self.id_column]
+            if self.flags.get(flag_id, False):
+                retval = flag_id if retval is None else f'{retval} | {flag_id}'
+
+        return retval if retval is not None else ''
+
+    @GObject.property(type=str)
+    def cmb_value(self):
+        return self.props.text if self.props.text != '' else None
+
+    @cmb_value.setter
+    def _set_value(self, value):
+        self.props.text = value if value is not None else ''
+
+        self.flags = {}
+        for check in self._checks:
+            self._checks[check].props.active = False
+
+        if value:
+            tokens = [t.strip() for t in value.split('|')]
+
+            for row in self.info.flags:
+                flag = row[self.text_column]
+                flag_id = row[self.id_column]
+
+                check = self._checks.get(flag_id, None)
+                if check:
+                    val = flag_id in tokens
+                    check.props.active = val
+                    self.flags[flag_id] = val
 
 
 class CmbObjectEditor(Gtk.Box):
@@ -236,10 +323,13 @@ class CmbObjectEditor(Gtk.Box):
 
                 editor = CmbSpinButton(digits=digits,
                                        adjustment=adjustment)
-            elif tinfo and tinfo.parent_id == 'enum':
-                editor = CmbComboBox(model=tinfo.enum,
-                                     id_column=0,
-                                     text_column=1)
+            elif tinfo:
+                if tinfo.parent_id == 'enum':
+                    editor = CmbComboBox(model=tinfo.enum,
+                                         id_column=0,
+                                         text_column=1)
+                elif tinfo.parent_id == 'flags':
+                    editor = CmbFlagsEntry(info=tinfo)
 
         if editor is None:
             editor = CmbEntry(hexpand=True,
