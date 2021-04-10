@@ -96,6 +96,7 @@ CREATE TABLE IF NOT EXISTS type_iface (
 CREATE TABLE IF NOT EXISTS type_enum (
   type_id TEXT REFERENCES type,
   name TEXT,
+  nick TEXT,
   value INTEGER,
   identifier TEXT,
   doc TEXT,
@@ -109,6 +110,7 @@ CREATE TABLE IF NOT EXISTS type_enum (
 CREATE TABLE IF NOT EXISTS type_flags (
   type_id TEXT REFERENCES type,
   name TEXT,
+  nick TEXT,
   value INTEGER,
   identifier TEXT,
   doc TEXT,

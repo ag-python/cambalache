@@ -70,9 +70,6 @@ class GirData:
                               'GtkSignalAction',
                               'GtkPrintJob']
 
-        # Dictionary of all classes/types
-        self.types = self._get_types(namespace, types, skip_types)
-
         # Dictionary of all enumerations
         self.enumerations = self._get_enumerations(namespace, types)
 
@@ -81,6 +78,9 @@ class GirData:
 
         # Dictionary of all interfaces
         self.ifaces = self._get_ifaces(namespace, types)
+
+        # Dictionary of all classes/types
+        self.types = self._get_types(namespace, types, skip_types)
 
         if self.name == 'Gtk':
             if self.version == '3.0':
@@ -147,12 +147,41 @@ class GirData:
 
         return None
 
+    def _get_enum_name_by_value(self, gtype, value):
+        name = GObject.type_name(gtype)
+        enum = self.enumerations.get(name, None)
+
+        if enum is not None:
+            members = enum['members']
+            for member in members:
+                if value == int(members[member]['value']):
+                    return member
+        return None
+
+    def _get_flags_names_by_value(self, gtype, value):
+        name = GObject.type_name(gtype)
+        enum = self.flags.get(name, None)
+        retval = None
+
+        if enum is not None:
+            members = enum['members']
+            for member in members:
+                if value & int(members[member]['value']):
+                    retval = member if retval is None else f'{retval} | {member}'
+
+        return retval
+
     def _get_default_value_from_pspec(self, pspec):
         if pspec is None:
             return None
 
         if pspec.value_type == GObject.TYPE_BOOLEAN:
             return 'True' if pspec.default_value != 0 else 'False'
+        elif GObject.type_is_a(pspec.value_type, GObject.TYPE_ENUM):
+            return self._get_enum_name_by_value(pspec.value_type, pspec.default_value)
+        elif GObject.type_is_a(pspec.value_type, GObject.TYPE_FLAGS):
+            return self._get_flags_names_by_value(pspec.value_type, pspec.default_value)
+
         return pspec.default_value
 
     def _gtk3_init(self):
@@ -357,6 +386,7 @@ class GirData:
 
             retval[child.get('name')] = {
                 'value': child.get('value'),
+                'nick': child.get(ns('glib','nick')),
                 'identifier': child.get(ns('c','identifier')),
                 'doc': doc_text
             }
@@ -397,8 +427,8 @@ class GirData:
             members = data['members']
             for member in members:
                 m = members[member]
-                conn.execute(f"INSERT INTO type_{parent} (type_id, name, value, identifier, doc) VALUES (?, ?, ?, ?, ?);",
-                             (name, member, m['value'], m['identifier'], m['doc']))
+                conn.execute(f"INSERT INTO type_{parent} (type_id, name, value, nick, identifier, doc) VALUES (?, ?, ?, ?, ?, ?);",
+                             (name, member, m['value'], m['nick'], m['identifier'], m['doc']))
 
 
         def db_insert_iface(conn, name, data):
@@ -424,7 +454,11 @@ class GirData:
                 prop_type = p['type']
 
                 # Ignore unknown types (Propably GBoxed)
-                if prop_type.startswith(self.name) and prop_type not in self.types:
+                if prop_type.startswith(self.name) and \
+                   prop_type not in self.types and \
+                   prop_type not in self.flags and \
+                   prop_type not in self.enumerations and \
+                   prop_type not in self.ifaces:
                     continue
 
                 conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, writable, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
