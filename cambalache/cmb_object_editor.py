@@ -79,6 +79,29 @@ class CmbSwitch(Gtk.Switch):
             self.props.active = False
 
 
+class CmbComboBox(Gtk.ComboBox):
+    text_column = GObject.Property(type=int)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.connect('changed', self._on_changed)
+
+        renderer_text = Gtk.CellRendererText()
+        self.pack_start(renderer_text, True)
+        self.add_attribute(renderer_text, "text", self.text_column)
+
+    def _on_changed(self, obj):
+        self.notify('cmb-value')
+
+    @GObject.property(type=str)
+    def cmb_value(self):
+        return self.props.active_id
+
+    @cmb_value.setter
+    def _set_value(self, value):
+        self.props.active_id = value
+
+
 class CmbObjectEditor(Gtk.Box):
     __gtype_name__ = 'CmbObjectEditor'
 
@@ -184,6 +207,7 @@ class CmbObjectEditor(Gtk.Box):
         if prop.info is not None:
             info = prop.info
             type_id = info.type_id
+            tinfo = self._object.project._type_info.get(type_id, None)
 
             if type_id == 'gboolean':
                 editor = CmbSwitch()
@@ -212,6 +236,10 @@ class CmbObjectEditor(Gtk.Box):
 
                 editor = CmbSpinButton(digits=digits,
                                        adjustment=adjustment)
+            elif tinfo and tinfo.parent_id == 'enum':
+                editor = CmbComboBox(model=tinfo.enum,
+                                     id_column=0,
+                                     text_column=1)
 
         if editor is None:
             editor = CmbEntry(hexpand=True,
