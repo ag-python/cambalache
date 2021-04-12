@@ -13,7 +13,8 @@ import importlib
 # We need to use lxml to get access to nsmap
 from lxml import etree
 from .toposort import toposort_flatten
-from gi.repository import GObject
+gi.require_version('CmbUtils', '0.1')
+from gi.repository import GObject, CmbUtils
 
 # Global XML name space
 nsmap = {}
@@ -48,10 +49,11 @@ class GirData:
 
         # Load Module described by gir
         try:
+            print(f"Loading {self.name} {self.version}")
             gi.require_version(self.name, self.version)
             self.mod = importlib.import_module(f'gi.repository.{self.name}')
-        except ValueError:
-            print(f"Oops! Could not load {self.name} {self.version} module")
+        except ValueError as e:
+            print(f"Oops! Could not load {self.name} {self.version} module: {e}")
 
         types = None
         skip_types = []
@@ -247,13 +249,11 @@ class GirData:
             elif self._type_is_a(name, 'GtkLayoutChild'):
                 data['layout'] = 'child'
 
-    def _type_get_properties (self, element, instance):
+    def _type_get_properties (self, element, props):
         retval = {}
         pspecs = {}
 
-        if instance is not None:
-            props = instance.list_properties()
-
+        if props is not None:
             for p in props:
                 pspecs[p.name] = p
 
@@ -333,8 +333,9 @@ class GirData:
 
         if use_instance:
             instance = self._get_instance_from_type(name)
+            props = instance.list_properties() if instance is not None else None
         else:
-            instance = None
+            props = None
 
         return {
             'parent': parent,
@@ -343,7 +344,7 @@ class GirData:
             'version': constructor.get('version'),
             'deprecated_version': constructor.get('deprecated-version'),
             'get_type': element.get(ns('glib','get-type')),
-            'properties': self._type_get_properties(element, instance),
+            'properties': self._type_get_properties(element, props),
             'signals': self._type_get_signals(element),
             'interfaces': self._type_get_interfaces(element)
         }
@@ -412,8 +413,21 @@ class GirData:
         for child in namespace.iterfind('interface', nsmap):
             name = child.get(ns('glib','type-name'))
             if name and (types is None or name in types):
+                if name.startswith(self.prefix):
+                    iface = getattr(self.mod, name[len(self.prefix):], None)
+                else:
+                    iface = getattr(self.mod, name, None)
+
+                # NOTE: this method is needed because
+                # g_object_interface_list_properties bindings do not work
+                props = CmbUtils.get_iface_properties(name)
+
                 retval[name] = {
                     'parent': 'interface',
+                    'version': child.get('version'),
+                    'deprecated_version': child.get('deprecated-version'),
+                    'properties': self._type_get_properties(child, props),
+                    'signals': self._type_get_signals(child),
                 }
 
         return retval
@@ -470,7 +484,7 @@ class GirData:
                 conn.execute(f"INSERT INTO signal (owner_id, signal_id, version, deprecated_version, detailed) VALUES (?, ?, ?, ?, ?);",
                              (name, signal, s['version'], s['deprecated_version'], s['detailed']))
 
-            for iface in data['interfaces']:
+            for iface in data.get('interfaces', []):
                 conn.execute(f"INSERT INTO type_iface (type_id, iface_id) VALUES (?, ?);",
                              (name, iface))
 
@@ -508,3 +522,7 @@ class GirData:
                 continue
             db_insert_type_data(conn, name, self.types[name])
 
+
+        # Now insert iface data (properties, signals, etc)
+        for name in self.ifaces:
+            db_insert_type_data(conn, name, self.ifaces[name])
