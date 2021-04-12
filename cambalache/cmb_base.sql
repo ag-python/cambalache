@@ -138,7 +138,7 @@ SELECT * FROM ancestor
 UNION
 SELECT ancestor.type_id, 0, type_iface.iface_id
   FROM ancestor JOIN type_iface
-  WHERE ancestor.parent_id = type_iface.type_id
+  WHERE ancestor.type_id = type_iface.type_id
 ORDER BY type_id,generation;
 
 

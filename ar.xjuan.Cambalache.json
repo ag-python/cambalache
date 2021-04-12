@@ -1,7 +1,7 @@
 {
     "app-id" : "ar.xjuan.Cambalache",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "3.38",
+    "runtime-version" : "40",
     "sdk" : "org.gnome.Sdk",
     "command" : "ar.xjuan.Cambalache",
     "finish-args" : [
@@ -26,7 +26,7 @@
             "name": "lxml",
             "buildsystem": "simple",
             "build-commands": [
-                "pip3 install --prefix=/app lxml-4.6.2-cp38-cp38-manylinux1_x86_64.whl"
+                "pip3 install lxml-4.6.2-cp38-cp38-manylinux1_x86_64.whl"
             ],
             "sources": [
                 {
