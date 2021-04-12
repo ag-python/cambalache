@@ -21,7 +21,7 @@ class CambalacheDb:
         dirname = os.path.dirname(__file__) or '.'
 
         # Create DB tables
-        with open(os.path.join(dirname, '../cambalache/cmb_base.sql'), 'r') as sql:
+        with open('../cambalache/cmb_base.sql', 'r') as sql:
             self.conn.executescript(sql.read())
             self.conn.commit()
 

@@ -3,4 +3,7 @@ cambalache/cambalache.gresource
 cambalache/config.py
 src/cambalache_app.gresource
 src/config.py
+tools/CmbUtils-0.1.gir
+tools/CmbUtils-0.1.typelib
+tools/libcmbutils.so
 
