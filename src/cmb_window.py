@@ -42,6 +42,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     # New Project
     np_name_entry = Gtk.Template.Child()
+    np_ui_entry = Gtk.Template.Child()
     np_location_chooser = Gtk.Template.Child()
     np_gtk3_radiobutton = Gtk.Template.Child()
     np_gtk4_radiobutton = Gtk.Template.Child()
@@ -84,6 +85,12 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         self.version_label.props.label = config.VERSION
         self.about_dialog.props.version = config.VERSION
+
+        GObject.Object.bind_property(self.np_name_entry, 'text',
+                                     self.np_ui_entry, 'placeholder-text',
+                                     GObject.BindingFlags.SYNC_CREATE,
+                                     self._np_name_to_ui,
+                                     None)
 
     @GObject.Property(type=CmbProject)
     def project(self):
@@ -140,6 +147,12 @@ class CmbWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback('on_np_cancel_button_clicked')
     def _on_np_cancel_button_clicked(self, button):
         self._set_page('workspace' if self.project is not None else 'cambalache')
+
+    def _np_name_to_ui(self, binding, value):
+        if len(value):
+            return value.lower().rsplit('.', 1)[0] + '.ui'
+        else:
+            return '<Choose a UI filename to create>'
 
     def _is_project_visible(self):
         page = self.stack.get_visible_child_name()
@@ -253,6 +266,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_new_activate(self, action, data):
         name = self.np_name_entry.props.text
         location = self.np_location_chooser.get_filename() or '.'
+        uiname = self.np_ui_entry.props.text
 
         if len(name) < 1:
             self.set_focus(self.np_name_entry)
@@ -265,6 +279,9 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         name, ext = os.path.splitext(name)
         filename = os.path.join(location, name + '.cmb')
+
+        if len(uiname) == 0:
+            uiname = self.np_ui_entry.props.placeholder_text
 
         if os.path.exists(filename):
             dialog = Gtk.MessageDialog(
@@ -281,6 +298,10 @@ class CmbWindow(Gtk.ApplicationWindow):
             return
 
         self.emit('open-project', filename, target_tk)
+
+        if self.project:
+            ui = self.project.add_ui(os.path.join(location, uiname))
+            self.project.set_selection([ui])
 
     def _on_undo_activate(self, action, data):
         if self.project is not None:
