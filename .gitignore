@@ -1,6 +1,9 @@
 *.pyc
 cambalache/cambalache.gresource
 cambalache/config.py
+merengue/merengue.gresource
+merengue/config.py
+merengue/merengue
 src/cambalache_app.gresource
 src/config.py
 tools/CmbUtils-0.1.gir

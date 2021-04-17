@@ -1,0 +1,35 @@
+#!@PYTHON@
+#
+# Merengue: Cambalache view process
+#
+# Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
+#
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+#
+
+import os
+import gi
+import sys
+import signal
+
+pythondir = '@pythondir@'
+
+sys.path.insert(1, pythondir)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+from gi.repository import GLib
+from merengue import merengue_init
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        _print(f"Ussage: {sys.argv[0]} gtkversion")
+        exit()
+
+    version, Gdk, Gtk = merengue_init(sys.argv[1])
+
+    if version == '3.0':
+        Gtk.main()
+    else:
+        context = GLib.MainContext.default()
+        while True:
+            context.iteration(True)

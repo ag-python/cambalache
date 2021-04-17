@@ -13,5 +13,6 @@ moduledir = join_paths(python_dir, meson.project_name())
 gnome = import('gnome')
 
 subdir('cambalache')
+subdir('merengue')
 subdir('src')
 

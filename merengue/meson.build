@@ -1,11 +1,11 @@
-gnome.compile_resources('cambalache_app',
-  'cambalache_app.gresource.xml',
+moduledir = join_paths(python_dir, 'merengue')
+
+gnome.compile_resources('merengue',
+  'merengue.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
 )
-
-appdir = join_paths(python_dir, meson.project_name(), 'app')
 
 conf = configuration_data()
 conf.set('VERSION', meson.project_version())
@@ -14,28 +14,26 @@ conf.set('pythondir', python_dir)
 conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
-  input: 'ar.xjuan.Cambalache.in',
-  output: 'ar.xjuan.Cambalache',
+  input: 'config.py.in',
+  output: 'config.py',
+  configuration: conf,
+  install: true,
+  install_dir: moduledir
+)
+
+configure_file(
+  input: 'merengue.in',
+  output: 'merengue',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir')
 )
 
-configure_file(
-  input: 'config.py.in',
-  output: 'config.py',
-  configuration: conf,
-  install: true,
-  install_dir: appdir
-)
-
 run_command('python3', '-m', 'compileall', '-b', '.')
 
 install_data([
-    '__init__.pyc',
-    'cmb_application.pyc',
-    'cmb_window.pyc'
-    ],
-    install_dir: appdir)
-
-
+  'cmb_merengue.pyc',
+  '__init__.pyc',
+  ],
+  install_dir: moduledir
+)
