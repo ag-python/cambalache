@@ -657,7 +657,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.history_pop()
 
-    def _get_object(self, builder_ver, ui_id, object_id):
+    def _get_object(self, builder_ver, ui_id, object_id, use_id=False):
         def node_set(node, attr, val):
             if val is not None:
                 node.set(attr, str(val))
@@ -669,7 +669,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         row = c.fetchone()
         node_set(obj, 'class', row[0])
-        node_set(obj, 'id', row[1])
+        node_set(obj, 'id', object_id if use_id else row[1])
 
         # Properties
         for row in c.execute('SELECT value, property_id FROM object_property WHERE ui_id=? AND object_id=?;',
@@ -693,7 +693,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Children
         for row in c.execute('SELECT object_id FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
             child_id = row[0]
-            child_obj = self._get_object(builder_ver, ui_id, child_id)
+            child_obj = self._get_object(builder_ver, ui_id, child_id, use_id=use_id)
             child = E.child(child_obj)
 
             # Packing / Layout
@@ -715,7 +715,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         cc.close()
         return obj
 
-    def export_ui(self, ui_id, filename=None):
+    def export_ui(self, ui_id, filename=None, use_id=False):
         c = self.conn.cursor()
 
         node = E.interface()
@@ -731,7 +731,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Iterate over toplovel objects
         for row in c.execute('SELECT object_id FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
-            child = self._get_object(builder_ver, ui_id, row[0])
+            child = self._get_object(builder_ver, ui_id, row[0], use_id)
             node.append(child)
 
         c.close()
