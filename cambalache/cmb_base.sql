@@ -150,7 +150,6 @@ CREATE TABLE IF NOT EXISTS property (
   property_id TEXT NOT NULL,
 
   type_id TEXT REFERENCES type,
-  writable BOOLEAN,
   construct_only BOOLEAN,
   default_value TEXT,
   minimum TEXT,

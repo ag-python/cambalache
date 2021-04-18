@@ -196,15 +196,15 @@ class GirData:
             for pspec in props:
                 owner = GObject.type_name(pspec.owner_type)
                 type_name = GObject.type_name(pspec.value_type)
+                writable  = pspec.flags & GObject.ParamFlags.WRITABLE
 
-                if owner != name or type_name.startswith('Gdk'):
+                if owner != name or type_name.startswith('Gdk') or not writable:
                     continue
 
                 retval[pspec.name] = {
                     'type': type_name,
                     'version': None,
                     'deprecated_version': None,
-                    'writable': 1 if pspec.flags & GObject.ParamFlags.WRITABLE else None,
                     'construct': 1 if pspec.flags & GObject.ParamFlags.CONSTRUCT else None,
                     'default_value': self._get_default_value_from_pspec(pspec),
                     'minimum': pspec.minimum if hasattr(pspec, 'minimum') else None,
@@ -261,7 +261,7 @@ class GirData:
             name = child.get('name')
             type = child.find('type', nsmap)
 
-            if type is None:
+            if type is None or child.get('writable') != '1':
                 continue
 
             type_name = type.get('name')
@@ -284,7 +284,6 @@ class GirData:
                 'type': type_name,
                 'version': child.get('version'),
                 'deprecated_version': child.get('deprecated-version'),
-                'writable': child.get('writable'),
                 'construct': child.get('construct'),
                 'default_value': self._get_default_value_from_pspec(pspec),
                 'minimum': pspec.minimum if hasattr(pspec, 'minimum') else None,
@@ -475,8 +474,8 @@ class GirData:
                    prop_type not in self.ifaces:
                     continue
 
-                conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, writable, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                             (name, prop, prop_type, p['writable'], p['construct'], p.get('default_value', None), p.get('minimum', None), p.get('maximum', None), p['version'], p['deprecated_version']))
+                conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                             (name, prop, prop_type, p['construct'], p.get('default_value', None), p.get('minimum', None), p.get('maximum', None), p['version'], p['deprecated_version']))
 
             signals = data['signals']
             for signal in signals:
