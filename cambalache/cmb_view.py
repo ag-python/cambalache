@@ -113,7 +113,21 @@ class CmbView(Gtk.Stack):
         if event != WebKit2.LoadEvent.FINISHED:
             return
 
-        webview.run_javascript('document.oncontextmenu = document.createElement("div").oncontextmenu;', None, None)
+        # Disable aler() function used when broadwayd get disconnected
+        # Monkey patch setupDocument() to avoid disabling document.oncontextmenu
+        webview.run_javascript('''
+window.alert = function (message) {
+    console.log (message);
+}
+
+window.merengueSetupDocument = setupDocument;
+
+window.setupDocument = function (document) {
+    var cb = oncontextmenu
+    merengueSetupDocument(document);
+    document.oncontextmenu = cb;
+}
+''', None, None)
 
     def _merengue_command(self, command, payload=None, args=None):
         if self._merengue.stdin is None:
@@ -145,8 +159,6 @@ class CmbView(Gtk.Stack):
 
             return
 
-        # TODO: make sure javascript popup when broadway gets disconnected is dismmised
-        self.webview.load_html('', None)
         self.buffer.set_text('')
         self._ui_id = 0
 
@@ -204,7 +216,7 @@ class CmbView(Gtk.Stack):
         elif self._ui_id > 0:
             self._ui_id = 0
             self._update_view()
-            self._merengue_command('clear_all')
+            self._merengue_command('selection_changed', args={ 'ui_id': self._ui_id, 'selection': [] })
 
     @GObject.property(type=GObject.GObject)
     def project(self):
