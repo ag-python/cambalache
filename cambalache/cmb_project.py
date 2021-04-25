@@ -17,7 +17,7 @@ from lxml.builder import E
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 
-from .cmb_objects import CmbUI, CmbObject, CmbTypeInfo
+from .cmb_objects import CmbUI, CmbObject, CmbProperty, CmbLayoutProperty, CmbTypeInfo
 from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
@@ -48,10 +48,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                            (CmbObject,)),
 
         'object-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
-                                    (CmbObject, str)),
+                                    (CmbObject, CmbProperty)),
 
         'object-layout-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
-                                           (CmbObject, CmbObject, str)),
+                                           (CmbObject, CmbObject, CmbLayoutProperty)),
 
         'object-signal-added': (GObject.SIGNAL_RUN_FIRST, None,
                                 (CmbObject, CmbSignal)),
@@ -669,7 +669,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         row = c.fetchone()
         node_set(obj, 'class', row[0])
-        node_set(obj, 'id', object_id if use_id else row[1])
+        node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}' if use_id else row[1])
 
         # Properties
         for row in c.execute('SELECT value, property_id FROM object_property WHERE ui_id=? AND object_id=?;',
@@ -898,7 +898,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         return self._selection
 
     def set_selection(self, selection):
-        if type(selection) != list:
+        if type(selection) != list or self._selection == selection:
             return
 
         for obj in selection:
@@ -914,10 +914,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         elif type(obj) == CmbUI:
             return self._object_id.get(obj.ui_id, None)
 
+    def _get_object_by_key(self, key):
+        _iter = self._object_id.get(key, None)
+        return self._store.get_value(_iter, 0) if _iter else None
+
     def _get_object_by_id(self, ui_id, object_id = None):
         key = f'{ui_id}.{object_id}' if object_id is not None else ui_id
-        _iter = self._object_id.get(key, None)
-        return self._store.get_value(_iter, 0)
+        return self._get_object_by_key(key)
 
     def _undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
         # FIXME:use a dict instead of walking the array
@@ -927,9 +930,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 p.notify(prop)
                 if layout:
                     parent = self._get_object_by_id(obj.ui_id, obj.parent_id)
-                    self.emit('object-layout-property-changed', parent, obj, property_id)
+                    self.emit('object-layout-property-changed', parent, obj, p)
                 else:
-                    self.emit('object-property-changed', obj, property_id)
+                    self.emit('object-property-changed', obj, p)
 
     def _get_history_command(self, history_index):
         c = self.conn.cursor()

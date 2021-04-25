@@ -67,7 +67,7 @@ class CmbProperty(CmbBaseProperty):
                           (self.ui_id, self.object_id, self.owner_id, self.property_id, value))
 
         if self._init == False:
-            self.project._object_property_changed(self.ui_id, self.object_id, self.property_id)
+            self.project._object_property_changed(self.ui_id, self.object_id, self)
 
         c.close()
 
@@ -114,7 +114,7 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
             self.project._object_layout_property_changed(self.ui_id,
                                                          self.object_id,
                                                          self.child_id,
-                                                         self.property_id)
+                                                         self)
 
         c.close()
 
