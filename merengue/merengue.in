@@ -25,9 +25,9 @@ if __name__ == "__main__":
         _print(f"Ussage: {sys.argv[0]} gtkversion")
         exit()
 
-    version, Gdk, Gtk = merengue_init(sys.argv[1])
+    Gtk = merengue_init(sys.argv[1])
 
-    if version == '3.0':
+    if Gtk.MAJOR_VERSION == 3:
         Gtk.main()
     else:
         context = GLib.MainContext.default()

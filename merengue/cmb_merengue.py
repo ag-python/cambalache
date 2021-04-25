@@ -12,35 +12,25 @@ import sys
 import json
 
 
+from gi.repository import GLib
+Gdk = None
+Gtk = None
+utils = None
+
+# Globals
+global_builder = None
+toplevels = []
+gestures = {}
+objects = {}
+preselected_widget = None
+
+
 def _print(*args):
     print(*args, file=sys.stderr)
 
 
 def get_object(ui_id, object_id):
     return objects.get(f'{ui_id}.{object_id}', None)
-
-
-def child_set_property(parent, child, property_id, val):
-    if version == '3.0':
-        obj.child_set_property(child, property_id, val)
-    else:
-        manager = parent.get_layout_manager()
-        layout_child = manager.get_layout_child()
-        layout_child.set_property(property_id, val)
-
-
-def object_get_id(obj):
-    if version == '3.0':
-        return Gtk.Buildable.get_name(obj)
-    else:
-        return Gtk.Buildable.get_buildable_id (obj)
-
-
-def widget_show(obj):
-    if version == '3.0':
-        obj.show_all()
-    else:
-        obj.show()
 
 
 def write_command(command, payload=None, args=None):
@@ -65,7 +55,12 @@ def write_command(command, payload=None, args=None):
 
 
 def clear_all():
-    global toplevels, objects
+    global toplevels, objects, gestures, preselected_widget
+
+    preselected_widget = None
+
+    # Free gestures
+    gestures = {}
 
     # Destroy all toplevels
     for win in toplevels:
@@ -74,28 +69,66 @@ def clear_all():
     toplevels = []
 
 
-def update_ui(ui_id, builder_string):
-    global toplevels, objects
+def _window_add_selection_handler(obj):
+    def _on_gesture_button_pressed(gesture, n_press, x, y, obj):
+        global preselected_widget
+
+        child = utils.get_child_at_position(obj, x, y)
+        object_id = utils.object_get_id(child)
+
+        # Pre select a widget on button press
+        preselected_widget = child if object_id else None
+
+
+    def _on_gesture_button_released(gesture, n_press, x, y, obj):
+        global preselected_widget
+
+        child = utils.get_child_at_position(obj, x, y)
+        object_id = utils.object_get_id(child)
+
+        # Select widget on button release only if its preselected
+        if object_id and child == preselected_widget:
+            _print('merengue selection_changed', child, object_id)
+            write_command('selection_changed', args={ 'selection': [object_id] })
+
+    if Gtk.MAJOR_VERSION == 3:
+        obj.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
+                       Gdk.EventMask.BUTTON_RELEASE_MASK)
+        gesture = Gtk.GestureMultiPress(widget=obj,
+                                        propagation_phase=Gtk.PropagationPhase.CAPTURE)
+    else:
+        gesture = Gtk.GestureClick(propagation_phase=Gtk.PropagationPhase.CAPTURE)
+        obj.add_controller(gesture)
+
+    gesture.connect('pressed', _on_gesture_button_pressed, obj)
+    gesture.connect('released', _on_gesture_button_released, obj)
+
+    return gesture
+
+
+def update_ui(ui_id, payload=None):
+    global toplevels, objects, gestures
 
     clear_all()
 
     # Build everything
     builder = Gtk.Builder()
-    builder.add_from_string(builder_string)
+    builder.add_from_string(payload)
 
     # Show toplevels
     for obj in builder.get_objects():
+        # Keep dict of all objects by id
+        object_id = utils.object_get_id(obj)
+        objects[object_id] = obj
+
         if obj.props.parent is None and issubclass(type(obj), Gtk.Window):
             toplevels.append(obj)
-            widget_show(obj)
-
-        # Keep dict of all objects by id
-        object_id = object_get_id(obj)
-        objects[f'{ui_id}.{object_id}'] = obj
+            utils.widget_show(obj)
+            gestures[object_id] = _window_add_selection_handler(obj)
 
 
 def object_removed(ui_id, object_id):
-    obj = get_object(ui_id, object_id)
+    obj = utils.get_object(ui_id, object_id)
 
     if obj:
         if issubclass(type(obj), Gtk.Widget):
@@ -129,7 +162,7 @@ def object_layout_property_changed(ui_id, object_id, child_id, property_id, valu
             status, val = global_builder.value_from_string_type(pspec.value_type, value)
             if status:
                 try:
-                    child_set_property(obj, child, property_id, val)
+                    utils.child_set_property(obj, child, property_id, val)
                 except:
                     pass
 
@@ -144,7 +177,7 @@ def selection_changed(ui_id, selection):
 
     # Add class to selected objects
     for obj_id in selection:
-        obj = objects[f'{ui_id}.{obj_id}']
+        obj = objects.get(f'{ui_id}.{obj_id}', None)
 
         if obj:
             obj.get_style_context().add_class('merengue_selected')
@@ -153,19 +186,14 @@ def selection_changed(ui_id, selection):
                 # TODO: fix broadway for this to work
                 obj.present()
 
-    write_command('selection_changed', args={ 'hola': 'mundo' })
 
-
-def run_command(cmd, payload):
-    command = cmd.get('command', None)
-    args = cmd.get('args', {})
-
+def run_command(command, args, payload):
     _print(command, args)
 
     if command == 'clear_all':
         clear_all()
     elif command == 'update_ui':
-        update_ui(cmd['args']['ui_id'], payload)
+        update_ui(**args, payload=payload)
     elif command == 'selection_changed':
         selection_changed(**args)
     elif command == 'object_removed':
@@ -179,12 +207,15 @@ def run_command(cmd, payload):
 
 
 def on_stdin(channel, condition):
+    if condition == GLib.IOCondition.HUP:
+        sys.exit(-1)
+        return GLib.SOURCE_REMOVE
+
     # We receive a command in each line
     retval = sys.stdin.readline()
 
     try:
-        # Command is a Json string with a command and payload_length field
-        # and any other command specific fields
+        # Command is a Json string with a command, args and payload_length fields
         cmd = json.loads(retval)
     except Exception as e:
         _print(e)
@@ -194,24 +225,17 @@ def on_stdin(channel, condition):
         # Read command payload if any
         payload = sys.stdin.read(payload_length) if payload_length else None
 
+        command = cmd.get('command', None)
+        args = cmd.get('args', {})
+
         # Run command
-        run_command(cmd, payload)
+        run_command(command, args, payload)
 
     return GLib.SOURCE_CONTINUE
 
 
-from gi.repository import GLib
-Gdk = None
-Gtk = None
-
-# Globals
-version = None
-global_builder = None
-toplevels = []
-objects = {}
-
 def merengue_init(ver):
-    global version, Gdk, Gtk, global_builder
+    global Gdk, Gtk, utils, global_builder
 
     version = '4.0' if ver == 'gtk-4.0' else '3.0'
     gi.require_version('Gdk', version)
@@ -219,14 +243,18 @@ def merengue_init(ver):
 
     from gi.repository import Gdk, Gtk
 
+    from . import utils
+
     global_builder = Gtk.Builder()
     stdin_channel = GLib.IOChannel.unix_new(sys.stdin.fileno())
-    GLib.io_add_watch(stdin_channel, GLib.PRIORITY_DEFAULT_IDLE, GLib.IOCondition.IN, on_stdin)
+    GLib.io_add_watch(stdin_channel, GLib.PRIORITY_DEFAULT_IDLE,
+                      GLib.IOCondition.IN | GLib.IOCondition.HUP,
+                      on_stdin)
 
     provider = Gtk.CssProvider()
     provider.load_from_resource('/ar/xjuan/Merengue/cmb_merengue.css')
 
-    if version == '3.0':
+    if Gtk.MAJOR_VERSION == 3:
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(),
             provider,
@@ -239,4 +267,5 @@ def merengue_init(ver):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-    return (version, Gdk, Gtk)
+    return Gtk
+

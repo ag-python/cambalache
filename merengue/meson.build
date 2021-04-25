@@ -33,6 +33,7 @@ run_command('python3', '-m', 'compileall', '-b', '.')
 
 install_data([
   'cmb_merengue.pyc',
+  'utils.pyc',
   '__init__.pyc',
   ],
   install_dir: moduledir

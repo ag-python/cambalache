@@ -1,28 +1,13 @@
 /*
- * cmb_merengue.css
+ * Merengue CSS
  *
- * Copyright (C) 2021 Juan Pablo Ugarte
+ * Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- * Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
  *
  */
 
 .merengue_selected {
-  border: solid @theme_selected_bg_color 4px;
-  margin: -4px;
-  border-radius: 2px 2px;
+  box-shadow: inset 0px 0px 4px 2px @theme_selected_bg_color;
 }
+
