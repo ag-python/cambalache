@@ -111,6 +111,9 @@ def update_ui(ui_id, payload=None):
 
     clear_all()
 
+    if payload == None:
+        return
+
     # Build everything
     builder = Gtk.Builder()
     builder.add_from_string(payload)
@@ -128,7 +131,7 @@ def update_ui(ui_id, payload=None):
 
 
 def object_removed(ui_id, object_id):
-    obj = utils.get_object(ui_id, object_id)
+    obj = get_object(ui_id, object_id)
 
     if obj:
         if issubclass(type(obj), Gtk.Widget):
