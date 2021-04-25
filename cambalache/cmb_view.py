@@ -26,6 +26,61 @@ GObject.type_ensure(WebKit2.Settings.__gtype__)
 GObject.type_ensure(WebKit2.WebView.__gtype__)
 
 
+class CmbProcess():
+    def __init__(self, file, on_stdout=None):
+        self.file = file
+        self.pid = 0
+        self.stdin = None
+        self.stdout = None
+        self.on_stdout = on_stdout
+
+    def stop(self):
+        if self.pid:
+            try:
+                GLib.spawn_close_pid(self.pid)
+                os.kill(self.pid, 9)
+            except:
+                pass
+
+        if self.stdin:
+            self.stdin.close()
+
+        if self.stdout:
+            self.stdout.close()
+
+        self.pid = 0
+        self.stdin = None
+        self.stdout = None
+
+    def run(self, args, env=[]):
+        if self.file is None or self.pid > 0:
+            return
+
+        envp = []
+        for var in os.environ:
+            val = os.environ.get(var)
+            envp.append(f"{var}={val}")
+
+        pid, stdin, stdout, stderr = GLib.spawn_async([self.file] + args,
+                                                      envp=envp+env,
+                                                      flags=GLib.SpawnFlags.DO_NOT_REAP_CHILD,
+                                                      standard_input=True,
+                                                      standard_output=self.on_stdout != None)
+        self.pid = pid
+
+        self.stdin = GLib.IOChannel.unix_new(stdin)
+        self.stdout = GLib.IOChannel.unix_new(stdout)
+
+        if self.on_stdout:
+            self.stdout.add_watch(GLib.IOCondition.IN | GLib.IOCondition.HUP,
+                                  self.on_stdout)
+
+        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid, self._on_exit, None)
+
+    def _on_exit(self, pid, status, data):
+        self.stop()
+
+
 @Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_view.ui')
 class CmbView(Gtk.Stack):
     __gtype_name__ = 'CmbView'
@@ -42,14 +97,17 @@ class CmbView(Gtk.Stack):
 
         self.webview.connect('load-changed', self._on_load_changed)
 
-        self._merengue = GLib.find_program_in_path('merengue')
-
-        self._merengue_pid = -1
-        self._merengue_stdin = None
-
+        self._merengue = CmbProcess(GLib.find_program_in_path('merengue'),
+                                    self._on_merengue_stdout)
         self._broadwayd = None
-        self._broadwayd_pid = -1
         self._port = None
+
+    def do_destroy(self):
+        if self._merengue:
+            self._merengue.stop()
+
+        if self._broadwayd:
+            self._broadwayd.stop()
 
     def _on_load_changed(self, webview, event):
         if event != WebKit2.LoadEvent.FINISHED:
@@ -58,7 +116,7 @@ class CmbView(Gtk.Stack):
         webview.run_javascript('document.oncontextmenu = document.createElement("div").oncontextmenu;', None, None)
 
     def _merengue_command(self, command, payload=None, args=None):
-        if self._merengue_stdin is None:
+        if self._merengue.stdin is None:
             return
 
         cmd = {
@@ -70,15 +128,15 @@ class CmbView(Gtk.Stack):
             cmd['args'] = args
 
         # Send command in one line as json
-        self._merengue_stdin.write(json.dumps(cmd))
-        self._merengue_stdin.write('\n')
+        self._merengue.stdin.write(json.dumps(cmd))
+        self._merengue.stdin.write('\n')
 
         # Send payload if any
         if payload is not None:
-            self._merengue_stdin.write(payload)
+            self._merengue.stdin.write(payload)
 
         # Flush
-        self._merengue_stdin.flush()
+        self._merengue.stdin.flush()
 
     def _update_view(self):
         if self._project is not None and self._ui_id > 0:
@@ -87,6 +145,8 @@ class CmbView(Gtk.Stack):
 
             return
 
+        # TODO: make sure javascript popup when broadway gets disconnected is dismmised
+        self.webview.load_html('', None)
         self.buffer.set_text('')
         self._ui_id = 0
 
@@ -158,10 +218,8 @@ class CmbView(Gtk.Stack):
             self._project.disconnect_by_func(self._on_object_property_changed)
             self._project.disconnect_by_func(self._on_object_layout_property_changed)
             self._project.disconnect_by_func(self._on_project_selection_changed)
-            if self._merengue_pid > 0:
-                os.kill(self._merengue_pid, 9)
-            if self._broadwayd_pid > 0:
-                os.kill(self._broadwayd_pid, 9)
+            self._merengue.stop()
+            self._broadwayd.stop()
 
         self._project = project
 
@@ -175,9 +233,10 @@ class CmbView(Gtk.Stack):
             project.connect('selection-changed', self._on_project_selection_changed)
 
             broadwayd = 'gtk4-broadwayd' if self._project.target_tk == 'gtk-4.0' else 'broadwayd'
-            self._broadwayd = GLib.find_program_in_path(broadwayd)
+            self._broadwayd = CmbProcess(GLib.find_program_in_path(broadwayd),
+                                         self._on_broadway_stdout)
             self._port = self._find_free_port()
-            self._run_broadway()
+            self._broadwayd.run([f'--port={self._port}'])
 
     @Gtk.Template.Callback('on_context_menu')
     def _on_context_menu(self, webview, menu, e, hit_test_result):
@@ -191,65 +250,51 @@ class CmbView(Gtk.Stack):
     def _on_inspect_button_clicked(self, button):
         self.props.visible_child_name = 'ui_xml'
 
-    def _on_merengue_exit(self, pid, status, data):
-        GLib.spawn_close_pid(self._merengue_pid)
-        self._merengue_pid = None
-        print('_on_merengue_exit')
+    def _command_selection_changed(self, selection):
+        objects = []
 
-    def _on_broadwayd_exit(self, pid, status, data):
-        GLib.spawn_close_pid(self._broadwayd_pid)
-        self._broadwayd_pid = None
-        print('_on_broadwayd_exit')
+        for key in selection:
+            obj = self._project._get_object_by_key(key)
+            objects.append(obj)
+
+        self._project.set_selection(objects)
 
     def _on_merengue_stdout(self, channel, condition):
-        retval = self._merengue_stdout.readline()
+        if condition == GLib.IOCondition.HUP:
+            self._merengue.stop()
+            return GLib.SOURCE_REMOVE
+
+        retval = self._merengue.stdout.readline()
+        cmd = None
 
         try:
             cmd = json.loads(retval)
-        except:
-            pass
+            command = cmd.get('command', None)
+            args = cmd.get('args', {})
+
+            if command == 'selection_changed':
+                self._command_selection_changed(**args)
+
+        except Exception as e:
+            print(e)
 
         return GLib.SOURCE_CONTINUE
 
-    def _run_merengue(self):
-        display = self._port - 8080
-
-        env = []
-        for var in os.environ:
-            val = os.environ.get(var)
-            env.append(f"{var}={val}")
-
-        env.append('GDK_BACKEND=broadway')
-        env.append(f'BROADWAY_DISPLAY=:{display}')
-        #env.append('GTK_DEBUG=interactive')
-
-        print([self._merengue, self._project.target_tk], display)
-        pid, stdin, stdout, stderr = GLib.spawn_async([self._merengue,
-                                                       self._project.target_tk],
-                                                      envp=env,
-                                                      flags=GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-                                                      standard_input=True,
-                                                      standard_output=True)
-
-        self._merengue_stdin = os.fdopen(stdin, 'w')
-        self._merengue_stdout = os.fdopen(stdout, 'r')
-
-        stdout_channel = GLib.IOChannel.unix_new(stdout)
-        stdout_channel.add_watch(GLib.IOCondition.IN, self._on_merengue_stdout)
-
-        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid,
-                             self._on_merengue_exit, None)
-
-        return GLib.SOURCE_REMOVE
-
     def _on_broadway_stdout(self, channel, condition):
+        if condition == GLib.IOCondition.HUP:
+            self._broadwayd.stop()
+            return GLib.SOURCE_REMOVE
+
         status, retval, length, terminator = channel.read_line()
         path = retval.replace('Listening on ', '').strip()
-        print('_on_broadway_stdout', path)
 
         # Run view process
-        GLib.timeout_add(1000, self._run_merengue)
-        #self._run_merengue()
+        display = self._port - 8080
+        self._merengue.run([self._project.target_tk], [
+            'GDK_BACKEND=broadway',
+            #'GTK_DEBUG=interactive',
+            f'BROADWAY_DISPLAY=:{display}'
+        ])
 
         # Load broadway desktop
         self.webview.load_uri(f'http://127.0.0.1:{self._port}')
@@ -268,17 +313,3 @@ class CmbView(Gtk.Stack):
 
         return 0
 
-    def _run_broadway(self):
-        if self._broadwayd is None or self._broadwayd_pid > 0:
-            return
-
-        print([self._broadwayd, f'--port={self._port}'])
-        pid, stdin, stdout, stderr = GLib.spawn_async([self._broadwayd, f'--port={self._port}'],
-                                                      flags=GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-                                                      standard_output=True)
-        self._broadwayd_pid = pid
-        stdout_channel = GLib.IOChannel.unix_new(stdout)
-        stdout_channel.add_watch(GLib.IOCondition.IN, self._on_broadway_stdout)
-
-        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid,
-                             self._on_broadwayd_exit, None)

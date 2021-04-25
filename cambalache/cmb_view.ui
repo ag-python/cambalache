@@ -7,12 +7,12 @@
   <object class="WebKitSettings" type-func="webkit_settings_get_type" id="settings">
     <property name="enable-html5-local-storage">False</property>
     <property name="enable-html5-database">False</property>
-    <property name="enable-plugins">False</property>
     <property name="enable-java">False</property>
     <property name="enable-fullscreen">False</property>
     <property name="enable-webaudio">False</property>
     <property name="media-playback-allows-inline">False</property>
     <property name="user-agent">Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15</property>
+    <property name="enable-accelerated-2d-canvas">True</property>
     <property name="enable-media">False</property>
   </object>
   <template class="CmbView" parent="GtkStack">

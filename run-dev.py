@@ -17,7 +17,7 @@ from gi.repository import GLib
 basedir = os.path.dirname(__file__)
 sys.path.insert(0, basedir)
 
-os.environ['PATH'] += os.environ.get('PATH') + ':' + os.path.join(basedir, 'merengue')
+os.environ['PATH'] = os.path.join(basedir, 'merengue') + ':' + os.environ.get('PATH')
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
