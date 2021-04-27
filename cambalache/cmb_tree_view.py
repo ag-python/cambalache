@@ -12,7 +12,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-from .cmb_objects import CmbUI, CmbObject
+from .cmb_ui import CmbUI
+from .cmb_object import CmbObject
 
 
 class CmbTreeView(Gtk.TreeView):

@@ -17,7 +17,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 from gi.repository import GObject, GLib, Gio, Gdk, Gtk, WebKit2
 
-from .cmb_objects import CmbObject
+from .cmb_object import CmbObject
 from .cmb_project import CmbProject
 
 basedir = os.path.dirname(__file__) or '.'

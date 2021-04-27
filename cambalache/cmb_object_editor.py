@@ -12,7 +12,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
-from .cmb_objects import CmbObject, CmbTypeInfo
+from .cmb_object import CmbObject
+from .cmb_type_info import CmbTypeInfo
 
 
 class CmbEntry(Gtk.Entry):

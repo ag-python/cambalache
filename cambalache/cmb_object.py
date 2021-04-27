@@ -1,0 +1,152 @@
+#
+# Cambalache Object wrapper
+#
+# Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
+#
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+#
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject, Gtk
+
+from .cmb_objects_base import CmbBaseObject, CmbSignal
+from .cmb_property import CmbProperty
+from .cmb_layout_property import CmbLayoutProperty
+from .cmb_type_info import CmbTypeInfo
+
+
+class CmbObject(CmbBaseObject):
+    info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    __gsignals__ = {
+        'signal-added': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, )),
+
+        'signal-removed': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, ))
+    }
+
+    def __init__(self, **kwargs):
+        self.properties = []
+        self.layout = []
+        self.signals = []
+
+        super().__init__(**kwargs)
+
+        if self.project is None:
+            return
+
+        self._populate_properties()
+
+    def _populate_type_properties(self, name):
+        property_info = self.project.get_type_properties(name)
+        if property_info is None:
+            return
+
+        for property_name in property_info:
+            info = property_info[property_name]
+
+            prop = CmbProperty(project=self.project,
+                               ui_id=self.ui_id,
+                               object_id=self.object_id,
+                               owner_id=name,
+                               property_id=info.property_id,
+                               info=info)
+
+            self.properties.append(prop)
+
+    def _populate_properties(self):
+        self._populate_type_properties(self.type_id)
+        for parent_id in self.info.hierarchy:
+            self._populate_type_properties(parent_id)
+
+    def _populate_layout_properties(self, name):
+        property_info = self.project.get_type_properties(name)
+        if property_info is None:
+            return
+
+        for property_name in property_info:
+            info = property_info[property_name]
+
+            prop = CmbLayoutProperty(project=self.project,
+                                     ui_id=self.ui_id,
+                                     object_id=self.parent_id,
+                                     child_id=self.object_id,
+                                     owner_id=name,
+                                     property_id=info.property_id,
+                                     info=info)
+
+            self.layout.append(prop)
+
+    @GObject.Property(type=int)
+    def parent_id(self):
+        retval = self.db_get('SELECT parent_id FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                             (self.ui_id, self.object_id, ))
+        return retval if retval is not None else 0
+
+    @parent_id.setter
+    def _set_parent_id(self, value):
+        self.db_set('UPDATE object SET parent_id=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ),
+                    value if value != 0 else None)
+
+        if value > 0:
+            parent = self.project._get_object_by_id(self.ui_id, value)
+            self._populate_layout_properties(f'{parent.type_id}LayoutChild')
+        else:
+            self.layout = []
+
+    def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
+        signal = CmbSignal(project=self.project,
+                           signal_pk=signal_pk,
+                           ui_id=self.ui_id,
+                           object_id=self.object_id,
+                           owner_id=owner_id,
+                           signal_id=signal_id,
+                           handler=handler,
+                           detail=detail,
+                           user_data=user_data,
+                           swap=swap,
+                           after=after)
+        self.signals.append(signal)
+        self.emit('signal-added', signal)
+        self.project._object_signal_added(self, signal)
+
+        return signal
+
+    def add_signal(self, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
+        try:
+            c = self.project.conn.cursor()
+            c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                      (self.ui_id, self.object_id, owner_id, signal_id, handler, detail, user_data, swap, after))
+            signal_pk = c.lastrowid
+            c.close()
+            self.project.conn.commit()
+        except Exception as e:
+            print('add_signal', e)
+            return None
+        else:
+            return self._add_signal(signal_pk,
+                                    owner_id,
+                                    signal_id,
+                                    handler,
+                                    detail=detail,
+                                    user_data=user_data,
+                                    swap=swap,
+                                    after=after)
+
+    def _remove_signal(self, signal):
+        self.signals.remove(signal)
+        self.emit('signal-removed', signal)
+        self.project._object_signal_removed(self, signal)
+
+    def remove_signal(self, signal):
+        try:
+            self.project.conn.execute("DELETE FROM object_signal WHERE signal_pk=?;",
+                                      (signal.signal_pk, ))
+            self.project.conn.commit()
+        except Exception as e:
+            print('remove_signal', e)
+            return False
+        else:
+            self._remove_signal(signal)
+            return True

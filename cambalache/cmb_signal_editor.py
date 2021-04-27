@@ -12,7 +12,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-from .cmb_objects import CmbObject
+from .cmb_object import CmbObject
 
 from enum import Enum
 

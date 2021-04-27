@@ -17,7 +17,11 @@ from lxml.builder import E
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 
-from .cmb_objects import CmbUI, CmbObject, CmbProperty, CmbLayoutProperty, CmbTypeInfo
+from .cmb_ui import CmbUI
+from .cmb_object import CmbObject
+from .cmb_property import CmbProperty
+from .cmb_layout_property import CmbLayoutProperty
+from .cmb_type_info import CmbTypeInfo
 from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
