@@ -22,12 +22,18 @@ from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
 
-BASE_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_base.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
-PROJECT_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_project.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
-HISTORY_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/cmb_history.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
-GOBJECT_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gobject-2.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
-GTK3_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gtk+-3.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
-GTK4_SQL = Gio.resources_lookup_data('/ar/xjuan/Cambalache/gtk-4.0.sql', Gio.ResourceLookupFlags.NONE).get_data().decode('UTF-8')
+def _get_text_resource(name):
+    gbytes = Gio.resources_lookup_data(f'/ar/xjuan/Cambalache/{name}',
+                                       Gio.ResourceLookupFlags.NONE)
+    return gbytes.get_data().decode('UTF-8')
+
+BASE_SQL = _get_text_resource('cmb_base.sql')
+PROJECT_SQL = _get_text_resource('cmb_project.sql')
+HISTORY_SQL = _get_text_resource('cmb_history.sql')
+GOBJECT_SQL = _get_text_resource('gobject-2.0.sql')
+GTK3_SQL = _get_text_resource('gtk+-3.0.sql')
+GTK4_SQL = _get_text_resource('gtk-4.0.sql')
+
 
 class CmbProject(GObject.GObject, Gtk.TreeModel):
     __gtype_name__ = 'CmbProject'
