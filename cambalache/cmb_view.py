@@ -154,19 +154,24 @@ window.setupDocument = function (document) {
 
     def _update_view(self):
         if self._project is not None and self._ui_id > 0:
-            ui = self._project.export_ui(self._ui_id, use_id=True)
-            self.buffer.set_text(ui.decode('unicode_escape'))
-
+            if self.props.visible_child_name == 'ui_xml':
+                ui = self._project.export_ui(self._ui_id)
+                self.buffer.set_text(ui.decode('unicode_escape'))
             return
 
         self.buffer.set_text('')
         self._ui_id = 0
 
+    def _merengue_update_ui(self, ui_id):
+        ui = self._project.export_ui(ui_id, use_id=True)
+
+        self._merengue_command('update_ui',
+                               payload=ui.decode('unicode_escape'),
+                               args={ 'ui_id': ui_id })
+
     def _on_object_added(self, project, obj):
         self._update_view()
-        self._merengue_command('update_ui',
-                               payload=self.buffer.props.text,
-                               args={ 'ui_id': obj.ui_id })
+        self._merengue_update_ui(obj.ui_id)
 
     def _on_object_removed(self, project, obj):
         self._update_view()
@@ -203,9 +208,8 @@ window.setupDocument = function (document) {
             if self._ui_id != ui_id:
                 self._ui_id = ui_id
                 self._update_view()
-                self._merengue_command('update_ui',
-                                       payload=self.buffer.props.text,
-                                       args={ 'ui_id': ui_id })
+                self._merengue_update_ui(ui_id)
+
             objects = []
             for obj in selection:
                 if type(obj) == CmbObject and obj.ui_id == ui_id:
@@ -216,7 +220,7 @@ window.setupDocument = function (document) {
         elif self._ui_id > 0:
             self._ui_id = 0
             self._update_view()
-            self._merengue_command('selection_changed', args={ 'ui_id': self._ui_id, 'selection': [] })
+            self._merengue_command('selection_changed', args={ 'ui_id': 0, 'selection': [] })
 
     @GObject.property(type=GObject.GObject)
     def project(self):
@@ -261,6 +265,7 @@ window.setupDocument = function (document) {
     @Gtk.Template.Callback('on_inspect_button_clicked')
     def _on_inspect_button_clicked(self, button):
         self.props.visible_child_name = 'ui_xml'
+        self._update_view()
 
     def _command_selection_changed(self, selection):
         objects = []
