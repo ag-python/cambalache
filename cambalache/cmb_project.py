@@ -334,7 +334,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         history_next_seq = f"(coalesce({history_seq}, 0) + 1)"
         clear_history = '''
             DELETE FROM history WHERE (SELECT value FROM global WHERE key='history_index') > 0 AND history_id > (SELECT value FROM global WHERE key='history_index');
-            UPDATE global SET value=-1 WHERE (SELECT value FROM global WHERE key='history_index') > 0 AND key='history_index'
+            UPDATE global SET value=-1 WHERE key='history_index' AND value >= 0
         '''
 
         for row in c.execute(f'PRAGMA table_info({table});'):
