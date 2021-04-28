@@ -26,31 +26,38 @@ GObject.type_ensure(WebKit2.Settings.__gtype__)
 GObject.type_ensure(WebKit2.WebView.__gtype__)
 
 
-class CmbProcess():
-    def __init__(self, file, on_stdout=None):
-        self.file = file
+class CmbProcess(GObject.Object):
+    __gsignals__ = {
+        'stdout': (GObject.SIGNAL_RUN_LAST, bool, (GLib.IOCondition, )),
+
+        'exit': (GObject.SIGNAL_RUN_LAST, None, ()),
+    }
+
+    file = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
         self.pid = 0
         self.stdin = None
         self.stdout = None
-        self.on_stdout = on_stdout
 
     def stop(self):
+        if self.stdin:
+            self.stdin.shutdown(False)
+            self.stdin = None
+
+        if self.stdout:
+            self.stdout.shutdown(False)
+            self.stdout = None
+
         if self.pid:
             try:
                 GLib.spawn_close_pid(self.pid)
                 os.kill(self.pid, 9)
-            except:
-                pass
-
-        if self.stdin:
-            self.stdin.close()
-
-        if self.stdout:
-            self.stdout.close()
-
-        self.pid = 0
-        self.stdin = None
-        self.stdout = None
+                self.pid = 0
+            except Exception as e:
+                print(e)
 
     def run(self, args, env=[]):
         if self.file is None or self.pid > 0:
@@ -65,20 +72,26 @@ class CmbProcess():
                                                       envp=envp+env,
                                                       flags=GLib.SpawnFlags.DO_NOT_REAP_CHILD,
                                                       standard_input=True,
-                                                      standard_output=self.on_stdout != None)
+                                                      standard_output=True)
         self.pid = pid
 
         self.stdin = GLib.IOChannel.unix_new(stdin)
         self.stdout = GLib.IOChannel.unix_new(stdout)
 
-        if self.on_stdout:
-            self.stdout.add_watch(GLib.IOCondition.IN | GLib.IOCondition.HUP,
-                                  self.on_stdout)
+        self.stdout.add_watch(GLib.IOCondition.IN | GLib.IOCondition.HUP,
+                              self._on_stdout)
 
-        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid, self._on_exit, None)
+        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE,
+                             pid,
+                             self._on_exit,
+                             None)
 
     def _on_exit(self, pid, status, data):
         self.stop()
+        self.emit('exit')
+
+    def _on_stdout(self, channel, condition):
+        return self.emit('stdout', condition)
 
 
 @Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_view.ui')
@@ -91,14 +104,18 @@ class CmbView(Gtk.Stack):
 
     def __init__(self, **kwargs):
         self._project = None
+        self._restart_project = None
         self._ui_id = 0
 
         super().__init__(**kwargs)
 
+        self._merengue_bin = GLib.find_program_in_path('merengue')
+        self._broadwayd_bin = GLib.find_program_in_path('broadwayd')
+        self._gtk4_broadwayd_bin = GLib.find_program_in_path('gtk4-broadwayd')
+
         self.webview.connect('load-changed', self._on_load_changed)
 
-        self._merengue = CmbProcess(GLib.find_program_in_path('merengue'),
-                                    self._on_merengue_stdout)
+        self._merengue = None
         self._broadwayd = None
         self._port = None
 
@@ -234,6 +251,7 @@ window.setupDocument = function (document) {
             self._project.disconnect_by_func(self._on_object_property_changed)
             self._project.disconnect_by_func(self._on_object_layout_property_changed)
             self._project.disconnect_by_func(self._on_project_selection_changed)
+            self._merengue.disconnect_by_func(self._on_merengue_stdout)
             self._merengue.stop()
             self._broadwayd.stop()
 
@@ -248,9 +266,15 @@ window.setupDocument = function (document) {
             project.connect('object-layout-property-changed', self._on_object_layout_property_changed)
             project.connect('selection-changed', self._on_project_selection_changed)
 
-            broadwayd = 'gtk4-broadwayd' if self._project.target_tk == 'gtk-4.0' else 'broadwayd'
-            self._broadwayd = CmbProcess(GLib.find_program_in_path(broadwayd),
-                                         self._on_broadway_stdout)
+            self._merengue = CmbProcess(file=self._merengue_bin)
+            self._merengue.connect('stdout', self._on_merengue_stdout)
+            self._merengue.connect('exit', self._on_process_exit)
+
+            broadwayd = self._gtk4_broadwayd_bin if self._project.target_tk == 'gtk-4.0' else self._broadwayd_bin
+            self._broadwayd = CmbProcess(file=broadwayd)
+            self._broadwayd.connect('stdout', self._on_broadwayd_stdout)
+            self._broadwayd.connect('exit', self._on_process_exit)
+
             self._port = self._find_free_port()
             self._broadwayd.run([f'--port={self._port}'])
 
@@ -267,6 +291,17 @@ window.setupDocument = function (document) {
         self.props.visible_child_name = 'ui_xml'
         self._update_view()
 
+    @Gtk.Template.Callback('on_restart_button_clicked')
+    def _on_restart_button_clicked(self, button):
+        self._restart_project = self._project
+        self.project = None
+
+    def _on_process_exit(self, process):
+        if self._broadwayd.pid == 0 and self._merengue.pid == 0:
+            self.project = self._restart_project
+            self._restart_project = None
+            self._ui_id = 0
+
     def _command_selection_changed(self, selection):
         objects = []
 
@@ -276,9 +311,12 @@ window.setupDocument = function (document) {
 
         self._project.set_selection(objects)
 
-    def _on_merengue_stdout(self, channel, condition):
+    def _on_merengue_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
             self._merengue.stop()
+            return GLib.SOURCE_REMOVE
+
+        if self._merengue.stdout is None:
             return GLib.SOURCE_REMOVE
 
         retval = self._merengue.stdout.readline()
@@ -291,18 +329,22 @@ window.setupDocument = function (document) {
 
             if command == 'selection_changed':
                 self._command_selection_changed(**args)
-
+            if command == 'started':
+                self._on_project_selection_changed(self._project)
         except Exception as e:
             print(e)
 
         return GLib.SOURCE_CONTINUE
 
-    def _on_broadway_stdout(self, channel, condition):
+    def _on_broadwayd_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
             self._broadwayd.stop()
             return GLib.SOURCE_REMOVE
 
-        status, retval, length, terminator = channel.read_line()
+        if self._broadwayd.stdout is None:
+            return GLib.SOURCE_REMOVE
+
+        status, retval, length, terminator = self._broadwayd.stdout.read_line()
         path = retval.replace('Listening on ', '').strip()
 
         # Run view process
@@ -316,7 +358,8 @@ window.setupDocument = function (document) {
         # Load broadway desktop
         self.webview.load_uri(f'http://127.0.0.1:{self._port}')
 
-        #channel.close()
+        self._broadwayd.stdout.shutdown(False)
+        self._broadwayd.stdout = None
         return GLib.SOURCE_REMOVE
 
     def _find_free_port(self):

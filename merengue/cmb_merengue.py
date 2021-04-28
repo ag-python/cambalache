@@ -270,5 +270,7 @@ def merengue_init(ver):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
+    write_command('started')
+
     return Gtk
 
