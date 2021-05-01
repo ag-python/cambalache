@@ -15,14 +15,14 @@ import json
 from gi.repository import GLib
 Gdk = None
 Gtk = None
+cmb_gtk = None
 utils = None
 
 # Globals
 global_builder = None
 toplevels = []
-gestures = {}
+controllers = {}
 objects = {}
-preselected_widget = None
 
 
 def _print(*args):
@@ -55,12 +55,13 @@ def write_command(command, payload=None, args=None):
 
 
 def clear_all():
-    global toplevels, objects, gestures, preselected_widget
+    global toplevels, objects, controllers, preselected_widget
 
     preselected_widget = None
 
-    # Free gestures
-    gestures = {}
+    # Unset controllers objects
+    for key in controllers:
+        controllers[key].object = None
 
     # Destroy all toplevels
     for win in toplevels:
@@ -69,45 +70,11 @@ def clear_all():
     toplevels = []
 
 
-def _window_add_selection_handler(obj):
-    def _on_gesture_button_pressed(gesture, n_press, x, y, obj):
-        global preselected_widget
-
-        child = utils.get_child_at_position(obj, x, y)
-        object_id = utils.object_get_id(child)
-
-        # Pre select a widget on button press
-        preselected_widget = child if object_id else None
-
-
-    def _on_gesture_button_released(gesture, n_press, x, y, obj):
-        global preselected_widget
-
-        child = utils.get_child_at_position(obj, x, y)
-        object_id = utils.object_get_id(child)
-
-        # Select widget on button release only if its preselected
-        if object_id and child == preselected_widget:
-            _print('merengue selection_changed', child, object_id)
-            write_command('selection_changed', args={ 'selection': [object_id] })
-
-    if Gtk.MAJOR_VERSION == 3:
-        obj.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
-                       Gdk.EventMask.BUTTON_RELEASE_MASK)
-        gesture = Gtk.GestureMultiPress(widget=obj,
-                                        propagation_phase=Gtk.PropagationPhase.CAPTURE)
-    else:
-        gesture = Gtk.GestureClick(propagation_phase=Gtk.PropagationPhase.CAPTURE)
-        obj.add_controller(gesture)
-
-    gesture.connect('pressed', _on_gesture_button_pressed, obj)
-    gesture.connect('released', _on_gesture_button_released, obj)
-
-    return gesture
-
-
 def update_ui(ui_id, payload=None):
-    global toplevels, objects, gestures
+    global toplevels, objects, controllers
+
+    def _on_object_selected(controller, object_id):
+        write_command('selection_changed', args={ 'selection': [object_id] })
 
     clear_all()
 
@@ -125,9 +92,19 @@ def update_ui(ui_id, payload=None):
         objects[object_id] = obj
 
         if obj.props.parent is None and issubclass(type(obj), Gtk.Window):
+            controller = controllers.get(object_id, None)
+
             toplevels.append(obj)
             utils.widget_show(obj)
-            gestures[object_id] = _window_add_selection_handler(obj)
+
+            if controller is None:
+                controller = cmb_gtk.CmbGtkWindowController(object=obj)
+                controller.connect('object-selected', _on_object_selected)
+            else:
+                _print('Reusing controller for object ', object_id)
+                controller.object = obj
+
+            controllers[object_id] = controller
 
 
 def object_removed(ui_id, object_id):
@@ -238,7 +215,7 @@ def on_stdin(channel, condition):
 
 
 def merengue_init(ver):
-    global Gdk, Gtk, utils, global_builder
+    global Gdk, Gtk, cmb_gtk, utils, global_builder
 
     version = '4.0' if ver == 'gtk-4.0' else '3.0'
     gi.require_version('Gdk', version)
@@ -246,7 +223,7 @@ def merengue_init(ver):
 
     from gi.repository import Gdk, Gtk
 
-    from . import utils
+    import cmb_gtk, utils
 
     global_builder = Gtk.Builder()
     stdin_channel = GLib.IOChannel.unix_new(sys.stdin.fileno())
