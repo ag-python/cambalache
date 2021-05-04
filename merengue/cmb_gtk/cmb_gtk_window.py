@@ -8,14 +8,14 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .cmb_controller import CmbController
+from .cmb_gtk_widget import CmbGtkWidgetController
 
 import utils
 
 preselected_widget = None
 
 
-class CmbGtkWindowController(CmbController):
+class CmbGtkWindowController(CmbGtkWidgetController):
     __gsignals__ = {
         'object-selected': (GObject.SIGNAL_RUN_FIRST, None, (str, )),
     }
@@ -32,11 +32,14 @@ class CmbGtkWindowController(CmbController):
         self._object = obj
 
         if obj:
+            # Handle widget selection
             self.gesture = self._add_selection_handler()
 
-            # TODO: marshal object set property trougth controller be able
-            # to ignore properties like deleteable
-            obj.props.deletable = False
+            # Make sure the user can not close the window
+            if Gtk.MAJOR_VERSION == 3:
+                obj.connect('delete-event', lambda o, e: True)
+            else:
+                obj.connect('close-request', lambda o: True)
 
             # TODO: keep track of size, position, and window state (maximized, fullscreen)
         else:

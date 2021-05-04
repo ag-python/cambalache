@@ -21,7 +21,7 @@ class CmbController(GObject.GObject):
         super().__init__(**kwargs)
 
     # Object set property wrapper
-    def set_object_property(name, value):
+    def set_object_property(self, name, value):
         if self.object and name not in self.property_ignore_list:
             self.object.set_property(name, value)
 

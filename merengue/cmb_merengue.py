@@ -91,20 +91,28 @@ def update_ui(ui_id, payload=None):
         object_id = utils.object_get_id(obj)
         objects[object_id] = obj
 
-        if obj.props.parent is None and issubclass(type(obj), Gtk.Window):
-            controller = controllers.get(object_id, None)
+        controller = controllers.get(object_id, None)
 
+        if obj.props.parent is None and issubclass(type(obj), Gtk.Window):
             toplevels.append(obj)
             utils.widget_show(obj)
 
             if controller is None:
                 controller = cmb_gtk.CmbGtkWindowController(object=obj)
                 controller.connect('object-selected', _on_object_selected)
-            else:
-                _print('Reusing controller for object ', object_id)
-                controller.object = obj
 
-            controllers[object_id] = controller
+        # TODO: we need a controller factory here to choose the right controller
+        if controller is None:
+            if issubclass(type(obj), Gtk.Widget):
+                controller = cmb_gtk.CmbGtkWidgetController(object=obj)
+            else:
+                controller = cmb_gtk.CmbController(object=obj)
+
+        if controller.object is None:
+            _print('Reusing controller for object ', object_id)
+            controller.object = obj
+
+        controllers[object_id] = controller
 
 
 def object_removed(ui_id, object_id):
@@ -119,17 +127,21 @@ def object_removed(ui_id, object_id):
 
 
 def object_property_changed(ui_id, object_id, property_id, value):
-    obj = get_object(ui_id, object_id)
+    controller = controllers.get(f'{ui_id}.{object_id}', None)
 
-    if obj:
-        pspec = obj.find_property(property_id)
-        if pspec:
+    if controller is None:
+        return
+
+    pspec = controller.object.find_property(property_id)
+
+    if pspec:
+        try:
             status, val = global_builder.value_from_string_type(pspec.value_type, value)
             if status:
-                try:
-                    obj.set_property(property_id, val)
-                except:
-                    pass
+                controller.set_object_property(property_id, val)
+                #controller.object.set_property(property_id, val)
+        except:
+            pass
 
 
 def object_layout_property_changed(ui_id, object_id, child_id, property_id, value):
