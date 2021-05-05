@@ -6,8 +6,32 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 #
 
+import sys
+import json
+
 import gi
 from gi.repository import Gtk
+
+
+def write_command(command, payload=None, args=None):
+    cmd = {
+        'command': command,
+        'payload_length': len(payload) if payload is not None else 0
+    }
+
+    if args is not None:
+        cmd['args'] = args
+
+    # Send command in one line as json
+    sys.stdout.write(json.dumps(cmd))
+    sys.stdout.write('\n')
+
+    # Send payload if any
+    if payload is not None:
+        sys.stdout.write(payload)
+
+    # Flush
+    sys.stdout.flush()
 
 
 def child_set_property(parent, child, property_id, val):

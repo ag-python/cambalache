@@ -1,5 +1,5 @@
 #
-# Cambalache Object controller
+# Cambalache controller object
 #
 # Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
 #
@@ -10,9 +10,9 @@ import gi
 from gi.repository import GObject
 
 
-class CmbController(GObject.GObject):
+class CmbController(GObject.Object):
     object = GObject.Property(type=GObject.GObject,
-                              flags = GObject.ParamFlags.READWRITE)
+                              flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         # Properties in this will will be ignored by set_object_property()

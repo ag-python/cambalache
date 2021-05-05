@@ -18,7 +18,10 @@ Gtk = None
 cmb_gtk = None
 utils = None
 
+from controller import CmbControllerRegistry
+
 # Globals
+registry = CmbControllerRegistry()
 global_builder = None
 toplevels = []
 controllers = {}
@@ -31,27 +34,6 @@ def _print(*args):
 
 def get_object(ui_id, object_id):
     return objects.get(f'{ui_id}.{object_id}', None)
-
-
-def write_command(command, payload=None, args=None):
-    cmd = {
-        'command': command,
-        'payload_length': len(payload) if payload is not None else 0
-    }
-
-    if args is not None:
-        cmd['args'] = args
-
-    # Send command in one line as json
-    sys.stdout.write(json.dumps(cmd))
-    sys.stdout.write('\n')
-
-    # Send payload if any
-    if payload is not None:
-        sys.stdout.write(payload)
-
-    # Flush
-    sys.stdout.flush()
 
 
 def clear_all():
@@ -73,9 +55,6 @@ def clear_all():
 def update_ui(ui_id, payload=None):
     global toplevels, objects, controllers
 
-    def _on_object_selected(controller, object_id):
-        write_command('selection_changed', args={ 'selection': [object_id] })
-
     clear_all()
 
     if payload == None:
@@ -91,22 +70,13 @@ def update_ui(ui_id, payload=None):
         object_id = utils.object_get_id(obj)
         objects[object_id] = obj
 
+        if obj.props.parent is None:
+            toplevels.append(obj)
+
         controller = controllers.get(object_id, None)
 
-        if obj.props.parent is None and issubclass(type(obj), Gtk.Window):
-            toplevels.append(obj)
-            utils.widget_show(obj)
-
-            if controller is None:
-                controller = cmb_gtk.CmbGtkWindowController(object=obj)
-                controller.connect('object-selected', _on_object_selected)
-
-        # TODO: we need a controller factory here to choose the right controller
         if controller is None:
-            if issubclass(type(obj), Gtk.Widget):
-                controller = cmb_gtk.CmbGtkWidgetController(object=obj)
-            else:
-                controller = cmb_gtk.CmbController(object=obj)
+            controller = registry.new_controller_for_object(obj)
 
         if controller.object is None:
             _print('Reusing controller for object ', object_id)
@@ -237,6 +207,9 @@ def merengue_init(ver):
 
     import cmb_gtk, utils
 
+    # TODO: support multiples plugins
+    registry.load_module(cmb_gtk)
+
     global_builder = Gtk.Builder()
     stdin_channel = GLib.IOChannel.unix_new(sys.stdin.fileno())
     GLib.io_add_watch(stdin_channel, GLib.PRIORITY_DEFAULT_IDLE,
@@ -259,7 +232,7 @@ def merengue_init(ver):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-    write_command('started')
+    utils.write_command('started')
 
     return Gtk
 

@@ -1,4 +1,4 @@
-# Merengue Gtk plugin
+# GtkWindow Controller
 #
 # Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
 #
@@ -16,10 +16,6 @@ preselected_widget = None
 
 
 class CmbGtkWindowController(CmbGtkWidgetController):
-    __gsignals__ = {
-        'object-selected': (GObject.SIGNAL_RUN_FIRST, None, (str, )),
-    }
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -40,6 +36,9 @@ class CmbGtkWindowController(CmbGtkWidgetController):
                 obj.connect('delete-event', lambda o, e: True)
             else:
                 obj.connect('close-request', lambda o: True)
+
+            # Always show toplevels windows
+            utils.widget_show(obj)
 
             # TODO: keep track of size, position, and window state (maximized, fullscreen)
         else:
@@ -62,7 +61,7 @@ class CmbGtkWindowController(CmbGtkWidgetController):
 
         # Select widget on button release only if its preselected
         if object_id and child == preselected_widget:
-            self.emit('object-selected', object_id)
+            utils.write_command('selection_changed', args={ 'selection': [object_id] })
 
     def _add_selection_handler(self):
         if Gtk.MAJOR_VERSION == 3:

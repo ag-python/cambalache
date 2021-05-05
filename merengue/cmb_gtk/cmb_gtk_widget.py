@@ -1,4 +1,4 @@
-# Merengue Gtk plugin
+# GtkWidget Controller
 #
 # Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
 #
@@ -8,10 +8,12 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .cmb_controller import CmbController
+from controller import CmbController
 
 
 class CmbGtkWidgetController(CmbController):
+    object = GObject.Property(type=Gtk.Widget,
+                              flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
