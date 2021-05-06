@@ -18,18 +18,17 @@ sys.path.insert(1, pythondir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 from gi.repository import GLib
-from merengue import merengue_init
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        _print(f"Ussage: {sys.argv[0]} gtkversion")
+        print(f"Ussage: {sys.argv[0]} gtkversion", file=sys.stderr)
         exit()
 
-    Gtk = merengue_init(sys.argv[1])
+    version = sys.argv[1]
+    gi.require_version('Gdk', version)
+    gi.require_version('Gtk', version)
 
-    if Gtk.MAJOR_VERSION == 3:
-        Gtk.main()
-    else:
-        context = GLib.MainContext.default()
-        while True:
-            context.iteration(True)
+    from merengue import MrgApplication
+    app = MrgApplication()
+    app.run([])
+

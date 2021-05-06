@@ -348,8 +348,13 @@ window.setupDocument = function (document) {
         path = retval.replace('Listening on ', '').strip()
 
         # Run view process
+        if self._project.target_tk == 'gtk+-3.0':
+            version = '3.0'
+        elif self._project.target_tk == 'gtk-4.0':
+            version = '4.0'
+
         display = self._port - 8080
-        self._merengue.run([self._project.target_tk], [
+        self._merengue.run([version], [
             'GDK_BACKEND=broadway',
             #'GTK_DEBUG=interactive',
             f'BROADWAY_DISPLAY=:{display}'
