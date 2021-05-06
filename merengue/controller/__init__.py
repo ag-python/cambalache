@@ -5,5 +5,5 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 #
 
-from .cmb_controller import CmbController
-from .cmb_controller_registry import CmbControllerRegistry
+from .mrg_controller import MrgController
+from .mrg_controller_registry import MrgControllerRegistry

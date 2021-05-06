@@ -8,14 +8,14 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .cmb_gtk_widget import CmbGtkWidgetController
+from .mrg_gtk_widget import MrgGtkWidgetController
 
 import utils
 
 preselected_widget = None
 
 
-class CmbGtkWindowController(CmbGtkWidgetController):
+class MrgGtkWindowController(MrgGtkWidgetController):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

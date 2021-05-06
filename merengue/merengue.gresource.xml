@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/ar/xjuan/Merengue/">
-    <file>cmb_merengue.css</file>
+    <file>merengue.css</file>
   </gresource>
 </gresources>

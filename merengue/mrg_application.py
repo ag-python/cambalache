@@ -15,13 +15,13 @@ import json
 from gi.repository import GLib
 Gdk = None
 Gtk = None
-cmb_gtk = None
+mrg_gtk = None
 utils = None
 
-from controller import CmbControllerRegistry
+from controller import MrgControllerRegistry
 
 # Globals
-registry = CmbControllerRegistry()
+registry = MrgControllerRegistry()
 global_builder = None
 toplevels = []
 controllers = {}
@@ -197,7 +197,7 @@ def on_stdin(channel, condition):
 
 
 def merengue_init(ver):
-    global Gdk, Gtk, cmb_gtk, utils, global_builder
+    global Gdk, Gtk, mrg_gtk, utils, global_builder
 
     version = '4.0' if ver == 'gtk-4.0' else '3.0'
     gi.require_version('Gdk', version)
@@ -205,10 +205,10 @@ def merengue_init(ver):
 
     from gi.repository import Gdk, Gtk
 
-    import cmb_gtk, utils
+    import mrg_gtk, utils
 
     # TODO: support multiples plugins
-    registry.load_module(cmb_gtk)
+    registry.load_module(mrg_gtk)
 
     global_builder = Gtk.Builder()
     stdin_channel = GLib.IOChannel.unix_new(sys.stdin.fileno())
@@ -217,7 +217,7 @@ def merengue_init(ver):
                       on_stdin)
 
     provider = Gtk.CssProvider()
-    provider.load_from_resource('/ar/xjuan/Merengue/cmb_merengue.css')
+    provider.load_from_resource('/ar/xjuan/Merengue/merengue.css')
 
     if Gtk.MAJOR_VERSION == 3:
         Gtk.StyleContext.add_provider_for_screen(

@@ -8,10 +8,10 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from controller import CmbController
+from controller import MrgController
 
 
-class CmbGtkWidgetController(CmbController):
+class MrgGtkWidgetController(MrgController):
     object = GObject.Property(type=Gtk.Widget,
                               flags=GObject.ParamFlags.READWRITE)
 

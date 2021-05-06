@@ -10,7 +10,7 @@ import gi
 from gi.repository import GObject
 
 
-class CmbController(GObject.Object):
+class MrgController(GObject.Object):
     object = GObject.Property(type=GObject.GObject,
                               flags=GObject.ParamFlags.READWRITE)
 

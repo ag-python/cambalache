@@ -11,10 +11,10 @@ import sys
 import inspect
 from gi.repository import GObject
 
-from .cmb_controller import CmbController
+from .mrg_controller import MrgController
 
 
-class CmbControllerRegistry(GObject.GObject):
+class MrgControllerRegistry(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -34,7 +34,7 @@ class CmbControllerRegistry(GObject.GObject):
 
         for component in module.__dict__.items():
             name, klass = component
-            if inspect.isclass(klass) and issubclass(klass, CmbController):
+            if inspect.isclass(klass) and issubclass(klass, MrgController):
                 object_type = get_object_type(klass)
                 self.registry[object_type] = klass
 

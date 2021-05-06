@@ -32,7 +32,7 @@ configure_file(
 run_command('python3', '-m', 'compileall', '-b', '.')
 
 install_data([
-  'cmb_merengue.pyc',
+  'mrg_application.pyc',
   'utils.pyc',
   '__init__.pyc',
   ],

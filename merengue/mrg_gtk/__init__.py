@@ -5,5 +5,5 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 #
 
-from .cmb_gtk_widget import CmbGtkWidgetController
-from .cmb_gtk_window import CmbGtkWindowController
+from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_window import MrgGtkWindowController

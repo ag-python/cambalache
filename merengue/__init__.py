@@ -12,4 +12,4 @@ from gi.repository import Gio
 resource = Gio.Resource.load(os.path.join(pkgdatadir, 'merengue.gresource'))
 resource._register()
 
-from .cmb_merengue import merengue_init
+from .mrg_application import merengue_init
