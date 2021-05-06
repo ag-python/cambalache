@@ -15,6 +15,15 @@ import utils
 preselected_widget = None
 
 
+class FindInContainerData():
+    def __init__(self, toplevel, x, y):
+        self.toplevel = toplevel
+        self.x = x
+        self.y = y
+        self.child = None
+        self.level = None
+
+
 class MrgGtkWindowController(MrgGtkWidgetController):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -38,7 +47,10 @@ class MrgGtkWindowController(MrgGtkWidgetController):
                 obj.connect('close-request', lambda o: True)
 
             # Always show toplevels windows
-            utils.widget_show(obj)
+            if Gtk.MAJOR_VERSION == 3:
+                obj.show_all()
+            else:
+                obj.show()
 
             # TODO: keep track of size, position, and window state (maximized, fullscreen)
         else:
@@ -47,7 +59,7 @@ class MrgGtkWindowController(MrgGtkWidgetController):
     def _on_gesture_button_pressed(self, gesture, n_press, x, y):
         global preselected_widget
 
-        child = utils.get_child_at_position(self.object, x, y)
+        child = self.get_child_at_position(self.object, x, y)
         object_id = utils.object_get_id(child)
 
         # Pre select a widget on button press
@@ -56,7 +68,7 @@ class MrgGtkWindowController(MrgGtkWidgetController):
     def _on_gesture_button_released(self, gesture, n_press, x, y):
         global preselected_widget
 
-        child = utils.get_child_at_position(self.object, x, y)
+        child = self.get_child_at_position(self.object, x, y)
         object_id = utils.object_get_id(child)
 
         # Select widget on button release only if its preselected
@@ -77,3 +89,56 @@ class MrgGtkWindowController(MrgGtkWidgetController):
         gesture.connect('released', self._on_gesture_button_released)
 
         return gesture
+
+    def is_widget_from_ui(self, obj):
+        object_id = utils.object_get_builder_id(obj)
+        return object_id is not None and object_id.startswith('__cambalache__')
+
+
+    def _find_first_child_inside_container (self, widget, data):
+        if data.child is not None or not widget.get_mapped():
+            return
+
+        x, y = data.toplevel.translate_coordinates(widget, data.x, data.y)
+
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
+
+        if x >= 0 and x < w and y >= 0 and y < h:
+            from_ui = self.is_widget_from_ui(widget)
+
+            if issubclass(type(widget), Gtk.Container):
+                if from_ui:
+                    data.child = self.get_child_at_position(widget, x, y)
+                else:
+                    widget.forall(self._find_first_child_inside_container, data)
+
+            if data.child is None and from_ui:
+                data.child = widget
+
+
+    def get_child_at_position(self, widget, x, y):
+        if Gtk.MAJOR_VERSION == 4:
+            pick = widget.pick(x, y, Gtk.PickFlags.INSENSITIVE | Gtk.PickFlags.NON_TARGETABLE)
+            while pick and not self.is_widget_from_ui(pick):
+                pick = pick.props.parent
+            return pick
+
+        if not widget.get_mapped():
+            return None
+
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
+
+        if x >= 0 and x <= w and y >= 0 and y <= h:
+            if issubclass(type(widget), Gtk.Container):
+                data = FindInContainerData(widget, x, y)
+
+                widget.forall(self._find_first_child_inside_container, data)
+
+                return data.child if data.child is not None else widget
+            else:
+                return widget
+
+        return None
+

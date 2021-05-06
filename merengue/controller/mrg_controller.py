@@ -25,3 +25,4 @@ class MrgController(GObject.Object):
         if self.object and name not in self.property_ignore_list:
             self.object.set_property(name, value)
 
+

@@ -115,18 +115,21 @@ def object_property_changed(ui_id, object_id, property_id, value):
 
 
 def object_layout_property_changed(ui_id, object_id, child_id, property_id, value):
-    obj = get_object(ui_id, object_id)
+    controller = controllers.get(f'{ui_id}.{object_id}', None)
     child = get_object(ui_id, child_id)
 
-    if obj and child:
-        pspec = obj.find_child_property (property_id)
-        if pspec:
+    if controller is None or child is None:
+        return
+
+    pspec = controller.find_child_property(child, property_id)
+
+    if pspec and child:
+        try:
             status, val = global_builder.value_from_string_type(pspec.value_type, value)
             if status:
-                try:
-                    utils.child_set_property(obj, child, property_id, val)
-                except:
-                    pass
+                controller.set_object_child_property(child, property_id, val)
+        except:
+            pass
 
 
 def selection_changed(ui_id, selection):
