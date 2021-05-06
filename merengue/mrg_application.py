@@ -23,21 +23,19 @@ from controller import MrgControllerRegistry
 # Globals
 registry = MrgControllerRegistry()
 global_builder = None
-toplevels = []
 controllers = {}
-objects = {}
 
 
 def _print(*args):
     print(*args, file=sys.stderr)
 
 
-def get_object(ui_id, object_id):
-    return objects.get(f'{ui_id}.{object_id}', None)
+def get_controller(ui_id, object_id):
+    return controllers.get(f'{ui_id}.{object_id}', None)
 
 
 def clear_all():
-    global toplevels, objects, controllers, preselected_widget
+    global controllers, preselected_widget
 
     preselected_widget = None
 
@@ -45,15 +43,9 @@ def clear_all():
     for key in controllers:
         controllers[key].object = None
 
-    # Destroy all toplevels
-    for win in toplevels:
-        win.destroy()
-
-    toplevels = []
-
 
 def update_ui(ui_id, payload=None):
-    global toplevels, objects, controllers
+    global controllers
 
     clear_all()
 
@@ -64,40 +56,38 @@ def update_ui(ui_id, payload=None):
     builder = Gtk.Builder()
     builder.add_from_string(payload)
 
-    # Show toplevels
+    # Keep dict of all object controllers by id
     for obj in builder.get_objects():
-        # Keep dict of all objects by id
         object_id = utils.object_get_id(obj)
-        objects[object_id] = obj
 
-        if obj.props.parent is None:
-            toplevels.append(obj)
+        if object_id is None:
+            continue
 
         controller = controllers.get(object_id, None)
 
-        if controller is None:
-            controller = registry.new_controller_for_object(obj)
-
-        if controller.object is None:
-            _print('Reusing controller for object ', object_id)
+        if controller:
+            # Reuse controller
             controller.object = obj
+        else:
+            # Create a new controller
+            controller = registry.new_controller_for_object(obj)
 
         controllers[object_id] = controller
 
 
 def object_removed(ui_id, object_id):
-    obj = get_object(ui_id, object_id)
+    controller = get_controller(ui_id, object_id)
 
-    if obj:
-        if issubclass(type(obj), Gtk.Widget):
-            obj.destroy()
+    if controller:
+        if issubclass(type(controller.object), Gtk.Widget):
+            controller.object.destroy()
+            controller.object = None
 
-        if issubclass(type(obj), Gtk.Window):
-            toplevels.remove(obj)
+        del controllers[f'{ui_id}.{object_id}']
 
 
 def object_property_changed(ui_id, object_id, property_id, value):
-    controller = controllers.get(f'{ui_id}.{object_id}', None)
+    controller = get_controller(ui_id, object_id)
 
     if controller is None:
         return
@@ -115,34 +105,36 @@ def object_property_changed(ui_id, object_id, property_id, value):
 
 
 def object_layout_property_changed(ui_id, object_id, child_id, property_id, value):
-    controller = controllers.get(f'{ui_id}.{object_id}', None)
-    child = get_object(ui_id, child_id)
+    controller = get_controller(ui_id, object_id)
+    child = get_controller(ui_id, object_id)
 
     if controller is None or child is None:
         return
 
-    pspec = controller.find_child_property(child, property_id)
+    pspec = controller.find_child_property(child.object, property_id)
 
-    if pspec and child:
+    if pspec:
         try:
             status, val = global_builder.value_from_string_type(pspec.value_type, value)
             if status:
-                controller.set_object_child_property(child, property_id, val)
+                controller.set_object_child_property(child.object, property_id, val)
         except:
             pass
 
 
 def selection_changed(ui_id, selection):
     # Clear objects
-    for obj_id in objects:
-        obj = objects[obj_id]
-        obj.get_style_context().remove_class('merengue_selected')
+    for object_id in controllers:
+        controller = controllers[object_id]
+        if controller.object:
+            controller.object.get_style_context().remove_class('merengue_selected')
 
     length = len(selection)
 
     # Add class to selected objects
-    for obj_id in selection:
-        obj = objects.get(f'{ui_id}.{obj_id}', None)
+    for object_id in selection:
+        controller = get_controller(ui_id, object_id)
+        obj = controller.object
 
         if obj:
             obj.get_style_context().add_class('merengue_selected')

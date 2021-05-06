@@ -26,6 +26,7 @@ class FindInContainerData():
 
 class MrgGtkWindowController(MrgGtkWidgetController):
     def __init__(self, **kwargs):
+        self._object = None
         super().__init__(**kwargs)
 
     @GObject.property(type=Gtk.Window)
@@ -34,6 +35,9 @@ class MrgGtkWindowController(MrgGtkWidgetController):
 
     @object.setter
     def _set_object(self, obj):
+        if self._object:
+            self._object.destroy()
+
         self._object = obj
 
         if obj:
