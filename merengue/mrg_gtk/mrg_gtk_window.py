@@ -27,6 +27,11 @@ class FindInContainerData():
 class MrgGtkWindowController(MrgGtkWidgetController):
     def __init__(self, **kwargs):
         self._object = None
+        self._position = None
+        self._size = None
+        self._is_maximized = None
+        self._is_fullscreen = None
+
         super().__init__(**kwargs)
 
     @GObject.property(type=Gtk.Window)
@@ -35,6 +40,9 @@ class MrgGtkWindowController(MrgGtkWidgetController):
 
     @object.setter
     def _set_object(self, obj):
+        # keep track of size, position, and window state (maximized)
+        self._save_state()
+
         if self._object:
             self._object.destroy()
 
@@ -50,15 +58,46 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             else:
                 obj.connect('close-request', lambda o: True)
 
+            # Restore size
+            if self._size and not self._is_maximized:
+                self.object.set_default_size(*self._size)
+
             # Always show toplevels windows
             if Gtk.MAJOR_VERSION == 3:
                 obj.show_all()
             else:
                 obj.show()
 
-            # TODO: keep track of size, position, and window state (maximized, fullscreen)
+            self._restore_state()
         else:
             self.gesture = None
+
+    def _save_state(self):
+        if self._object is None:
+            return
+
+        self._is_maximized = self.object.is_maximized()
+
+        if self._is_maximized:
+            return
+
+        if Gtk.MAJOR_VERSION == 3:
+            self._position = self.object.get_position()
+            self._size = self.object.get_size()
+        else:
+            self._size = [self.object.get_width(), self.object.get_height()]
+
+    def _restore_state(self):
+        if self._is_maximized:
+            self.object.maximize()
+            return
+
+        if Gtk.MAJOR_VERSION == 3:
+            if self._position:
+                self.object.move(*self._position)
+        else:
+            # TODO: find a way to store position on gtk4
+            pass
 
     def _on_gesture_button_pressed(self, gesture, n_press, x, y):
         global preselected_widget
