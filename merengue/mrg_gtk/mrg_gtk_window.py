@@ -68,6 +68,10 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             else:
                 obj.show()
 
+            # Add gtk version CSS class
+            gtkversion = 'gtk3' if Gtk.MAJOR_VERSION == 3 else 'gtk4'
+            obj.get_style_context().add_class(gtkversion)
+
             self._restore_state()
         else:
             self.gesture = None
