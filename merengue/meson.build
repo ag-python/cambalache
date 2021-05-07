@@ -33,8 +33,31 @@ run_command('python3', '-m', 'compileall', '-b', '.')
 
 install_data([
   'mrg_application.pyc',
-  'utils.pyc',
   '__init__.pyc',
   ],
   install_dir: moduledir
 )
+
+install_data([
+  'controller/__init__.pyc',
+  'controller/mrg_controller.pyc',
+  'controller/mrg_controller_registry.pyc',
+  ],
+  install_dir: join_paths(python_dir, 'controller')
+)
+
+install_data([
+  'mrg_gtk/__init__.pyc',
+  'mrg_gtk/mrg_gtk_widget.pyc',
+  'mrg_gtk/mrg_gtk_window.pyc',
+  ],
+  install_dir: join_paths(python_dir, 'mrg_gtk')
+)
+
+install_data([
+  'utils/__init__.pyc',
+  'utils/utils.pyc',
+  ],
+  install_dir: join_paths(python_dir, 'utils')
+)
+
