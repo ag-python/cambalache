@@ -32,3 +32,6 @@ class CmbTypeInfo(CmbBaseTypeInfo):
 
         return retval
 
+    def is_a(self, type_id):
+        return self.type_id == type_id or type_id in self.hierarchy
+

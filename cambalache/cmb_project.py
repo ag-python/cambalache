@@ -265,7 +265,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                             parent_id IS NOT NULL AND
                             abstract IS NOT True AND
                             parent_id NOT IN ('interface', 'enum', 'flags') AND
-                            layout IS NULL
+                            (layout IS NULL OR layout = 'container')
                           ORDER BY type_id;'''
         self.type_list = CmbListStore(project=self, table='type', query=type_query)
 
@@ -867,7 +867,32 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         return obj
 
+    def _check_can_add(self, obj_type, parent_type):
+        obj_info = self._type_info.get(obj_type, None)
+        parent_info = self._type_info.get(parent_type, None)
+
+        if obj_info is None or parent_info is None:
+            return False
+
+        # Only GtkWidget can be a child
+        if not obj_info.is_a('GtkWidget'):
+            return False
+
+        # GtkWindow can not be a child
+        if obj_info.is_a('GtkWindow'):
+            return False
+
+        return parent_info.layout == 'container'
+
     def add_object(self, ui_id, obj_type, name=None, parent_id=None):
+        if parent_id:
+            parent = self._get_object_by_id(ui_id, parent_id)
+            if parent is None:
+                return None
+
+            if not self._check_can_add(obj_type, parent.type_id):
+                return None
+
         c = self.conn.cursor()
 
         try:
