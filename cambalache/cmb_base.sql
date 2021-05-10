@@ -59,7 +59,6 @@ CREATE TABLE IF NOT EXISTS type (
 
   parent_id TEXT REFERENCES type,
   library_id TEXT REFERENCES library,
-  get_type TEXT,
   version TEXT,
   deprecated_version TEXT,
   abstract BOOLEAN,

@@ -70,7 +70,6 @@ class CmbBaseTypeInfo(CmbBase):
     type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     parent_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     library_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    get_type = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     deprecated_version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     abstract = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
@@ -80,12 +79,11 @@ class CmbBaseTypeInfo(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, type_id, parent_id, library_id, get_type, version, deprecated_version, abstract, layout):
+    def from_row(cls, project, type_id, parent_id, library_id, version, deprecated_version, abstract, layout):
         return cls(project=project,
                    type_id=type_id,
                    parent_id=parent_id,
                    library_id=library_id,
-                   get_type=get_type,
                    version=version,
                    deprecated_version=deprecated_version,
                    abstract=abstract,
