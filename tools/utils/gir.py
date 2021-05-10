@@ -13,8 +13,10 @@ import importlib
 # We need to use lxml to get access to nsmap
 from lxml import etree
 from .toposort import toposort_flatten
-gi.require_version('CmbUtils', '0.1')
-from gi.repository import GObject, CmbUtils
+
+from gi.repository import GObject
+
+CmbUtils = None
 
 # Global XML name space
 nsmap = {}
@@ -58,12 +60,14 @@ class GirData:
         types = None
         skip_types = []
         if self.name == 'GObject':
+            gi.require_version('CmbUtils', '3.0')
             types = ['GObject', 'GBinding', 'GBindingFlags']
             skip_types = ['GBinding']
         elif self.name == 'Gtk':
             if self.version == '3.0':
-                pass
+                gi.require_version('CmbUtils', '3.0')
             elif self.version == '4.0':
+                gi.require_version('CmbUtils', '4.0')
                 skip_types = ['GtkActivateAction',
                               'GtkMnemonicAction',
                               'GtkNamedAction',
@@ -71,6 +75,11 @@ class GirData:
                               'GtkNothingAction',
                               'GtkSignalAction',
                               'GtkPrintJob']
+        else:
+            gi.require_version('CmbUtils', '3.0')
+
+        global CmbUtils
+        from gi.repository import CmbUtils
 
         # Dictionary of all enumerations
         self.enumerations = self._get_enumerations(namespace, types)
@@ -102,6 +111,9 @@ class GirData:
         self.sorted_types = toposort_flatten(types_deps)
 
     def _type_is_a (self, type, is_a_type):
+        if type == is_a_type:
+            return True
+
         parent = self.types[type]
 
         while parent:
@@ -221,6 +233,9 @@ class GirData:
                 continue
 
             data = self.types[name]
+
+            # Mark class as a container type
+            data['layout'] = 'container'
             props = self._container_list_child_properties(name)
             properties = get_properties(name, props)
 
@@ -232,7 +247,6 @@ class GirData:
                     'abstract': 1,
                     'version': None,
                     'deprecated_version': None,
-                    'get_type': None,
                     'signals': {},
                     'interfaces': []
                 }
@@ -330,19 +344,24 @@ class GirData:
         if constructor is None:
             constructor = element
 
+        is_container = False
+
         if use_instance:
             instance = self._get_instance_from_type(name)
             props = instance.list_properties() if instance is not None else None
+
+            if instance is not None:
+                is_container = CmbUtils.implements_buildable_add_child(instance)
         else:
             props = None
 
         return {
             'parent': parent,
-            'layout': None,
+            'is_container': is_container,
+            'layout': 'container' if is_container else None,
             'abstract': element.get('abstract'),
             'version': constructor.get('version'),
             'deprecated_version': constructor.get('deprecated-version'),
-            'get_type': element.get(ns('glib','get-type')),
             'properties': self._type_get_properties(element, props),
             'signals': self._type_get_signals(element),
             'interfaces': self._type_get_interfaces(element)
@@ -456,8 +475,8 @@ class GirData:
             if parent and parent.find('.') >= 0:
                 parent = 'object'
 
-            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, get_type, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                         (self.lib, name, parent, data['get_type'], data['version'], data['deprecated_version'], data['abstract'], data['layout']))
+            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                         (self.lib, name, parent, data['version'], data['deprecated_version'], data['abstract'], data['layout']))
 
 
         def db_insert_type_data(conn, name, data):
