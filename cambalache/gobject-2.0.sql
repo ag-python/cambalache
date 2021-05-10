@@ -3,9 +3,9 @@ INSERT INTO library VALUES
 ('gobject', '2.0', 'libgobject-2.0.so.0', NULL, NULL);
 
 INSERT INTO type VALUES
-('GBinding', 'GObject', 'gobject', 'g_binding_get_type', '2.26', NULL, NULL, NULL),
-('GBindingFlags', 'flags', 'gobject', NULL, NULL, NULL, NULL, NULL),
-('GObject', 'object', 'gobject', 'g_object_get_type', NULL, NULL, NULL, NULL);
+('GBinding', 'GObject', 'gobject', '2.26', NULL, NULL, NULL),
+('GBindingFlags', 'flags', 'gobject', NULL, NULL, NULL, NULL),
+('GObject', 'object', 'gobject', NULL, NULL, NULL, NULL);
 
 INSERT INTO type_flags VALUES
 ('GBindingFlags', 'bidirectional', 'bidirectional', 1, 'G_BINDING_BIDIRECTIONAL', 'Bidirectional binding; if either the property of the source or the property of the target changes, the other is updated.'),
