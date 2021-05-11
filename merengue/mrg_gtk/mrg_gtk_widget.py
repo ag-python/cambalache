@@ -27,6 +27,15 @@ class MrgGtkWidgetController(MrgController):
         if Gtk.MAJOR_VERSION == 3:
             self.property_ignore_list.add('no-show-all')
 
+    def remove_object(self):
+        if self.object is None:
+            return
+
+        if self.object.props.parent:
+            self.object.props.parent.remove(self.object)
+
+        super().remove_object()
+
     def find_child_property(self, child, property_id):
         if self.object is None:
             return None

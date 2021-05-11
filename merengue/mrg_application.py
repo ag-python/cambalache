@@ -80,10 +80,7 @@ class MrgApplication(Gtk.Application):
         controller = self.get_controller(ui_id, object_id)
 
         if controller:
-            if issubclass(type(controller.object), Gtk.Widget):
-                controller.object.destroy()
-                controller.object = None
-
+            controller.remove_object()
             del self.controllers[f'{ui_id}.{object_id}']
 
     def object_property_changed(self, ui_id, object_id, property_id, value):
@@ -131,9 +128,9 @@ class MrgApplication(Gtk.Application):
         # Add class to selected objects
         for object_id in selection:
             controller = self.get_controller(ui_id, object_id)
-            obj = controller.object
 
-            if obj:
+            if controller:
+                obj = controller.object
                 obj.get_style_context().add_class('merengue_selected')
 
                 if length == 1 and issubclass(type(obj), Gtk.Window):

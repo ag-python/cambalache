@@ -20,6 +20,9 @@ class MrgController(GObject.Object):
 
         super().__init__(**kwargs)
 
+    def remove_object(self):
+        self.object = None
+
     # Object set property wrapper
     def set_object_property(self, name, value):
         if self.object and name not in self.property_ignore_list:
