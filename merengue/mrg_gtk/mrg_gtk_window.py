@@ -49,6 +49,8 @@ class MrgGtkWindowController(MrgGtkWidgetController):
         self._object = obj
 
         if obj:
+            self._update_name()
+
             # Handle widget selection
             self.gesture = self._add_selection_handler()
 
@@ -75,6 +77,14 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             self._restore_state()
         else:
             self.gesture = None
+
+    def _update_name(self):
+        if self._object is None:
+            return
+
+        name = utils.object_get_name(self._object)
+        type_name = GObject.type_name(self._object.__gtype__)
+        self._object.props.title = f'{name} - {type_name}' if name else type_name
 
     def _save_state(self):
         if self._object is None:

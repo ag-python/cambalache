@@ -10,7 +10,7 @@ import sys
 import json
 
 import gi
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk
 
 
 def write_command(command, payload=None, args=None):
@@ -49,6 +49,17 @@ def object_get_id(obj):
         builder_id = object_get_builder_id(obj)
         if builder_id.startswith('__cambalache__'):
             return builder_id[14:]
+
+    return None
+
+
+def object_get_name(obj):
+    if obj:
+        builder_id = object_get_builder_id(obj)
+        if builder_id.startswith('__cambalache__'):
+            tokens = builder_id[14:].split('+', 2)
+            if len(tokens) > 1:
+                return GLib.uri_unescape_string(tokens[1], None)
 
     return None
 
