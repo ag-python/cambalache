@@ -677,9 +677,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         obj = E.object()
 
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
-        row = c.fetchone()
-        node_set(obj, 'class', row[0])
-        node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}' if use_id else row[1])
+        type_id, name = c.fetchone()
+        node_set(obj, 'class', type_id)
+
+        if use_id and name:
+            name = GLib.uri_escape_string(name, None, True)
+            node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}+{name}')
+        else:
+            node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}' if use_id else name)
 
         # Properties
         for row in c.execute('SELECT value, property_id FROM object_property WHERE ui_id=? AND object_id=?;',
