@@ -147,7 +147,7 @@ window.setupDocument = function (document) {
 ''', None, None)
 
     def _merengue_command(self, command, payload=None, args=None):
-        if self._merengue.stdin is None:
+        if self._merengue is None or self._merengue.stdin is None:
             return
 
         cmd = {
