@@ -36,6 +36,7 @@ class CmbObject(CmbBaseObject):
             return
 
         self._populate_properties()
+        self._populate_signals()
 
     def _populate_type_properties(self, name):
         property_info = self.project.get_type_properties(name)
@@ -77,6 +78,19 @@ class CmbObject(CmbBaseObject):
 
             self.layout.append(prop)
 
+    def _add_signal_object(self, signal):
+        self.signals.append(signal)
+        self.emit('signal-added', signal)
+        self.project._object_signal_added(self, signal)
+
+    def _populate_signals(self):
+        c = self.project.conn.cursor()
+
+        # Populate signals
+        for row in c.execute('SELECT * FROM object_signal WHERE ui_id=? AND object_id=?;',
+                             (self.ui_id, self.object_id)):
+            self._add_signal_object(CmbSignal.from_row(self.project, *row))
+
     @GObject.Property(type=int)
     def parent_id(self):
         retval = self.db_get('SELECT parent_id FROM object WHERE (ui_id, object_id) IS (?, ?);',
@@ -107,9 +121,8 @@ class CmbObject(CmbBaseObject):
                            user_data=user_data,
                            swap=swap,
                            after=after)
-        self.signals.append(signal)
-        self.emit('signal-added', signal)
-        self.project._object_signal_added(self, signal)
+
+        self._add_signal_object(signal)
 
         return signal
 

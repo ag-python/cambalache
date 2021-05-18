@@ -596,6 +596,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?);",
                       (ui_id, object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, ui_id, user_data, swap, after))
 
+        # Make sure object create its signals
+        obj._populate_signals()
+
         # Children
         for child in node.iterfind('child'):
             obj = child.find('object')
