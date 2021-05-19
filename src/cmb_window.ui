@@ -641,6 +641,8 @@
                           <object class="GtkViewport">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="margin-start">4</property>
+                            <property name="margin-end">4</property>
                             <child>
                               <object class="CmbObjectEditor" id="object_editor">
                                 <property name="visible">True</property>
@@ -659,6 +661,8 @@
                       <object class="GtkScrolledWindow">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="margin-start">4</property>
+                        <property name="margin-end">4</property>
                         <child>
                           <object class="GtkViewport">
                             <property name="visible">True</property>
@@ -686,7 +690,9 @@
                       <object class="CmbSignalEditor" id="signal_editor">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="border-width">4</property>
+                        <property name="margin-start">4</property>
+                        <property name="margin-end">4</property>
+                        <property name="margin-bottom">4</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">4</property>
                       </object>
