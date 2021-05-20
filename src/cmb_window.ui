@@ -345,7 +345,7 @@
                               <object class="GtkImage">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="resource">/ar/xjuan/Cambalache/App/images/gtk3.svg</property>
+                                <property name="resource">/ar/xjuan/Cambalache/images/gtk3.svg</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -357,7 +357,7 @@
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Gtk 3&lt;/b&gt;</property>
+                                <property name="label">&lt;b&gt;Gtk 3&lt;/b&gt;</property>
                                 <property name="use-markup">True</property>
                                 <property name="justify">center</property>
                               </object>
@@ -394,7 +394,7 @@
                               <object class="GtkImage">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="resource">/ar/xjuan/Cambalache/App/images/gtk4.svg</property>
+                                <property name="resource">/ar/xjuan/Cambalache/images/gtk4.svg</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -406,7 +406,7 @@
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Gtk 4&lt;/b&gt;</property>
+                                <property name="label">&lt;b&gt;Gtk 4&lt;/b&gt;</property>
                                 <property name="use-markup">True</property>
                                 <property name="justify">center</property>
                               </object>
@@ -956,10 +956,11 @@
     <property name="program-name">Cambalache</property>
     <property name="copyright" translatable="yes">© 2020-2021 Juan Pablo Ugarte - All Rights Reserved</property>
     <property name="comments" translatable="yes">UI Maker</property>
-    <property name="license" translatable="yes">This application is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied.</property>
+    <property name="license" translatable="yes">This application is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied.</property>
     <property name="authors">Juan Pablo Ugarte</property>
-    <property name="logo">resource:///ar/xjuan/Cambalache/App/images/cmb.svg</property>
+    <property name="logo-icon-name">ar.xjuan.Cambalache</property>
     <property name="license-type">custom</property>
     <signal name="delete-event" handler="on_about_dialog_delete_event" swapped="no"/>
     <child internal-child="vbox">

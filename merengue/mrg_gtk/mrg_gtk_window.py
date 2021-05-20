@@ -10,7 +10,7 @@ from gi.repository import GObject, Gdk, Gtk
 
 from .mrg_gtk_widget import MrgGtkWidgetController
 
-import utils
+from merengue import utils
 
 preselected_widget = None
 

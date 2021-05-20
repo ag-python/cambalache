@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Cambalache
+GenericName=UI Maker
+Exec=cambalache %f
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Development;GUIDesigner;
+MimeType=application/x-gtk-builder;application/x-glade;
+StartupNotify=true
+# TRANSLATORS: Don't translate this, its an icon name
+Icon=ar.xjuan.Cambalache
+# Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+Keywords=UI Maker;GUI designer;user interface;ui builder;

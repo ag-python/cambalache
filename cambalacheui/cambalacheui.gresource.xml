@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/ar/xjuan/Cambalache">
+  <gresource prefix="/ar/xjuan/Cambalacheui">
     <file>cmb_base.sql</file>
     <file>cmb_project.sql</file>
     <file>cmb_history.sql</file>

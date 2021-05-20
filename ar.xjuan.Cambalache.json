@@ -3,13 +3,15 @@
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "40",
     "sdk" : "org.gnome.Sdk",
-    "command" : "ar.xjuan.Cambalache",
+    "separate-locales": false,
+    "command" : "cambalache",
     "finish-args" : [
         "--share=ipc",
         "--share=network",
         "--socket=fallback-x11",
         "--socket=wayland",
-        "--filesystem=home"
+        "--filesystem=home",
+        "--device=dri"
     ],
     "cleanup" : [
         "/include",

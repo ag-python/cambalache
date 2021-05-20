@@ -14,10 +14,11 @@ import traceback
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gio, Gtk
 
-from cambalache import *
+from locale import gettext as _
+from cambalacheui import *
 
 
-@Gtk.Template(resource_path='/ar/xjuan/Cambalache/App/cmb_window.ui')
+@Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_window.ui')
 class CmbWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'CmbWindow'
 
@@ -152,7 +153,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         if len(value):
             return value.lower().rsplit('.', 1)[0] + '.ui'
         else:
-            return '<Choose a UI filename to create>'
+            return _('<Choose a UI filename to create>')
 
     def _is_project_visible(self):
         page = self.stack.get_visible_child_name()
@@ -238,7 +239,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                 flags=0,
                 message_type=Gtk.MessageType.INFO,
                 buttons=Gtk.ButtonsType.OK,
-                text=f'Error loading {filename}'
+                text=f_('Error loading {filename}')
             )
             print(traceback.format_exc())
 
@@ -246,7 +247,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             dialog.destroy()
 
     def _on_open_activate(self, action, data):
-        dialog = self._file_open_dialog_new("Choose file to open",
+        dialog = self._file_open_dialog_new(_("Choose file to open"),
                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
             self.emit('open-project', dialog.get_filename(), None)
@@ -289,7 +290,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                 flags=0,
                 message_type=Gtk.MessageType.INFO,
                 buttons=Gtk.ButtonsType.OK,
-                text="File name already exists, choose a different name.",
+                text=_("File name already exists, choose a different name."),
             )
 
             dialog.run()
@@ -321,7 +322,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self.project is None:
             return
 
-        dialog = self._file_open_dialog_new("Choose a new file to save the project",
+        dialog = self._file_open_dialog_new(_("Choose a new file to save the project"),
                                             Gtk.FileChooserAction.SAVE)
         if dialog.run() == Gtk.ResponseType.OK:
             self.project.filename = dialog.get_filename()
@@ -333,7 +334,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self.project is None:
             return
 
-        dialog = self._file_open_dialog_new("Choose a file name for the new UI",
+        dialog = self._file_open_dialog_new(_("Choose a file name for the new UI"),
                                             Gtk.FileChooserAction.SAVE)
         if dialog.run() == Gtk.ResponseType.OK:
             ui = self.project.add_ui(dialog.get_filename())
@@ -353,7 +354,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                     flags=0,
                     message_type=Gtk.MessageType.QUESTION,
                     buttons=Gtk.ButtonsType.YES_NO,
-                    text=f"Do you want to delete selected UI?",
+                    text=f_("Do you want to delete selected UI?"),
                 )
 
                 if dialog.run() == Gtk.ResponseType.YES:
@@ -367,7 +368,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self.project is None:
             return
 
-        dialog = self._file_open_dialog_new("Choose file to import",
+        dialog = self._file_open_dialog_new(_("Choose file to import"),
                                             filter_obj=self.import_filter)
         if dialog.run() == Gtk.ResponseType.OK:
             self.project.import_file(dialog.get_filename())

@@ -1,5 +1,8 @@
-gnome.compile_resources('cambalache',
-  'cambalache.gresource.xml',
+pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalacheui')
+moduledir = join_paths(get_option('prefix'), python_bin.get_install_dir(), 'cambalacheui')
+
+gnome.compile_resources('cambalacheui',
+  'cambalacheui.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,

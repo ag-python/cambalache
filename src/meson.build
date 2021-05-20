@@ -1,21 +1,22 @@
-gnome.compile_resources('cambalache_app',
-  'cambalache_app.gresource.xml',
+pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalache')
+moduledir = join_paths(pkgdatadir, 'cambalache')
+
+gnome.compile_resources('cambalache',
+  'cambalache.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
 )
 
-appdir = join_paths(python_dir, meson.project_name(), 'app')
-
 conf = configuration_data()
 conf.set('VERSION', meson.project_version())
-conf.set('PYTHON', python.find_installation('python3').path())
-conf.set('pythondir', python_dir)
+conf.set('PYTHON', python_bin.path())
+conf.set('localedir', localedir)
 conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
-  input: 'ar.xjuan.Cambalache.in',
-  output: 'ar.xjuan.Cambalache',
+  input: 'cambalache.in',
+  output: 'cambalache',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir')
@@ -26,7 +27,7 @@ configure_file(
   output: 'config.py',
   configuration: conf,
   install: true,
-  install_dir: appdir
+  install_dir: moduledir
 )
 
 run_command('python3', '-m', 'compileall', '-b', '.')
@@ -36,6 +37,6 @@ install_data([
     'cmb_application.pyc',
     'cmb_window.pyc'
     ],
-    install_dir: appdir)
+    install_dir: moduledir)
 
 

@@ -11,11 +11,12 @@ import os
 import sys
 import stat
 import signal
+
 import xml.etree.ElementTree as ET
 from gi.repository import GLib
 
 basedir = os.path.dirname(__file__)
-sys.path.insert(0, basedir)
+sys.path.insert(1, basedir)
 
 os.environ['PATH'] = os.path.join(basedir, 'merengue') + ':' + os.environ.get('PATH')
 
@@ -70,8 +71,8 @@ def configure_file(input_file, output_file, config):
 
 
 # Create config files pointing to source directories
-dev_config('cambalache/config.py',
-           f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'")
+dev_config('cambalacheui/config.py',
+           f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalacheui')}'")
 dev_config('merengue/config.py',
            f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('merengue')}'")
 dev_config('src/config.py',
@@ -79,14 +80,14 @@ dev_config('src/config.py',
 
 configure_file('merengue/merengue.in', 'merengue/merengue', {
     'PYTHON': GLib.find_program_in_path('python3'),
-    'pythondir': os.path.abspath('.')
+    'pkgdatadir': os.path.abspath('.')
 })
 os.chmod('merengue/merengue', stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
 # Ensure gresources are up to date
-compile_resource('cambalache', 'cambalache.gresource')
+compile_resource('cambalacheui', 'cambalacheui.gresource')
 compile_resource('merengue', 'merengue.gresource')
-compile_resource('src', 'cambalache_app.gresource')
+compile_resource('src', 'cambalache.gresource')
 
 from src import CmbApplication
 

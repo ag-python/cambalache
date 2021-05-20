@@ -14,6 +14,6 @@ Tool to generate GObject classes from DB tables
 ```
 flatpak-builder --force-clean --repo=repo build ar.xjuan.Cambalache.json
 flatpak build-bundle repo cambalache.flatpak ar.xjuan.Cambalache
-flatpak install cambalache.flatpak
+flatpak install --user cambalache.flatpak
 ```
 

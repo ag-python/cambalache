@@ -27,7 +27,7 @@ from .cmb_list_store import CmbListStore
 from .config import *
 
 def _get_text_resource(name):
-    gbytes = Gio.resources_lookup_data(f'/ar/xjuan/Cambalache/{name}',
+    gbytes = Gio.resources_lookup_data(f'/ar/xjuan/Cambalacheui/{name}',
                                        Gio.ResourceLookupFlags.NONE)
     return gbytes.get_data().decode('UTF-8')
 

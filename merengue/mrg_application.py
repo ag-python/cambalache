@@ -12,9 +12,9 @@ import sys
 import json
 
 from gi.repository import GLib, Gio, Gdk, Gtk
-import utils
 
-from controller import MrgControllerRegistry
+from merengue.controller import MrgControllerRegistry
+from merengue import utils
 
 
 class MrgApplication(Gtk.Application):
@@ -186,7 +186,7 @@ class MrgApplication(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         # TODO: support multiples plugins
-        import mrg_gtk
+        from merengue import mrg_gtk
         self.registry.load_module(mrg_gtk)
 
         stdin_channel = GLib.IOChannel.unix_new(sys.stdin.fileno())

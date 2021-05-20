@@ -94,7 +94,7 @@ class CmbProcess(GObject.Object):
         return self.emit('stdout', condition)
 
 
-@Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_view.ui')
+@Gtk.Template(resource_path='/ar/xjuan/Cambalacheui/cmb_view.ui')
 class CmbView(Gtk.Stack):
     __gtype_name__ = 'CmbView'
 

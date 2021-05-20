@@ -8,7 +8,7 @@
 import os
 from .config import *
 from gi.repository import Gio
-resource = Gio.Resource.load(os.path.join(pkgdatadir, 'cambalache.gresource'))
+resource = Gio.Resource.load(os.path.join(pkgdatadir, 'cambalacheui.gresource'))
 resource._register()
 
 from .cmb_ui import CmbUI

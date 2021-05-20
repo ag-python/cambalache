@@ -6,13 +6,15 @@ project(
 
 python = import('python')
 python_bin = python.find_installation('python3')
-python_dir = join_paths(get_option('prefix'), python_bin.get_install_dir())
-
-pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())
-moduledir = join_paths(python_dir, meson.project_name())
+localedir = join_paths(get_option('prefix'), get_option('localedir'))
 gnome = import('gnome')
 
-subdir('cambalache')
+i18n = import('i18n')
+
+subdir('data')
+subdir('cambalacheui')
 subdir('merengue')
 subdir('src')
+subdir('po')
 
+meson.add_install_script('postinstall.py')

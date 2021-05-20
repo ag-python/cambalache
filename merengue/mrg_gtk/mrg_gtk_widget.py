@@ -8,7 +8,7 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from controller import MrgController
+from merengue.controller import MrgController
 
 
 class MrgGtkWidgetController(MrgController):

@@ -12,9 +12,9 @@ import gi
 import sys
 import signal
 
-pythondir = '@pythondir@'
+pkgdatadir = '@pkgdatadir@'
 
-sys.path.insert(1, pythondir)
+sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 from gi.repository import GLib

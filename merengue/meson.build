@@ -1,4 +1,5 @@
-moduledir = join_paths(python_dir, 'merengue')
+pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'merengue')
+moduledir = join_paths(pkgdatadir, 'merengue')
 
 gnome.compile_resources('merengue',
   'merengue.gresource.xml',
@@ -9,8 +10,7 @@ gnome.compile_resources('merengue',
 
 conf = configuration_data()
 conf.set('VERSION', meson.project_version())
-conf.set('PYTHON', python.find_installation('python3').path())
-conf.set('pythondir', python_dir)
+conf.set('PYTHON', python_bin.path())
 conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
@@ -43,7 +43,7 @@ install_data([
   'controller/mrg_controller.pyc',
   'controller/mrg_controller_registry.pyc',
   ],
-  install_dir: join_paths(python_dir, 'controller')
+  install_dir: join_paths(moduledir, 'controller')
 )
 
 install_data([
@@ -51,13 +51,13 @@ install_data([
   'mrg_gtk/mrg_gtk_widget.pyc',
   'mrg_gtk/mrg_gtk_window.pyc',
   ],
-  install_dir: join_paths(python_dir, 'mrg_gtk')
+  install_dir: join_paths(moduledir, 'mrg_gtk')
 )
 
 install_data([
   'utils/__init__.pyc',
   'utils/utils.pyc',
   ],
-  install_dir: join_paths(python_dir, 'utils')
+  install_dir: join_paths(moduledir, 'utils')
 )
 

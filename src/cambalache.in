@@ -11,12 +11,19 @@ import os
 import sys
 import signal
 
-pythondir = '@pythondir@'
+pkgdatadir = '@pkgdatadir@'
+localedir = '@localedir@'
 
-sys.path.insert(1, pythondir)
+sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+print(pkgdatadir, localedir)
 
-from cambalache.app import CmbApplication
+import locale
+locale.bindtextdomain("cambalache", localedir)
+locale.textdomain("cambalache")
+
+
+from cambalache import CmbApplication
 
 if __name__ == '__main__':
     app = CmbApplication()
