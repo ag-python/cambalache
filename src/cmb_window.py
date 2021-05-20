@@ -23,7 +23,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'CmbWindow'
 
     __gsignals__ = {
-        'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str)),
+        'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str, str)),
         'cmb-action': (GObject.SIGNAL_RUN_LAST | GObject.SIGNAL_ACTION, None, (str, )),
     }
 
@@ -143,7 +143,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         uri = recent.get_current_uri()
         if uri is not None:
             filename, host = GLib.filename_from_uri(uri)
-            self.emit('open-project', filename, None)
+            self.emit('open-project', filename, None, None)
 
     @Gtk.Template.Callback('on_np_cancel_button_clicked')
     def _on_np_cancel_button_clicked(self, button):
@@ -228,9 +228,13 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         return dialog
 
-    def open_project(self, filename, target_tk=None):
+    def open_project(self, filename, target_tk=None, uiname=None):
         try:
             self.project = CmbProject(filename=filename, target_tk=target_tk)
+            if uiname:
+                ui = self.project.add_ui(uiname)
+                self.project.set_selection([ui])
+
             self._set_page('workspace')
             self._update_actions()
         except Exception as e:
@@ -250,7 +254,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         dialog = self._file_open_dialog_new(_("Choose file to open"),
                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
-            self.emit('open-project', dialog.get_filename(), None)
+            self.emit('open-project', dialog.get_filename(), None, None)
 
         dialog.destroy()
 
@@ -298,11 +302,8 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.set_focus(self.np_name_entry)
             return
 
-        self.emit('open-project', filename, target_tk)
-
-        if self.project:
-            ui = self.project.add_ui(os.path.join(location, uiname))
-            self.project.set_selection([ui])
+        self.emit('open-project', filename, target_tk, os.path.join(location, uiname))
+        self._set_page('workspace' if self.project is not None else 'cambalache')
 
     def _on_undo_activate(self, action, data):
         if self.project is not None:

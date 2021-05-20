@@ -26,7 +26,7 @@ class CmbApplication(Gtk.Application):
         super().__init__(application_id='ar.xjuan.Cambalache',
                          flags=Gio.ApplicationFlags.HANDLES_OPEN)
 
-    def open(self, path, target_tk=None):
+    def open(self, path, target_tk=None, uiname=None):
         window = None
 
         for win in self.get_windows():
@@ -37,7 +37,7 @@ class CmbApplication(Gtk.Application):
             window = CmbWindow(application=self)
             window.connect('open-project', self._on_open_project)
             if path is not None:
-                window.open_project(path, target_tk=target_tk)
+                window.open_project(path, target_tk=target_tk, uiname=uiname)
             self.add_window(window)
 
         window.present()
@@ -67,11 +67,11 @@ class CmbApplication(Gtk.Application):
         if self.props.active_window is None:
             self.open(None)
 
-    def _on_open_project(self, window, filename, target_tk):
+    def _on_open_project(self, window, filename, target_tk, uiname):
         if window.project is None:
-            window.open_project(filename, target_tk)
+            window.open_project(filename, target_tk, uiname)
         else:
-            self.open(filename, target_tk)
+            self.open(filename, target_tk, uiname)
 
     def _on_quit_activate(self, action, data):
         self.quit()
