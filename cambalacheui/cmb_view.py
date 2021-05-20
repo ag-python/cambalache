@@ -276,7 +276,8 @@ window.setupDocument = function (document) {
             self._broadwayd.connect('exit', self._on_process_exit)
 
             self._port = self._find_free_port()
-            self._broadwayd.run([f'--port={self._port}'])
+            display = self._port - 8080
+            self._broadwayd.run([f':{display}'])
 
     @Gtk.Template.Callback('on_context_menu')
     def _on_context_menu(self, webview, menu, e, hit_test_result):
