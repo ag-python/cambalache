@@ -32,6 +32,27 @@ class GirData:
 
         self._instances = {}
 
+        # Supported param specs
+        self.pspec_map = {
+            'GParamBoolean':  'gboolean',
+            'GParamChar':  'gchar',
+            'GParamUChar':  'guchar',
+            'GParamInt':  'gint',
+            'GParamUInt':  'guint',
+            'GParamLong':  'glong',
+            'GParamULong':  'gulong',
+            'GParamInt64':  'gint64',
+            'GParamUInt64':  'guint64',
+            'GParamFloat':  'gfloat',
+            'GParamDouble':  'gdouble',
+            'GParamEnum':  'enum',
+            'GParamFlags':  'flags',
+            'GParamString':  'gchararray',
+            'GParamObject':  'object',
+            'GParamUnichar':  'gunichar',
+            'GParamGType':  'gtype'
+        }
+
         tree = etree.parse(gir_file)
         root = tree.getroot()
 
@@ -253,6 +274,15 @@ class GirData:
 
         self.types.update(layout_types)
 
+        # Remove Accessible derived classes
+        toremove = []
+        for name in self.types:
+            if self._type_is_a(name, 'GtkAccessible'):
+                toremove.append(name)
+
+        for key in toremove:
+            del self.types[key]
+
     def _gtk4_init(self):
         # Mark Layout classes
         for name in self.types:
@@ -278,21 +308,24 @@ class GirData:
             if type is None or child.get('writable') != '1':
                 continue
 
-            type_name = type.get('name')
-
-            # FIXME: Ignore types defined in other NS for now
-            if type_name is None or type_name.find('.') >= 0:
-                continue
-
-            # FIXME: Crappy test to see if types refers to an object
-            if type_name[0].isupper():
-                type_name = self.name + type_name
-
-            if type_name == 'utf8':
-                type_name = 'gchararray'
-
             # Property pspec
             pspec = pspecs.get(name, None)
+
+            pspec_type_name = GObject.type_name(pspec) if pspec else None
+
+            type_name = self.pspec_map.get(pspec_type_name, None)
+            if type_name is None:
+                continue
+
+            if type_name == 'object' or type_name == 'enum' or type_name == 'flags':
+                type_name = type.get('name', 'GObject')
+
+                # FIXME: Ignore types defined in other NS for now
+                if type_name.find('.') >= 0:
+                    continue
+
+                if type_name != 'GObject':
+                    type_name = self.prefix + type_name
 
             retval[name] = {
                 'type': type_name,
@@ -346,14 +379,12 @@ class GirData:
 
         is_container = False
 
+        props = CmbUtils.get_class_properties(name)
+
         if use_instance:
             instance = self._get_instance_from_type(name)
-            props = instance.list_properties() if instance is not None else None
-
             if instance is not None:
                 is_container = CmbUtils.implements_buildable_add_child(instance)
-        else:
-            props = None
 
         return {
             'parent': parent,
