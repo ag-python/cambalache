@@ -14,7 +14,10 @@ INSERT INTO type_flags VALUES
 ('GBindingFlags', 'sync_create', 'sync-create', 2, 'G_BINDING_SYNC_CREATE', 'Synchronize the values of the source and target properties when creating the binding; the direction of the synchronization is always from the source to the target.');
 
 INSERT INTO property VALUES
+('GBinding', 'flags', 'GBindingFlags', NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'source', 'GObject', NULL, NULL, NULL, NULL, '2.26', NULL),
 ('GBinding', 'source-property', 'gchararray', NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'target', 'GObject', NULL, NULL, NULL, NULL, '2.26', NULL),
 ('GBinding', 'target-property', 'gchararray', NULL, NULL, NULL, NULL, '2.26', NULL);
 
 INSERT INTO signal VALUES
