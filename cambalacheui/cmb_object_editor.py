@@ -299,6 +299,10 @@ class CmbObjectEditor(Gtk.Box):
 
             if type_id == 'gboolean':
                 editor = CmbSwitch()
+            if type_id == 'gunichar':
+                editor = CmbEntry(hexpand=True,
+                                  max_length=1,
+                                  placeholder_text=f'<{type_id}>')
             elif type_id == 'gchar' or type_id == 'guchar' or \
                  type_id == 'gint' or type_id == 'guint' or \
                  type_id == 'glong' or type_id == 'gulong' or \
