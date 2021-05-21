@@ -71,11 +71,10 @@ CREATE INDEX IF NOT EXISTS type_library_id_fk ON type (library_id);
 /* Add fundamental types */
 INSERT INTO type (type_id) VALUES
  ('object'), ('interface'), ('enum'), ('flags'), ('gtype'),
- ('gchar'), ('guchar'), ('gchararray'),
+ ('gchar'), ('guchar'), ('gunichar'), ('gchararray'),
  ('gboolean'),
  ('gint'), ('guint'), ('glong'), ('gulong'), ('gint64'), ('guint64'),
- ('gfloat'), ('gdouble'),
- ('gpointer'), ('gboxed'), ('gparam'), ('gvariant');
+ ('gfloat'), ('gdouble');
 
 
 /* Type Interfaces
