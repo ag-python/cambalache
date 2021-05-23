@@ -84,7 +84,7 @@ class CmbObject(CmbBaseObject):
         self.project._object_signal_added(self, signal)
 
     def _populate_signals(self):
-        c = self.project.conn.cursor()
+        c = self.project.db.cursor()
 
         # Populate signals
         for row in c.execute('SELECT * FROM object_signal WHERE ui_id=? AND object_id=?;',
@@ -128,12 +128,12 @@ class CmbObject(CmbBaseObject):
 
     def add_signal(self, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         try:
-            c = self.project.conn.cursor()
+            c = self.project.db.cursor()
             c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
                       (self.ui_id, self.object_id, owner_id, signal_id, handler, detail, user_data, swap, after))
             signal_pk = c.lastrowid
             c.close()
-            self.project.conn.commit()
+            self.project.db.commit()
         except Exception as e:
             print('add_signal', e)
             return None
@@ -154,9 +154,9 @@ class CmbObject(CmbBaseObject):
 
     def remove_signal(self, signal):
         try:
-            self.project.conn.execute("DELETE FROM object_signal WHERE signal_pk=?;",
-                                      (signal.signal_pk, ))
-            self.project.conn.commit()
+            self.project.db.execute("DELETE FROM object_signal WHERE signal_pk=?;",
+                                    (signal.signal_pk, ))
+            self.project.db.commit()
         except Exception as e:
             print('remove_signal', e)
             return False

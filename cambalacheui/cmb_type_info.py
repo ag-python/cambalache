@@ -27,7 +27,7 @@ class CmbTypeInfo(CmbBaseTypeInfo):
     def _init_enum_flags(self, name):
         retval = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_INT)
 
-        for row in self.project.conn.execute(f'SELECT name, nick, value FROM type_{name} WHERE type_id=?', (self.type_id,)):
+        for row in self.project.db.execute(f'SELECT name, nick, value FROM type_{name} WHERE type_id=?', (self.type_id,)):
             retval.append(row)
 
         return retval

@@ -28,7 +28,7 @@ class CmbListStore(Gtk.ListStore):
         self._populate()
 
     def _populate(self):
-        c = self.project.conn.cursor()
+        c = self.project.db.cursor()
         for row in c.execute(self.query):
             self.append(row)
 

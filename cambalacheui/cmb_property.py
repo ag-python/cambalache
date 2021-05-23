@@ -22,7 +22,7 @@ class CmbProperty(CmbBaseProperty):
 
     @GObject.property(type=str)
     def value(self):
-        c = self.project.conn.execute("SELECT value FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
+        c = self.project.db.execute("SELECT value FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
                                         (self.ui_id,
                                          self.object_id,
                                          self.owner_id,
@@ -32,7 +32,7 @@ class CmbProperty(CmbBaseProperty):
 
     @value.setter
     def _set_value(self, value):
-        c = self.project.conn.cursor()
+        c = self.project.db.cursor()
 
         if value is None or value == self.info.default_value:
             c.execute("DELETE FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
