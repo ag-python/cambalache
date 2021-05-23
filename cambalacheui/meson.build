@@ -24,6 +24,7 @@ run_command('python3', '-m', 'compileall', '-b', '.')
 
 install_data([
     'cmb_base.pyc',
+    'cmb_db.pyc',
     'cmb_objects_base.pyc',
     'cmb_tree_view.pyc',
     'cmb_list_store.pyc',
