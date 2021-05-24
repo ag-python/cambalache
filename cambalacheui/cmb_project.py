@@ -10,6 +10,8 @@ import os
 import sys
 import gi
 
+from locale import gettext as _
+
 from lxml import etree
 from lxml.builder import E
 
@@ -283,7 +285,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def save(self):
         self.db.save(self.filename)
 
-    def _import_object(self, builder_ver, ui_id, node, parent_id):
+    def _import_object(self, ui_id, node, parent_id):
         c = self.db.cursor()
         klass = node.get('class')
         name = node.get('id')
@@ -341,10 +343,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         for child in node.iterfind('child'):
             obj = child.find('object')
             if obj is not None:
-                self._import_object(builder_ver, ui_id, obj, object_id)
+                self._import_object(ui_id, obj, object_id)
 
         # Packing properties
-        if builder_ver == 3:
+        if self.target_tk == 'gtk+-3.0':
             # Gtk 3, packing props are sibling to <object>
             packing = node.getnext()
             if packing is not None and packing.tag != 'packing':
@@ -360,7 +362,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if parent_type is None:
                 return
 
-            if builder_ver == 3:
+            if self.target_tk == 'gtk+-3.0':
                 # For Gtk 3 we fake a LayoutChild class for each GtkContainer
                 owner_id = f'Cambalache{parent_type[0]}LayoutChild'
             else:
@@ -375,40 +377,46 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.close()
 
     def import_file(self, filename, overwrite=False):
-        self.history_push(f'Import file "{filename}"')
+        tree = etree.parse(filename)
+        root = tree.getroot()
 
+        # Requires
+        target_tk = None
+        for req in root.iterfind('requires'):
+            lib = req.get('lib')
+            version = req.get('version')
+
+            if lib == 'gtk':
+                target_tk = 'gtk-4.0'
+            elif lib == 'gtk+':
+                target_tk = 'gtk+-3.0'
+
+            # TODO: look for layout properties tag to infer if its for gtk 4 or 3
+
+        if target_tk not in ['gtk+-3.0', 'gtk-4.0']:
+            raise Exception(_('Could not determine gtk version'))
+
+        if target_tk != self.target_tk:
+            raise Exception(_('Target version mismatch'))
+
+        self.history_push(_(f'Import file "{filename}"'))
         c = self.db.cursor()
 
         # Remove old UI
         if overwrite:
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
-        tree = etree.parse(filename)
-        root = tree.getroot()
-
-        # Requires
-        builder_ver = 4
-        for req in root.iterfind('requires'):
-            lib = req.get('lib')
-            version = req.get('version')
-
-            if lib == 'gtk+':
-                builder_ver = 3;
-
-            if lib == 'gtk' or lib == 'gtk+':
-                self.target_tk = f'{lib}-{version}'
-
         ui = self.add_ui(filename)
 
         for child in root.iterfind('object'):
-            self._import_object(builder_ver, ui.ui_id, child, None)
+            self._import_object(ui.ui_id, child, None)
             self.db.commit()
 
         c.close()
 
         self.history_pop()
 
-    def _get_object(self, builder_ver, ui_id, object_id, use_id=False):
+    def _get_object(self, ui_id, object_id, use_id=False):
         def node_set(node, attr, val):
             if val is not None:
                 node.set(attr, str(val))
@@ -449,18 +457,18 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Children
         for row in c.execute('SELECT object_id FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
             child_id = row[0]
-            child_obj = self._get_object(builder_ver, ui_id, child_id, use_id=use_id)
+            child_obj = self._get_object(ui_id, child_id, use_id=use_id)
             child = E.child(child_obj)
 
             # Packing / Layout
-            layout = E('packing' if builder_ver == 3 else 'layout')
+            layout = E('packing' if self.target_tk == 'gtk+-3.0' else 'layout')
 
             for prop in cc.execute('SELECT value, property_id FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=?;',
                                  (ui_id, object_id, child_id)):
                 layout.append(E.property(prop[0], name=prop[1]))
 
             if len(layout) > 0:
-                if builder_ver == 3:
+                if self.target_tk == 'gtk+-3.0':
                     child.append(layout)
                 else:
                     child_obj.append(layout)
@@ -478,16 +486,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
 
         # requires
-        builder_ver = 4
         for row in c.execute('SELECT library_id, version FROM ui_library WHERE ui_id=?;', (ui_id,)):
             node.append(E.requires(lib=row[0], version=row[1]))
-            if row[0] == 'gtk+':
-                builder_ver = 3;
 
         # Iterate over toplovel objects
         for row in c.execute('SELECT object_id FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
-            child = self._get_object(builder_ver, ui_id, row[0], use_id)
+            child = self._get_object(ui_id, row[0], use_id)
             node.append(child)
 
         c.close()
@@ -556,7 +561,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         dirname = os.path.dirname(self.filename)
         relpath = os.path.relpath(filename, dirname)
         try:
-            self.history_push(f"Add UI {basename}")
+            self.history_push(_(f"Add UI {basename}"))
             c = self.db.cursor()
             c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
                       (basename, relpath))
@@ -584,7 +589,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def remove_ui(self, ui):
         try:
-            self.history_push(f'Remove UI "{ui.name}"')
+            self.history_push(_(f'Remove UI "{ui.name}"'))
             self.db.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
             self.history_pop()
             self.db.commit()
@@ -665,7 +670,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def remove_object(self, obj):
         try:
             name = obj.name if obj.name is not None else obj.type_id
-            self.history_push(f'Remove object {name}')
+            self.history_push(_(f'Remove object {name}'))
             self.db.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;",
                             (obj.ui_id, obj.object_id))
             self.history_pop()
@@ -907,29 +912,29 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             msg = {
                 'ui': {
-                    'INSERT': 'Create UI {ui}',
-                    'DELETE': 'Remove UI {ui}',
-                    'UPDATE': 'Update UI {ui}'
+                    'INSERT': _('Create UI {ui}'),
+                    'DELETE': _('Remove UI {ui}'),
+                    'UPDATE': _('Update UI {ui}')
                 },
                 'object': {
-                    'INSERT': 'Create object {obj}',
-                    'DELETE': 'Remove object {obj}',
-                    'UPDATE': 'Update object {obj}'
+                    'INSERT': _('Create object {obj}'),
+                    'DELETE': _('Remove object {obj}'),
+                    'UPDATE': _('Update object {obj}')
                 },
                 'object_property': {
-                    'INSERT': 'Set property "{prop}" of {obj} to {value}',
-                    'DELETE': 'Unset property "{prop}" of {obj}',
-                    'UPDATE': 'Update property "{prop}" of {obj} to {value}'
+                    'INSERT': _('Set property "{prop}" of {obj} to {value}'),
+                    'DELETE': _('Unset property "{prop}" of {obj}'),
+                    'UPDATE': _('Update property "{prop}" of {obj} to {value}')
                 },
                 'object_layout_property': {
-                    'INSERT': 'Set layout property "{prop}" of {obj} to {value}',
-                    'DELETE': 'Unset layout property "{prop}" of {obj}',
-                    'UPDATE': 'Update layout property "{prop}" of {obj} to {value}'
+                    'INSERT': _('Set layout property "{prop}" of {obj} to {value}'),
+                    'DELETE': _('Unset layout property "{prop}" of {obj}'),
+                    'UPDATE': _('Update layout property "{prop}" of {obj} to {value}')
                 },
                 'object_signal': {
-                    'INSERT': 'Add {signal} signal to {obj}',
-                    'DELETE': 'Remove {signal} signal from {obj}',
-                    'UPDATE': 'Update {signal} signal of {obj}'
+                    'INSERT': _('Add {signal} signal to {obj}'),
+                    'DELETE': _('Remove {signal} signal from {obj}'),
+                    'UPDATE': _('Update {signal} signal of {obj}')
                 },
             }.get(table, {}).get(command, None)
 
