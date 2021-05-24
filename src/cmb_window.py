@@ -228,6 +228,17 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         return dialog
 
+    def present_message_to_user(self, message):
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.OK,
+            text=message
+        )
+        dialog.run()
+        dialog.destroy()
+
     def open_project(self, filename, target_tk=None, uiname=None):
         try:
             self.project = CmbProject(filename=filename, target_tk=target_tk)
@@ -238,17 +249,8 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._set_page('workspace')
             self._update_actions()
         except Exception as e:
-            dialog = Gtk.MessageDialog(
-                transient_for=self,
-                flags=0,
-                message_type=Gtk.MessageType.INFO,
-                buttons=Gtk.ButtonsType.OK,
-                text=f_('Error loading {filename}')
-            )
             print(traceback.format_exc())
-
-            dialog.run()
-            dialog.destroy()
+            self.present_message_to_user(_(f'Error loading {filename}'))
 
     def _on_open_activate(self, action, data):
         dialog = self._file_open_dialog_new(_("Choose file to open"),
@@ -289,16 +291,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             uiname = self.np_ui_entry.props.placeholder_text
 
         if os.path.exists(filename):
-            dialog = Gtk.MessageDialog(
-                transient_for=self,
-                flags=0,
-                message_type=Gtk.MessageType.INFO,
-                buttons=Gtk.ButtonsType.OK,
-                text=_("File name already exists, choose a different name."),
-            )
-
-            dialog.run()
-            dialog.destroy()
+            self.present_message_to_user(_("File name already exists, choose a different name."))
             self.set_focus(self.np_name_entry)
             return
 
@@ -355,7 +348,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                     flags=0,
                     message_type=Gtk.MessageType.QUESTION,
                     buttons=Gtk.ButtonsType.YES_NO,
-                    text=f_("Do you want to delete selected UI?"),
+                    text=_(f"Do you want to delete selected UI?"),
                 )
 
                 if dialog.run() == Gtk.ResponseType.YES:
@@ -372,7 +365,11 @@ class CmbWindow(Gtk.ApplicationWindow):
         dialog = self._file_open_dialog_new(_("Choose file to import"),
                                             filter_obj=self.import_filter)
         if dialog.run() == Gtk.ResponseType.OK:
-            self.project.import_file(dialog.get_filename())
+            try:
+                filename = dialog.get_filename()
+                self.project.import_file(filename)
+            except Exception as e:
+                self.present_message_to_user(_(f"Error importing {filename}: {e}"))
 
         dialog.destroy()
 
