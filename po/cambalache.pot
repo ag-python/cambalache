@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-20 17:11-0300\n"
+"POT-Creation-Date: 2021-05-24 19:38-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,28 +113,145 @@ msgstr ""
 msgid "Inspect UI definition"
 msgstr ""
 
+#: cambalacheui/cmb_project.py:395
+msgid "Could not determine gtk version"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:398
+msgid "Target version mismatch"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:400
+#, python-brace-format
+msgid "Import file \"{filename}\""
+msgstr ""
+
+#: cambalacheui/cmb_project.py:562
+#, python-brace-format
+msgid "Add UI {basename}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:590
+#, python-brace-format
+msgid "Remove UI \"{ui.name}\""
+msgstr ""
+
+#: cambalacheui/cmb_project.py:671
+#, python-brace-format
+msgid "Remove object {name}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:913
+#, python-brace-format
+msgid "Create UI {ui}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:914
+#, python-brace-format
+msgid "Remove UI {ui}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:915
+#, python-brace-format
+msgid "Update UI {ui}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:918
+#, python-brace-format
+msgid "Create object {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:919
+#, python-brace-format
+msgid "Remove object {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:920
+#, python-brace-format
+msgid "Update object {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:923
+#, python-brace-format
+msgid "Set property \"{prop}\" of {obj} to {value}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:924
+#, python-brace-format
+msgid "Unset property \"{prop}\" of {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:925
+#, python-brace-format
+msgid "Update property \"{prop}\" of {obj} to {value}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:928
+#, python-brace-format
+msgid "Set layout property \"{prop}\" of {obj} to {value}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:929
+#, python-brace-format
+msgid "Unset layout property \"{prop}\" of {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:930
+#, python-brace-format
+msgid "Update layout property \"{prop}\" of {obj} to {value}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:933
+#, python-brace-format
+msgid "Add {signal} signal to {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:934
+#, python-brace-format
+msgid "Remove {signal} signal from {obj}"
+msgstr ""
+
+#: cambalacheui/cmb_project.py:935
+#, python-brace-format
+msgid "Update {signal} signal of {obj}"
+msgstr ""
+
 #: src/cmb_window.py:156
 msgid "<Choose a UI filename to create>"
 msgstr ""
 
-#: src/cmb_window.py:250
+#: src/cmb_window.py:253
+#, python-brace-format
+msgid "Error loading {filename}"
+msgstr ""
+
+#: src/cmb_window.py:256
 msgid "Choose file to open"
 msgstr ""
 
-#: src/cmb_window.py:293
+#: src/cmb_window.py:294
 msgid "File name already exists, choose a different name."
 msgstr ""
 
-#: src/cmb_window.py:325
+#: src/cmb_window.py:319
 msgid "Choose a new file to save the project"
 msgstr ""
 
-#: src/cmb_window.py:337
+#: src/cmb_window.py:331
 msgid "Choose a file name for the new UI"
 msgstr ""
 
-#: src/cmb_window.py:371
+#: src/cmb_window.py:351
+msgid "Do you want to delete selected UI?"
+msgstr ""
+
+#: src/cmb_window.py:365
 msgid "Choose file to import"
+msgstr ""
+
+#: src/cmb_window.py:372
+#, python-brace-format
+msgid "Error importing {filename}: {e}"
 msgstr ""
 
 #: src/cmb_window.ui:31
