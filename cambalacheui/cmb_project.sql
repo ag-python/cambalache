@@ -29,6 +29,7 @@ CREATE TABLE ui (
   authors TEXT,
   license_id TEXT REFERENCES license,
   translation_domain TEXT,
+  comment TEXT,
   FOREIGN KEY(ui_id, template_id) REFERENCES object(ui_id, object_id) ON DELETE SET NULL
 );
 
@@ -42,6 +43,7 @@ CREATE TABLE ui_library (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   library_id TEXT,
   version TEXT,
+  comment TEXT,
   PRIMARY KEY(ui_id, library_id),
   FOREIGN KEY(library_id, version) REFERENCES library_version
 ) WITHOUT ROWID;
@@ -58,6 +60,7 @@ CREATE TABLE object (
   type_id TEXT NOT NULL REFERENCES type,
   name TEXT,
   parent_id INTEGER,
+  comment TEXT,
   PRIMARY KEY(ui_id, object_id),
   FOREIGN KEY(ui_id, parent_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE
 ) WITHOUT ROWID;
@@ -78,6 +81,7 @@ CREATE TABLE object_property (
 
   value TEXT,
   translatable BOOLEAN,
+  comment TEXT,
   PRIMARY KEY(ui_id, object_id, owner_id, property_id),
   FOREIGN KEY(ui_id, object_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE,
   FOREIGN KEY(owner_id, property_id) REFERENCES property
@@ -100,6 +104,7 @@ CREATE TABLE object_layout_property (
 
   value TEXT,
   translatable BOOLEAN,
+  comment TEXT,
   PRIMARY KEY(ui_id, object_id, child_id, owner_id, property_id),
   FOREIGN KEY(ui_id, object_id) REFERENCES object ON DELETE CASCADE,
   FOREIGN KEY(ui_id, child_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE,
@@ -125,6 +130,7 @@ CREATE TABLE object_signal (
   user_data INTEGER,
   swap BOOLEAN,
   after BOOLEAN,
+  comment TEXT,
   FOREIGN KEY(ui_id, object_id) REFERENCES object ON DELETE CASCADE,
   FOREIGN KEY(owner_id, signal_id) REFERENCES signal
 );

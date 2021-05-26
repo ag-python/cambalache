@@ -285,6 +285,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def save(self):
         self.db.save(self.filename)
 
+    def comment_from_node(self, node):
+        prev = node.getprevious()
+        if prev is not None and prev.tag is etree.Comment:
+            return prev.text
+        return None
+
     def _import_object(self, ui_id, node, parent_id):
         c = self.db.cursor()
         klass = node.get('class')
@@ -293,11 +299,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Insert object
         obj = self.add_object(ui_id, klass, name, parent_id)
         object_id = obj.object_id
+        comment = self.comment_from_node(node)
+        if comment:
+            obj.comment = comment
 
         # Properties
         for prop in node.iterfind('property'):
             property_id = prop.get('name')
             translatable = prop.get('translatable', None)
+            comment = self.comment_from_node(prop)
 
             # Find owner type for property
             c.execute("SELECT owner_id FROM property WHERE property_id=? AND owner_id IN (SELECT parent_id FROM type_tree WHERE type_id=? UNION SELECT ?);",
@@ -306,8 +316,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             # Insert property
             if owner_id:
-                c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?);",
-                          (ui_id, object_id, owner_id[0], property_id, prop.text, translatable))
+                try:
+                    c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                              (ui_id, object_id, owner_id[0], property_id, prop.text, translatable, comment))
+                except Exception as e:
+                    raise Exception(f'Can not save object {object_id} {property_id} property: {e}')
             else:
                 print(f'Could not find owner type for {klass}:{property_id}')
 
@@ -326,6 +339,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             user_data = signal.get('object')
             swap = signal.get('swapped')
             after = signal.get('after')
+            comment = self.comment_from_node(signal)
 
             # Find owner type for signal
             c.execute("SELECT owner_id FROM signal WHERE signal_id=? AND owner_id IN (SELECT parent_id FROM type_tree WHERE type_id=? UNION SELECT ?);",
@@ -333,8 +347,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             owner_id = c.fetchone()
 
             # Insert signal
-            c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?);",
-                      (ui_id, object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, ui_id, user_data, swap, after))
+            try:
+                c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
+                          (ui_id, object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
+            except Exception as e:
+                raise Exception(f'Can not save object {object_id} {signal_id} signal: {e}')
 
         # Make sure object create its signals
         obj._populate_signals()
@@ -364,27 +381,37 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             if self.target_tk == 'gtk+-3.0':
                 # For Gtk 3 we fake a LayoutChild class for each GtkContainer
-                owner_id = f'Cambalache{parent_type[0]}LayoutChild'
+                owner_id = f'{parent_type[0]}LayoutChild'
             else:
                 # FIXME: Need to get layout-manager-type from class
                 owner_id = f'{parent_type[0]}LayoutChild'
 
             for prop in packing.iterfind('property'):
+                comment = self.comment_from_node(prop)
                 property_id = prop.get('name')
                 translatable = prop.get('translatable', None)
-                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                          (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable))
+                try:
+                    c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                              (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment))
+                except Exception as e:
+                    raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} layout property: {e}')
         c.close()
 
     def import_file(self, filename, overwrite=False):
         tree = etree.parse(filename)
         root = tree.getroot()
 
-        # Requires
+        requirements = {}
+        req_comments = {}
+
+        # Collect requirements, comments and target_tk
         target_tk = None
         for req in root.iterfind('requires'):
             lib = req.get('lib')
             version = req.get('version')
+
+            requirements[lib] = version
+            req_comments[lib] = self.comment_from_node(req)
 
             if lib == 'gtk':
                 target_tk = 'gtk-4.0'
@@ -393,6 +420,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             # TODO: look for layout properties tag to infer if its for gtk 4 or 3
 
+        # Make sure we support target_tk
         if target_tk not in ['gtk+-3.0', 'gtk-4.0']:
             raise Exception(_('Could not determine gtk version'))
 
@@ -406,8 +434,21 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if overwrite:
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
-        ui = self.add_ui(filename)
+        ui = self.add_ui(filename, requirements)
 
+        # Update requirement comments
+        for key in req_comments:
+            comment = req_comments[key]
+            if comment:
+                c.execute('UPDATE ui_library SET comment=? WHERE ui_id=? AND library_id=?;',
+                          (comment, ui.ui_id, key))
+
+        # Update interface comment
+        comment = self.comment_from_node(root)
+        if comment and not comment.startswith('Created with Cambalache'):
+            ui.comment = comment
+
+        # Import objects
         for child in root.iterfind('object'):
             self._import_object(ui.ui_id, child, None)
             self.db.commit()
@@ -415,6 +456,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.close()
 
         self.history_pop()
+
+    def node_add_comment(self, node, comment):
+        if comment:
+            node.addprevious(etree.Comment(comment))
 
     def _get_object(self, ui_id, object_id, use_id=False):
         def node_set(node, attr, val):
@@ -436,15 +481,17 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}' if use_id else name)
 
         # Properties
-        for row in c.execute('SELECT value, property_id FROM object_property WHERE ui_id=? AND object_id=?;',
+        for row in c.execute('SELECT value, property_id, comment FROM object_property WHERE ui_id=? AND object_id=?;',
                              (ui_id, object_id,)):
-            val, name = row
-            obj.append(E.property(row[0], name=row[1]))
+            val, name, comment = row
+            node = E.property(val, name=name)
+            obj.append(node)
+            self.node_add_comment(node, comment)
 
         # Signals
-        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after FROM object_signal WHERE ui_id=? AND object_id=?;',
+        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after, comment FROM object_signal WHERE ui_id=? AND object_id=?;',
                              (ui_id, ui_id, object_id,)):
-            signal_id, handler, detail, data, swap, after = row
+            signal_id, handler, detail, data, swap, after, comment = row
             name = f'{signal_id}::{detail}' if detail is not None else signal_id
             node = E.signal(name=name, handler=handler)
             node_set(node, 'object', data)
@@ -453,19 +500,24 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if after:
                 node_set(node, 'after', 'yes')
             obj.append(node)
+            self.node_add_comment(node, comment)
 
         # Children
-        for row in c.execute('SELECT object_id FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
-            child_id = row[0]
+        for row in c.execute('SELECT object_id, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
+            child_id, comment = row
             child_obj = self._get_object(ui_id, child_id, use_id=use_id)
             child = E.child(child_obj)
+            self.node_add_comment(child_obj, comment)
 
             # Packing / Layout
             layout = E('packing' if self.target_tk == 'gtk+-3.0' else 'layout')
 
-            for prop in cc.execute('SELECT value, property_id FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=?;',
+            for prop in cc.execute('SELECT value, property_id, comment FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=?;',
                                  (ui_id, object_id, child_id)):
-                layout.append(E.property(prop[0], name=prop[1]))
+                value, property_id, comment = prop
+                node = E.property(value, name=property_id)
+                layout.append(node)
+                self.node_add_comment(node, comment)
 
             if len(layout) > 0:
                 if self.target_tk == 'gtk+-3.0':
@@ -485,15 +537,24 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         node = E.interface()
         node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
 
+        c.execute('SELECT comment FROM ui WHERE ui_id=?;', (ui_id,))
+        comment, = c.fetchone()
+        self.node_add_comment(node, comment)
+
         # requires
-        for row in c.execute('SELECT library_id, version FROM ui_library WHERE ui_id=?;', (ui_id,)):
-            node.append(E.requires(lib=row[0], version=row[1]))
+        for row in c.execute('SELECT library_id, version, comment FROM ui_library WHERE ui_id=?;', (ui_id,)):
+            library_id, version, comment = row
+            req = E.requires(lib=library_id, version=version)
+            self.node_add_comment(req, comment)
+            node.append(req)
 
         # Iterate over toplovel objects
-        for row in c.execute('SELECT object_id FROM object WHERE parent_id IS NULL AND ui_id=?;',
+        for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
-            child = self._get_object(ui_id, row[0], use_id)
+            object_id, comment = row
+            child = self._get_object(ui_id, object_id, use_id)
             node.append(child)
+            self.node_add_comment(child, comment)
 
         c.close()
 
@@ -537,7 +598,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         else:
             self.emit('selection-changed')
 
-    def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
+    def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
         ui = CmbUI(project=self,
                    ui_id=ui_id,
                    template_id=template_id if template_id is not None else 0,
@@ -547,7 +608,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                    copyright=copyright,
                    authors=authors,
                    license_id=license_id,
-                   translation_domain=translation_domain)
+                   translation_domain=translation_domain,
+                   comment=comment)
 
         self._object_id[ui_id] = self._store.append(None, [ui])
 
@@ -556,7 +618,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         return ui
 
-    def add_ui(self, filename):
+    def add_ui(self, filename, requirements={}):
         basename = os.path.basename(filename)
         dirname = os.path.dirname(self.filename)
         relpath = os.path.relpath(filename, dirname)
@@ -567,17 +629,16 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                       (basename, relpath))
             ui_id = c.lastrowid
 
-            token = self.target_tk.split('-')
-
-            c.execute('INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);',
-                      (ui_id, token[0], token[1]))
+            for req in requirements:
+                c.execute('INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);',
+                          (ui_id, req, requirements[req]))
             c.close()
             self.history_pop()
             self.db.commit()
         except:
             return None
         else:
-            return self._add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None)
+            return self._add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None, None)
 
     def _remove_ui(self, ui):
         iter_ = self._object_id.pop(ui.ui_id, None)
@@ -597,14 +658,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             pass
 
-    def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None):
+    def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, comment=None):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,
                         type_id=obj_type,
                         name=name,
                         parent_id=parent_id if parent_id is not None else 0,
-                        info=self._type_info[obj_type])
+                        info=self._type_info[obj_type],
+                        comment=comment)
 
         if obj.parent_id == 0:
             parent = self._object_id.get(obj.ui_id, None)

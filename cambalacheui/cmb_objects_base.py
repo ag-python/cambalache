@@ -99,7 +99,7 @@ class CmbBaseUI(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain):
+    def from_row(cls, project, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
         return cls(project=project,
                    ui_id=ui_id)
 
@@ -183,6 +183,16 @@ class CmbBaseUI(CmbBase):
         self.db_set('UPDATE ui SET translation_domain=? WHERE (ui_id) IS (?);',
                     (self.ui_id, ), value)
 
+    @GObject.Property(type=str)
+    def comment(self):
+        return self.db_get('SELECT comment FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @comment.setter
+    def _set_comment(self, value):
+        self.db_set('UPDATE ui SET comment=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
 
 class CmbBaseProperty(CmbBase):
     __gtype_name__ = 'CmbBaseProperty'
@@ -196,7 +206,7 @@ class CmbBaseProperty(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable):
+    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable, comment):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id,
@@ -223,6 +233,16 @@ class CmbBaseProperty(CmbBase):
         self.db_set('UPDATE object_property SET translatable=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
                     (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
 
+    @GObject.Property(type=str)
+    def comment(self):
+        return self.db_get('SELECT comment FROM object_property WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.property_id, ))
+
+    @comment.setter
+    def _set_comment(self, value):
+        self.db_set('UPDATE object_property SET comment=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
+
 
 class CmbBaseLayoutProperty(CmbBase):
     __gtype_name__ = 'CmbBaseLayoutProperty'
@@ -237,7 +257,7 @@ class CmbBaseLayoutProperty(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, child_id, owner_id, property_id, value, translatable):
+    def from_row(cls, project, ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id,
@@ -265,6 +285,16 @@ class CmbBaseLayoutProperty(CmbBase):
         self.db_set('UPDATE object_layout_property SET translatable=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
                     (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
 
+    @GObject.Property(type=str)
+    def comment(self):
+        return self.db_get('SELECT comment FROM object_layout_property WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ))
+
+    @comment.setter
+    def _set_comment(self, value):
+        self.db_set('UPDATE object_layout_property SET comment=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
+
 
 class CmbSignal(CmbBase):
     __gtype_name__ = 'CmbSignal'
@@ -275,7 +305,7 @@ class CmbSignal(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, signal_pk, ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after):
+    def from_row(cls, project, signal_pk, ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment):
         return cls(project=project,
                    signal_pk=signal_pk)
 
@@ -369,6 +399,16 @@ class CmbSignal(CmbBase):
         self.db_set('UPDATE object_signal SET after=? WHERE (signal_pk) IS (?);',
                     (self.signal_pk, ), value)
 
+    @GObject.Property(type=str)
+    def comment(self):
+        return self.db_get('SELECT comment FROM object_signal WHERE (signal_pk) IS (?);',
+                           (self.signal_pk, ))
+
+    @comment.setter
+    def _set_comment(self, value):
+        self.db_set('UPDATE object_signal SET comment=? WHERE (signal_pk) IS (?);',
+                    (self.signal_pk, ), value)
+
 
 class CmbBaseObject(CmbBase):
     __gtype_name__ = 'CmbBaseObject'
@@ -380,7 +420,7 @@ class CmbBaseObject(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id):
+    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, comment):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id)
@@ -413,4 +453,14 @@ class CmbBaseObject(CmbBase):
     @parent_id.setter
     def _set_parent_id(self, value):
         self.db_set('UPDATE object SET parent_id=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=str)
+    def comment(self):
+        return self.db_get('SELECT comment FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @comment.setter
+    def _set_comment(self, value):
+        self.db_set('UPDATE object SET comment=? WHERE (ui_id, object_id) IS (?, ?);',
                     (self.ui_id, self.object_id, ), value)
