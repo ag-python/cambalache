@@ -340,3 +340,28 @@ class CmbDB(GObject.GObject):
 
     def execute(self, *args):
         return self.conn.execute(*args)
+
+    def add_ui(self, name, filename, requirements={}, comment=None):
+        c = self.conn.cursor()
+        c.execute("INSERT INTO ui (name, filename, comment) VALUES (?, ?, ?);",
+                  (name, filename, comment))
+        ui_id = c.lastrowid
+
+        for req in requirements:
+            c.execute('INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);',
+                      (ui_id, req, requirements[req]))
+        c.close()
+
+        return ui_id
+
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, comment=None):
+        c = self.conn.cursor()
+
+        c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
+        object_id = c.fetchone()[0]
+
+        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?);",
+                  (ui_id, object_id, obj_type, name, parent_id, comment))
+        c.close()
+
+        return object_id
