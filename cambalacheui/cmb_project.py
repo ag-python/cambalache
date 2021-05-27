@@ -267,11 +267,19 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.db.load(self.filename)
         self.history_enabled = True
 
+        self._populate_objects()
+
+    def _populate_objects(self, ui_id=None):
         c = self.db.cursor()
         cc = self.db.cursor()
 
+        if ui_id:
+            rows = c.execute('SELECT * FROM ui WHERE ui_id=?;', (ui_id, ))
+        else:
+            rows = c.execute('SELECT * FROM ui;')
+
         # Populate tree view
-        for row in c.execute('SELECT * FROM ui;'):
+        for row in rows:
             ui_id = row[0]
             self._add_ui(False, *row)
 
@@ -292,20 +300,22 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         return None
 
     def _import_object(self, ui_id, node, parent_id):
-        c = self.db.cursor()
         klass = node.get('class')
         name = node.get('id')
+        comment = self.comment_from_node(node)
 
         # Insert object
-        obj = self.add_object(ui_id, klass, name, parent_id)
-        object_id = obj.object_id
-        comment = self.comment_from_node(node)
-        if comment:
-            obj.comment = comment
+        try:
+            object_id = self.db.add_object(ui_id, klass, name, parent_id, comment)
+        except:
+            print('Error importing', klass)
+            return
+
+        c = self.db.cursor()
 
         # Properties
         for prop in node.iterfind('property'):
-            property_id = prop.get('name')
+            property_id = prop.get('name').replace('_', '-')
             translatable = prop.get('translatable', None)
             comment = self.comment_from_node(prop)
 
@@ -353,9 +363,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             except Exception as e:
                 raise Exception(f'Can not save object {object_id} {signal_id} signal: {e}')
 
-        # Make sure object create its signals
-        obj._populate_signals()
-
         # Children
         for child in node.iterfind('child'):
             obj = child.find('object')
@@ -388,7 +395,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             for prop in packing.iterfind('property'):
                 comment = self.comment_from_node(prop)
-                property_id = prop.get('name')
+                property_id = prop.get('name').replace('_', '-')
                 translatable = prop.get('translatable', None)
                 try:
                     c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
@@ -404,8 +411,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         requirements = {}
         req_comments = {}
 
+        # Default to Gtk 3
+        target_tk = 'gtk+-3.0'
+
         # Collect requirements, comments and target_tk
-        target_tk = None
         for req in root.iterfind('requires'):
             lib = req.get('lib')
             version = req.get('version')
@@ -415,8 +424,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
             if lib == 'gtk':
                 target_tk = 'gtk-4.0'
-            elif lib == 'gtk+':
-                target_tk = 'gtk+-3.0'
 
             # TODO: look for layout properties tag to infer if its for gtk 4 or 3
 
@@ -434,26 +441,32 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if overwrite:
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
-        ui = self.add_ui(filename, requirements)
+
+        # Update interface comment
+        comment = self.comment_from_node(root)
+        if comment and comment.startswith('Created with Cambalache'):
+            comment = None
+
+        basename = os.path.basename(filename)
+        dirname = os.path.dirname(self.filename)
+        relpath = os.path.relpath(filename, dirname)
+        ui_id = self.db.add_ui(basename, relpath, requirements, comment)
 
         # Update requirement comments
         for key in req_comments:
             comment = req_comments[key]
             if comment:
                 c.execute('UPDATE ui_library SET comment=? WHERE ui_id=? AND library_id=?;',
-                          (comment, ui.ui_id, key))
-
-        # Update interface comment
-        comment = self.comment_from_node(root)
-        if comment and not comment.startswith('Created with Cambalache'):
-            ui.comment = comment
+                          (comment, ui_id, key))
 
         # Import objects
         for child in root.iterfind('object'):
-            self._import_object(ui.ui_id, child, None)
+            self._import_object(ui_id, child, None)
             self.db.commit()
 
         c.close()
+
+        self._populate_objects(ui_id)
 
         self.history_pop()
 
@@ -624,17 +637,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         relpath = os.path.relpath(filename, dirname)
         try:
             self.history_push(_(f"Add UI {basename}"))
-            c = self.db.cursor()
-            c.execute("INSERT INTO ui (name, filename) VALUES (?, ?);",
-                      (basename, relpath))
-            ui_id = c.lastrowid
-
-            for req in requirements:
-                c.execute('INSERT INTO ui_library (ui_id, library_id, version) VALUES (?, ?, ?);',
-                          (ui_id, req, requirements[req]))
-            c.close()
-            self.history_pop()
+            ui_id = self.db.add_ui(basename, relpath, requirements)
             self.db.commit()
+            self.history_pop()
         except:
             return None
         else:
@@ -687,15 +692,18 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if obj_info is None or parent_info is None:
             return False
 
-        # Only GtkWidget can be a child
-        if not obj_info.is_a('GtkWidget'):
-            return False
+        if parent_info.is_a('GtkWidget'):
+            # Only GtkWidget can be a child
+            if not obj_info.is_a('GtkWidget'):
+                return False
 
-        # GtkWindow can not be a child
-        if obj_info.is_a('GtkWindow'):
-            return False
+            # GtkWindow can not be a child
+            if obj_info.is_a('GtkWindow'):
+                return False
 
-        return parent_info.layout == 'container'
+            return parent_info.layout == 'container'
+        else:
+            return True
 
     def add_object(self, ui_id, obj_type, name=None, parent_id=None):
         if parent_id:
@@ -706,18 +714,10 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if not self._check_can_add(obj_type, parent.type_id):
                 return None
 
-        c = self.db.cursor()
-
         try:
-            # Insert object
-            c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
-            object_id = c.fetchone()[0]
-
-            c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id) VALUES (?, ?, ?, ?, ?);",
-                      (ui_id, object_id, obj_type, name, parent_id))
-            c.close()
+            object_id = self.db.add_object(ui_id, obj_type, name, parent_id)
             self.db.commit()
-        except:
+        except Exception as e:
             return None
         else:
             return self._add_object(True, ui_id, object_id, obj_type, name, parent_id)

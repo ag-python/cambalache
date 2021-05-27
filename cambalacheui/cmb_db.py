@@ -16,6 +16,8 @@ from lxml.builder import E
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
+from .config import *
+
 
 def _get_text_resource(name):
     gbytes = Gio.resources_lookup_data(f'/ar/xjuan/Cambalacheui/{name}',
