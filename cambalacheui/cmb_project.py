@@ -470,123 +470,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.history_pop()
 
-    def node_add_comment(self, node, comment):
-        if comment:
-            node.addprevious(etree.Comment(comment))
-
-    def _get_object(self, ui_id, object_id, use_id=False):
-        def node_set(node, attr, val):
-            if val is not None:
-                node.set(attr, str(val))
-
-        c = self.db.cursor()
-        cc = self.db.cursor()
-        obj = E.object()
-
-        c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
-        type_id, name = c.fetchone()
-        node_set(obj, 'class', type_id)
-
-        if use_id and name:
-            name = GLib.uri_escape_string(name, None, True)
-            node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}+{name}')
-        else:
-            node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}' if use_id else name)
-
-        # Properties
-        for row in c.execute('SELECT value, property_id, comment FROM object_property WHERE ui_id=? AND object_id=?;',
-                             (ui_id, object_id,)):
-            val, name, comment = row
-            node = E.property(val, name=name)
-            obj.append(node)
-            self.node_add_comment(node, comment)
-
-        # Signals
-        for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after, comment FROM object_signal WHERE ui_id=? AND object_id=?;',
-                             (ui_id, ui_id, object_id,)):
-            signal_id, handler, detail, data, swap, after, comment = row
-            name = f'{signal_id}::{detail}' if detail is not None else signal_id
-            node = E.signal(name=name, handler=handler)
-            node_set(node, 'object', data)
-            if swap:
-                node_set(node, 'swapped', 'yes')
-            if after:
-                node_set(node, 'after', 'yes')
-            obj.append(node)
-            self.node_add_comment(node, comment)
-
-        # Children
-        for row in c.execute('SELECT object_id, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
-            child_id, comment = row
-            child_obj = self._get_object(ui_id, child_id, use_id=use_id)
-            child = E.child(child_obj)
-            self.node_add_comment(child_obj, comment)
-
-            # Packing / Layout
-            layout = E('packing' if self.target_tk == 'gtk+-3.0' else 'layout')
-
-            for prop in cc.execute('SELECT value, property_id, comment FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=?;',
-                                 (ui_id, object_id, child_id)):
-                value, property_id, comment = prop
-                node = E.property(value, name=property_id)
-                layout.append(node)
-                self.node_add_comment(node, comment)
-
-            if len(layout) > 0:
-                if self.target_tk == 'gtk+-3.0':
-                    child.append(layout)
-                else:
-                    child_obj.append(layout)
-
-            obj.append(child)
-
-        c.close()
-        cc.close()
-        return obj
-
-    def export_ui(self, ui_id, filename=None, use_id=False):
-        c = self.db.cursor()
-
-        node = E.interface()
-        node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
-
-        c.execute('SELECT comment FROM ui WHERE ui_id=?;', (ui_id,))
-        comment, = c.fetchone()
-        self.node_add_comment(node, comment)
-
-        # requires
-        for row in c.execute('SELECT library_id, version, comment FROM ui_library WHERE ui_id=?;', (ui_id,)):
-            library_id, version, comment = row
-            req = E.requires(lib=library_id, version=version)
-            self.node_add_comment(req, comment)
-            node.append(req)
-
-        # Iterate over toplovel objects
-        for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
-                             (ui_id,)):
-            object_id, comment = row
-            child = self._get_object(ui_id, object_id, use_id)
-            node.append(child)
-            self.node_add_comment(child, comment)
-
-        c.close()
-
-        tree = etree.ElementTree(node)
-
-        if filename is not None:
-            # Dump xml to file
-            with open(filename, 'wb') as fd:
-                tree.write(fd,
-                           pretty_print=True,
-                           xml_declaration=True,
-                           encoding='UTF-8')
-                fd.close()
-        else:
-            return etree.tostring(tree,
-                                  pretty_print=True,
-                                  xml_declaration=True,
-                                  encoding='UTF-8')
-
     def export(self):
         c = self.db.cursor()
 
@@ -597,9 +480,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             filename = os.path.splitext(row[1])[0] + '.cmb.ui'
 
             if os.path.isabs(filename):
-                self.export_ui(row[0], filename)
+                self.db.export_ui(row[0], filename)
             else:
-                self.export_ui(row[0], os.path.join(dirname, filename))
+                self.db.export_ui(row[0], os.path.join(dirname, filename))
 
         c.close()
 

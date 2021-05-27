@@ -172,18 +172,18 @@ window.setupDocument = function (document) {
     def _update_view(self):
         if self._project is not None and self._ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self._project.export_ui(self._ui_id)
-                self.buffer.set_text(ui.decode('UTF-8'))
+                ui = self._project.db.export_ui(self._ui_id)
+                self.buffer.set_text(ui)
             return
 
         self.buffer.set_text('')
         self._ui_id = 0
 
     def _merengue_update_ui(self, ui_id):
-        ui = self._project.export_ui(ui_id, use_id=True)
+        ui = self._project.db.export_ui(ui_id, use_id=True)
 
         self._merengue_command('update_ui',
-                               payload=ui.decode('UTF-8'),
+                               payload=ui,
                                args={ 'ui_id': ui_id })
 
     def _on_object_added(self, project, obj):
