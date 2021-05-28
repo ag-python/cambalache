@@ -9,6 +9,7 @@
 import os
 import sys
 import gi
+import time
 
 from locale import gettext as _
 
@@ -293,182 +294,29 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def save(self):
         self.db.save(self.filename)
 
-    def comment_from_node(self, node):
-        prev = node.getprevious()
-        if prev is not None and prev.tag is etree.Comment:
-            return prev.text
-        return None
-
-    def _import_object(self, ui_id, node, parent_id):
-        klass = node.get('class')
-        name = node.get('id')
-        comment = self.comment_from_node(node)
-
-        # Insert object
-        try:
-            object_id = self.db.add_object(ui_id, klass, name, parent_id, comment)
-        except:
-            print('Error importing', klass)
-            return
-
-        c = self.db.cursor()
-
-        # Properties
-        for prop in node.iterfind('property'):
-            property_id = prop.get('name').replace('_', '-')
-            translatable = prop.get('translatable', None)
-            comment = self.comment_from_node(prop)
-
-            # Find owner type for property
-            c.execute("SELECT owner_id FROM property WHERE property_id=? AND owner_id IN (SELECT parent_id FROM type_tree WHERE type_id=? UNION SELECT ?);",
-                      (property_id, klass, klass))
-            owner_id = c.fetchone()
-
-            # Insert property
-            if owner_id:
-                try:
-                    c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                              (ui_id, object_id, owner_id[0], property_id, prop.text, translatable, comment))
-                except Exception as e:
-                    raise Exception(f'Can not save object {object_id} {property_id} property: {e}')
-            else:
-                print(f'Could not find owner type for {klass}:{property_id}')
-
-        # Signals
-        for signal in node.iterfind('signal'):
-            tokens = signal.get('name').split('::')
-
-            if len(tokens) > 1:
-                signal_id = tokens[0]
-                detail = tokens[1]
-            else:
-                signal_id = tokens[0]
-                detail = None
-
-            handler = signal.get('handler')
-            user_data = signal.get('object')
-            swap = signal.get('swapped')
-            after = signal.get('after')
-            comment = self.comment_from_node(signal)
-
-            # Find owner type for signal
-            c.execute("SELECT owner_id FROM signal WHERE signal_id=? AND owner_id IN (SELECT parent_id FROM type_tree WHERE type_id=? UNION SELECT ?);",
-                      (signal_id, klass, klass))
-            owner_id = c.fetchone()
-
-            # Insert signal
-            try:
-                c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
-                          (ui_id, object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
-            except Exception as e:
-                raise Exception(f'Can not save object {object_id} {signal_id} signal: {e}')
-
-        # Children
-        for child in node.iterfind('child'):
-            obj = child.find('object')
-            if obj is not None:
-                self._import_object(ui_id, obj, object_id)
-
-        # Packing properties
-        if self.target_tk == 'gtk+-3.0':
-            # Gtk 3, packing props are sibling to <object>
-            packing = node.getnext()
-            if packing is not None and packing.tag != 'packing':
-                packing = None
-        else:
-            # Gtk 4, layout props are children of <object>
-            packing = node.find('layout')
-
-        if parent_id and packing is not None:
-            c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
-            parent_type = c.fetchone()
-
-            if parent_type is None:
-                return
-
-            if self.target_tk == 'gtk+-3.0':
-                # For Gtk 3 we fake a LayoutChild class for each GtkContainer
-                owner_id = f'{parent_type[0]}LayoutChild'
-            else:
-                # FIXME: Need to get layout-manager-type from class
-                owner_id = f'{parent_type[0]}LayoutChild'
-
-            for prop in packing.iterfind('property'):
-                comment = self.comment_from_node(prop)
-                property_id = prop.get('name').replace('_', '-')
-                translatable = prop.get('translatable', None)
-                try:
-                    c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                              (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment))
-                except Exception as e:
-                    raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} layout property: {e}')
-        c.close()
-
     def import_file(self, filename, overwrite=False):
-        tree = etree.parse(filename)
-        root = tree.getroot()
-
-        requirements = {}
-        req_comments = {}
-
-        # Default to Gtk 3
-        target_tk = 'gtk+-3.0'
-
-        # Collect requirements, comments and target_tk
-        for req in root.iterfind('requires'):
-            lib = req.get('lib')
-            version = req.get('version')
-
-            requirements[lib] = version
-            req_comments[lib] = self.comment_from_node(req)
-
-            if lib == 'gtk':
-                target_tk = 'gtk-4.0'
-
-            # TODO: look for layout properties tag to infer if its for gtk 4 or 3
-
-        # Make sure we support target_tk
-        if target_tk not in ['gtk+-3.0', 'gtk-4.0']:
-            raise Exception(_('Could not determine gtk version'))
-
-        if target_tk != self.target_tk:
-            raise Exception(_('Target version mismatch'))
+        start = time.monotonic()
 
         self.history_push(_(f'Import file "{filename}"'))
-        c = self.db.cursor()
 
         # Remove old UI
         if overwrite:
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
+        # Import file
+        ui_id = self.db.import_file(self._type_info,
+                                    filename,
+                                    os.path.dirname(self.filename))
 
-        # Update interface comment
-        comment = self.comment_from_node(root)
-        if comment and comment.startswith('Created with Cambalache'):
-            comment = None
+        import_end = time.monotonic()
 
-        basename = os.path.basename(filename)
-        dirname = os.path.dirname(self.filename)
-        relpath = os.path.relpath(filename, dirname)
-        ui_id = self.db.add_ui(basename, relpath, requirements, comment)
-
-        # Update requirement comments
-        for key in req_comments:
-            comment = req_comments[key]
-            if comment:
-                c.execute('UPDATE ui_library SET comment=? WHERE ui_id=? AND library_id=?;',
-                          (comment, ui_id, key))
-
-        # Import objects
-        for child in root.iterfind('object'):
-            self._import_object(ui_id, child, None)
-            self.db.commit()
-
-        c.close()
-
+        # Populate UI
         self._populate_objects(ui_id)
 
         self.history_pop()
+
+        print('Import took:', import_end - start,
+              'UI update:', time.monotonic() - import_end)
 
     def export(self):
         c = self.db.cursor()
