@@ -370,13 +370,15 @@ class CmbDB(GObject.GObject):
 
         return object_id
 
-    def _import_object(self, ui_id, node, parent_id):
+    def _import_object(self, type_info, ui_id, node, parent_id):
         klass = node.get('class')
         name = node.get('id')
         comment = self._node_get_comment(node)
+        info = type_info.get(klass, None)
 
         # Insert object
         try:
+            assert info
             object_id = self.add_object(ui_id, klass, name, parent_id, comment)
         except:
             print('Error importing', klass)
@@ -384,34 +386,33 @@ class CmbDB(GObject.GObject):
 
         c = self.conn.cursor()
 
-        # TODO: use type info from project instead
-        hierarchy = [klass]
-        for row in c.execute("SELECT parent_id FROM type_tree WHERE type_id=?;", (klass, )):
-            hierarchy.append(row[0])
-
-        hierarchy_str = '", "'.join(hierarchy)
-        property_owner = f'SELECT owner_id FROM property WHERE property_id=? AND owner_id IN ("{hierarchy_str}");'
-        signal_owner = f'SELECT owner_id FROM signal WHERE signal_id=? AND owner_id IN ("{hierarchy_str}");'
-
         # Properties
         for prop in node.iterfind('property'):
             property_id = prop.get('name').replace('_', '-')
             translatable = prop.get('translatable', None)
             comment = self._node_get_comment(prop)
 
+            owner_id = None
+
             # Find owner type for property
-            c.execute(property_owner, (property_id, ))
-            owner_id = c.fetchone()
+            if property_id in info.properties:
+                owner_id = klass
+            else:
+                for parent in info.hierarchy:
+                    pinfo = type_info[parent]
+                    if property_id in pinfo.properties:
+                        owner_id = parent
+                        break
 
             # Insert property
             if owner_id:
                 try:
                     c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                              (ui_id, object_id, owner_id[0], property_id, prop.text, translatable, comment))
+                              (ui_id, object_id, owner_id, property_id, prop.text, translatable, comment))
                 except Exception as e:
-                    raise Exception(f'Can not save object {object_id} {property_id} property: {e}')
+                    raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} property: {e}')
             else:
-                print(f'Could not find owner type for {klass}:{property_id}')
+                print(f'Could not find owner type for {klass}:{property_id} property')
 
         # Signals
         for signal in node.iterfind('signal'):
@@ -431,21 +432,30 @@ class CmbDB(GObject.GObject):
             comment = self._node_get_comment(signal)
 
             # Find owner type for signal
-            c.execute(signal_owner, (signal_id, ))
-            owner_id = c.fetchone()
+            if signal_id in info.signals:
+                owner_id = klass
+            else:
+                for parent in info.hierarchy:
+                    pinfo = type_info[parent]
+                    if signal_id in pinfo.signals:
+                        owner_id = parent
+                        break
 
             # Insert signal
-            try:
-                c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
-                          (ui_id, object_id, owner_id[0] if owner_id else None, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
-            except Exception as e:
-                raise Exception(f'Can not save object {object_id} {signal_id} signal: {e}')
+            if owner_id:
+                try:
+                    c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
+                              (ui_id, object_id, owner_id, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
+                except Exception as e:
+                    raise Exception(f'Can not save object {object_id} {owner_id}:{signal_id} signal: {e}')
+            else:
+                print(f'Could not find owner type for {klass}:{signal_id} signal')
 
         # Children
         for child in node.iterfind('child'):
             obj = child.find('object')
             if obj is not None:
-                self._import_object(ui_id, obj, object_id)
+                self._import_object(type_info, ui_id, obj, object_id)
 
         # Packing properties
         if self.target_tk == 'gtk+-3.0':
@@ -503,7 +513,7 @@ class CmbDB(GObject.GObject):
 
         return retval
 
-    def import_file(self, filename, projectdir='.'):
+    def import_file(self, type_info, filename, projectdir='.'):
         tree = etree.parse(filename)
         root = tree.getroot()
 
@@ -526,7 +536,7 @@ class CmbDB(GObject.GObject):
 
         # Import objects
         for child in root.iterfind('object'):
-            self._import_object(ui_id, child, None)
+            self._import_object(type_info, ui_id, child, None)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)

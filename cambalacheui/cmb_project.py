@@ -75,9 +75,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.type_list = None
 
-        # Property Information
-        self._property_info = {}
-
         # Selection
         self._selection = []
 
@@ -198,18 +195,30 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def _init_type_info(self, c):
         owner_id = None
-        props = None
 
         # Dictionary with all the types hierarchy
         type_hierarchy = {}
         type_id = None
         hierarchy = None
-        for row in c.execute('SELECT type_id, parent_id FROM type_tree;'):
+        for row in c.execute('SELECT type_id, parent_id FROM type_tree WHERE parent_id != "object";'):
             if type_id != row[0]:
                 type_id = row[0]
                 hierarchy = []
                 type_hierarchy[type_id] = hierarchy
             hierarchy.append(row[1])
+
+        # Dictionary with all the type properties
+        type_properties = {}
+        owner_id = None
+        props = None
+        for row in c.execute("SELECT * FROM property ORDER BY owner_id, property_id;"):
+            if owner_id != row[0]:
+                owner_id = row[0]
+                props = {}
+                type_properties[owner_id] = props
+
+            property_id = row[1]
+            props[property_id] = CmbPropertyInfo.from_row(self, *row)
 
         # Dictionary with all the type signals
         type_signals = {}
@@ -218,9 +227,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         for row in c.execute('SELECT * FROM signal ORDER BY owner_id, signal_id;'):
             if owner_id != row[0]:
                 owner_id = row[0]
-                signals = []
+                signals = {}
                 type_signals[owner_id] = signals
-            signals.append(CmbSignalInfo.from_row(self, *row))
+
+            signal_id = row[1]
+            signals[signal_id] = CmbSignalInfo.from_row(self, *row)
 
         for row in c.execute('''SELECT * FROM type
                                   WHERE
@@ -229,21 +240,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             type_id = row[0]
             info = CmbTypeInfo.from_row(self, *row)
             info.hierarchy = type_hierarchy.get(type_id, [])
-            info.signals = type_signals.get(type_id, [])
+            info.properties = type_properties.get(type_id, {})
+            info.signals = type_signals.get(type_id, {})
             self._type_info[type_id] = info
-
-    def _init_property_info(self, c):
-        owner_id = None
-        props = None
-
-        for row in c.execute("SELECT * FROM property ORDER BY owner_id, property_id;"):
-            if owner_id != row[0]:
-                owner_id = row[0]
-                props = {}
-                self._property_info[owner_id] = props
-
-            property_id = row[1]
-            props[property_id] = CmbPropertyInfo.from_row(self, *row)
 
     def _init_data(self):
         if self.target_tk is None:
@@ -255,8 +254,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._init_list_stores()
 
         self._init_type_info(c)
-
-        self._init_property_info(c)
 
         c.close()
 
@@ -758,7 +755,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._undo_redo(False)
 
     def get_type_properties(self, name):
-        return self._property_info.get(name, None)
+        info = self._type_info.get(name, None)
+        return info.properties if info else None
 
     def _object_property_changed(self, ui_id, object_id, prop):
         self.emit('object-property-changed',

@@ -189,7 +189,8 @@ class CmbSignalEditor(Gtk.Box):
                                         False,
                                         False,
                                         None))
-        for signal in info.signals:
+        for signal_id in info.signals:
+            signal = info.signals[signal_id]
             self.treestore.append(parent,
                                   (None,
                                    info.type_id,

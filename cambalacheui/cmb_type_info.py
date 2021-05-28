@@ -16,7 +16,8 @@ from .cmb_objects_base import CmbBaseTypeInfo
 class CmbTypeInfo(CmbBaseTypeInfo):
     def __init__(self, **kwargs):
         self.hierarchy = []
-        self.signals = []
+        self.properties = {}
+        self.signals = {}
         super().__init__(**kwargs)
 
         if self.parent_id == 'enum':
