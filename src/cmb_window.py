@@ -365,13 +365,14 @@ class CmbWindow(Gtk.ApplicationWindow):
         dialog = self._file_open_dialog_new(_("Choose file to import"),
                                             filter_obj=self.import_filter)
         if dialog.run() == Gtk.ResponseType.OK:
+            filename = dialog.get_filename()
+            dialog.destroy()
             try:
-                filename = dialog.get_filename()
                 self.project.import_file(filename)
             except Exception as e:
                 self.present_message_to_user(_(f"Error importing {filename}: {e}"))
-
-        dialog.destroy()
+        else:
+            dialog.destroy()
 
     def _on_export_activate(self, action, data):
         if self.project is not None:
