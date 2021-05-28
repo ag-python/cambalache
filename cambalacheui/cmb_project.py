@@ -340,17 +340,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             self.emit('selection-changed')
 
     def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
-        ui = CmbUI(project=self,
-                   ui_id=ui_id,
-                   template_id=template_id if template_id is not None else 0,
-                   name=name,
-                   filename=filename,
-                   description=description,
-                   copyright=copyright,
-                   authors=authors,
-                   license_id=license_id,
-                   translation_domain=translation_domain,
-                   comment=comment)
+        ui = CmbUI(project=self, ui_id=ui_id)
 
         self._object_id[ui_id] = self._store.append(None, [ui])
 
@@ -395,18 +385,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,
-                        type_id=obj_type,
-                        name=name,
-                        parent_id=parent_id if parent_id is not None else 0,
-                        info=self._type_info[obj_type],
-                        comment=comment)
+                        info=self._type_info[obj_type])
 
-        if obj.parent_id == 0:
-            parent = self._object_id.get(obj.ui_id, None)
+        if parent_id:
+            parent = self._object_id.get(f'{ui_id}.{parent_id}', None)
         else:
-            parent = self._object_id.get(f'{obj.ui_id}.{obj.parent_id}', None)
+            parent = self._object_id.get(ui_id, None)
 
-        self._object_id[f'{obj.ui_id}.{obj.object_id}'] = self._store.append(parent, [obj])
+        self._object_id[f'{ui_id}.{object_id}'] = self._store.append(parent, [obj])
 
         if emit:
             self.emit('object-added', obj)
