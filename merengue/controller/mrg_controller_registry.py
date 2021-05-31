@@ -44,6 +44,10 @@ class MrgControllerRegistry(GObject.GObject):
 
         while gtype and klass is None:
             klass = self.registry.get(gtype, None)
-            gtype = GObject.type_parent(gtype)
+            try:
+                gtype = GObject.type_parent(gtype)
+            except:
+                gtype = None
+                break
 
-        return klass(object=obj)
+        return klass(object=obj) if klass else MrgController(object=obj)
