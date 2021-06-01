@@ -56,7 +56,11 @@ class MrgApplication(Gtk.Application):
 
         # Build everything
         builder = Gtk.Builder()
-        builder.add_from_string(payload)
+
+        try:
+            builder.add_from_string(payload)
+        except Exception as e:
+            self.print(e)
 
         # Keep dict of all object controllers by id
         for obj in builder.get_objects():
@@ -129,9 +133,12 @@ class MrgApplication(Gtk.Application):
         # Add class to selected objects
         for object_id in selection:
             controller = self.get_controller(ui_id, object_id)
+            if controller is None:
+                continue
+
             obj = controller.object
 
-            if controller and issubclass(type(obj), Gtk.Widget):
+            if obj and issubclass(type(obj), Gtk.Widget):
                 obj.get_style_context().add_class('merengue_selected')
 
                 if length == 1 and issubclass(type(obj), Gtk.Window):
@@ -210,6 +217,9 @@ class MrgApplication(Gtk.Application):
                 provider,
                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
+
+        settings = Gtk.Settings.get_default()
+        settings.props.gtk_enable_animations = False
 
         # We need to add at least a window for the app not to exit!
         self.add_window(Gtk.Window())
