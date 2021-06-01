@@ -358,19 +358,19 @@ class CmbDB(GObject.GObject):
 
         return ui_id
 
-    def add_object(self, ui_id, obj_type, name=None, parent_id=None, comment=None):
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None):
         c = self.conn.cursor()
 
         c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
         object_id = c.fetchone()[0]
 
-        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?);",
-                  (ui_id, object_id, obj_type, name, parent_id, comment))
+        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, internal, type, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                  (ui_id, object_id, obj_type, name, parent_id, internal_child, child_type, comment))
         c.close()
 
         return object_id
 
-    def _import_object(self, type_info, ui_id, node, parent_id):
+    def _import_object(self, type_info, ui_id, node, parent_id, internal_child=None, child_type=None):
         klass = node.get('class')
         name = node.get('id')
         comment = self._node_get_comment(node)
@@ -379,7 +379,7 @@ class CmbDB(GObject.GObject):
         # Insert object
         try:
             assert info
-            object_id = self.add_object(ui_id, klass, name, parent_id, comment)
+            object_id = self.add_object(ui_id, klass, name, parent_id, internal_child, child_type, comment)
         except:
             print('Error importing', klass)
             return
@@ -454,8 +454,11 @@ class CmbDB(GObject.GObject):
         # Children
         for child in node.iterfind('child'):
             obj = child.find('object')
+            ctype = child.get('type', None)
+            internal = child.get('internal-child', None)
+
             if obj is not None:
-                self._import_object(type_info, ui_id, obj, object_id)
+                self._import_object(type_info, ui_id, obj, object_id, internal, ctype)
 
         # Packing properties
         if self.target_tk == 'gtk+-3.0':
@@ -592,10 +595,12 @@ class CmbDB(GObject.GObject):
             self._node_add_comment(node, comment)
 
         # Children
-        for row in c.execute('SELECT object_id, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
-            child_id, comment = row
+        for row in c.execute('SELECT object_id, internal, type, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
+            child_id, internal, ctype,  comment = row
             child_obj = self._get_object(ui_id, child_id, use_id=use_id)
             child = E.child(child_obj)
+            node_set(child, 'internal-child', internal)
+            node_set(child, 'type', ctype)
             self._node_add_comment(child_obj, comment)
 
             # Packing / Layout
