@@ -420,7 +420,7 @@ class CmbBaseObject(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, comment):
+    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, internal, type, comment):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id)
@@ -453,6 +453,26 @@ class CmbBaseObject(CmbBase):
     @parent_id.setter
     def _set_parent_id(self, value):
         self.db_set('UPDATE object SET parent_id=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=str)
+    def internal(self):
+        return self.db_get('SELECT internal FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @internal.setter
+    def _set_internal(self, value):
+        self.db_set('UPDATE object SET internal=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=str)
+    def type(self):
+        return self.db_get('SELECT type FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @type.setter
+    def _set_type(self, value):
+        self.db_set('UPDATE object SET type=? WHERE (ui_id, object_id) IS (?, ?);',
                     (self.ui_id, self.object_id, ), value)
 
     @GObject.Property(type=str)

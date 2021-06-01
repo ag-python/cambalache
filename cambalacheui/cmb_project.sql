@@ -60,6 +60,8 @@ CREATE TABLE object (
   type_id TEXT NOT NULL REFERENCES type,
   name TEXT,
   parent_id INTEGER,
+  internal TEXT,
+  type TEXT,
   comment TEXT,
   PRIMARY KEY(ui_id, object_id),
   FOREIGN KEY(ui_id, parent_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE
