@@ -116,6 +116,36 @@ CREATE TABLE IF NOT EXISTS type_flags (
 ) WITHOUT ROWID;
 
 
+/* Type Data
+ *
+ * This table allow us to store extra data for each type in a hierachical way.
+ * It does not have any particular restrictions which means it is responsability
+ * of the editor to create a valid structure.
+ */
+CREATE TABLE IF NOT EXISTS type_data (
+  owner_id TEXT,
+  data_id INTEGER,
+  parent_id INTEGER,
+  key TEXT NOT NULL,
+  type_id TEXT REFERENCES type,
+  PRIMARY KEY(owner_id, data_id),
+  FOREIGN KEY(owner_id, parent_id) REFERENCES type_data(owner_id, data_id)
+) WITHOUT ROWID;
+
+
+/* Type Data Args
+ *
+ */
+CREATE TABLE IF NOT EXISTS type_data_arg (
+  owner_id TEXT,
+  data_id INTEGER,
+  key TEXT NOT NULL,
+  type_id TEXT REFERENCES type,
+  PRIMARY KEY(owner_id, data_id, key),
+  FOREIGN KEY(owner_id, data_id) REFERENCES type_data(owner_id, data_id)
+) WITHOUT ROWID;
+
+
 /* Type Tree
  *
  * VIEW of ancestors and ifaces by type

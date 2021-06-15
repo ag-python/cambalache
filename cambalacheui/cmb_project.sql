@@ -140,3 +140,40 @@ CREATE TABLE object_signal (
 CREATE INDEX object_signal_object_fk ON object (ui_id, object_id);
 CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
 
+
+/* Object Data
+ *
+ * This store any extra data defined in type_data table.
+ * It allows generic loading and saving of custom type data without validation.
+ */
+CREATE TABLE object_data (
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
+  object_id INTEGER,
+  owner_id TEXT,
+  data_id INTEGER,
+  id INTEGER,
+  value TEXT,
+  parent_id INTEGER,
+  comment TEXT,
+  PRIMARY KEY(ui_id, object_id, owner_id, data_id, id),
+  FOREIGN KEY(ui_id, object_id) REFERENCES object ON DELETE CASCADE,
+  FOREIGN KEY(owner_id, data_id) REFERENCES type_data
+);
+
+
+/* Object Data Arg
+ *
+ */
+CREATE TABLE object_data_arg (
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
+  object_id INTEGER,
+  owner_id TEXT,
+  data_id INTEGER,
+  id INTEGER,
+  key TEXT,
+  value TEXT NOT NULL,
+  PRIMARY KEY(ui_id, object_id, owner_id, data_id, id, key),
+  FOREIGN KEY(ui_id, object_id, owner_id, data_id, id) REFERENCES object_data ON DELETE CASCADE,
+  FOREIGN KEY(owner_id, data_id, key) REFERENCES type_data_arg
+);
+
