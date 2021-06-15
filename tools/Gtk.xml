@@ -1,0 +1,67 @@
+<!--
+ CambalacheDB - Data Model for Cambalache
+
+ Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
+
+ Unauthorized copying of this file, via any medium is strictly prohibited.
+-->
+<types>
+  <GtkWidget>
+    <style>
+      <class name="gchararray"/>
+    </style>
+  </GtkWidget>
+
+  <GtkDialog>
+    <action-widgets>
+      <action-widget response="gint">GtkWidget</action-widget>
+    </action-widgets>
+  </GtkDialog>
+
+  <GtkListStore>
+    <columns>
+      <column type="type"/>
+    </columns>
+    <data>
+      <row>
+        <col id="gint">gchararray</col>
+      </row>
+    </data>
+  </GtkListStore>
+
+  <GtkTreeStore>
+    <columns>
+      <column type="type"/>
+    </columns>
+  </GtkTreeStore>
+
+  <GtkLabel>
+    <attributes>
+      <attribute name="gchararray" value="gchararray" start="gint" end="gint"/>
+    </attributes>
+  </GtkLabel>
+
+  <GtkLevelBar>
+    <offsets>
+      <offset name="gchararray" value="gdouble"/>
+    </offsets>
+  </GtkLevelBar>
+
+  <GtkScale>
+    <marks>
+      <mark value="gdouble" position="GtkPositionType">gchararray</mark>
+    </marks>
+  </GtkScale>
+
+  <GtkComboBoxText>
+    <items>
+      <item id="gchararray">gchararray</item>
+    </items>
+  </GtkComboBoxText>
+
+  <GtkSizeGroup>
+    <widgets>
+      <widget name="GtkWidget"/>
+    </widgets>
+  </GtkSizeGroup>
+</types>

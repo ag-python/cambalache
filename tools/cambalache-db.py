@@ -9,6 +9,7 @@
 import os
 import sys
 import sqlite3
+from lxml import etree
 
 from utils import gir
 
@@ -89,6 +90,47 @@ class CambalacheDb:
         self.conn.commit()
         return lib
 
+    def _import_tag(self, c, node, owner_id, parent_id):
+        key = node.tag
+        if node.text:
+            text = node.text.strip()
+            type_id = None if text == '' else text
+        else:
+            type_id = None
+
+        c.execute("SELECT coalesce((SELECT data_id FROM type_data WHERE owner_id=? ORDER BY data_id DESC LIMIT 1), 0) + 1;",
+                  (owner_id, ))
+        data_id = c.fetchone()[0]
+
+        c.execute("INSERT INTO type_data (owner_id, data_id, parent_id, key, type_id) VALUES (?, ?, ?, ?, ?);",
+                  (owner_id, data_id, parent_id, key, type_id))
+
+        for attr in node.keys():
+            c.execute("INSERT INTO type_data_arg (owner_id, data_id, key, type_id) VALUES (?, ?, ?, ?);",
+                      (owner_id, data_id, attr, node.get(attr)))
+
+        # Iterate children tags
+        for child in node:
+            self._import_tag(c, child, owner_id, data_id)
+
+    def populate_extra_data_from_xml(self, filename):
+        if not os.path.exists(filename):
+            return
+
+        tree = etree.parse(filename)
+        root = tree.getroot()
+
+        c = self.conn.cursor()
+
+        for klass in root:
+            owner_id = klass.tag
+
+            for child in klass:
+                self._import_tag(c, child, owner_id, None)
+
+        c.close()
+        self.conn.commit()
+
 if __name__ == "__main__":
     nargs = len(sys.argv)
     if nargs < 3:
@@ -96,5 +138,11 @@ if __name__ == "__main__":
         exit()
 
     db = CambalacheDb()
+
     lib = db.populate_from_gir(sys.argv[1])
+
+    # Load custom type data from json file
+    db.populate_extra_data_from_xml(f'{lib.name}.xml')
+    db.populate_extra_data_from_xml(f'{lib.name}-{lib.version}.xml')
+
     db.dump(sys.argv[2])

@@ -36,22 +36,22 @@
  
  - GtkWidget
    - <style> <class name="css-class"/> </style>
-   -  <action-widgets>
-        <action-widget response="cancel">cancel_info_dialog</action-widget>
-      </action-widgets>
+   - <action-widgets>
+       <action-widget response="">value</action-widget>
+     </action-widgets>
 
  - GtkListStore
-   - <columns> <column type=""/> </columns>
-   - <data> <row> <col id="0">value</col> </row> </data>
+   - <columns> <column type="gtype"/> </columns>
+   - <data> <row> <col id="int">value</col> </row> </data>
 
  - GtkTreeStore
-   - <columns> <column type=""/> </columns>
+   - <columns> <column type="gtype"/> </columns>
 
- - GtkCellRendererText
-   - <attributes> <attribute name="text">0</attribute> </attributes>
+ - GtkLabel
+   - <attributes> <attribute name="gchararray" value="red" start="5" end="10">int</attribute> </attributes>
 
  - GtkLevelBar
-   - <offsets> <offset name="low" value="1"/> </offsets>
+   - <offsets> <offset name="gchararray" value="1"/> </offsets>
 
  - GtkScale
    - <marks> <mark value="0" position="bottom"> </mark>
@@ -60,4 +60,4 @@
    - <items> <item>1</item> </items>
    
  - GtkSizeGroup
-   - <widgets> <widget name="listboxrow1"/> </widgets>
+   - <widgets> <widget name="gchararray"/> </widgets>
