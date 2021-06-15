@@ -41,6 +41,8 @@ class CmbDB(GObject.GObject):
     def __init__(self, **kwargs):
         self._target_tk = None
 
+        self.type_info = None
+
         self.history_commands = {}
 
         self.conn = sqlite3.connect(':memory:')
@@ -370,11 +372,11 @@ class CmbDB(GObject.GObject):
 
         return object_id
 
-    def _import_object(self, type_info, ui_id, node, parent_id, internal_child=None, child_type=None):
+    def _import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None):
         klass = node.get('class')
         name = node.get('id')
         comment = self._node_get_comment(node)
-        info = type_info.get(klass, None)
+        info = self.type_info.get(klass, None)
 
         # Insert object
         try:
@@ -399,7 +401,7 @@ class CmbDB(GObject.GObject):
                 owner_id = klass
             else:
                 for parent in info.hierarchy:
-                    pinfo = type_info[parent]
+                    pinfo = self.type_info[parent]
                     if property_id in pinfo.properties:
                         owner_id = parent
                         break
@@ -436,7 +438,7 @@ class CmbDB(GObject.GObject):
                 owner_id = klass
             else:
                 for parent in info.hierarchy:
-                    pinfo = type_info[parent]
+                    pinfo = self.type_info[parent]
                     if signal_id in pinfo.signals:
                         owner_id = parent
                         break
@@ -458,7 +460,7 @@ class CmbDB(GObject.GObject):
             internal = child.get('internal-child', None)
 
             if obj is not None:
-                self._import_object(type_info, ui_id, obj, object_id, internal, ctype)
+                self._import_object(ui_id, obj, object_id, internal, ctype)
 
         # Packing properties
         if self.target_tk == 'gtk+-3.0':
@@ -493,6 +495,50 @@ class CmbDB(GObject.GObject):
                               (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment))
                 except Exception as e:
                     raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} layout property: {e}')
+
+        # Custom buildable tags
+        def import_object_data(owner_id, taginfo, ntag, parent_id):
+            data_id = taginfo.data_id
+            text = ntag.text.strip() if ntag.text else None
+            value = text if text and len(text) > 0 else None
+            comment = self._node_get_comment(ntag)
+
+            c.execute("SELECT coalesce((SELECT id FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? ORDER BY id DESC LIMIT 1), 0) + 1;",
+                      (ui_id, object_id, owner_id, data_id))
+            id = c.fetchone()[0]
+
+            c.execute("INSERT INTO object_data (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                      (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment))
+
+            for key in taginfo.args:
+                val = ntag.get(key, None)
+                c.execute("INSERT INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                          (ui_id, object_id, owner_id, data_id, id, key, val))
+
+            for child in taginfo.children:
+                for nchild in ntag.iterfind(child):
+                    import_object_data(owner_id,
+                                       taginfo.children[child],
+                                       nchild,
+                                       id)
+
+        def import_type_data(info, node):
+            if len(info.data.keys()) == 0:
+                return
+
+            for tag in info.data:
+                taginfo = info.data[tag]
+
+                for ntag in node.iterfind(tag):
+                    if ntag is not None:
+                        import_object_data(info.type_id, taginfo, ntag, None)
+
+        # Iterate over all hierarchy extra data
+        import_type_data(info, node)
+        for parent in info.hierarchy:
+            pinfo = self.type_info[parent]
+            import_type_data(pinfo, node)
+
         c.close()
 
     def _node_get_comment(self, node):
@@ -516,7 +562,7 @@ class CmbDB(GObject.GObject):
 
         return retval
 
-    def import_file(self, type_info, filename, projectdir='.'):
+    def import_file(self, filename, projectdir='.'):
         tree = etree.parse(filename)
         root = tree.getroot()
 
@@ -539,7 +585,7 @@ class CmbDB(GObject.GObject):
 
         # Import objects
         for child in root.iterfind('object'):
-            self._import_object(type_info, ui_id, child, None)
+            self._import_object(ui_id, child, None)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
@@ -565,6 +611,8 @@ class CmbDB(GObject.GObject):
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         type_id, name = c.fetchone()
         node_set(obj, 'class', type_id)
+
+        info = self.type_info.get(type_id, None)
 
         if use_id and name:
             name = GLib.uri_escape_string(name, None, True)
@@ -593,6 +641,56 @@ class CmbDB(GObject.GObject):
                 node_set(node, 'after', 'yes')
             obj.append(node)
             self._node_add_comment(node, comment)
+
+        # Custom buildable tags
+        def export_object_data(owner_id, name, info, node, parent_id):
+            c = self.conn.cursor()
+            cc = self.conn.cursor()
+
+            for row in c.execute('SELECT id, value, comment FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND parent_id=?;',
+                                 (ui_id, object_id, owner_id, info.data_id, parent_id)):
+                id, value, comment = row
+                ntag = etree.Element(name)
+                if value:
+                    ntag.text = value
+                node.append(ntag)
+                self._node_add_comment(ntag, comment)
+
+                for row in cc.execute('SELECT key, value FROM object_data_arg WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND value IS NOT NULL;',
+                                      (ui_id, object_id, owner_id, info.data_id, id)):
+                    key, value = row
+                    ntag.set(key, value)
+
+                for tag in info.children:
+                    export_object_data(owner_id, tag, info.children[tag], ntag, id)
+
+            c.close()
+            cc.close()
+
+        def export_type_data(owner_id, info, node):
+            if len(info.data.keys()) == 0:
+                return
+
+            for tag in info.data:
+                taginfo = info.data[tag]
+
+                for row in c.execute('SELECT id, value, comment FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=?;',
+                                     (ui_id, object_id, owner_id, taginfo.data_id)):
+                    id, value, comment = row
+                    ntag = etree.Element(tag)
+                    if value:
+                        ntag.text = value
+                    node.append(ntag)
+                    self._node_add_comment(ntag, comment)
+
+                    for child in taginfo.children:
+                        export_object_data(owner_id, child, taginfo.children[child], ntag, id)
+
+        # Iterate over all hierarchy extra data
+        export_type_data(type_id, info, obj)
+        for parent in info.hierarchy:
+            pinfo = self.type_info[parent]
+            export_type_data(parent, pinfo, obj)
 
         # Children
         for row in c.execute('SELECT object_id, internal, type, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):

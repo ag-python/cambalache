@@ -24,7 +24,7 @@ from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
-from .cmb_type_info import CmbTypeInfo
+from .cmb_type_info import CmbTypeInfo, CmbTypeData
 from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
@@ -107,6 +107,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         # DataModel is only used internally
         self.db = CmbDB(target_tk=self.target_tk)
+        self.db.type_info = self._type_info
         self._init_data()
 
         self._load()
@@ -193,6 +194,32 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                           ORDER BY type_id;'''
         self.type_list = CmbListStore(project=self, table='type', query=type_query)
 
+    def _type_get_data(self, type_id, data_id, parent_id, key, value_type_id):
+        args = {}
+        children = {}
+        retval = CmbTypeData(data_id, value_type_id)
+
+        c = self.db.cursor()
+
+        # Collect Arguments
+        for row in c.execute('SELECT * FROM type_data_arg WHERE owner_id=? AND data_id=?;',
+                             (type_id, data_id)):
+            type_id, data_id, key, value_type_id = row
+            args[key] = value_type_id
+
+        # Recurse children
+        for row in c.execute('SELECT * FROM type_data WHERE owner_id=? AND parent_id=?;',
+                             (type_id, data_id)):
+            type_id, data_id, parent_id, key, value_type_id = row
+            children[key] = self._type_get_data(*row)
+
+        c.close()
+
+        retval.args = args
+        retval.children = children
+
+        return retval
+
     def _init_type_info(self, c):
         owner_id = None
 
@@ -233,6 +260,19 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             signal_id = row[1]
             signals[signal_id] = CmbSignalInfo.from_row(self, *row)
 
+        # Dictionary with all the type extra data
+        type_data = {}
+        owner_id = None
+        data = None
+        for row in c.execute('SELECT * FROM type_data WHERE parent_id IS NULL ORDER BY owner_id, data_id;'):
+            if owner_id != row[0]:
+                owner_id = row[0]
+                data = {}
+                type_data[owner_id] = data
+
+            key = row[3]
+            data[key] = self._type_get_data(*row)
+
         for row in c.execute('''SELECT * FROM type
                                   WHERE
                                     parent_id IS NOT NULL
@@ -242,6 +282,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             info.hierarchy = type_hierarchy.get(type_id, [])
             info.properties = type_properties.get(type_id, {})
             info.signals = type_signals.get(type_id, {})
+            info.data = type_data.get(type_id, {})
             self._type_info[type_id] = info
 
     def _init_data(self):
@@ -301,9 +342,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
         # Import file
-        ui_id = self.db.import_file(self._type_info,
-                                    filename,
-                                    os.path.dirname(self.filename))
+        ui_id = self.db.import_file(filename, os.path.dirname(self.filename))
 
         import_end = time.monotonic()
 

@@ -171,7 +171,7 @@ CREATE TABLE object_data_arg (
   data_id INTEGER,
   id INTEGER,
   key TEXT,
-  value TEXT NOT NULL,
+  value TEXT,
   PRIMARY KEY(ui_id, object_id, owner_id, data_id, id, key),
   FOREIGN KEY(ui_id, object_id, owner_id, data_id, id) REFERENCES object_data ON DELETE CASCADE,
   FOREIGN KEY(owner_id, data_id, key) REFERENCES type_data_arg
