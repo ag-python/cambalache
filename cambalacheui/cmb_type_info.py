@@ -12,12 +12,20 @@ from gi.repository import GObject, Gtk
 
 from .cmb_objects_base import CmbBaseTypeInfo
 
+class CmbTypeData:
+    def __init__(self, data_id, value_type_id):
+        self.data_id = data_id
+        self.value_type_id = value_type_id
+        self.args = {}
+        self.children = {}
+
 
 class CmbTypeInfo(CmbBaseTypeInfo):
     def __init__(self, **kwargs):
         self.hierarchy = []
         self.properties = {}
         self.signals = {}
+        self.data = {}
         super().__init__(**kwargs)
 
         if self.parent_id == 'enum':
