@@ -1513,6 +1513,46 @@ INSERT INTO type_flags VALUES
 ('GtkTreeModelFlags', 'iters_persist', 'iters-persist', 1, 'GTK_TREE_MODEL_ITERS_PERSIST', 'iterators survive all signals emitted by the tree'),
 ('GtkTreeModelFlags', 'list_only', 'list-only', 2, 'GTK_TREE_MODEL_LIST_ONLY', 'the model is a list only, and never has children');
 
+INSERT INTO type_data VALUES
+('GtkComboBoxText', 1, NULL, 'items', NULL),
+('GtkComboBoxText', 2, 1, 'item', 'gchararray'),
+('GtkDialog', 1, NULL, 'action-widgets', NULL),
+('GtkDialog', 2, 1, 'action-widget', 'GtkWidget'),
+('GtkLabel', 1, NULL, 'attributes', NULL),
+('GtkLabel', 2, 1, 'attribute', NULL),
+('GtkLevelBar', 1, NULL, 'offsets', NULL),
+('GtkLevelBar', 2, 1, 'offset', NULL),
+('GtkListStore', 1, NULL, 'columns', NULL),
+('GtkListStore', 2, 1, 'column', NULL),
+('GtkListStore', 3, NULL, 'data', NULL),
+('GtkListStore', 4, 3, 'row', NULL),
+('GtkListStore', 5, 4, 'col', 'gchararray'),
+('GtkScale', 1, NULL, 'marks', NULL),
+('GtkScale', 2, 1, 'mark', 'gchararray'),
+('GtkSizeGroup', 1, NULL, 'widgets', NULL),
+('GtkSizeGroup', 2, 1, 'widget', NULL),
+('GtkTreeStore', 1, NULL, 'columns', NULL),
+('GtkTreeStore', 2, 1, 'column', NULL),
+('GtkWidget', 1, NULL, 'style', NULL),
+('GtkWidget', 2, 1, 'class', NULL);
+
+INSERT INTO type_data_arg VALUES
+('GtkComboBoxText', 2, 'id', 'gchararray'),
+('GtkDialog', 2, 'response', 'gint'),
+('GtkLabel', 2, 'end', 'gint'),
+('GtkLabel', 2, 'name', 'gchararray'),
+('GtkLabel', 2, 'start', 'gint'),
+('GtkLabel', 2, 'value', 'gchararray'),
+('GtkLevelBar', 2, 'name', 'gchararray'),
+('GtkLevelBar', 2, 'value', 'gdouble'),
+('GtkListStore', 2, 'type', 'type'),
+('GtkListStore', 5, 'id', 'gint'),
+('GtkScale', 2, 'position', 'GtkPositionType'),
+('GtkScale', 2, 'value', 'gdouble'),
+('GtkSizeGroup', 2, 'name', 'GtkWidget'),
+('GtkTreeStore', 2, 'type', 'type'),
+('GtkWidget', 2, 'name', 'gchararray');
+
 INSERT INTO property VALUES
 ('GtkATContext', 'accessible', 'GtkAccessible', NULL, NULL, NULL, NULL, NULL, NULL),
 ('GtkATContext', 'accessible-role', 'GtkAccessibleRole', 1, 'none', NULL, NULL, NULL, NULL),

@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = OFF;
 INSERT INTO library VALUES
-('gtk+', '3.0', 'libgtk-3.so.0,libgdk-3.so.0', NULL, NULL);
+('gtk+', '3.0', 'libgtk-3.so.0', NULL, NULL);
 
 INSERT INTO library_version VALUES
 ('gtk+', '3.0'),
@@ -1380,6 +1380,46 @@ INSERT INTO type_flags VALUES
 ('GtkUIManagerItemType', 'toolbar', 'toolbar', 4, 'GTK_UI_MANAGER_TOOLBAR', 'Create a toolbar.'),
 ('GtkUIManagerItemType', 'toolitem', 'toolitem', 64, 'GTK_UI_MANAGER_TOOLITEM', 'Create a toolitem.');
 
+INSERT INTO type_data VALUES
+('GtkComboBoxText', 1, NULL, 'items', NULL),
+('GtkComboBoxText', 2, 1, 'item', 'gchararray'),
+('GtkDialog', 1, NULL, 'action-widgets', NULL),
+('GtkDialog', 2, 1, 'action-widget', 'GtkWidget'),
+('GtkLabel', 1, NULL, 'attributes', NULL),
+('GtkLabel', 2, 1, 'attribute', NULL),
+('GtkLevelBar', 1, NULL, 'offsets', NULL),
+('GtkLevelBar', 2, 1, 'offset', NULL),
+('GtkListStore', 1, NULL, 'columns', NULL),
+('GtkListStore', 2, 1, 'column', NULL),
+('GtkListStore', 3, NULL, 'data', NULL),
+('GtkListStore', 4, 3, 'row', NULL),
+('GtkListStore', 5, 4, 'col', 'gchararray'),
+('GtkScale', 1, NULL, 'marks', NULL),
+('GtkScale', 2, 1, 'mark', 'gchararray'),
+('GtkSizeGroup', 1, NULL, 'widgets', NULL),
+('GtkSizeGroup', 2, 1, 'widget', NULL),
+('GtkTreeStore', 1, NULL, 'columns', NULL),
+('GtkTreeStore', 2, 1, 'column', NULL),
+('GtkWidget', 1, NULL, 'style', NULL),
+('GtkWidget', 2, 1, 'class', NULL);
+
+INSERT INTO type_data_arg VALUES
+('GtkComboBoxText', 2, 'id', 'gchararray'),
+('GtkDialog', 2, 'response', 'gint'),
+('GtkLabel', 2, 'end', 'gint'),
+('GtkLabel', 2, 'name', 'gchararray'),
+('GtkLabel', 2, 'start', 'gint'),
+('GtkLabel', 2, 'value', 'gchararray'),
+('GtkLevelBar', 2, 'name', 'gchararray'),
+('GtkLevelBar', 2, 'value', 'gdouble'),
+('GtkListStore', 2, 'type', 'type'),
+('GtkListStore', 5, 'id', 'gint'),
+('GtkScale', 2, 'position', 'GtkPositionType'),
+('GtkScale', 2, 'value', 'gdouble'),
+('GtkSizeGroup', 2, 'name', 'GtkWidget'),
+('GtkTreeStore', 2, 'type', 'type'),
+('GtkWidget', 2, 'name', 'gchararray');
+
 INSERT INTO property VALUES
 ('GtkAboutDialog', 'comments', 'gchararray', NULL, NULL, NULL, NULL, '2.6', NULL),
 ('GtkAboutDialog', 'copyright', 'gchararray', NULL, NULL, NULL, NULL, '2.6', NULL),
@@ -2044,7 +2084,7 @@ Click to make changes', NULL, NULL, NULL, NULL),
 ('GtkSettings', 'gtk-modules', 'gchararray', NULL, NULL, NULL, NULL, NULL, NULL),
 ('GtkSettings', 'gtk-overlay-scrolling', 'gboolean', NULL, 'True', NULL, NULL, '3.24.9', NULL),
 ('GtkSettings', 'gtk-primary-button-warps-slider', 'gboolean', NULL, 'True', NULL, NULL, '3.6', NULL),
-('GtkSettings', 'gtk-print-backends', 'gchararray', NULL, 'file,cups,cloudprint', NULL, NULL, '2.10', NULL),
+('GtkSettings', 'gtk-print-backends', 'gchararray', NULL, 'file,lpr,cups', NULL, NULL, '2.10', NULL),
 ('GtkSettings', 'gtk-print-preview-command', 'gchararray', NULL, 'evince --unlink-tempfile --preview --print-settings %s %f', NULL, NULL, '2.10', NULL),
 ('GtkSettings', 'gtk-recent-files-enabled', 'gboolean', NULL, 'True', NULL, NULL, '3.8', NULL),
 ('GtkSettings', 'gtk-recent-files-limit', 'gint', NULL, '50', '-1', '2147483647', '2.12', '3.10'),
