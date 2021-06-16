@@ -216,6 +216,8 @@ class CmbDB(GObject.GObject):
         self._create_support_table(c, 'object_property')
         self._create_support_table(c, 'object_layout_property')
         self._create_support_table(c, 'object_signal')
+        self._create_support_table(c, 'object_data')
+        self._create_support_table(c, 'object_data_arg')
 
         self.conn.commit()
         c.close()
