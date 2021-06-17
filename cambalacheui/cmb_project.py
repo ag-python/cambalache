@@ -13,9 +13,6 @@ import time
 
 from locale import gettext as _
 
-from lxml import etree
-from lxml.builder import E
-
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 
@@ -363,10 +360,19 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         for row in c.execute('SELECT ui_id, filename FROM ui;'):
             filename = os.path.splitext(row[1])[0] + '.cmb.ui'
 
-            if os.path.isabs(filename):
-                self.db.export_ui(row[0], filename)
-            else:
-                self.db.export_ui(row[0], os.path.join(dirname, filename))
+            if not os.path.isabs(filename):
+                filename = os.path.join(dirname, filename)
+
+            # Get XML tree
+            ui = self.db.export_ui(row[0])
+
+            # Dump xml to file
+            with open(filename, 'wb') as fd:
+                ui.write(fd,
+                         pretty_print=True,
+                         xml_declaration=True,
+                         encoding='UTF-8')
+                fd.close()
 
         c.close()
 

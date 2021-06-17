@@ -725,7 +725,7 @@ class CmbDB(GObject.GObject):
         cc.close()
         return obj
 
-    def export_ui(self, ui_id, filename=None, use_id=False):
+    def export_ui(self, ui_id, use_id=False):
         c = self.conn.cursor()
 
         node = E.interface()
@@ -752,18 +752,4 @@ class CmbDB(GObject.GObject):
 
         c.close()
 
-        tree = etree.ElementTree(node)
-
-        if filename is not None:
-            # Dump xml to file
-            with open(filename, 'wb') as fd:
-                tree.write(fd,
-                           pretty_print=True,
-                           xml_declaration=True,
-                           encoding='UTF-8')
-                fd.close()
-        else:
-            return etree.tostring(tree,
-                                  pretty_print=True,
-                                  xml_declaration=True,
-                                  encoding='UTF-8').decode('UTF-8')
+        return etree.ElementTree(node)

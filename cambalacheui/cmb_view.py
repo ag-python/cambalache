@@ -12,6 +12,7 @@ import json
 import socket
 
 from time import sleep
+from lxml import etree
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
@@ -169,10 +170,17 @@ window.setupDocument = function (document) {
         # Flush
         self._merengue.stdin.flush()
 
+    def _get_ui_xml(self, ui_id, use_id=False):
+        ui = self._project.db.export_ui(ui_id, use_id=use_id)
+        return etree.tostring(ui,
+                              pretty_print=True,
+                              xml_declaration=True,
+                              encoding='UTF-8').decode('UTF-8')
+
     def _update_view(self):
         if self._project is not None and self._ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self._project.db.export_ui(self._ui_id)
+                ui = self._get_ui_xml(self._ui_id)
                 self.buffer.set_text(ui)
             return
 
@@ -180,7 +188,7 @@ window.setupDocument = function (document) {
         self._ui_id = 0
 
     def _merengue_update_ui(self, ui_id):
-        ui = self._project.db.export_ui(ui_id, use_id=True)
+        ui = self._get_ui_xml(ui_id, use_id=True)
 
         self._merengue_command('update_ui',
                                payload=ui,
