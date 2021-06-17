@@ -51,7 +51,8 @@ def object_get_id(obj):
     if obj:
         builder_id = object_get_builder_id(obj)
         if builder_id.startswith('__cambalache__'):
-            return builder_id[14:]
+            tokens = builder_id[14:].split('+', 2)
+            return tokens[0]
 
     return None
 
