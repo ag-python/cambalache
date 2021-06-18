@@ -23,9 +23,21 @@ class MrgGtkWidgetController(MrgController):
 
         self.child_property_ignore_list = set()
 
+        self.connect("notify::selected", self._on_selected_notify)
+        self.connect("notify::object", self._on_selected_notify)
+
         # Make sure show_all() always works
         if Gtk.MAJOR_VERSION == 3:
             self.property_ignore_list.add('no-show-all')
+
+    def _on_selected_notify(self, obj, pspec):
+        if self.object is None:
+            return
+
+        if self.selected:
+            self.object.get_style_context().add_class('merengue_selected')
+        else:
+            self.object.get_style_context().remove_class('merengue_selected')
 
     def remove_object(self):
         if self.object is None:
@@ -57,3 +69,4 @@ class MrgGtkWidgetController(MrgController):
             manager = self.object.get_layout_manager()
             layout_child = manager.get_layout_child(child)
             layout_child.set_property(property_id, val)
+

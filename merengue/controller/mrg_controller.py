@@ -14,6 +14,9 @@ class MrgController(GObject.Object):
     object = GObject.Property(type=GObject.GObject,
                               flags=GObject.ParamFlags.READWRITE)
 
+    selected = GObject.Property(type=bool, default=False,
+                                flags=GObject.ParamFlags.READWRITE)
+
     def __init__(self, **kwargs):
         # Properties in this will will be ignored by set_object_property()
         self.property_ignore_list = set()

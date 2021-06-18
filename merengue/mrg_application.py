@@ -123,10 +123,7 @@ class MrgApplication(Gtk.Application):
     def selection_changed(self, ui_id, selection):
         # Clear objects
         for object_id in self.controllers:
-            controller = self.controllers[object_id]
-            obj = controller.object
-            if obj and issubclass(type(obj), Gtk.Widget):
-                obj.get_style_context().remove_class('merengue_selected')
+            self.controllers[object_id].selected = False
 
         length = len(selection)
 
@@ -139,7 +136,7 @@ class MrgApplication(Gtk.Application):
             obj = controller.object
 
             if obj and issubclass(type(obj), Gtk.Widget):
-                obj.get_style_context().add_class('merengue_selected')
+                controller.selected = True
 
                 if length == 1 and issubclass(type(obj), Gtk.Window):
                     # TODO: fix broadway for this to work
