@@ -34,6 +34,8 @@ class MrgGtkWindowController(MrgGtkWidgetController):
 
         super().__init__(**kwargs)
 
+        self.property_ignore_list.add('modal')
+
     @GObject.property(type=Gtk.Window)
     def object(self):
         return self._object
@@ -63,6 +65,9 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             # Restore size
             if self._size and not self._is_maximized:
                 self.object.set_default_size(*self._size)
+
+            # Disable modal at runtime
+            obj.props.modal = False
 
             # Always show toplevels windows
             if Gtk.MAJOR_VERSION == 3:
