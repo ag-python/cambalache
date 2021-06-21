@@ -41,6 +41,10 @@ class MrgApplication(Gtk.Application):
     def get_controller(self, ui_id, object_id):
         return self.controllers.get(f'{ui_id}.{object_id}', None)
 
+    def get_controller_from_object(self, obj):
+        object_id = utils.object_get_id(obj)
+        return self.controllers.get(object_id, None)
+
     def clear_all(self):
         self.preselected_widget = None
 
@@ -76,7 +80,7 @@ class MrgApplication(Gtk.Application):
                 controller.object = obj
             else:
                 # Create a new controller
-                controller = self.registry.new_controller_for_object(obj)
+                controller = self.registry.new_controller_for_object(obj, self)
 
             self.controllers[object_id] = controller
 

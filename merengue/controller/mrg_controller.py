@@ -11,6 +11,10 @@ from gi.repository import GObject
 
 
 class MrgController(GObject.Object):
+
+    app = GObject.Property(type=GObject.GObject,
+                           flags=GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
     object = GObject.Property(type=GObject.GObject,
                               flags=GObject.ParamFlags.READWRITE)
 

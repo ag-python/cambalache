@@ -38,7 +38,7 @@ class MrgControllerRegistry(GObject.GObject):
                 object_type = get_object_type(klass)
                 self.registry[object_type] = klass
 
-    def new_controller_for_object(self, obj):
+    def new_controller_for_object(self, obj, app):
         gtype = obj.__gtype__
         klass = None
 
@@ -50,4 +50,4 @@ class MrgControllerRegistry(GObject.GObject):
                 gtype = None
                 break
 
-        return klass(object=obj) if klass else MrgController(object=obj)
+        return klass(object=obj, app=app) if klass else MrgController(object=obj, app=app)

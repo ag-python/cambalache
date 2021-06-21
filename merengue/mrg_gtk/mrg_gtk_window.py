@@ -122,20 +122,34 @@ class MrgGtkWindowController(MrgGtkWidgetController):
         global preselected_widget
 
         child = self.get_child_at_position(self.object, x, y)
+
         object_id = utils.object_get_id(child)
+        if object_id is None:
+            return
 
         # Pre select a widget on button press
-        preselected_widget = child if object_id else None
+        if preselected_widget != child:
+            preselected_widget = child
+            gesture.set_state(Gtk.EventSequenceState.CLAIMED)
 
     def _on_gesture_button_released(self, gesture, n_press, x, y):
         global preselected_widget
 
         child = self.get_child_at_position(self.object, x, y)
+
         object_id = utils.object_get_id(child)
+        if object_id is None:
+            return
+
+        controller = self.app.get_controller_from_object(child)
+        if controller.selected:
+            return
 
         # Select widget on button release only if its preselected
-        if object_id and child == preselected_widget:
+        if child == preselected_widget:
             utils.write_command('selection_changed', args={ 'selection': [object_id] })
+            controller.selected = True
+            gesture.set_state(Gtk.EventSequenceState.CLAIMED)
 
     def _add_selection_handler(self):
         if Gtk.MAJOR_VERSION == 3:
