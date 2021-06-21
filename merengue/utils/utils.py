@@ -48,11 +48,13 @@ def object_get_builder_id(obj):
 
 
 def object_get_id(obj):
-    if obj:
-        builder_id = object_get_builder_id(obj)
-        if builder_id.startswith('__cambalache__'):
-            tokens = builder_id[14:].split('+', 2)
-            return tokens[0]
+    if obj is None:
+        return None
+
+    builder_id = object_get_builder_id(obj)
+    if builder_id and builder_id.startswith('__cambalache__'):
+        tokens = builder_id[14:].split('+', 2)
+        return tokens[0]
 
     return None
 

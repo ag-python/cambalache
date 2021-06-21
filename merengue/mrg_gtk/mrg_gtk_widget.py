@@ -23,14 +23,14 @@ class MrgGtkWidgetController(MrgController):
 
         self.child_property_ignore_list = set()
 
-        self.connect("notify::selected", self._on_selected_notify)
-        self.connect("notify::object", self._on_selected_notify)
+        self.connect("notify::selected", self.on_selected_changed)
+        self.connect("notify::object", self.on_selected_changed)
 
         # Make sure show_all() always works
         if Gtk.MAJOR_VERSION == 3:
             self.property_ignore_list.add('no-show-all')
 
-    def _on_selected_notify(self, obj, pspec):
+    def on_selected_changed(self, obj, pspec):
         if self.object is None:
             return
 
@@ -38,6 +38,16 @@ class MrgGtkWidgetController(MrgController):
             self.object.get_style_context().add_class('merengue_selected')
         else:
             self.object.get_style_context().remove_class('merengue_selected')
+
+        # Update toplevel backdrop state
+        if Gtk.MAJOR_VERSION == 3:
+            toplevel = self.object.get_toplevel()
+        else:
+            toplevel = self.object.get_root()
+
+        if toplevel:
+            state = Gtk.StateFlags.NORMAL if self.selected else Gtk.StateFlags.BACKDROP
+            toplevel.set_state_flags(state, True)
 
     def remove_object(self):
         if self.object is None:
