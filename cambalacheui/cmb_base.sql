@@ -178,6 +178,7 @@ CREATE TABLE IF NOT EXISTS property (
   property_id TEXT NOT NULL,
 
   type_id TEXT REFERENCES type,
+  is_object BOOLEAN,
   construct_only BOOLEAN,
   default_value TEXT,
   minimum TEXT,
@@ -197,6 +198,13 @@ BEGIN
       WHEN (SELECT parent_id FROM type WHERE type_id=NEW.owner_id) IS NULL THEN
             RAISE (ABORT,'owner_id is not an object type')
     END;
+END;
+
+CREATE TRIGGER on_property_after_insert AFTER INSERT ON property
+WHEN
+  (SELECT parent_id FROM type WHERE type_id = new.type_id) NOT IN ('enum', 'flags')
+BEGIN
+  UPDATE property SET is_object = TRUE WHERE owner_id = new.owner_id and property_id = new.property_id;
 END;
 
 
