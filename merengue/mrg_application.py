@@ -206,15 +206,15 @@ class MrgApplication(Gtk.Application):
         provider = Gtk.CssProvider()
         provider.load_from_resource('/ar/xjuan/Merengue/merengue.css')
 
-        if Gtk.MAJOR_VERSION == 3:
-            Gtk.StyleContext.add_provider_for_screen(
-                Gdk.Screen.get_default(),
+        if Gtk.MAJOR_VERSION == 4:
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(),
                 provider,
                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
-        else:
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(),
+        elif Gtk.MAJOR_VERSION == 3:
+            Gtk.StyleContext.add_provider_for_screen(
+                Gdk.Screen.get_default(),
                 provider,
                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )

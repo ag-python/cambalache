@@ -57,10 +57,10 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             self.gesture = self._add_selection_handler()
 
             # Make sure the user can not close the window
-            if Gtk.MAJOR_VERSION == 3:
-                obj.connect('delete-event', lambda o, e: True)
-            else:
+            if Gtk.MAJOR_VERSION == 4:
                 obj.connect('close-request', lambda o: True)
+            else:
+                obj.connect('delete-event', lambda o, e: True)
 
             # Restore size
             if self._size and not self._is_maximized:
@@ -70,13 +70,13 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             obj.props.modal = False
 
             # Always show toplevels windows
-            if Gtk.MAJOR_VERSION == 3:
-                obj.show_all()
-            else:
+            if Gtk.MAJOR_VERSION == 4:
                 obj.show()
+            else:
+                obj.show_all()
 
             # Add gtk version CSS class
-            gtkversion = 'gtk3' if Gtk.MAJOR_VERSION == 3 else 'gtk4'
+            gtkversion = 'gtk4' if Gtk.MAJOR_VERSION == 4 else 'gtk3'
             obj.get_style_context().add_class(gtkversion)
 
             self._restore_state()
@@ -100,23 +100,23 @@ class MrgGtkWindowController(MrgGtkWidgetController):
         if self._is_maximized:
             return
 
-        if Gtk.MAJOR_VERSION == 3:
+        if Gtk.MAJOR_VERSION == 4:
+            self._size = [self.object.get_width(), self.object.get_height()]
+        else:
             self._position = self.object.get_position()
             self._size = self.object.get_size()
-        else:
-            self._size = [self.object.get_width(), self.object.get_height()]
 
     def _restore_state(self):
         if self._is_maximized:
             self.object.maximize()
             return
 
-        if Gtk.MAJOR_VERSION == 3:
-            if self._position:
-                self.object.move(*self._position)
-        else:
+        if Gtk.MAJOR_VERSION == 4:
             # TODO: find a way to store position on gtk4
             pass
+        else:
+            if self._position:
+                self.object.move(*self._position)
 
     def _on_gesture_button_pressed(self, gesture, n_press, x, y):
         global preselected_widget
@@ -152,14 +152,14 @@ class MrgGtkWindowController(MrgGtkWidgetController):
             gesture.set_state(Gtk.EventSequenceState.CLAIMED)
 
     def _add_selection_handler(self):
-        if Gtk.MAJOR_VERSION == 3:
+        if Gtk.MAJOR_VERSION == 4:
+            gesture = Gtk.GestureClick(propagation_phase=Gtk.PropagationPhase.CAPTURE)
+            self.object.add_controller(gesture)
+        else:
             self.object.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
                                    Gdk.EventMask.BUTTON_RELEASE_MASK)
             gesture = Gtk.GestureMultiPress(widget=self.object,
                                             propagation_phase=Gtk.PropagationPhase.CAPTURE)
-        else:
-            gesture = Gtk.GestureClick(propagation_phase=Gtk.PropagationPhase.CAPTURE)
-            self.object.add_controller(gesture)
 
         gesture.connect('pressed', self._on_gesture_button_pressed)
         gesture.connect('released', self._on_gesture_button_released)

@@ -39,10 +39,10 @@ def object_get_builder_id(obj):
         return None
 
     if issubclass(type(obj), Gtk.Buildable):
-        if Gtk.MAJOR_VERSION == 3:
-            return Gtk.Buildable.get_name(obj)
+        if Gtk.MAJOR_VERSION == 4:
+            return Gtk.Buildable.get_buildable_id(obj)
         else:
-            return Gtk.Buildable.get_buildable_id (obj)
+            return Gtk.Buildable.get_name(obj)
     else:
         return _g_object_get_data(obj, 'gtk-builder-name')
 
