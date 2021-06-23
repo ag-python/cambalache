@@ -218,6 +218,16 @@ class CmbObjectEditor(Gtk.Box):
         box.pack_start(entry, True, True, 0)
         return box
 
+    def _on_expander_expanded(self, expander, pspec, revealer):
+        expanded = expander.props.expanded
+
+        if expanded:
+            revealer.props.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN
+        else:
+            revealer.props.transition_type = Gtk.RevealerTransitionType.SLIDE_UP
+
+        revealer.props.reveal_child = expanded
+
     def _update_view(self):
         for child in self.get_children():
             self.remove(child)
@@ -238,15 +248,23 @@ class CmbObjectEditor(Gtk.Box):
         for prop in properties:
             if owner_id != prop.owner_id:
                 owner_id = prop.owner_id
+
                 expander = Gtk.Expander(label=f'<b>{owner_id}</b>',
                                         use_markup=True,
                                         expanded=True)
+                revealer = Gtk.Revealer(reveal_child=True)
+
+                expander.connect('notify::expanded', self._on_expander_expanded, revealer)
+
                 grid = Gtk.Grid(hexpand=True,
                                 margin_start=16,
                                 row_spacing=4,
                                 column_spacing=4)
-                expander.add(grid)
+
+                revealer.add(grid)
+
                 self.add(expander)
+                self.add(revealer)
                 i = 0
 
             label = Gtk.Label(label=prop.property_id,
