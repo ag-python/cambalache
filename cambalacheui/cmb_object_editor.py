@@ -8,6 +8,7 @@
 
 import io
 import gi
+import math
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
@@ -310,9 +311,9 @@ class CmbObjectEditor(Gtk.Box):
         elif type_id == 'guint64':
             return (0, GLib.MAXUINT64)
         elif type_id == 'gfloat':
-            return (GLib.MINFLOAT, GLib.MAXFLOAT)
+            return (-GLib.MAXFLOAT, GLib.MAXFLOAT)
         elif type_id == 'gdouble':
-            return (GLib.MINDOUBLE, GLib.MAXDOUBLE)
+            return (-GLib.MAXDOUBLE, GLib.MAXDOUBLE)
 
     def _create_editor_for_property(self, prop):
         editor = None
@@ -337,17 +338,22 @@ class CmbObjectEditor(Gtk.Box):
                 digits = 0
                 step_increment = 1
                 minimum, maximum = self._get_min_max_for_type(type_id)
+
+                # FIXME: is there a better way to handle inf -inf values other
+                # than casting to str?
                 if info.minimum is not None:
-                    minimum = info.minimum
+                    value = float(info.minimum)
+                    minimum = value if value != -math.inf else -GLib.MAXDOUBLE
                 if info.maximum is not None:
-                    maximum = info.maximum
+                    value = float(info.maximum)
+                    maximum = value if value != math.inf else GLib.MAXDOUBLE
 
                 if type_id == 'gfloat' or type_id == 'gdouble':
                     digits = 4
                     step_increment = 0.1
 
-                adjustment = Gtk.Adjustment(lower=float(minimum),
-                                            upper=float(maximum),
+                adjustment = Gtk.Adjustment(lower=minimum,
+                                            upper=maximum,
                                             step_increment=step_increment,
                                             page_increment=10)
 
