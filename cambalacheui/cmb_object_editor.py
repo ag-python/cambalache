@@ -75,7 +75,14 @@ class CmbSwitch(Gtk.Switch):
     def _set_value(self, value):
         if value is not None:
             val = value.lower()
-            self.props.active = True if val == 'true' or val == 'yes' else False
+
+            if type(val) == str:
+                if val.lower() in {'1', 't', 'y', 'true', 'yes'}:
+                    self.props.active = True
+                else:
+                    self.props.active = False
+            else:
+                self.props.active = bool(value)
         else:
             self.props.active = False
 
