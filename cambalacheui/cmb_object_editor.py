@@ -205,6 +205,34 @@ class CmbFlagsEntry(Gtk.Entry):
                     self.flags[flag_id] = val
 
 
+class CmbObjectChooser(Gtk.Entry):
+    object = GObject.Property(type=CmbObject, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.connect('notify::text', self._on_text_notify)
+        self.props.placeholder_text = f'<{self.type_id}>'
+
+    def _on_text_notify(self, obj, pspec):
+        self.notify('cmb-value')
+
+    @GObject.property(type=str)
+    def cmb_value(self):
+        obj = self.object.project._get_object_by_name(self.object.ui_id,
+                                                      self.props.text)
+        return obj.object_id if obj else None
+
+    @cmb_value.setter
+    def _set_value(self, value):
+        if value:
+            obj = self.object.project._get_object_by_id(self.object.ui_id,
+                                                        int(value))
+            self.props.text = obj.name if obj else ''
+        else:
+            self.props.text = ''
+
+
 class CmbObjectEditor(Gtk.Box):
     __gtype_name__ = 'CmbObjectEditor'
 
@@ -366,6 +394,9 @@ class CmbObjectEditor(Gtk.Box):
 
                 editor = CmbSpinButton(digits=digits,
                                        adjustment=adjustment)
+            elif info.is_object:
+                editor = CmbObjectChooser(object=self._object,
+                                          type_id=type_id)
             elif tinfo:
                 if tinfo.parent_id == 'enum':
                     editor = CmbComboBox(model=tinfo.enum,
