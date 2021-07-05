@@ -396,27 +396,28 @@ class CmbDB(GObject.GObject):
             translatable = prop.get('translatable', None)
             comment = self._node_get_comment(prop)
 
-            owner_id = None
+            pinfo = None
 
             # Find owner type for property
             if property_id in info.properties:
-                owner_id = klass
+                pinfo = info.properties[property_id]
             else:
                 for parent in info.hierarchy:
-                    pinfo = self.type_info[parent]
-                    if property_id in pinfo.properties:
-                        owner_id = parent
+                    type_info = self.type_info[parent]
+                    if property_id in type_info.properties:
+                        pinfo = type_info.properties[property_id]
                         break
 
             # Insert property
-            if owner_id:
-                try:
-                    c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                              (ui_id, object_id, owner_id, property_id, prop.text, translatable, comment))
-                except Exception as e:
-                    raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} property: {e}')
-            else:
+            if not pinfo:
                 print(f'Could not find owner type for {klass}:{property_id} property')
+                continue
+
+            try:
+                c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                          (ui_id, object_id, pinfo.owner_id, property_id, prop.text, translatable, comment))
+            except Exception as e:
+                raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} property: {e}')
 
         # Signals
         for signal in node.iterfind('signal'):
@@ -592,6 +593,10 @@ class CmbDB(GObject.GObject):
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
 
+        # Fix object references!
+        c.execute("UPDATE object_property AS op SET value=o.object_id FROM property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;",
+                  (ui_id, ))
+
         self.conn.commit()
         c.close()
 
@@ -616,17 +621,23 @@ class CmbDB(GObject.GObject):
 
         info = self.type_info.get(type_id, None)
 
-        if use_id and name:
-            name = GLib.uri_escape_string(name, None, True)
-            node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}+{name}')
+        if use_id:
+            node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
         else:
-            node_set(obj, 'id', f'__cambalache__{ui_id}.{object_id}' if use_id else name)
+            node_set(obj, 'id', name)
 
         # Properties
-        for row in c.execute('SELECT value, property_id, comment FROM object_property WHERE ui_id=? AND object_id=?;',
+        for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object, o.name FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND op.object_id=? AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.object_id = op.object_id;',
                              (ui_id, object_id,)):
-            val, name, comment = row
-            node = E.property(val, name=name)
+            val, property_id, comment, is_object, name = row
+
+            if use_id and is_object:
+                value = f'__cmb__{ui_id}.{val}'
+            else:
+                value = val
+
+            node = E.property(value, name=property_id)
+
             obj.append(node)
             self._node_add_comment(node, comment)
 
