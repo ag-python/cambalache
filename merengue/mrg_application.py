@@ -91,10 +91,19 @@ class MrgApplication(Gtk.Application):
             controller.remove_object()
             del self.controllers[f'{ui_id}.{object_id}']
 
-    def object_property_changed(self, ui_id, object_id, property_id, value):
+    def object_property_changed(self, ui_id, object_id, property_id, is_object, value):
         controller = self.get_controller(ui_id, object_id)
 
         if controller is None:
+            return
+
+        if is_object:
+            target_controller = self.get_controller(ui_id, value)
+
+            if target_controller:
+                controller.set_object_property(property_id,
+                                               target_controller.object)
+
             return
 
         pspec = controller.object.find_property(property_id)

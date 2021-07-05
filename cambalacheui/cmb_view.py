@@ -211,6 +211,7 @@ window.setupDocument = function (document) {
             'ui_id': obj.ui_id,
             'object_id': obj.object_id,
             'property_id': prop.property_id,
+            'is_object': prop.info.is_object,
             'value': prop.value
         })
 
