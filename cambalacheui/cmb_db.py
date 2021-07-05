@@ -326,7 +326,8 @@ class CmbDB(GObject.GObject):
             fd.write(f'/* Cambalache target={self.target_tk} */\n')
 
             for table in ['ui', 'ui_library', 'object', 'object_property',
-                          'object_layout_property', 'object_signal']:
+                          'object_layout_property', 'object_signal',
+                          'object_data', 'object_data_arg']:
                 _dump_table(fd, table)
             fd.close();
 
