@@ -87,9 +87,9 @@ class MrgGtkWindowController(MrgGtkWidgetController):
         if self._object is None:
             return
 
-        name = utils.object_get_name(self._object)
+        # TODO: finx a way to get object name instead of ID
         type_name = GObject.type_name(self._object.__gtype__)
-        self._object.props.title = f'{name} - {type_name}' if name else type_name
+        self._object.props.title = type_name
 
     def _save_state(self):
         if self._object is None:
@@ -168,7 +168,7 @@ class MrgGtkWindowController(MrgGtkWidgetController):
 
     def is_widget_from_ui(self, obj):
         object_id = utils.object_get_builder_id(obj)
-        return object_id is not None and object_id.startswith('__cambalache__')
+        return object_id is not None and object_id.startswith('__cmb__')
 
 
     def _find_first_child_inside_container (self, widget, data):

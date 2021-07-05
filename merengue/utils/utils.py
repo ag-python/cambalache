@@ -52,20 +52,8 @@ def object_get_id(obj):
         return None
 
     builder_id = object_get_builder_id(obj)
-    if builder_id and builder_id.startswith('__cambalache__'):
-        tokens = builder_id[14:].split('+', 2)
-        return tokens[0]
-
-    return None
-
-
-def object_get_name(obj):
-    if obj:
-        builder_id = object_get_builder_id(obj)
-        if builder_id.startswith('__cambalache__'):
-            tokens = builder_id[14:].split('+', 2)
-            if len(tokens) > 1:
-                return GLib.uri_unescape_string(tokens[1], None)
+    if builder_id and builder_id.startswith('__cmb__'):
+        return builder_id[7:]
 
     return None
 

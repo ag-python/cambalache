@@ -9,5 +9,4 @@
 from .utils import write_command
 from .utils import object_get_builder_id
 from .utils import object_get_id
-from .utils import object_get_name
 
