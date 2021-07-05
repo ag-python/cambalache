@@ -56,7 +56,14 @@ class CmbSpinButton(Gtk.SpinButton):
 
     @cmb_value.setter
     def _set_value(self, value):
-        self.props.value = float(value)
+        value = float(value)
+
+        if value == math.inf:
+            self.props.value = GLib.MAXDOUBLE
+        elif value == -math.inf:
+            self.props.value = -GLib.MAXDOUBLE
+        else:
+            self.props.value = value
 
 
 class CmbSwitch(Gtk.Switch):
