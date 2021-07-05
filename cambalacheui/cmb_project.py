@@ -529,6 +529,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         key = f'{ui_id}.{object_id}' if object_id is not None else ui_id
         return self._get_object_by_key(key)
 
+    def _get_object_by_name(self, ui_id, name):
+        c = self.db.execute("SELECT object_id FROM object WHERE ui_id=? AND name=?;",
+                            (ui_id, name))
+        row = c.fetchone()
+        return self._get_object_by_key(f'{ui_id}.{row[0]}') if row else None
+
     def _undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
         # FIXME:use a dict instead of walking the array
         properties = obj.layout if layout else obj.properties
