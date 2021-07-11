@@ -9,6 +9,7 @@
 import os
 import sys
 import sqlite3
+import ast
 import gi
 
 from lxml import etree
@@ -39,8 +40,6 @@ class CmbDB(GObject.GObject):
     target_tk = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
-        self._target_tk = None
-
         self.type_info = None
 
         self.history_commands = {}
@@ -230,7 +229,6 @@ class CmbDB(GObject.GObject):
         c.executescript(GOBJECT_SQL)
 
         # Add gtk data
-        # TODO: implement own format instead of sql
         if self.target_tk == 'gtk+-3.0':
             c.executescript(GTK3_SQL)
         elif self.target_tk == 'gtk-4.0':
@@ -240,18 +238,24 @@ class CmbDB(GObject.GObject):
 
     @staticmethod
     def get_target_from_file(filename):
+        retval = None
         try:
-            with open(filename, 'r') as sql:
-                cmb = sql.readline()
+            f = open(filename, 'r')
+            for line in f:
+                line = line.strip()
 
-                if cmb.startswith('/* Cambalache target=gtk-4.0 */'):
-                    return 'gtk-4.0'
-                elif cmb.startswith('/* Cambalache target=gtk+-3.0 */'):
-                    return 'gtk+-3.0'
+                # FIXME: find a robust way of doing this without parsing the
+                # whole file
+                if line.startswith('<project'):
+                    root = etree.fromstring(line + '</project>')
+                    retval = root.get('target_tk', None)
+                    break
+
+            f.close()
         except:
             pass
 
-        return None
+        return retval
 
     def get_data(self, key):
         c = self.execute("SELECT value FROM global WHERE key=?;", (key, ))
@@ -268,68 +272,92 @@ class CmbDB(GObject.GObject):
         if filename is None or not os.path.isfile(filename):
             return
 
-        target_tk = CmbDB.get_target_from_file(filename)
+        tree = etree.parse(filename)
+        root = tree.getroot()
+
+        target_tk = root.get('target_tk', None)
 
         if target_tk != self.target_tk:
-            return
+            raise Exception(f'Can not load a {target_tk} target in {self.target_tk} project.')
 
-        # TODO: implement own format instead of sql
-        with open(filename, 'r') as sql:
-            self.conn.executescript(sql.read())
+        c = self.conn.cursor()
+        for child in root.getchildren():
+            data = ast.literal_eval(f'[{child.text}]') if child.text else []
+
+            if len(data) == 0:
+                continue
+
+            cols = ', '.join(['?' for col in data[0]])
+            c.executemany(f'INSERT INTO {child.tag} VALUES ({cols})', data)
+
+        self.conn.commit()
+        c.close()
 
     def save(self, filename):
         def get_row(row):
-            r = '('
-            first = True
+            r = None
 
             for c in row:
-                if first:
-                    first = False
+                if r:
+                    r += ','
                 else:
-                    r += ', '
+                    r = ''
 
                 if type(c)  == str:
-                    val = c.replace("'", "''")
-                    r += f"'{val}'"
-                elif c is None:
-                    r += 'NULL'
-                else:
+                    # FIXME: find a better way to escape string
+                    val = c.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+                    r += f'"{val}"'
+                elif c:
                     r += str(c)
+                else:
+                    r += 'None'
 
-            r += ')'
+            return f'\t({r})'
 
-            return r
-
-        def _dump_table(fd, table):
-            c = self.conn.cursor()
-
+        def _dump_table(c, table):
             c.execute(f"SELECT * FROM {table};")
             row = c.fetchone()
 
-            if row is not None:
-                fd.write(f"INSERT INTO {table} VALUES\n")
+            if row is None:
+                return None
 
+            retval = ''
             while row is not None:
-                fd.write(get_row(row))
+                retval += get_row(row)
                 row = c.fetchone()
-                if row is not None:
-                    fd.write(',\n')
-                else:
-                    fd.write(';\n\n')
 
-            c.close()
+                if row:
+                    retval += ',\n'
+
+            return f'\n{retval}\n  '
 
         self.conn.commit()
+        c = self.conn.cursor()
 
-        # TODO: create custom XML file format with all the data from project tables
-        with open(filename, 'w') as fd:
-            fd.write(f'/* Cambalache target={self.target_tk} */\n')
+        project = E.project(version=VERSION, target_tk=self.target_tk)
 
-            for table in ['ui', 'ui_library', 'object', 'object_property',
-                          'object_layout_property', 'object_signal',
-                          'object_data', 'object_data_arg']:
-                _dump_table(fd, table)
-            fd.close();
+        for table in ['ui', 'ui_library', 'object', 'object_property',
+                      'object_layout_property', 'object_signal',
+                      'object_data', 'object_data_arg']:
+            data = _dump_table(c, table)
+
+            if data is None:
+                continue
+
+            element = etree.Element(table)
+            element.text = data
+            project.append(element)
+
+        # Dump xml to file
+        with open(filename, 'wb') as fd:
+            tree = etree.ElementTree(project)
+            tree.write(fd,
+                       pretty_print=True,
+                       xml_declaration=True,
+                       encoding='UTF-8')
+            fd.close()
+
+        c.close()
 
     def backup(self, filename):
         self.conn.commit()
