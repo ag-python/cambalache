@@ -3,6 +3,7 @@
   <gresource prefix="/ar/xjuan/Cambalache">
     <file>cmb_window.ui</file>
     <file>cambalache.css</file>
+    <file>images/logo.svg</file>
     <file>images/gtk3.svg</file>
     <file>images/gtk4.svg</file>
   </gresource>

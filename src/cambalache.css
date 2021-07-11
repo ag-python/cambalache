@@ -35,3 +35,7 @@ CmbWindow {
   -gtk-key-bindings: WindowBindings;
 }
 
+CmbWindow .logo {
+  background: url('resource:///ar/xjuan/Cambalache/images/logo.svg') no-repeat 50% 35% / 40%
+}
+
