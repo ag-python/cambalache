@@ -48,6 +48,7 @@ install_data([
 
 install_data([
   'mrg_gtk/__init__.pyc',
+  'mrg_gtk/mrg_selection.pyc',
   'mrg_gtk/mrg_gtk_widget.pyc',
   'mrg_gtk/mrg_gtk_window.pyc',
   ],

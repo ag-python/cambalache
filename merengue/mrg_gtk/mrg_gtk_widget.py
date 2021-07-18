@@ -9,13 +9,17 @@ import gi
 from gi.repository import GObject, Gdk, Gtk
 
 from merengue.controller import MrgController
+from .mrg_selection import MrgSelection
 
+import sys
 
 class MrgGtkWidgetController(MrgController):
     object = GObject.Property(type=Gtk.Widget,
                               flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
+        self.window = None
+
         super().__init__(**kwargs)
 
         # Make sure all widget are always visible
@@ -24,11 +28,39 @@ class MrgGtkWidgetController(MrgController):
         self.child_property_ignore_list = set()
 
         self.connect("notify::selected", self.on_selected_changed)
-        self.connect("notify::object", self.on_selected_changed)
+        self.connect("notify::object", self.on_object_changed)
 
         # Make sure show_all() always works
         if Gtk.MAJOR_VERSION == 3:
             self.property_ignore_list.add('no-show-all')
+
+        self.on_object_changed(self.object, None)
+
+    def on_object_changed(self, obj, pspec):
+        self.on_selected_changed(obj, pspec)
+
+        if self.object is None:
+            return
+
+        parent = self.object.get_parent()
+
+        if parent or issubclass(type(self.object), Gtk.Window):
+            return
+
+        if self.window is None:
+            type_name = GObject.type_name(self.object.__gtype__)
+            self.window = Gtk.Window(deletable=False, title=type_name)
+            self.selection = MrgSelection(app=self.app, window=self.window)
+
+        if Gtk.MAJOR_VERSION == 4:
+            self.window.set_child(self.object)
+            self.window.show()
+        else:
+            child = self.window.get_child()
+            if child:
+                self.window.remove(child)
+            self.window.add(self.object)
+            self.window.show_all()
 
     def on_selected_changed(self, obj, pspec):
         if self.object is None:
