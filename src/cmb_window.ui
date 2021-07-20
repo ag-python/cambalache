@@ -174,14 +174,18 @@
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel" id="version_label">
+                <property name="name">version</property>
+                <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="width-chars">32</property>
+                <property name="halign">center</property>
+                <property name="valign">end</property>
+                <property name="margin-bottom">4</property>
                 <attributes>
-                  <attribute name="weight" value="bold"/>
+                  <attribute name="size" value="9000"/>
                 </attributes>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>

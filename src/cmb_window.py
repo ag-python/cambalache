@@ -84,7 +84,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         self._update_actions()
 
-        self.version_label.props.label = config.VERSION
+        self.version_label.props.label = f"version {config.VERSION}"
         self.about_dialog.props.version = config.VERSION
 
         GObject.Object.bind_property(self.np_name_entry, 'text',
