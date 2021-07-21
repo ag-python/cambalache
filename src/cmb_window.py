@@ -12,7 +12,7 @@ import gi
 import traceback
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gio, Gtk
+from gi.repository import GLib, GObject, Gio, Gdk, Gtk
 
 from locale import gettext as _
 from cambalacheui import *
@@ -73,7 +73,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'save', 'save_as',
                        'add_ui', 'delete',
                        'import', 'export',
-                       'close', 'debug', 'about']:
+                       'close', 'debug', 'donate', 'about']:
             gaction = Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self._actions[action] = gaction
@@ -403,6 +403,9 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_about_activate(self, action, data):
         self.about_dialog.present()
+
+    def _on_donate_activate(self, action, data):
+        Gtk.show_uri_on_window(self, "https://www.patreon.com/cambalache", Gdk.CURRENT_TIME)
 
     def do_cmb_action(self, action):
         self._actions[action].activate()
