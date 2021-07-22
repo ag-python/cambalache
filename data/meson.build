@@ -18,11 +18,11 @@ desktop_file = i18n.merge_file(
 )
 
 appstream_file = i18n.merge_file(
-  input: 'ar.xjuan.Cambalache.appdata.xml.in',
-  output: 'ar.xjuan.Cambalache.appdata.xml',
+  input: 'ar.xjuan.Cambalache.metainfo.xml.in',
+  output: 'ar.xjuan.Cambalache.metainfo.xml',
   po_dir: '../po',
   install: true,
-  install_dir: join_paths(datadir, 'appdata')
+  install_dir: join_paths(datadir, 'metainfo')
 )
 
 desktop_file_validate = find_program('desktop-file-validate', required: false)
