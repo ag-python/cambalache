@@ -1,4 +1,4 @@
-# Cambalache
+# Merengue Application
 #
 # Copyright (C) 2021  Juan Pablo Ugarte
 #
@@ -21,19 +21,10 @@
 #
 
 import os
-from .config import *
+
+from . import config
 from gi.repository import Gio
-resource = Gio.Resource.load(os.path.join(pkgdatadir, 'cambalacheui.gresource'))
+resource = Gio.Resource.load(os.path.join(config.pkgdatadir, 'merengue.gresource'))
 resource._register()
 
-from .cmb_ui import CmbUI
-from .cmb_object import CmbObject
-from .cmb_property import CmbProperty
-from .cmb_layout_property import CmbLayoutProperty
-from .cmb_type_info import CmbTypeInfo
-from .cmb_project import CmbProject
-
-from .cmb_view import CmbView
-from .cmb_tree_view import CmbTreeView
-from .cmb_object_editor import CmbObjectEditor
-from .cmb_signal_editor import CmbSignalEditor
+from .mrg_application import MrgApplication

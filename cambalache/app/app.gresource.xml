@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/ar/xjuan/Cambalache">
+  <gresource prefix="/ar/xjuan/Cambalache/app">
     <file>cmb_window.ui</file>
     <file>cambalache.css</file>
     <file>images/logo.svg</file>

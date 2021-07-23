@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 
+<!-- Generated with glade 3.38.2
 
 Cambalache - A new RAD tool for Gtk 4
 Copyright (C) Juan Pablo Ugarte
@@ -357,7 +357,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                               <object class="GtkImage">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="resource">/ar/xjuan/Cambalache/images/gtk3.svg</property>
+                                <property name="resource">/ar/xjuan/Cambalache/app/images/gtk3.svg</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -406,7 +406,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                               <object class="GtkImage">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="resource">/ar/xjuan/Cambalache/images/gtk4.svg</property>
+                                <property name="resource">/ar/xjuan/Cambalache/app/images/gtk4.svg</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

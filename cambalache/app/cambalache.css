@@ -36,6 +36,6 @@ CmbWindow {
 }
 
 CmbWindow .logo {
-  background: url('resource:///ar/xjuan/Cambalache/images/logo.svg') no-repeat 50% 35% / 40%
+  background: url('resource:///ar/xjuan/Cambalache/app/images/logo.svg') no-repeat 50% 35% / 40%
 }
 

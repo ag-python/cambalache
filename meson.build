@@ -12,9 +12,7 @@ gnome = import('gnome')
 i18n = import('i18n')
 
 subdir('data')
-subdir('cambalacheui')
-subdir('merengue')
-subdir('src')
+subdir('cambalache')
 subdir('po')
 
 meson.add_install_script('postinstall.py')

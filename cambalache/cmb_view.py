@@ -33,6 +33,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 from gi.repository import GObject, GLib, Gio, Gdk, Gtk, WebKit2
 
+from . import config
 from .cmb_object import CmbObject
 from .cmb_project import CmbProject
 
@@ -110,7 +111,7 @@ class CmbProcess(GObject.Object):
         return self.emit('stdout', condition)
 
 
-@Gtk.Template(resource_path='/ar/xjuan/Cambalacheui/cmb_view.ui')
+@Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_view.ui')
 class CmbView(Gtk.Stack):
     __gtype_name__ = 'CmbView'
 
@@ -125,7 +126,7 @@ class CmbView(Gtk.Stack):
 
         super().__init__(**kwargs)
 
-        self._merengue_bin = GLib.find_program_in_path('merengue')
+        self._merengue_bin = os.path.join(config.merenguedir, 'merengue', 'merengue')
         self._broadwayd_bin = GLib.find_program_in_path('broadwayd')
         self._gtk4_broadwayd_bin = GLib.find_program_in_path('gtk4-broadwayd')
 

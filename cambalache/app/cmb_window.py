@@ -15,10 +15,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gio, Gdk, Gtk
 
 from locale import gettext as _
-from cambalacheui import *
+from cambalache import *
 
 
-@Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_window.ui')
+@Gtk.Template(resource_path='/ar/xjuan/Cambalache/app/cmb_window.ui')
 class CmbWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'CmbWindow'
 

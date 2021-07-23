@@ -12,9 +12,9 @@ import gi
 import sys
 import signal
 
-pkgdatadir = '@pkgdatadir@'
+merenguedir = '@merenguedir@'
 
-sys.path.insert(1, pkgdatadir)
+sys.path.insert(1, merenguedir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 from gi.repository import GLib

@@ -43,7 +43,7 @@ class Col(Enum):
     INFO = 8
 
 
-@Gtk.Template(resource_path='/ar/xjuan/Cambalacheui/cmb_signal_editor.ui')
+@Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_signal_editor.ui')
 class CmbSignalEditor(Gtk.Box):
     __gtype_name__ = 'CmbSignalEditor'
 

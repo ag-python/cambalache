@@ -1,8 +1,8 @@
 pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalache')
-moduledir = join_paths(pkgdatadir, 'cambalache')
+moduledir = join_paths(get_option('prefix'), python_bin.get_install_dir(), 'cambalache', 'app')
 
-gnome.compile_resources('cambalache',
-  'cambalache.gresource.xml',
+gnome.compile_resources('app',
+  'app.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
@@ -22,21 +22,10 @@ configure_file(
   install_dir: get_option('bindir')
 )
 
-configure_file(
-  input: 'config.py.in',
-  output: 'config.py',
-  configuration: conf,
-  install: true,
-  install_dir: moduledir
-)
-
-run_command('python3', '-m', 'compileall', '-b', '.')
-
 install_data([
-    '__init__.pyc',
-    'cmb_application.pyc',
-    'cmb_window.pyc'
+    '__init__.py',
+    'cmb_application.py',
+    'cmb_window.py'
     ],
     install_dir: moduledir)
-
 

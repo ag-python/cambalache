@@ -14,7 +14,7 @@ gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 
-from cambalacheui import *
+from cambalache import *
 
 from .cmb_window import CmbWindow
 
@@ -56,7 +56,7 @@ class CmbApplication(Gtk.Application):
             self.add_action(gaction)
 
         provider = Gtk.CssProvider()
-        provider.load_from_resource('/ar/xjuan/Cambalache/cambalache.css')
+        provider.load_from_resource('/ar/xjuan/Cambalache/app/cambalache.css')
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(),
             provider,

@@ -32,8 +32,6 @@ from gi.repository import GLib
 basedir = os.path.dirname(__file__)
 sys.path.insert(1, basedir)
 
-os.environ['PATH'] = os.path.join(basedir, 'merengue') + ':' + os.environ.get('PATH')
-
 glib_compile_resources = GLib.find_program_in_path ('glib-compile-resources')
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -59,19 +57,15 @@ def get_resource_mtime(filename):
 
     return max_mtime
 
-def compile_resource(dirname, filename):
+def compile_resource(sourcedir, resource, resource_xml):
     if glib_compile_resources is None:
         return
 
-    filename_xml = f'{filename}.xml'
-    resource = os.path.join(basedir, dirname, filename)
-    resource_xml = os.path.join(basedir, dirname, filename_xml)
-
     if not os.path.exists(resource) or \
        os.path.getmtime (resource) < get_resource_mtime(resource_xml):
-        print('glib-compile-resources', dirname, filename_xml)
-        GLib.spawn_sync(dirname,
-                        [glib_compile_resources, filename_xml],
+        print('glib-compile-resources', resource)
+        GLib.spawn_sync('.',
+                        [glib_compile_resources, f'--sourcedir={sourcedir}', f'--target={resource}', resource_xml],
                         None,
                         GLib.SpawnFlags.DEFAULT,
                         None,
@@ -93,26 +87,26 @@ if __name__ == '__main__':
         exit()
 
     # Create config files pointing to source directories
-    dev_config('cambalacheui/config.py',
-               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalacheui')}'")
-    dev_config('merengue/config.py',
-               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('merengue')}'")
-    dev_config('src/config.py',
-               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('src')}'")
+    dev_config('cambalache/config.py',
+               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'")
+
+    # Create config files pointing to source directories
+    dev_config('cambalache/merengue/config.py',
+               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'")
 
     # Create merengue bin script
-    configure_file('merengue/merengue.in', 'merengue/merengue', {
+    configure_file('cambalache/merengue/merengue.in', 'cambalache/merengue/merengue', {
         'PYTHON': GLib.find_program_in_path('python3'),
-        'pkgdatadir': os.path.abspath('.')
+        'merenguedir': os.path.abspath('cambalache')
     })
-    os.chmod('merengue/merengue', stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+    os.chmod('cambalache/merengue/merengue', stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
 
     # Ensure gresources are up to date
-    compile_resource('cambalacheui', 'cambalacheui.gresource')
-    compile_resource('merengue', 'merengue.gresource')
-    compile_resource('src', 'cambalache.gresource')
+    compile_resource('cambalache', 'cambalache/cambalache.gresource', 'cambalache/cambalache.gresource.xml')
+    compile_resource('cambalache/merengue', 'cambalache/merengue.gresource', 'cambalache/merengue/merengue.gresource.xml')
+    compile_resource('cambalache/app', 'cambalache/app.gresource', 'cambalache/app/app.gresource.xml')
 
     # Run Application
-    from src import CmbApplication
+    from cambalache.app import CmbApplication
     app = CmbApplication()
     app.run(sys.argv)

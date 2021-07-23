@@ -23,7 +23,7 @@ locale.bindtextdomain("cambalache", localedir)
 locale.textdomain("cambalache")
 
 
-from cambalache import CmbApplication
+from cambalache.app import CmbApplication
 
 if __name__ == '__main__':
     app = CmbApplication()
