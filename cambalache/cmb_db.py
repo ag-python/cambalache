@@ -637,11 +637,17 @@ class CmbDB(GObject.GObject):
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
 
+        # Do not use UPDATE FROM since its not supported in gnome sdk sqlite
+        #c.execute("UPDATE object_property AS op SET value=o.object_id FROM property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;", (ui_id, ))
+
         # Fix object references!
-        c.execute("UPDATE object_property AS op SET value=o.object_id FROM property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;",
-                  (ui_id, ))
+        cc = self.conn.cursor()
+        for row in c.execute("SELECT o.object_id, ?, op.object_id, op.owner_id, op.property_id FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;",
+                             (ui_id, ui_id)):
+            cc.execute("UPDATE object_property SET value=? WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?", row)
 
         self.conn.commit()
+        cc.close()
         c.close()
 
         return ui_id
