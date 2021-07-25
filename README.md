@@ -1,4 +1,4 @@
-# Cambalache
+![Cambalache](cambalache/app/images/logo-horizontal.svg)
 
 Cambalache is a new RAD tool for Gtk 4 and 3 with a clear MVC design and data model first philosophy.
 This translates to a wide feature coverage with minimal/none developer intervention for basic support.
@@ -20,7 +20,7 @@ version 2 (GPL) as described in the COPYING.GPL file.
 
 ## Source code
 
-Source code lives on GNOME gitlab at [gitlab](https://gitlab.gnome.org/jpu/cambalache)
+Source code lives on GNOME gitlab [here](https://gitlab.gnome.org/jpu/cambalache)
 
 `git clone https://gitlab.gnome.org/jpu/cambalache.git`
 
@@ -34,7 +34,7 @@ resources and create extra files needed to run.
 ## Flatpak
 
 The preferred way to run Cambalache is using flatpak.
-You can find prebuilt bundles in [gitlab pkgs](https://gitlab.gnome.org/jpu/cambalache/-/packages)
+You can find prebuilt bundles [here](https://gitlab.gnome.org/jpu/cambalache/-/packages)
 
 Or build your own with the following commands
 ```
