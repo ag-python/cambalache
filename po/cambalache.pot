@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-24 19:38-0300\n"
+"POT-Creation-Date: 2021-08-03 15:05-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
-#: data/ar.xjuan.Cambalache.appdata.xml.in:6 src/cmb_window.ui:731
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:743
 msgid "Cambalache"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.desktop.in:4 src/cmb_window.ui:958
+#: data/ar.xjuan.Cambalache.desktop.in:4
 msgid "UI Maker"
 msgstr ""
 
@@ -31,260 +31,250 @@ msgstr ""
 msgid "UI Maker;GUI designer;user interface;ui builder;"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.appdata.xml.in:7
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:7
 msgid "Create and edit UI files for Gtk 4 and Gtk 3 applications"
 msgstr ""
 
 #. To translators: AppData description first paragraph
-#: data/ar.xjuan.Cambalache.appdata.xml.in:11
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:11
 msgid ""
 "Cambalache is a new RAD tool that enables the creation of user interfaces "
 "for Gtk and the GNOME desktop environment."
 msgstr ""
 
 #. To translators: AppData description second paragraph
-#: data/ar.xjuan.Cambalache.appdata.xml.in:17
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:17
 msgid ""
 "Cambalache's main target is Gtk version 4 but it has been designed from the "
 "ground up to support other versions."
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.appdata.xml.in:52
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:52
 msgid "Juan Pablo Ugarte"
 msgstr ""
 
-#: cambalacheui/cmb_signal_editor.ui:57
+#: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
 msgstr ""
 
-#: cambalacheui/cmb_signal_editor.ui:72
+#: cambalache/cmb_signal_editor.ui:72
 msgid "Handler"
 msgstr ""
 
-#: cambalacheui/cmb_signal_editor.ui:88
+#: cambalache/cmb_signal_editor.ui:88
 msgid "Data"
 msgstr ""
 
-#: cambalacheui/cmb_signal_editor.ui:103
+#: cambalache/cmb_signal_editor.ui:103
 msgid "Swap"
 msgstr ""
 
-#: cambalacheui/cmb_signal_editor.ui:116
+#: cambalache/cmb_signal_editor.ui:116
 msgid "After"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:36
+#: cambalache/cmb_view.ui:36
 msgid "Project View"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:81
+#: cambalache/cmb_view.ui:81
 msgid "UI Definition"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:102
+#: cambalache/cmb_view.ui:102
 msgid "Cut"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:116
+#: cambalache/cmb_view.ui:116
 msgid "Copy"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:130
+#: cambalache/cmb_view.ui:130
 msgid "Paste"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:144
+#: cambalache/cmb_view.ui:144
 msgid "Delete"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:169
+#: cambalache/cmb_view.ui:169
 msgid "Clear Properties"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:183
+#: cambalache/cmb_view.ui:183
 msgid "Read Documentation"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:207
+#: cambalache/cmb_view.ui:207
 msgid "Restart workspace"
 msgstr ""
 
-#: cambalacheui/cmb_view.ui:221
+#: cambalache/cmb_view.ui:221
 msgid "Inspect UI definition"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:395
-msgid "Could not determine gtk version"
-msgstr ""
-
-#: cambalacheui/cmb_project.py:398
-msgid "Target version mismatch"
-msgstr ""
-
-#: cambalacheui/cmb_project.py:400
+#: cambalache/cmb_project.py:350
 #, python-brace-format
 msgid "Import file \"{filename}\""
 msgstr ""
 
-#: cambalacheui/cmb_project.py:562
+#: cambalache/cmb_project.py:417
 #, python-brace-format
 msgid "Add UI {basename}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:590
+#: cambalache/cmb_project.py:436
 #, python-brace-format
 msgid "Remove UI \"{ui.name}\""
 msgstr ""
 
-#: cambalacheui/cmb_project.py:671
+#: cambalache/cmb_project.py:509
 #, python-brace-format
 msgid "Remove object {name}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:913
+#: cambalache/cmb_project.py:757
 #, python-brace-format
 msgid "Create UI {ui}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:914
+#: cambalache/cmb_project.py:758
 #, python-brace-format
 msgid "Remove UI {ui}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:915
+#: cambalache/cmb_project.py:759
 #, python-brace-format
 msgid "Update UI {ui}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:918
+#: cambalache/cmb_project.py:762
 #, python-brace-format
 msgid "Create object {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:919
+#: cambalache/cmb_project.py:763
 #, python-brace-format
 msgid "Remove object {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:920
+#: cambalache/cmb_project.py:764
 #, python-brace-format
 msgid "Update object {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:923
+#: cambalache/cmb_project.py:767
 #, python-brace-format
 msgid "Set property \"{prop}\" of {obj} to {value}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:924
+#: cambalache/cmb_project.py:768
 #, python-brace-format
 msgid "Unset property \"{prop}\" of {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:925
+#: cambalache/cmb_project.py:769
 #, python-brace-format
 msgid "Update property \"{prop}\" of {obj} to {value}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:928
+#: cambalache/cmb_project.py:772
 #, python-brace-format
 msgid "Set layout property \"{prop}\" of {obj} to {value}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:929
+#: cambalache/cmb_project.py:773
 #, python-brace-format
 msgid "Unset layout property \"{prop}\" of {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:930
+#: cambalache/cmb_project.py:774
 #, python-brace-format
 msgid "Update layout property \"{prop}\" of {obj} to {value}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:933
+#: cambalache/cmb_project.py:777
 #, python-brace-format
 msgid "Add {signal} signal to {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:934
+#: cambalache/cmb_project.py:778
 #, python-brace-format
 msgid "Remove {signal} signal from {obj}"
 msgstr ""
 
-#: cambalacheui/cmb_project.py:935
+#: cambalache/cmb_project.py:779
 #, python-brace-format
 msgid "Update {signal} signal of {obj}"
 msgstr ""
 
-#: src/cmb_window.py:156
+#: cambalache/app/cmb_window.py:175
 msgid "<Choose a UI filename to create>"
 msgstr ""
 
-#: src/cmb_window.py:253
+#: cambalache/app/cmb_window.py:272
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr ""
 
-#: src/cmb_window.py:256
+#: cambalache/app/cmb_window.py:275
 msgid "Choose file to open"
 msgstr ""
 
-#: src/cmb_window.py:294
+#: cambalache/app/cmb_window.py:313
 msgid "File name already exists, choose a different name."
 msgstr ""
 
-#: src/cmb_window.py:319
+#: cambalache/app/cmb_window.py:338
 msgid "Choose a new file to save the project"
 msgstr ""
 
-#: src/cmb_window.py:331
+#: cambalache/app/cmb_window.py:350
 msgid "Choose a file name for the new UI"
 msgstr ""
 
-#: src/cmb_window.py:351
+#: cambalache/app/cmb_window.py:370
 msgid "Do you want to delete selected UI?"
 msgstr ""
 
-#: src/cmb_window.py:365
+#: cambalache/app/cmb_window.py:384
 msgid "Choose file to import"
 msgstr ""
 
-#: src/cmb_window.py:372
+#: cambalache/app/cmb_window.py:392
 #, python-brace-format
 msgid "Error importing {filename}: {e}"
 msgstr ""
 
-#: src/cmb_window.ui:31
+#: cambalache/app/cmb_window.ui:52
 msgid "Import"
 msgstr ""
 
-#: src/cmb_window.ui:45
+#: cambalache/app/cmb_window.ui:66
 msgid "Export all"
 msgstr ""
 
-#: src/cmb_window.ui:59
+#: cambalache/app/cmb_window.ui:80
 msgid "Close Project"
 msgstr ""
 
-#: src/cmb_window.ui:73
+#: cambalache/app/cmb_window.ui:94
 msgid "Debug Project Data"
 msgstr ""
 
-#: src/cmb_window.ui:98
-msgid "About Cambalache"
+#: cambalache/app/cmb_window.ui:119
+msgid "Donate"
 msgstr ""
 
-#: src/cmb_window.ui:112
+#: cambalache/app/cmb_window.ui:133
+msgid "About"
+msgstr ""
+
+#: cambalache/app/cmb_window.ui:147
 msgid "Quit"
 msgstr ""
 
-#: src/cmb_window.ui:193
-msgid ""
-"<b><span size=\"40000\">Cambalache</span>\n"
-"<span size=\"20000\">UI Maker</span></b>"
-msgstr ""
-
-#: src/cmb_window.ui:234
+#: cambalache/app/cmb_window.ui:246
 msgid ""
 "<b>\n"
 "\n"
@@ -292,89 +282,86 @@ msgid ""
 "</b>"
 msgstr ""
 
-#: src/cmb_window.ui:262
+#: cambalache/app/cmb_window.ui:274
 msgid "Name"
 msgstr ""
 
-#: src/cmb_window.ui:274
+#: cambalache/app/cmb_window.ui:286
 msgid "Toolkit target"
 msgstr ""
 
-#: src/cmb_window.ui:286
+#: cambalache/app/cmb_window.ui:298
 msgid "Location"
 msgstr ""
 
-#: src/cmb_window.ui:298
+#: cambalache/app/cmb_window.ui:310
 msgid "<project basename>"
 msgstr ""
 
-#: src/cmb_window.ui:310
+#: cambalache/app/cmb_window.ui:322
 msgid "Create"
 msgstr ""
 
-#: src/cmb_window.ui:440
+#: cambalache/app/cmb_window.ui:452
 msgid "Choose a location to save the project"
 msgstr ""
 
-#: src/cmb_window.ui:450
+#: cambalache/app/cmb_window.ui:462
 msgid "Cancel"
 msgstr ""
 
-#: src/cmb_window.ui:467
+#: cambalache/app/cmb_window.ui:479
 msgid "UI Filename"
 msgstr ""
 
-#: src/cmb_window.ui:504
+#: cambalache/app/cmb_window.ui:516
 msgid "New Project"
 msgstr ""
 
-#: src/cmb_window.ui:657
+#: cambalache/app/cmb_window.ui:669
 msgid "Properties"
 msgstr ""
 
-#: src/cmb_window.ui:685
+#: cambalache/app/cmb_window.ui:697
 msgid "Layout"
 msgstr ""
 
-#: src/cmb_window.ui:701
+#: cambalache/app/cmb_window.ui:713
 msgid "Signals"
 msgstr ""
 
-#: src/cmb_window.ui:759
+#: cambalache/app/cmb_window.ui:771
 msgid "_Open"
 msgstr ""
 
-#: src/cmb_window.ui:763
+#: cambalache/app/cmb_window.ui:775
 msgid "Open a project"
 msgstr ""
 
-#: src/cmb_window.ui:804
+#: cambalache/app/cmb_window.ui:816
 msgid "Create a new project"
 msgstr ""
 
-#: src/cmb_window.ui:825
+#: cambalache/app/cmb_window.ui:837
 msgid "Save"
 msgstr ""
 
-#: src/cmb_window.ui:829
+#: cambalache/app/cmb_window.ui:841
 msgid "Save project"
 msgstr ""
 
-#: src/cmb_window.ui:844
+#: cambalache/app/cmb_window.ui:856
 msgid "Save project with a different file name"
 msgstr ""
 
-#: src/cmb_window.ui:881
+#: cambalache/app/cmb_window.ui:893
 msgid "Add new UI to project"
 msgstr ""
 
-#: src/cmb_window.ui:957
-msgid "© 2020-2021 Juan Pablo Ugarte - All Rights Reserved"
+#: cambalache/app/cmb_window.ui:969
+msgid "© 2020-2021 Juan Pablo Ugarte"
 msgstr ""
 
-#: src/cmb_window.ui:959
-msgid ""
-"This application is distributed on an \"AS IS\" BASIS, WITHOUT\n"
-"WARRANTIES OR CONDITIONS OF ANY KIND,\n"
-"either express or implied."
+#: cambalache/app/cmb_window.ui:970
+msgid "User Interface Maker"
 msgstr ""
