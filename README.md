@@ -31,10 +31,14 @@ resources and create extra files needed to run.
 
 `./run-dev.py`
 
+The minimum requirements are Gtk 3 and lxml, Gtk 4 is only needed to have a functional Gtk 4 workspace.
+
 ## Flatpak
 
 The preferred way to run Cambalache is using flatpak.
-You can find prebuilt bundles [here](https://gitlab.gnome.org/jpu/cambalache/-/packages)
+Instructions on how to install flatpak can be found [here](https://flatpak.org/setup/).
+
+You can get Cambalache prebuilt bundles [here](https://gitlab.gnome.org/jpu/cambalache/-/packages).
 
 Or build your own with the following commands
 ```
