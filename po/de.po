@@ -1,0 +1,402 @@
+# German translations for cambalache package.
+# Copyright (C) 2021 THE cambalache'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the cambalache package.
+# PhilProg <No_E-Mail>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cambalache\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-03 15:05-0400\n"
+"PO-Revision-Date: 2021-08-04 16:38+0200\n"
+"Last-Translator: PhilProg <No_E-Mail>\n"
+"Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0\n"
+
+#: data/ar.xjuan.Cambalache.desktop.in:3
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:743
+msgid "Cambalache"
+msgstr "Cambalache"
+
+#: data/ar.xjuan.Cambalache.desktop.in:4
+msgid "UI Maker"
+msgstr "UI-Ersteller"
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/ar.xjuan.Cambalache.desktop.in:14
+msgid "UI Maker;GUI designer;user interface;ui builder;"
+msgstr "UI-Ersteller, GUI-Designer, Benutzeroberfläche, UI-Builder;"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:7
+msgid "Create and edit UI files for Gtk 4 and Gtk 3 applications"
+msgstr ""
+"Erstellen und bearbeiten Sie UI-Dateien für Gtk 4- und Gtk 3-Anwendungen"
+
+#. To translators: AppData description first paragraph
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:11
+msgid ""
+"Cambalache is a new RAD tool that enables the creation of user interfaces "
+"for Gtk and the GNOME desktop environment."
+msgstr ""
+"Cambalache ist ein neues RAD-Tool, das die Erstellung von "
+"Benutzeroberflächen für Gtk und die GNOME-Desktop-Umgebung ermöglicht."
+
+#. To translators: AppData description second paragraph
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:17
+msgid ""
+"Cambalache's main target is Gtk version 4 but it has been designed from the "
+"ground up to support other versions."
+msgstr ""
+"Cambalaches Hauptziel ist die Gtk-Version 4, es jedoch von Grund auf für die "
+"Unterstützung anderer Versionen entwickelt wurde."
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:52
+msgid "Juan Pablo Ugarte"
+msgstr "Juan Pablo Ugarte"
+
+#: cambalache/cmb_signal_editor.ui:57
+msgid "Signal"
+msgstr "Signal"
+
+#: cambalache/cmb_signal_editor.ui:72
+msgid "Handler"
+msgstr "Steuerung"
+
+#: cambalache/cmb_signal_editor.ui:88
+msgid "Data"
+msgstr "Benutzerdaten"
+
+#: cambalache/cmb_signal_editor.ui:103
+msgid "Swap"
+msgstr "Vertauschen"
+
+#: cambalache/cmb_signal_editor.ui:116
+msgid "After"
+msgstr "Danach"
+
+#: cambalache/cmb_view.ui:36
+msgid "Project View"
+msgstr "Projektansicht"
+
+#: cambalache/cmb_view.ui:81
+msgid "UI Definition"
+msgstr "UI-Definition"
+
+#: cambalache/cmb_view.ui:102
+msgid "Cut"
+msgstr "Schneiden"
+
+#: cambalache/cmb_view.ui:116
+msgid "Copy"
+msgstr "Kopieren"
+
+#: cambalache/cmb_view.ui:130
+msgid "Paste"
+msgstr "Einfügen"
+
+#: cambalache/cmb_view.ui:144
+msgid "Delete"
+msgstr "Entfernen"
+
+#: cambalache/cmb_view.ui:169
+msgid "Clear Properties"
+msgstr "Eigenschaften löschen"
+
+#: cambalache/cmb_view.ui:183
+msgid "Read Documentation"
+msgstr "Dokumentation lesen"
+
+#: cambalache/cmb_view.ui:207
+msgid "Restart workspace"
+msgstr "Arbeitsbereich neu starten"
+
+#: cambalache/cmb_view.ui:221
+msgid "Inspect UI definition"
+msgstr "UI-Definition überprüfen"
+
+#: cambalache/cmb_project.py:350
+#, python-brace-format
+msgid "Import file \"{filename}\""
+msgstr "Datei \"{filename}\" importieren"
+
+#: cambalache/cmb_project.py:417
+#, python-brace-format
+msgid "Add UI {basename}"
+msgstr "Benutzeroberfläche {basename} hinzufügen"
+
+#: cambalache/cmb_project.py:436
+#, python-brace-format
+msgid "Remove UI \"{ui.name}\""
+msgstr "Benutzeroberfläche \"{ui.name}\" entfernen"
+
+#: cambalache/cmb_project.py:509
+#, python-brace-format
+msgid "Remove object {name}"
+msgstr "Objekt {name} entfernen"
+
+#: cambalache/cmb_project.py:757
+#, python-brace-format
+msgid "Create UI {ui}"
+msgstr "Benutzeroberfläche {ui} erstellen"
+
+#: cambalache/cmb_project.py:758
+#, python-brace-format
+msgid "Remove UI {ui}"
+msgstr "Benutzeroberfläche {ui} entfernen"
+
+#: cambalache/cmb_project.py:759
+#, python-brace-format
+msgid "Update UI {ui}"
+msgstr "Benutzeroberfläche {ui} aktualisieren"
+
+#: cambalache/cmb_project.py:762
+#, python-brace-format
+msgid "Create object {obj}"
+msgstr "Objekt {obj} erstellen"
+
+#: cambalache/cmb_project.py:763
+#, python-brace-format
+msgid "Remove object {obj}"
+msgstr "Objekt {obj} entfernen"
+
+#: cambalache/cmb_project.py:764
+#, python-brace-format
+msgid "Update object {obj}"
+msgstr "Objekt {obj} aktualisieren"
+
+#: cambalache/cmb_project.py:767
+#, python-brace-format
+msgid "Set property \"{prop}\" of {obj} to {value}"
+msgstr "Eigenschaft \"{prop}\" von {obj} auf {value} setzen"
+
+#: cambalache/cmb_project.py:768
+#, python-brace-format
+msgid "Unset property \"{prop}\" of {obj}"
+msgstr "Eigenschaft \"{prop}\" von {obj} aufheben"
+
+#: cambalache/cmb_project.py:769
+#, python-brace-format
+msgid "Update property \"{prop}\" of {obj} to {value}"
+msgstr "Eigenschaft \"{prop}\" von {obj} auf {value} aktualisieren"
+
+#: cambalache/cmb_project.py:772
+#, python-brace-format
+msgid "Set layout property \"{prop}\" of {obj} to {value}"
+msgstr "Layouteigenschaft \"{prop}\" von {obj} auf {value} setzen"
+
+#: cambalache/cmb_project.py:773
+#, python-brace-format
+msgid "Unset layout property \"{prop}\" of {obj}"
+msgstr "Layout-Eigenschaft \"{prop}\" von {obj} aufheben"
+
+#: cambalache/cmb_project.py:774
+#, python-brace-format
+msgid "Update layout property \"{prop}\" of {obj} to {value}"
+msgstr "Layout-Eigenschaft \"{prop}\" von {obj} auf {value} aktualisieren"
+
+#: cambalache/cmb_project.py:777
+#, python-brace-format
+msgid "Add {signal} signal to {obj}"
+msgstr "{signal}-Signal zu {obj} hinzufügen"
+
+#: cambalache/cmb_project.py:778
+#, python-brace-format
+msgid "Remove {signal} signal from {obj}"
+msgstr "{signal}-Signal von {obj} entfernen"
+
+#: cambalache/cmb_project.py:779
+#, python-brace-format
+msgid "Update {signal} signal of {obj}"
+msgstr "{signal}-Signal von {obj} aktualisieren"
+
+#: cambalache/app/cmb_window.py:175
+msgid "<Choose a UI filename to create>"
+msgstr "<Wählen Sie einen zu erstellenden UI-Dateinamen>"
+
+#: cambalache/app/cmb_window.py:272
+#, python-brace-format
+msgid "Error loading {filename}"
+msgstr "Fehler beim Laden von {filename}"
+
+#: cambalache/app/cmb_window.py:275
+msgid "Choose file to open"
+msgstr "Datei zum Öffnen auswählen"
+
+#: cambalache/app/cmb_window.py:313
+msgid "File name already exists, choose a different name."
+msgstr "Dateiname existiert bereits, wählen Sie einen anderen Namen."
+
+#: cambalache/app/cmb_window.py:338
+msgid "Choose a new file to save the project"
+msgstr "Wählen Sie eine neue Datei, um das Projekt zu speichern"
+
+#: cambalache/app/cmb_window.py:350
+msgid "Choose a file name for the new UI"
+msgstr "Wählen Sie einen Dateinamen für die neue Benutzeroberfläche"
+
+#: cambalache/app/cmb_window.py:370
+msgid "Do you want to delete selected UI?"
+msgstr "Möchten Sie die ausgewählte Benutzeroberfläche löschen?"
+
+#: cambalache/app/cmb_window.py:384
+msgid "Choose file to import"
+msgstr "Datei zum Importieren auswählen"
+
+#: cambalache/app/cmb_window.py:392
+#, python-brace-format
+msgid "Error importing {filename}: {e}"
+msgstr "Fehler beim Importieren von {filename}: {e}"
+
+#: cambalache/app/cmb_window.ui:52
+msgid "Import"
+msgstr "Importieren"
+
+#: cambalache/app/cmb_window.ui:66
+msgid "Export all"
+msgstr "Alles exportieren"
+
+#: cambalache/app/cmb_window.ui:80
+msgid "Close Project"
+msgstr "Projekt schließen"
+
+#: cambalache/app/cmb_window.ui:94
+msgid "Debug Project Data"
+msgstr "Projektdaten debuggen"
+
+#: cambalache/app/cmb_window.ui:119
+msgid "Donate"
+msgstr "Spenden"
+
+#: cambalache/app/cmb_window.ui:133
+msgid "About"
+msgstr "Über"
+
+#: cambalache/app/cmb_window.ui:147
+msgid "Quit"
+msgstr "Beenden"
+
+#: cambalache/app/cmb_window.ui:246
+msgid ""
+"<b>\n"
+"\n"
+"<span size=\"18000\">New project</span>\n"
+"</b>"
+msgstr ""
+"<b>\n"
+"\n"
+"<span size=\"18000\">Neues Projekt</span>\n"
+"</b>"
+
+#: cambalache/app/cmb_window.ui:274
+msgid "Name"
+msgstr "Name"
+
+#: cambalache/app/cmb_window.ui:286
+msgid "Toolkit target"
+msgstr "Toolkit"
+
+#: cambalache/app/cmb_window.ui:298
+msgid "Location"
+msgstr "Speicherort"
+
+#: cambalache/app/cmb_window.ui:310
+msgid "<project basename>"
+msgstr "<Projektbasisname>"
+
+#: cambalache/app/cmb_window.ui:322
+msgid "Create"
+msgstr "Erstellen"
+
+#: cambalache/app/cmb_window.ui:452
+msgid "Choose a location to save the project"
+msgstr "Wählen Sie einen Speicherort zum Speichern des Projekts"
+
+#: cambalache/app/cmb_window.ui:462
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: cambalache/app/cmb_window.ui:479
+msgid "UI Filename"
+msgstr "UI-Dateiname"
+
+#: cambalache/app/cmb_window.ui:516
+msgid "New Project"
+msgstr "Neues Projekt"
+
+#: cambalache/app/cmb_window.ui:669
+msgid "Properties"
+msgstr "Eigenschaften"
+
+#: cambalache/app/cmb_window.ui:697
+msgid "Layout"
+msgstr "Layout"
+
+#: cambalache/app/cmb_window.ui:713
+msgid "Signals"
+msgstr "Signale"
+
+#: cambalache/app/cmb_window.ui:771
+msgid "_Open"
+msgstr "_Öffnen"
+
+#: cambalache/app/cmb_window.ui:775
+msgid "Open a project"
+msgstr "Projekt öffnen"
+
+#: cambalache/app/cmb_window.ui:816
+msgid "Create a new project"
+msgstr "Neues Projekt erstellen"
+
+#: cambalache/app/cmb_window.ui:837
+msgid "Save"
+msgstr "Speichern"
+
+#: cambalache/app/cmb_window.ui:841
+msgid "Save project"
+msgstr "Projekt speichern"
+
+#: cambalache/app/cmb_window.ui:856
+msgid "Save project with a different file name"
+msgstr "Projekt unter anderem Dateinamen speichern"
+
+#: cambalache/app/cmb_window.ui:893
+msgid "Add new UI to project"
+msgstr "Neue Benutzeroberfläche zum Projekt hinzufügen"
+
+#: cambalache/app/cmb_window.ui:969
+msgid "© 2020-2021 Juan Pablo Ugarte"
+msgstr "© 2020-2021 Juan Pablo Ugarte"
+
+#: cambalache/app/cmb_window.ui:970
+msgid "User Interface Maker"
+msgstr "Benutzeroberflächen-Ersteller"
+
+#~ msgid "Could not determine gtk version"
+#~ msgstr "GTK-Version konnte nicht ermittelt werden"
+
+#~ msgid "Target version mismatch"
+#~ msgstr "Nichtübereinstimmung der Zielversion"
+
+#~ msgid "About Cambalache"
+#~ msgstr "Über Cambalache"
+
+#~ msgid ""
+#~ "<b><span size=\"40000\">Cambalache</span>\n"
+#~ "<span size=\"20000\">UI Maker</span></b>"
+#~ msgstr ""
+#~ "<b><span size=\"40000\">Cambalache</span>\n"
+#~ "<span size=\"20000\">UI-Ersteller</span></b>"
+
+#~ msgid ""
+#~ "This application is distributed on an \"AS IS\" BASIS, WITHOUT\n"
+#~ "WARRANTIES OR CONDITIONS OF ANY KIND,\n"
+#~ "either express or implied."
+#~ msgstr ""
+#~ "Diese Anwendung wird \"WIE SIE IST\" verteilt, OHNE\n"
+#~ "GEWÄHRLEISTUNGEN ODER BEDINGUNGEN JEGLICHER ART,\n"
+#~ "entweder ausdrücklich oder stillschweigend."
