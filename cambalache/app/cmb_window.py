@@ -272,7 +272,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.present_message_to_user(_(f'Error loading {filename}'))
 
     def _on_open_activate(self, action, data):
-        dialog = self._file_open_dialog_new(_("Choose file to open"),
+        dialog = self._file_open_dialog_new(_("Choose project to open"),
                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
             self.emit('open-project', dialog.get_filename(), None, None)
