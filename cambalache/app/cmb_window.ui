@@ -163,17 +163,11 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
     <mime-types>
       <mime-type>application/x-cambalache</mime-type>
     </mime-types>
-    <patterns>
-      <pattern>*.cmb</pattern>
-    </patterns>
   </object>
   <object class="GtkRecentFilter" id="recent_filter">
     <mime-types>
       <mime-type>application/x-cambalache</mime-type>
     </mime-types>
-    <patterns>
-      <pattern>*.cmb</pattern>
-    </patterns>
   </object>
   <object class="GtkRecentChooserMenu" id="recent_menu">
     <property name="visible">True</property>

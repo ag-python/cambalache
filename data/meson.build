@@ -1,11 +1,15 @@
 datadir = get_option('datadir')
 
 install_data('ar.xjuan.Cambalache.svg',
-  install_dir: join_paths(datadir, 'icons/hicolor/scalable/apps')
+  install_dir: join_paths(datadir, 'icons', 'hicolor', 'scalable', 'apps')
 )
 
 install_data('ar.xjuan.Cambalache-symbolic.svg',
-  install_dir: join_paths(datadir, 'icons/hicolor/symbolic/apps')
+  install_dir: join_paths(datadir, 'icons', 'hicolor', 'symbolic', 'apps')
+)
+
+install_data('ar.xjuan.Cambalache.mime.xml',
+    install_dir: join_paths(datadir, 'mime', 'packages')
 )
 
 desktop_file = i18n.merge_file(

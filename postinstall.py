@@ -9,6 +9,9 @@ destdir = environ.get('DESTDIR', '')
 
 # Package managers set this so we don't need to run
 if not destdir:
+    print('Updating mime database...')
+    call(['update-mime-database', path.join(datadir, 'mime')])
+    
     print('Updating icon cache...')
     call(['gtk-update-icon-cache', '-qtf', path.join(datadir, 'icons', 'hicolor')])
 

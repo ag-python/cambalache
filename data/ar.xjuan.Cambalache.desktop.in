@@ -5,7 +5,7 @@ Exec=cambalache %f
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;Development;GUIDesigner;
-MimeType=application/x-gtk-builder;application/x-glade;
+MimeType=application/x-cambalache;application/x-gtk-builder;application/x-glade;
 StartupNotify=true
 # TRANSLATORS: Don't translate this, its an icon name
 Icon=ar.xjuan.Cambalache
