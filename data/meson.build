@@ -8,6 +8,10 @@ install_data('ar.xjuan.Cambalache-symbolic.svg',
   install_dir: join_paths(datadir, 'icons', 'hicolor', 'symbolic', 'apps')
 )
 
+install_data('ar.xjuan.Cambalache.mime.svg',
+  install_dir: join_paths(datadir, 'icons', 'hicolor', 'scalable', 'mimetypes')
+)
+
 install_data('ar.xjuan.Cambalache.mime.xml',
     install_dir: join_paths(datadir, 'mime', 'packages')
 )

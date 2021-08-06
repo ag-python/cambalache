@@ -2,6 +2,7 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="application/x-cambalache">
     <comment>Cambalache Project File</comment>
-      <glob pattern="*.cmb"/>
+    <glob pattern="*.cmb"/>
+    <generic-icon name="ar.xjuan.Cambalache.mime"/>
   </mime-type>
 </mime-info>
