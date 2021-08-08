@@ -25,7 +25,8 @@ configure_file(
 install_data([
     '__init__.py',
     'cmb_application.py',
-    'cmb_window.py'
+    'cmb_window.py',
+    'cmb_tutor.py'
     ],
     install_dir: moduledir)
 
