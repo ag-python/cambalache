@@ -31,6 +31,7 @@ from gi.repository import GLib, GObject, Gio, Gdk, Gtk
 
 from locale import gettext as _
 from cambalache import *
+from .cmb_tutor import CmbTutor, CmbTutorPosition
 
 
 @Gtk.Template(resource_path='/ar/xjuan/Cambalache/app/cmb_window.ui')
@@ -74,6 +75,16 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     about_dialog = Gtk.Template.Child()
 
+    # Tutor widgets
+    intro_button = Gtk.Template.Child()
+    open_button = Gtk.Template.Child()
+    recent_button = Gtk.Template.Child()
+    new_button = Gtk.Template.Child()
+    add_button = Gtk.Template.Child()
+    save_button = Gtk.Template.Child()
+    save_as_button = Gtk.Template.Child()
+    menu_button = Gtk.Template.Child()
+
     def __init__(self, **kwargs):
         self._project = None
 
@@ -84,7 +95,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.import_button_box.props.homogeneous = False
 
         for action in ['open', 'create_new', 'new',
-                       'undo', 'redo',
+                       'undo', 'redo', 'intro',
                        'save', 'save_as',
                        'add_ui', 'delete',
                        'import', 'export',
@@ -111,6 +122,8 @@ class CmbWindow(Gtk.ApplicationWindow):
                                      GObject.BindingFlags.SYNC_CREATE,
                                      self._np_name_to_ui,
                                      None)
+
+        self.tutor = None
 
     @GObject.Property(type=CmbProject)
     def project(self):
@@ -261,6 +274,10 @@ class CmbWindow(Gtk.ApplicationWindow):
     def open_project(self, filename, target_tk=None, uiname=None):
         try:
             self.project = CmbProject(filename=filename, target_tk=target_tk)
+
+            # Clear intro tutorial
+            self.tutor = None
+
             if uiname:
                 ui = self.project.add_ui(uiname)
                 self.project.set_selection([ui])
@@ -428,6 +445,37 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def do_cmb_action(self, action):
         self._actions[action].activate()
+
+    def _on_intro_activate(self, action, data):
+        if self.tutor:
+            self.tutor.play()
+            return
+
+        if self.project is None:
+            script = [
+                (self.intro_button, 5,   _("Hi, I will show you around Cambalache")),
+
+                (self.open_button, 3,    _("You can open a project")),
+                (self.recent_button, 2,  _("find recently used")),
+                (self.new_button, 4,     _("or create a new one")),
+                (self.add_button, 6,     _("Also, add more than one UI file to the project here.")),
+
+                (self.undo_button, 5,    _("Common actions like Undo")),
+                (self.redo_button, 2,    _("Redo")),
+                (self.save_button, 4,    _("and Save are directly accessible in the headerbar")),
+                (self.save_as_button, 2, _("just like Save As")),
+                (self.menu_button, 3,    _("and the main menu")),
+
+                (self.intro_button, 2,   _("Enjoy!")),
+            ]
+        else:
+            script = [
+                (self.intro_button, 5, _("Great! You have a project opened")),
+                (self.intro_button, 2, _("Enjoy!")),
+            ]
+
+        self.tutor = CmbTutor(script)
+        self.tutor.play()
 
 
 Gtk.WidgetClass.set_css_name(CmbWindow, 'CmbWindow')

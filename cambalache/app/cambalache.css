@@ -39,3 +39,23 @@ CmbWindow .logo {
   background: url('resource:///ar/xjuan/Cambalache/app/images/logo.svg') no-repeat 50% 35% / 40%
 }
 
+
+popover.cmb-tutor {
+  padding: 1em;
+}
+
+popover.cmb-tutor label {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@keyframes widget-highlight {
+  from { box-shadow: 0px 0px 10px @theme_selected_bg_color, inset 0px 0px 4px  @theme_selected_bg_color; }
+  to   { box-shadow: 0px 0px 4px  @theme_selected_bg_color, inset 0px 0px 10px @theme_selected_bg_color; }
+}
+
+button.cmb-tutor-highlight,
+buttonbox.cmb-tutor-highlight > button,
+stackswitcher.cmb-tutor-highlight > button {
+  animation: widget-highlight 1s infinite alternate;
+}

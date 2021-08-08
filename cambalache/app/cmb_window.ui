@@ -737,7 +737,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
         <property name="title" translatable="yes">Cambalache</property>
         <property name="show-close-button">True</property>
         <child>
-          <object class="GtkMenuButton">
+          <object class="GtkMenuButton" id="menu_button">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
@@ -761,7 +761,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
             <property name="can-focus">False</property>
             <property name="layout-style">expand</property>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="open_button">
                 <property name="label" translatable="yes">_Open</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -777,7 +777,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
               </packing>
             </child>
             <child>
-              <object class="GtkMenuButton" id="recent_menu_button">
+              <object class="GtkMenuButton" id="recent_button">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -803,7 +803,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           </packing>
         </child>
         <child>
-          <object class="GtkButton">
+          <object class="GtkButton" id="new_button">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
@@ -827,7 +827,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
             <property name="can-focus">False</property>
             <property name="layout-style">expand</property>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="save_button">
                 <property name="label" translatable="yes">Save</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -843,7 +843,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="export_button">
+              <object class="GtkButton" id="save_as_button">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -880,7 +880,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           </packing>
         </child>
         <child>
-          <object class="GtkButton">
+          <object class="GtkButton" id="add_button">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
@@ -897,6 +897,26 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="pack-type">end</property>
             <property name="position">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="intro_button">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">Start interactive introduction</property>
+            <property name="action-name">win.intro</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">start-here-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+            <property name="position">7</property>
           </packing>
         </child>
         <child>
