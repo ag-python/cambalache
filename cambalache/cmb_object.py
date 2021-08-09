@@ -51,6 +51,7 @@ class CmbObject(CmbBaseObject):
             return
 
         self._populate_properties()
+        self._populate_layout_properties()
         self._populate_signals()
 
     def _populate_type_properties(self, name):
@@ -75,17 +76,19 @@ class CmbObject(CmbBaseObject):
         for parent_id in self.info.hierarchy:
             self._populate_type_properties(parent_id)
 
-    def _populate_layout_properties(self, name):
+    def _populate_layout_properties_from_type(self, name):
         property_info = self.project.get_type_properties(name)
         if property_info is None:
             return
 
+        # parent_id is stored in the DB so its better to cache it
+        parent_id = self.parent_id
         for property_name in property_info:
             info = property_info[property_name]
 
             prop = CmbLayoutProperty(project=self.project,
                                      ui_id=self.ui_id,
-                                     object_id=self.parent_id,
+                                     object_id=parent_id,
                                      child_id=self.object_id,
                                      owner_id=name,
                                      property_id=info.property_id,
@@ -106,6 +109,15 @@ class CmbObject(CmbBaseObject):
                              (self.ui_id, self.object_id)):
             self._add_signal_object(CmbSignal.from_row(self.project, *row))
 
+    def _populate_layout_properties(self):
+        parent_id = self.parent_id
+
+        if parent_id > 0:
+            parent = self.project._get_object_by_id(self.ui_id, parent_id)
+            self._populate_layout_properties_from_type(f"{parent.type_id}LayoutChild")
+        else:
+            self.layout = []
+
     @GObject.Property(type=int)
     def parent_id(self):
         retval = self.db_get('SELECT parent_id FROM object WHERE (ui_id, object_id) IS (?, ?);',
@@ -118,11 +130,7 @@ class CmbObject(CmbBaseObject):
                     (self.ui_id, self.object_id, ),
                     value if value != 0 else None)
 
-        if value > 0:
-            parent = self.project._get_object_by_id(self.ui_id, value)
-            self._populate_layout_properties(f'{parent.type_id}LayoutChild')
-        else:
-            self.layout = []
+        self._populate_layout_properties()
 
     def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         signal = CmbSignal(project=self.project,
