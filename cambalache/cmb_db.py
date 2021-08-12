@@ -295,7 +295,13 @@ class CmbDB(GObject.GObject):
         if target_tk != self.target_tk:
             raise Exception(f'Can not load a {target_tk} target in {self.target_tk} project.')
 
+
         c = self.conn.cursor()
+
+        # Avoid circular dependencies errors
+        c.execute("COMMIT;")
+        c.execute("PRAGMA foreign_keys=OFF;")
+
         for child in root.getchildren():
             data = ast.literal_eval(f'[{child.text}]') if child.text else []
 
@@ -305,7 +311,8 @@ class CmbDB(GObject.GObject):
             cols = ', '.join(['?' for col in data[0]])
             c.executemany(f'INSERT INTO {child.tag} VALUES ({cols})', data)
 
-        self.conn.commit()
+        c.execute("PRAGMA foreign_keys = ON;")
+        c.execute("COMMIT;")
         c.close()
 
     def save(self, filename):
@@ -418,9 +425,16 @@ class CmbDB(GObject.GObject):
 
         return object_id
 
-    def _import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None):
-        klass = node.get('class')
-        name = node.get('id')
+    def _import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False):
+        is_template = node.tag == 'template'
+
+        if is_template:
+            klass = node.get('parent')
+            name = node.get('class')
+        else:
+            klass = node.get('class')
+            name = node.get('id')
+
         comment = self._node_get_comment(node)
         info = self.type_info.get(klass, None)
 
@@ -433,6 +447,9 @@ class CmbDB(GObject.GObject):
             return
 
         c = self.conn.cursor()
+
+        if is_template:
+            c.execute("UPDATE ui SET template_id=? WHERE ui_id=?", (object_id, ui_id))
 
         # Properties
         for prop in node.iterfind('property'):
@@ -631,8 +648,11 @@ class CmbDB(GObject.GObject):
         ui_id = self.add_ui(basename, relpath, requirements, comment)
 
         # Import objects
-        for child in root.iterfind('object'):
-            self._import_object(ui_id, child, None)
+        for child in root.iter():
+            if child.tag == 'object':
+                self._import_object(ui_id, child, None)
+            elif child.tag == 'template':
+                self._import_object(ui_id, child, None)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
@@ -656,25 +676,31 @@ class CmbDB(GObject.GObject):
         if comment:
             node.addprevious(etree.Comment(comment))
 
-    def _get_object(self, ui_id, object_id, use_id=False):
+    def _get_object(self, ui_id, object_id, use_id=False, template_id=None):
         def node_set(node, attr, val):
             if val is not None:
                 node.set(attr, str(val))
 
         c = self.conn.cursor()
         cc = self.conn.cursor()
-        obj = E.object()
 
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         type_id, name = c.fetchone()
-        node_set(obj, 'class', type_id)
+
+        if not use_id and template_id == object_id:
+            obj = E.template()
+            node_set(obj, 'class', name)
+            node_set(obj, 'parent', type_id)
+        else:
+            obj = E.object()
+            node_set(obj, 'class', type_id)
+
+            if use_id:
+                node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
+            else:
+                node_set(obj, 'id', name)
 
         info = self.type_info.get(type_id, None)
-
-        if use_id:
-            node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
-        else:
-            node_set(obj, 'id', name)
 
         # Properties
         for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object, o.name FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND op.object_id=? AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.object_id = op.object_id;',
@@ -792,8 +818,8 @@ class CmbDB(GObject.GObject):
         node = E.interface()
         node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
 
-        c.execute('SELECT comment FROM ui WHERE ui_id=?;', (ui_id,))
-        comment, = c.fetchone()
+        c.execute('SELECT comment, template_id FROM ui WHERE ui_id=?;', (ui_id,))
+        comment, template_id = c.fetchone()
         self._node_add_comment(node, comment)
 
         # requires
@@ -807,7 +833,7 @@ class CmbDB(GObject.GObject):
         for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
             object_id, comment = row
-            child = self._get_object(ui_id, object_id, use_id)
+            child = self._get_object(ui_id, object_id, use_id=use_id, template_id=template_id)
             node.append(child)
             self._node_add_comment(child, comment)
 
