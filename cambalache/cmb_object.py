@@ -29,6 +29,7 @@ from .cmb_objects_base import CmbBaseObject, CmbSignal
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
 from .cmb_type_info import CmbTypeInfo
+from .cmb_ui import CmbUI
 
 
 class CmbObject(CmbBaseObject):
@@ -131,6 +132,10 @@ class CmbObject(CmbBaseObject):
                     value if value != 0 else None)
 
         self._populate_layout_properties()
+
+    @GObject.Property(type=CmbUI)
+    def ui(self):
+        return self.project._get_object_by_id(self.ui_id)
 
     def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         signal = CmbSignal(project=self.project,
