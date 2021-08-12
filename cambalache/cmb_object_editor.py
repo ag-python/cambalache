@@ -27,6 +27,7 @@ import math
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
+from locale import gettext as _
 
 from .cmb_object import CmbObject
 from .cmb_type_info import CmbTypeInfo
@@ -257,6 +258,7 @@ class CmbObjectEditor(Gtk.Box):
 
     def __init__(self, **kwargs):
         self._object = None
+        self._id_label = None
 
         super().__init__(**kwargs)
 
@@ -265,16 +267,40 @@ class CmbObjectEditor(Gtk.Box):
     def _create_id_editor(self):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
                       spacing=6)
-        box.add(Gtk.Label(label='Object Id:'))
 
+        # Label
+        self._id_label = Gtk.Label(label=_('Object Id'), width_chars=8)
+
+        # Template check
+        if self._object and not self._object.parent_id:
+            is_template = self._object.object_id == self._object.ui.template_id
+
+            check = Gtk.CheckButton(active=is_template,
+                                    tooltip_text=_('Switch between object and template'))
+            check.connect('toggled', self._on_template_check_toggled)
+            self._on_template_check_toggled(check)
+
+            check.add(self._id_label)
+            box.add(check)
+        else:
+            box.add(self._id_label)
+
+        # Id/Class entry
         entry = CmbEntry()
         GObject.Object.bind_property(self._object, 'name',
                                      entry, 'cmb-value',
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.BIDIRECTIONAL)
-
         box.pack_start(entry, True, True, 0)
         return box
+
+    def _on_template_check_toggled(self, button):
+        if button.props.active:
+            self._object.ui.template_id = self._object.object_id
+            self._id_label.props.label = _('Template')
+        else:
+            self._object.ui.template_id = 0
+            self._id_label.props.label = _('Object Id')
 
     def _on_expander_expanded(self, expander, pspec, revealer):
         expanded = expander.props.expanded
