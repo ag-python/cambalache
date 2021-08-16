@@ -58,7 +58,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           </packing>
         </child>
         <child>
-          <object class="GtkModelButton">
+          <object class="GtkModelButton" id="export_all">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
@@ -115,13 +115,27 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
+            <property name="action-name">win.intro</property>
+            <property name="text" translatable="yes">Interactive intro</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="donate">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
             <property name="action-name">win.donate</property>
             <property name="text" translatable="yes">Donate</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">5</property>
+            <property name="position">6</property>
           </packing>
         </child>
         <child>
@@ -135,7 +149,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">6</property>
+            <property name="position">7</property>
           </packing>
         </child>
         <child>
@@ -149,7 +163,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">7</property>
+            <property name="position">8</property>
           </packing>
         </child>
       </object>
@@ -521,7 +535,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="inspector">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>

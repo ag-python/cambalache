@@ -31,7 +31,8 @@ from gi.repository import GLib, GObject, Gio, Gdk, Gtk
 
 from locale import gettext as _
 from cambalache import *
-from .cmb_tutor import CmbTutor, CmbTutorPosition
+from .cmb_tutor import CmbTutor, CmbTutorState
+from . import cmb_tutorial
 
 
 @Gtk.Template(resource_path='/ar/xjuan/Cambalache/app/cmb_window.ui')
@@ -85,6 +86,12 @@ class CmbWindow(Gtk.ApplicationWindow):
     save_button = Gtk.Template.Child()
     save_as_button = Gtk.Template.Child()
     menu_button = Gtk.Template.Child()
+    main_menu = Gtk.Template.Child()
+    export_all = Gtk.Template.Child()
+    donate = Gtk.Template.Child()
+
+    # Settings
+    completed_intro = GObject.Property(type=bool, default=False, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         self._project = None
@@ -113,8 +120,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self._opensqlite is None:
             self._opensqlite = GLib.find_program_in_path('xdg-open')
 
-        self._update_actions()
-
         self.version_label.props.label = f"version {config.VERSION}"
         self.about_dialog.props.version = config.VERSION
 
@@ -129,6 +134,21 @@ class CmbWindow(Gtk.ApplicationWindow):
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.BIDIRECTIONAL)
         self.tutor = None
+        self.turor_waiting_for_user_action = False
+
+        # Create settings object
+        self.settings = Gio.Settings(schema_id='ar.xjuan.Cambalache')
+
+        # Settings list
+        settings = [
+            'completed-intro',
+        ]
+
+        # Bind settings
+        for prop in settings:
+            self.settings.bind(prop, self, prop.replace('-', '_'), Gio.SettingsBindFlags.DEFAULT)
+
+        self._update_actions()
 
     @GObject.Property(type=CmbProject)
     def project(self):
@@ -238,6 +258,15 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.object_layout_editor.object = obj
         self.signal_editor.object = obj
 
+    def _update_action_intro(self):
+        enabled = False
+
+        if not self.completed_intro:
+            enabled = True
+            self.intro_button.props.tooltip_text = _('Start interactive introduction')
+
+        self.intro_button.set_visible(enabled)
+
     def _update_actions(self):
         has_project = self._is_project_visible()
 
@@ -248,6 +277,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'close', 'debug']:
             self._actions[action].set_enabled(has_project)
 
+        self._update_action_intro()
         self._update_action_delete()
         self._update_action_undo_redo()
         self._actions['debug'].set_enabled(has_project and self._opensqlite is not None)
@@ -317,9 +347,6 @@ class CmbWindow(Gtk.ApplicationWindow):
     def open_project(self, filename, target_tk=None, uiname=None):
         try:
             self.project = CmbProject(filename=filename, target_tk=target_tk)
-
-            # Clear intro tutorial
-            self.tutor = None
 
             if uiname:
                 ui = self.project.add_ui(uiname)
@@ -489,35 +516,65 @@ class CmbWindow(Gtk.ApplicationWindow):
     def do_cmb_action(self, action):
         self._actions[action].activate()
 
-    def _on_intro_activate(self, action, data):
-        if self.tutor:
+    def _on_project_notify(self, obj, pspec):
+        if self.project:
+            self.turor_waiting_for_user_action = False
             self.tutor.play()
+
+    def _on_object_added(self, project, obj):
+        if obj.type_id == 'GtkWindow':
+            self.turor_waiting_for_user_action = False
+            self.tutor.play()
+
+    def _on_ui_added(self, project, ui):
+        self.turor_waiting_for_user_action = False
+        self.tutor.play()
+
+    def _on_tutor_show_node(self, tutor, node, widget):
+        if node == 'add-project':
+            if self.project is None:
+                self.connect('notify::project', self._on_project_notify)
+        elif node == 'add-ui':
+            self.project.connect('ui-added', self._on_ui_added)
+        elif node == 'add-window':
+            self.project.connect('object-added', self._on_object_added)
+        elif node == 'main-menu':
+            self.main_menu.props.modal = False
+
+    def _on_tutor_hide_node(self, tutor, node, widget):
+        if node == 'intro-end':
+            self.completed_intro = True
+        elif node == 'add-project':
+            if self.project is None:
+                self.turor_waiting_for_user_action = True
+                self.tutor.pause()
+        elif node == 'add-ui' or node == 'add-window':
+            self.turor_waiting_for_user_action = True
+            self.tutor.pause()
+        elif node == 'main-menu':
+            self.export_all.get_style_context().remove_class("cmb-tutor-highlight")
+        elif node == 'donate':
+            self.main_menu.props.modal = True
+            self.main_menu.popdown()
+
+        self._update_actions()
+
+    def _on_intro_activate(self, action, data):
+        self.intro_button.set_visible(True)
+
+        if self.turor_waiting_for_user_action:
             return
 
-        if self.project is None:
-            script = [
-                (self.intro_button, 5,   _("Hi, I will show you around Cambalache")),
+        if self.tutor:
+            if self.tutor.state == CmbTutorState.PLAYING:
+                self.tutor.pause()
+            else:
+                self.tutor.play()
+            return
 
-                (self.open_button, 3,    _("You can open a project")),
-                (self.recent_button, 2,  _("find recently used")),
-                (self.new_button, 4,     _("or create a new one")),
-                (self.add_button, 6,     _("Also, add more than one UI file to the project here.")),
-
-                (self.undo_button, 5,    _("Common actions like Undo")),
-                (self.redo_button, 2,    _("Redo")),
-                (self.save_button, 4,    _("and Save are directly accessible in the headerbar")),
-                (self.save_as_button, 2, _("just like Save As")),
-                (self.menu_button, 3,    _("and the main menu")),
-
-                (self.intro_button, 2,   _("Enjoy!")),
-            ]
-        else:
-            script = [
-                (self.intro_button, 5, _("Great! You have a project opened")),
-                (self.intro_button, 2, _("Enjoy!")),
-            ]
-
-        self.tutor = CmbTutor(script)
+        self.tutor = CmbTutor(script=cmb_tutorial.intro, window=self)
+        self.tutor.connect('show-node', self._on_tutor_show_node)
+        self.tutor.connect('hide-node', self._on_tutor_hide_node)
         self.tutor.play()
 
 

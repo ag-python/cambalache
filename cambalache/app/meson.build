@@ -26,7 +26,8 @@ install_data([
     '__init__.py',
     'cmb_application.py',
     'cmb_window.py',
-    'cmb_tutor.py'
+    'cmb_tutor.py',
+    'cmb_tutorial.py',
     ],
     install_dir: moduledir)
 

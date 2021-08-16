@@ -49,13 +49,13 @@ popover.cmb-tutor label {
   font-weight: bold;
 }
 
-@keyframes widget-highlight {
-  from { box-shadow: 0px 0px 10px @theme_selected_bg_color, inset 0px 0px 4px  @theme_selected_bg_color; }
-  to   { box-shadow: 0px 0px 4px  @theme_selected_bg_color, inset 0px 0px 10px @theme_selected_bg_color; }
-}
-
 button.cmb-tutor-highlight,
+modelbutton.cmb-tutor-highlight,
 buttonbox.cmb-tutor-highlight > button,
-stackswitcher.cmb-tutor-highlight > button {
-  animation: widget-highlight 1s infinite alternate;
+stackswitcher.cmb-tutor-highlight > button,
+entry.cmb-tutor-highlight,
+treeview.cmb-tutor-highlight,
+box.cmb-tutor-highlight {
+  box-shadow: inset 0px 0px 6px @theme_selected_bg_color;
+  transition: box-shadow .75s ease;
 }
