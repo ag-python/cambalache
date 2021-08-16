@@ -45,3 +45,6 @@ if appstream_util.found()
        args: ['validate', appstream_file])
 endif
 
+install_data('ar.xjuan.Cambalache.gschema.xml',
+  install_dir: join_paths(datadir, 'glib-2.0', 'schemas')
+)

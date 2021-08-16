@@ -26,6 +26,9 @@ import sys
 import stat
 import signal
 
+# Set GSchema dir before loading GLib
+os.environ['GSETTINGS_SCHEMA_DIR'] = 'data'
+
 import xml.etree.ElementTree as ET
 from gi.repository import GLib
 
@@ -33,6 +36,7 @@ basedir = os.path.dirname(__file__)
 sys.path.insert(1, basedir)
 
 glib_compile_resources = GLib.find_program_in_path ('glib-compile-resources')
+glib_compile_schemas = GLib.find_program_in_path ('glib-compile-schemas')
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -66,6 +70,23 @@ def compile_resource(sourcedir, resource, resource_xml):
         print('glib-compile-resources', resource)
         GLib.spawn_sync('.',
                         [glib_compile_resources, f'--sourcedir={sourcedir}', f'--target={resource}', resource_xml],
+                        None,
+                        GLib.SpawnFlags.DEFAULT,
+                        None,
+                        None)
+
+def compile_schemas(schema_xml):
+    if glib_compile_schemas is None:
+        return
+
+    schemadir = os.path.dirname(schema_xml)
+    schema = os.path.join(schemadir, 'gschemas.compiled')
+
+    if not os.path.exists(schema) or \
+       os.path.getmtime (schema) < os.path.getmtime (schema_xml):
+        print('glib-compile-schemas', schema)
+        GLib.spawn_sync('.',
+                        [glib_compile_schemas, schemadir],
                         None,
                         GLib.SpawnFlags.DEFAULT,
                         None,
@@ -105,6 +126,8 @@ if __name__ == '__main__':
     compile_resource('cambalache', 'cambalache/cambalache.gresource', 'cambalache/cambalache.gresource.xml')
     compile_resource('cambalache/merengue', 'cambalache/merengue.gresource', 'cambalache/merengue/merengue.gresource.xml')
     compile_resource('cambalache/app', 'cambalache/app.gresource', 'cambalache/app/app.gresource.xml')
+
+    compile_schemas('data/ar.xjuan.Cambalache.gschema.xml')
 
     # Run Application
     from cambalache.app import CmbApplication
