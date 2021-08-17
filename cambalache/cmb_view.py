@@ -304,6 +304,19 @@ window.setupDocument = function (document) {
             display = self._port - 8080
             self._broadwayd.run([f':{display}'])
 
+    @GObject.property(type=str)
+    def gtk_theme(self):
+        return self._theme
+
+    @gtk_theme.setter
+    def _set_theme(self, theme):
+        self._theme = theme
+        self._merengue_command('gtk_settings_set',
+                               args={
+                                   'property': 'gtk-theme-name',
+                                   'value': theme
+                               })
+
     @Gtk.Template.Callback('on_context_menu')
     def _on_context_menu(self, webview, menu, e, hit_test_result):
         r = Gdk.Rectangle()
@@ -355,8 +368,17 @@ window.setupDocument = function (document) {
 
             if command == 'selection_changed':
                 self._command_selection_changed(**args)
-            if command == 'started':
+            elif command == 'started':
                 self._on_project_selection_changed(self._project)
+
+                self._merengue_command('gtk_settings_get',
+                                       args={ 'property': 'gtk-theme-name' })
+            elif command == 'gtk_settings_get':
+                print(args)
+                if args['property'] == 'gtk-theme-name':
+                    self._theme = args['value']
+                    self.notify('gtk_theme')
+
         except Exception as e:
             print(e)
 
