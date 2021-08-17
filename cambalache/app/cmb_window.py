@@ -279,10 +279,16 @@ class CmbWindow(Gtk.ApplicationWindow):
         dirs += GLib.get_system_data_dirs()
         dirs.append(GLib.get_user_data_dir())
 
+        # Add /themes to every dir
+        dirs = list(map(lambda d: os.path.join(d, 'themes'), dirs))
+
+        # Append ~/.themes
+        dirs.append(os.path.join(GLib.get_home_dir(), '.themes'))
+
+        # Default themes
         themes = ['Adwaita', 'HighContrast', 'HighContrastInverse']
 
-        for d in dirs:
-            path = os.path.join(d, 'themes')
+        for path in dirs:
             if not os.path.isdir(path):
                 continue
 
