@@ -69,6 +69,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     tree_view = Gtk.Template.Child()
     type_entry = Gtk.Template.Child()
     type_entrycompletion = Gtk.Template.Child()
+    theme_combobox = Gtk.Template.Child()
     object_editor = Gtk.Template.Child()
     object_layout_editor = Gtk.Template.Child()
     signal_editor = Gtk.Template.Child()
@@ -123,6 +124,10 @@ class CmbWindow(Gtk.ApplicationWindow):
                                      self._np_name_to_ui,
                                      None)
 
+        GObject.Object.bind_property(self.theme_combobox, 'active-id',
+                                     self.view, 'gtk-theme',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL)
         self.tutor = None
 
     @GObject.Property(type=CmbProject)
@@ -147,6 +152,12 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._project.connect('selection-changed', self._on_project_selection_changed)
             self._project.connect('changed', self._on_project_changed)
             self.type_entry.set_placeholder_text(project.target_tk)
+
+            # Populate gtk theme combo
+            if self._project.target_tk == 'gtk+-3.0':
+                self._populate_theme_combobox('3.0')
+            elif self._project.target_tk == 'gtk-4.0':
+                self._populate_theme_combobox('4.0')
         else:
             self.headerbar.set_subtitle(None)
 
@@ -259,6 +270,32 @@ class CmbWindow(Gtk.ApplicationWindow):
             dialog.set_current_folder(os.path.dirname(self.project.filename))
 
         return dialog
+
+    def _populate_theme_combobox(self, version):
+        self.theme_combobox.remove_all()
+
+        dirs = []
+
+        dirs += GLib.get_system_data_dirs()
+        dirs.append(GLib.get_user_data_dir())
+
+        themes = ['Adwaita', 'HighContrast', 'HighContrastInverse']
+
+        for d in dirs:
+            path = os.path.join(d, 'themes')
+            if not os.path.isdir(path):
+                continue
+
+            for theme in os.listdir(path):
+                tpath = os.path.join(path, theme, f'gtk-{version}', 'gtk.css')
+                if os.path.exists(tpath):
+                    themes.append(theme)
+
+        # Dedup and sort
+        themes = list(dict.fromkeys(themes))
+
+        for theme in sorted(themes):
+            self.theme_combobox.append(theme, theme)
 
     def present_message_to_user(self, message):
         dialog = Gtk.MessageDialog(
