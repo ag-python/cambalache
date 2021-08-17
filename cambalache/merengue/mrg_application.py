@@ -50,6 +50,8 @@ class MrgApplication(Gtk.Application):
         # a widget on button release
         self.preselected_widget = None
 
+        self.settings = Gtk.Settings.get_default()
+
     def print(self, *args):
         print(*args, file=sys.stderr)
 
@@ -170,6 +172,16 @@ class MrgApplication(Gtk.Application):
                     # TODO: fix broadway for this to work
                     obj.present()
 
+    def gtk_settings_set(self, property, value):
+        self.settings.set_property(property, value)
+
+    def gtk_settings_get(self, property):
+        utils.write_command('gtk_settings_get',
+                            args={
+                                'property': property,
+                                'value': self.settings.get_property(property)
+                            })
+
     def run_command(self, command, args, payload):
         self.print(command, args)
 
@@ -185,6 +197,10 @@ class MrgApplication(Gtk.Application):
             self.object_property_changed(**args)
         elif command == 'object_layout_property_changed':
             self.object_layout_property_changed(**args)
+        elif command == 'gtk_settings_set':
+            self.gtk_settings_set(**args)
+        elif command == 'gtk_settings_get':
+            self.gtk_settings_get(**args)
         else:
             self.print('Unknown command', command)
 
