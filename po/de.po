@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-18 10:48-0400\n"
-"PO-Revision-Date: 2021-08-04 16:38+0200\n"
+"PO-Revision-Date: 2021-08-18 22:59+0200\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
 "Language: de\n"
@@ -217,117 +217,119 @@ msgstr "{signal}-Signal von {obj} aktualisieren"
 #. Label
 #: cambalache/cmb_object_editor.py:272 cambalache/cmb_object_editor.py:303
 msgid "Object Id"
-msgstr ""
+msgstr "Objekt-ID"
 
 #: cambalache/cmb_object_editor.py:279
 msgid "Switch between object and template"
-msgstr ""
+msgstr "Zwischen Objekt und Vorlage wechseln"
 
 #: cambalache/cmb_object_editor.py:300
 msgid "Template"
-msgstr ""
+msgstr "Vorlage"
 
 #: cambalache/app/cmb_tutorial.py:28
 msgid "Hi, I will show you around Cambalache"
-msgstr ""
+msgstr "Hallo, ich zeige dir Cambalache"
 
 #: cambalache/app/cmb_tutorial.py:31
-#, fuzzy
 msgid "You can open a project"
-msgstr "Projekt öffnen"
+msgstr "Du kannst ein Projekt öffnen"
 
 #: cambalache/app/cmb_tutorial.py:32
 msgid "find recently used"
-msgstr ""
+msgstr "vor kurzem geöffnete finden"
 
 #: cambalache/app/cmb_tutorial.py:33
-#, fuzzy
 msgid "or create a new one"
-msgstr "Neues Projekt erstellen"
+msgstr "oder ein neues Projekt erstellen"
 
 #: cambalache/app/cmb_tutorial.py:35
 msgid "Common actions like Undo"
-msgstr ""
+msgstr "Häufige Aktionen wie Rückgängig machen"
 
 #: cambalache/app/cmb_tutorial.py:36
 msgid "Redo"
-msgstr ""
+msgstr "Wiederholen"
 
 #: cambalache/app/cmb_tutorial.py:37
-#, fuzzy
 msgid "Add new UI file"
 msgstr "Neue Benutzeroberfläche zum Projekt hinzufügen"
 
 #: cambalache/app/cmb_tutorial.py:38
 msgid "and Save are directly accessible in the headerbar"
-msgstr ""
+msgstr "und Speichern sind direkt in der Headerleiste zugänglich"
 
 #: cambalache/app/cmb_tutorial.py:39
 msgid "just like Save As"
-msgstr ""
+msgstr "genau wie Speichern unter"
 
 #: cambalache/app/cmb_tutorial.py:40
 msgid "and the main menu"
-msgstr ""
+msgstr "und das Hauptmenü"
 
 #: cambalache/app/cmb_tutorial.py:42
-#, fuzzy
 msgid "Create a project to continue"
-msgstr "Neues Projekt erstellen"
+msgstr "Erstelle ein neues Projekt um fortzufahren"
 
 #: cambalache/app/cmb_tutorial.py:43
-#, fuzzy
 msgid "Great!"
-msgstr "Erstellen"
+msgstr "Großartig!"
 
 #: cambalache/app/cmb_tutorial.py:45
 msgid ""
 "This is the project workspace, where you can see and select the widgets to "
 "edit"
 msgstr ""
+"Dies ist der Projektarbeitsbereich, in dem Sie die zu bearbeitenden Widgets "
+"anzeigen und auswählen können"
 
 #: cambalache/app/cmb_tutorial.py:47
 msgid "Project tree, with multiple UI support"
-msgstr ""
+msgstr "Projektbaum mit Unterstützung für mehrere Benutzeroberflächen"
 
 #: cambalache/app/cmb_tutorial.py:50
 msgid "Class selector"
-msgstr ""
+msgstr "Klassenauswahl"
 
 #: cambalache/app/cmb_tutorial.py:51
-#, fuzzy
 msgid "And the object editor"
-msgstr "Objekt {obj} aktualisieren"
+msgstr "Und der Objekteditor"
 
 #: cambalache/app/cmb_tutorial.py:54
 msgid "Now let's add a new UI file"
-msgstr ""
+msgstr "Jetzt füge eine neue UI-Datei hinzu"
 
 #: cambalache/app/cmb_tutorial.py:56
 msgid "Good, now try to create a window"
-msgstr ""
+msgstr "Gut, jetzt versuche ein Fenster zu erstellen"
 
 #: cambalache/app/cmb_tutorial.py:57
 msgid "Make sure a UI is selected, type 'GtkWindow' and press enter"
 msgstr ""
+"Stelle sicher, dass eine Benutzeroberfläche ausgewählt ist, geben "
+"'GtkWindow' ein und drücke die Entertaste"
 
 #: cambalache/app/cmb_tutorial.py:60
 msgid "Excelent!"
-msgstr ""
+msgstr "Exellent!"
 
 #: cambalache/app/cmb_tutorial.py:62
 msgid "Once you finish, you can export all UI files to xml here"
 msgstr ""
+"Wenn du fertig bist, kannst du hier alle UI-Dateien in eine XML-Datei "
+"exportieren"
 
 #: cambalache/app/cmb_tutorial.py:64
 msgid ""
 "That is all for now.\n"
 "If you find Cambalache usefull please consider donating"
 msgstr ""
+"Das war alles für jetzt.\n"
+"Wenn du Cambalache nützlich findest, denke bitte über eine Spende nach"
 
 #: cambalache/app/cmb_tutorial.py:66
 msgid "Have a nice day!"
-msgstr ""
+msgstr "Habe einen schönen Tag!"
 
 #: cambalache/app/cmb_window.py:219
 msgid "<Choose a UI filename to create>"
@@ -335,7 +337,7 @@ msgstr "<Wählen Sie einen zu erstellenden UI-Dateinamen>"
 
 #: cambalache/app/cmb_window.py:266 cambalache/app/cmb_window.ui:930
 msgid "Start interactive introduction"
-msgstr ""
+msgstr "Starte interaktive Tour"
 
 #: cambalache/app/cmb_window.py:359
 #, python-brace-format
@@ -343,9 +345,8 @@ msgid "Error loading {filename}"
 msgstr "Fehler beim Laden von {filename}"
 
 #: cambalache/app/cmb_window.py:362
-#, fuzzy
 msgid "Choose project to open"
-msgstr "Datei zum Öffnen auswählen"
+msgstr "Projekt zum Öffnen auswählen"
 
 #: cambalache/app/cmb_window.py:400
 msgid "File name already exists, choose a different name."
@@ -390,7 +391,7 @@ msgstr "Projektdaten debuggen"
 
 #: cambalache/app/cmb_window.ui:119
 msgid "Interactive intro"
-msgstr ""
+msgstr "Interaktive Tour"
 
 #: cambalache/app/cmb_window.ui:133
 msgid "Donate"
