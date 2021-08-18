@@ -22,19 +22,19 @@
   <translation type="gettext">cambalache</translation>
   <screenshots>
     <screenshot type="default">
-      <caption>Cambalache start window.</caption>
+      <caption>Cambalache start window</caption>
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache.png</image>
     </screenshot>
     <screenshot>
-      <caption>Cambalache new project page.</caption>
+      <caption>Cambalache new project page</caption>
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache2.png</image>
     </screenshot>
     <screenshot>
-      <caption>Cambalache workspace.</caption>
+      <caption>Cambalache workspace</caption>
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache3.png</image>
     </screenshot>
     <screenshot>
-      <caption>Workspace gtk dark theme.</caption>
+      <caption>Workspace gtk dark theme</caption>
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache4.png</image>
     </screenshot>
   </screenshots>
