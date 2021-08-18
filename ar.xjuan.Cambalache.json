@@ -26,20 +26,6 @@
     ],
     "modules" : [
         {
-            "name": "lxml",
-            "buildsystem": "simple",
-            "build-commands": [
-                "pip3 install lxml-4.6.2-cp38-cp38-manylinux1_x86_64.whl"
-            ],
-            "sources": [
-                {
-                    "type": "file",
-                    "url": "https://files.pythonhosted.org/packages/52/a5/98a73a83bb06d271c3f915a4a13f9613fdd8a685524f46d9733eebeb55ce/lxml-4.6.2-cp38-cp38-manylinux1_x86_64.whl",
-                    "sha256": "2e5cc908fe43fe1aa299e58046ad66981131a66aea3129aac7770c37f590a644"
-                }
-            ]
-        },
-        {
             "name" : "cambalache",
             "builddir" : true,
             "buildsystem" : "meson",
