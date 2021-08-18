@@ -15,5 +15,6 @@ cambalache/cmb_object_editor.py
 cambalache/cmb_property.py
 cambalache/cmb_ui.py
 cambalache/app/cmb_application.py
+cambalache/app/cmb_tutorial.py
 cambalache/app/cmb_window.py
 cambalache/app/cmb_window.ui

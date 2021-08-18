@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-03 15:05-0400\n"
-"PO-Revision-Date: 2021-08-03 15:06-0400\n"
+"POT-Creation-Date: 2021-08-18 10:48-0400\n"
+"PO-Revision-Date: 2021-08-18 11:01-0400\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -20,7 +20,7 @@ msgstr ""
 "X-Generator: Gtranslator 3.38.0\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:743
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:760
 msgid "Cambalache"
 msgstr ""
 
@@ -86,39 +86,39 @@ msgstr "Después"
 msgid "Project View"
 msgstr "Vista del Proyecto"
 
-#: cambalache/cmb_view.ui:81
+#: cambalache/cmb_view.ui:83
 msgid "UI Definition"
 msgstr "Definición del UI"
 
-#: cambalache/cmb_view.ui:102
+#: cambalache/cmb_view.ui:104
 msgid "Cut"
 msgstr "Cortar"
 
-#: cambalache/cmb_view.ui:116
+#: cambalache/cmb_view.ui:118
 msgid "Copy"
 msgstr "Copiar"
 
-#: cambalache/cmb_view.ui:130
+#: cambalache/cmb_view.ui:132
 msgid "Paste"
 msgstr "Pegar"
 
-#: cambalache/cmb_view.ui:144
+#: cambalache/cmb_view.ui:146
 msgid "Delete"
 msgstr "Borrar"
 
-#: cambalache/cmb_view.ui:169
+#: cambalache/cmb_view.ui:171
 msgid "Clear Properties"
 msgstr "Limpiar Propiedades"
 
-#: cambalache/cmb_view.ui:183
+#: cambalache/cmb_view.ui:185
 msgid "Read Documentation"
 msgstr "Leer Documentación"
 
-#: cambalache/cmb_view.ui:207
+#: cambalache/cmb_view.ui:209
 msgid "Restart workspace"
 msgstr "Reiniciar área de trabajo"
 
-#: cambalache/cmb_view.ui:221
+#: cambalache/cmb_view.ui:223
 msgid "Inspect UI definition"
 msgstr "Inspeccionar UI"
 
@@ -217,40 +217,158 @@ msgstr "Borrar señal {signal} de {obj}"
 msgid "Update {signal} signal of {obj}"
 msgstr "Actualizar señal {signal} de {obj}"
 
-#: cambalache/app/cmb_window.py:175
+#. Label
+#: cambalache/cmb_object_editor.py:272 cambalache/cmb_object_editor.py:303
+msgid "Object Id"
+msgstr "ID de objeto"
+
+#: cambalache/cmb_object_editor.py:279
+msgid "Switch between object and template"
+msgstr "Cambiar entre objeto y plantilla"
+
+#: cambalache/cmb_object_editor.py:300
+msgid "Template"
+msgstr "Plantilla"
+
+#: cambalache/app/cmb_tutorial.py:28
+msgid "Hi, I will show you around Cambalache"
+msgstr "Hola, te voy a mostrar Cambalache"
+
+#: cambalache/app/cmb_tutorial.py:31
+msgid "You can open a project"
+msgstr "Puedes abrir un proyecto"
+
+#: cambalache/app/cmb_tutorial.py:32
+msgid "find recently used"
+msgstr "encontrar recientemente usados"
+
+#: cambalache/app/cmb_tutorial.py:33
+msgid "or create a new one"
+msgstr "o crear uno nuevo"
+
+#: cambalache/app/cmb_tutorial.py:35
+msgid "Common actions like Undo"
+msgstr "Acciones comunes como Deshacer"
+
+#: cambalache/app/cmb_tutorial.py:36
+msgid "Redo"
+msgstr "Reahacer"
+
+#: cambalache/app/cmb_tutorial.py:37
+msgid "Add new UI file"
+msgstr "Agregar UI nuevo"
+
+#: cambalache/app/cmb_tutorial.py:38
+msgid "and Save are directly accessible in the headerbar"
+msgstr "y Guardar son accesibles directamente en la cabecera"
+
+#: cambalache/app/cmb_tutorial.py:39
+msgid "just like Save As"
+msgstr "como también Guardar como"
+
+#: cambalache/app/cmb_tutorial.py:40
+msgid "and the main menu"
+msgstr "y el menú principal"
+
+#: cambalache/app/cmb_tutorial.py:42
+msgid "Create a project to continue"
+msgstr "Crea un proyecto para continuar"
+
+#: cambalache/app/cmb_tutorial.py:43
+msgid "Great!"
+msgstr "Genial!"
+
+#: cambalache/app/cmb_tutorial.py:45
+msgid ""
+"This is the project workspace, where you can see and select the widgets to "
+"edit"
+msgstr ""
+"Este es el área de trabajo, donde podes ver y seleccionar los componentes "
+"para editar"
+
+#: cambalache/app/cmb_tutorial.py:47
+msgid "Project tree, with multiple UI support"
+msgstr "El árbol del proyecto, con soporte para múltiples UI"
+
+#: cambalache/app/cmb_tutorial.py:50
+msgid "Class selector"
+msgstr "Selector de clases"
+
+#: cambalache/app/cmb_tutorial.py:51
+msgid "And the object editor"
+msgstr "Y el editor de objectos"
+
+#: cambalache/app/cmb_tutorial.py:54
+msgid "Now let's add a new UI file"
+msgstr "Ahora agreguemos una nueva UI"
+
+#: cambalache/app/cmb_tutorial.py:56
+msgid "Good, now try to create a window"
+msgstr "Bien, ahora crea una ventana"
+
+#: cambalache/app/cmb_tutorial.py:57
+msgid "Make sure a UI is selected, type 'GtkWindow' and press enter"
+msgstr ""
+"Asegurate que la UI este seleccionada, escribe 'GtkWindow' y presiona enter"
+
+#: cambalache/app/cmb_tutorial.py:60
+msgid "Excelent!"
+msgstr "Excelente!"
+
+#: cambalache/app/cmb_tutorial.py:62
+msgid "Once you finish, you can export all UI files to xml here"
+msgstr "Cuando termines, podes exportar todos los UI a xml aquí"
+
+#: cambalache/app/cmb_tutorial.py:64
+msgid ""
+"That is all for now.\n"
+"If you find Cambalache usefull please consider donating"
+msgstr ""
+"Eso es todo por ahora.\n"
+"Si Cambalache te es útil por favor considera donar"
+
+#: cambalache/app/cmb_tutorial.py:66
+msgid "Have a nice day!"
+msgstr "Que tenga un buen día!"
+
+#: cambalache/app/cmb_window.py:219
 msgid "<Choose a UI filename to create>"
 msgstr "<Elija un nombre de archivo para crear un UI>"
 
-#: cambalache/app/cmb_window.py:272
+#: cambalache/app/cmb_window.py:266 cambalache/app/cmb_window.ui:930
+msgid "Start interactive introduction"
+msgstr "Comenzar introducción interactiva"
+
+#: cambalache/app/cmb_window.py:359
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Error abriendo {filename}"
 
-#: cambalache/app/cmb_window.py:275
-msgid "Choose file to open"
-msgstr "Elija un archivo para abrir"
+#: cambalache/app/cmb_window.py:362
+msgid "Choose project to open"
+msgstr "Elija un proyecto para abrir"
 
-#: cambalache/app/cmb_window.py:313
+#: cambalache/app/cmb_window.py:400
 msgid "File name already exists, choose a different name."
 msgstr "El archivo ya existe, elija un nombre diferente."
 
-#: cambalache/app/cmb_window.py:338
+#: cambalache/app/cmb_window.py:425
 msgid "Choose a new file to save the project"
 msgstr "Elija un nuevo archivo para guardar el proyecto"
 
-#: cambalache/app/cmb_window.py:350
+#: cambalache/app/cmb_window.py:437
 msgid "Choose a file name for the new UI"
 msgstr "Elija un nombre de archivo para la UI nueva"
 
-#: cambalache/app/cmb_window.py:370
+#: cambalache/app/cmb_window.py:457
 msgid "Do you want to delete selected UI?"
 msgstr "Querés borrar la UI seleccionada?"
 
-#: cambalache/app/cmb_window.py:384
+#: cambalache/app/cmb_window.py:471
 msgid "Choose file to import"
 msgstr "Elija un archivo para importar"
 
-#: cambalache/app/cmb_window.py:392
+#: cambalache/app/cmb_window.py:479
 #, python-brace-format
 msgid "Error importing {filename}: {e}"
 msgstr "Error importando {filename}: {e}"
@@ -272,18 +390,22 @@ msgid "Debug Project Data"
 msgstr "Depurar datos"
 
 #: cambalache/app/cmb_window.ui:119
+msgid "Interactive intro"
+msgstr "Intro interaciva"
+
+#: cambalache/app/cmb_window.ui:133
 msgid "Donate"
 msgstr "Donar"
 
-#: cambalache/app/cmb_window.ui:133
+#: cambalache/app/cmb_window.ui:147
 msgid "About"
 msgstr "Acerca de"
 
-#: cambalache/app/cmb_window.ui:147
+#: cambalache/app/cmb_window.ui:161
 msgid "Quit"
 msgstr "Salir"
 
-#: cambalache/app/cmb_window.ui:246
+#: cambalache/app/cmb_window.ui:254
 msgid ""
 "<b>\n"
 "\n"
@@ -295,87 +417,87 @@ msgstr ""
 "<span size=\"18000\">Proyecto Nuevo</span>\n"
 "</b>"
 
-#: cambalache/app/cmb_window.ui:274
+#: cambalache/app/cmb_window.ui:282
 msgid "Name"
 msgstr "Nombre"
 
-#: cambalache/app/cmb_window.ui:286
+#: cambalache/app/cmb_window.ui:294
 msgid "Toolkit target"
 msgstr "Biblioteca"
 
-#: cambalache/app/cmb_window.ui:298
+#: cambalache/app/cmb_window.ui:306
 msgid "Location"
 msgstr "Directorio"
 
-#: cambalache/app/cmb_window.ui:310
+#: cambalache/app/cmb_window.ui:318
 msgid "<project basename>"
 msgstr "<nombre base del proyecto>"
 
-#: cambalache/app/cmb_window.ui:322
+#: cambalache/app/cmb_window.ui:330
 msgid "Create"
 msgstr "Crear"
 
-#: cambalache/app/cmb_window.ui:452
+#: cambalache/app/cmb_window.ui:460
 msgid "Choose a location to save the project"
 msgstr "Elija un lugar donde guardar el proyecto"
 
-#: cambalache/app/cmb_window.ui:462
+#: cambalache/app/cmb_window.ui:470
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: cambalache/app/cmb_window.ui:479
+#: cambalache/app/cmb_window.ui:487
 msgid "UI Filename"
 msgstr "Archivo de UI"
 
-#: cambalache/app/cmb_window.ui:516
+#: cambalache/app/cmb_window.ui:524
 msgid "New Project"
 msgstr "Proyecto Nuevo"
 
-#: cambalache/app/cmb_window.ui:669
+#: cambalache/app/cmb_window.ui:686
 msgid "Properties"
 msgstr "Propiedades"
 
-#: cambalache/app/cmb_window.ui:697
+#: cambalache/app/cmb_window.ui:714
 msgid "Layout"
 msgstr "Diseño"
 
-#: cambalache/app/cmb_window.ui:713
+#: cambalache/app/cmb_window.ui:730
 msgid "Signals"
 msgstr "Señales"
 
-#: cambalache/app/cmb_window.ui:771
+#: cambalache/app/cmb_window.ui:788
 msgid "_Open"
 msgstr "_Abrir"
 
-#: cambalache/app/cmb_window.ui:775
+#: cambalache/app/cmb_window.ui:792
 msgid "Open a project"
 msgstr "Abrir proyecto"
 
-#: cambalache/app/cmb_window.ui:816
+#: cambalache/app/cmb_window.ui:833
 msgid "Create a new project"
 msgstr "Crear proyecto nuevo"
 
-#: cambalache/app/cmb_window.ui:837
+#: cambalache/app/cmb_window.ui:854
 msgid "Save"
 msgstr "Guardar"
 
-#: cambalache/app/cmb_window.ui:841
+#: cambalache/app/cmb_window.ui:858
 msgid "Save project"
 msgstr "Guardar proyecto"
 
-#: cambalache/app/cmb_window.ui:856
+#: cambalache/app/cmb_window.ui:873
 msgid "Save project with a different file name"
 msgstr "Guardar proyecto con un nombre diferente"
 
-#: cambalache/app/cmb_window.ui:893
+#: cambalache/app/cmb_window.ui:910
 msgid "Add new UI to project"
 msgstr "Agregar nueva UI al proyecto"
 
-#: cambalache/app/cmb_window.ui:969
+#: cambalache/app/cmb_window.ui:1006
 msgid "© 2020-2021 Juan Pablo Ugarte"
 msgstr "© 2020-2021 Juan Pablo Ugarte"
 
-#: cambalache/app/cmb_window.ui:970
+#: cambalache/app/cmb_window.ui:1007
 msgid "User Interface Maker"
 msgstr "Creador de Interfaces Gráficas"
 
