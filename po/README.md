@@ -25,5 +25,10 @@ thanks!
 
 Each time new strings are added to the project we need to update the .po file
 
-`meson compile cambalache-update-po`
+```
+mkdir _build
+cd _build
+meson
+meson compile cambalache-update-po
+```
 
