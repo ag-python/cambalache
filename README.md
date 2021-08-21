@@ -47,6 +47,28 @@ flatpak build-bundle repo cambalache.flatpak ar.xjuan.Cambalache
 flatpak install --user cambalache.flatpak
 ```
 
+## Flathub Beta
+
+Flathub is the central place for building and hosting Flatpak builds.
+Cambalache is currently available on Flathub beta
+
+To install it, use the following:
+```
+flatpak remote-add flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak install flathub-beta ar.xjuan.Cambalache
+```
+
+## Contributing
+
+If you are interested in contributing you can open and issue [here](https://gitlab.gnome.org/jpu/cambalache/-/issues)
+and/or a merge request [here](https://gitlab.gnome.org/jpu/cambalache/-/merge_requests)
+
+## Financial support
+
+You can financially support Cambalache development on Patreon [here](https://www.patreon.com/cambalache)
+like all these [people](./SUPPORTERS.md) did.
+
+
 ## Tools
 
  - cambalache-db:
