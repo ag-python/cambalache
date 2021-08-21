@@ -123,6 +123,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.version_label.props.label = f"version {config.VERSION}"
         self.about_dialog.props.version = config.VERSION
 
+        self._populate_about_dialog_sponsors()
+
         GObject.Object.bind_property(self.np_name_entry, 'text',
                                      self.np_ui_entry, 'placeholder-text',
                                      GObject.BindingFlags.SYNC_CREATE,
@@ -300,6 +302,18 @@ class CmbWindow(Gtk.ApplicationWindow):
             dialog.set_current_folder(os.path.dirname(self.project.filename))
 
         return dialog
+
+    def _populate_about_dialog_sponsors(self):
+        gbytes = Gio.resources_lookup_data('/ar/xjuan/Cambalache/app/SUPPORTERS.md',
+                                           Gio.ResourceLookupFlags.NONE)
+        supporters = gbytes.get_data().decode('UTF-8').splitlines()
+        sponsors = []
+
+        for name in supporters:
+            if name.startswith('* '):
+                sponsors.append(name[2:])
+
+        self.about_dialog.add_credit_section(_('Sponsors'), sponsors)
 
     def _populate_theme_combobox(self, version):
         self.theme_combobox.remove_all()
