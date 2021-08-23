@@ -36,7 +36,7 @@ class CambalacheDb:
         dirname = os.path.dirname(__file__) or '.'
 
         # Create DB tables
-        with open('../cambalacheui/cmb_base.sql', 'r') as sql:
+        with open('../cambalache/cmb_base.sql', 'r') as sql:
             self.conn.executescript(sql.read())
             self.conn.commit()
 
@@ -139,7 +139,8 @@ class CambalacheDb:
         for klass in root:
             owner_id = klass.tag
 
-            for child in klass:
+            # Read type custom tags
+            for child in klass.find('data'):
                 self._import_tag(c, child, owner_id, None)
 
         c.close()

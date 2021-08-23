@@ -7,61 +7,79 @@
 -->
 <types>
   <GtkWidget>
-    <style>
-      <class name="gchararray"/>
-    </style>
+    <data>
+      <style>
+        <class name="gchararray"/>
+      </style>
+  </data>
   </GtkWidget>
 
   <GtkDialog>
-    <action-widgets>
-      <action-widget response="gint">GtkWidget</action-widget>
-    </action-widgets>
+    <data>
+      <action-widgets>
+        <action-widget response="gint">GtkWidget</action-widget>
+      </action-widgets>
+    </data>
   </GtkDialog>
 
   <GtkListStore>
-    <columns>
-      <column type="type"/>
-    </columns>
     <data>
-      <row>
-        <col id="gint">gchararray</col>
-      </row>
+      <columns>
+        <column type="type"/>
+      </columns>
+      <data>
+        <row>
+          <col id="gint">gchararray</col>
+        </row>
+      </data>
     </data>
   </GtkListStore>
 
   <GtkTreeStore>
-    <columns>
-      <column type="type"/>
-    </columns>
+    <data>
+      <columns>
+        <column type="type"/>
+      </columns>
+    </data>
   </GtkTreeStore>
 
   <GtkLabel>
-    <attributes>
-      <attribute name="gchararray" value="gchararray" start="gint" end="gint"/>
-    </attributes>
+    <data>
+      <attributes>
+        <attribute name="gchararray" value="gchararray" start="gint" end="gint"/>
+      </attributes>
+    </data>
   </GtkLabel>
 
   <GtkLevelBar>
-    <offsets>
-      <offset name="gchararray" value="gdouble"/>
-    </offsets>
+    <data>
+      <offsets>
+        <offset name="gchararray" value="gdouble"/>
+      </offsets>
+    </data>
   </GtkLevelBar>
 
   <GtkScale>
-    <marks>
-      <mark value="gdouble" position="GtkPositionType">gchararray</mark>
-    </marks>
+    <data>
+      <marks>
+        <mark value="gdouble" position="GtkPositionType">gchararray</mark>
+      </marks>
+    </data>
   </GtkScale>
 
   <GtkComboBoxText>
-    <items>
-      <item id="gchararray">gchararray</item>
-    </items>
+    <data>
+      <items>
+        <item id="gchararray">gchararray</item>
+      </items>
+    </data>
   </GtkComboBoxText>
 
   <GtkSizeGroup>
-    <widgets>
-      <widget name="GtkWidget"/>
-    </widgets>
+    <data>
+      <widgets>
+        <widget name="GtkWidget"/>
+      </widgets>
+    </data>
   </GtkSizeGroup>
 </types>

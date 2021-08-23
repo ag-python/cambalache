@@ -12,16 +12,16 @@ CAMBALACHE_DB=flatpak run \
 
 all: CmbUtils-3.0.typelib CmbUtils-4.0.typelib
 
-update: ../cambalacheui/gobject-2.0.sql ../cambalacheui/gtk+-3.0.sql ../cambalacheui/gtk-4.0.sql
+update: ../cambalache/gobject-2.0.sql ../cambalache/gtk+-3.0.sql ../cambalache/gtk-4.0.sql
 
-../cambalacheui/gobject-2.0.sql: CmbUtils-3.0.typelib
-	${CAMBALACHE_DB} /usr/share/gir-1.0/GObject-2.0.gir ../cambalacheui/gobject-2.0.sql
+../cambalache/gobject-2.0.sql: CmbUtils-3.0.typelib
+	${CAMBALACHE_DB} /usr/share/gir-1.0/GObject-2.0.gir ../cambalache/gobject-2.0.sql
 
-../cambalacheui/gtk+-3.0.sql: CmbUtils-3.0.typelib
-	${CAMBALACHE_DB} /usr/share/gir-1.0/Gtk-3.0.gir ../cambalacheui/gtk+-3.0.sql && true
+../cambalache/gtk+-3.0.sql: CmbUtils-3.0.typelib
+	${CAMBALACHE_DB} /usr/share/gir-1.0/Gtk-3.0.gir ../cambalache/gtk+-3.0.sql && true
 
-../cambalacheui/gtk-4.0.sql: CmbUtils-4.0.typelib
-	${CAMBALACHE_DB} /usr/share/gir-1.0/Gtk-4.0.gir ../cambalacheui/gtk-4.0.sql
+../cambalache/gtk-4.0.sql: CmbUtils-4.0.typelib
+	${CAMBALACHE_DB} /usr/share/gir-1.0/Gtk-4.0.gir ../cambalache/gtk-4.0.sql
 
 libcmbutils3.so: utils/utils.h utils/utils.c
 	cc -c -fpic -Wall `pkg-config gtk+-3.0 --cflags` -Iutils utils/utils.c -o utils.o
