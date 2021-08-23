@@ -677,6 +677,7 @@ class CmbDB(GObject.GObject):
             node.addprevious(etree.Comment(comment))
 
     def _export_object(self, ui_id, object_id, use_id=False, template_id=None):
+
         def node_set(node, attr, val):
             if val is not None:
                 node.set(attr, str(val))
@@ -703,12 +704,16 @@ class CmbDB(GObject.GObject):
         info = self.type_info.get(type_id, None)
 
         # Properties
-        for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object, o.name FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND op.object_id=? AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.object_id = op.value;',
+        for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object FROM object_property AS op, property AS p WHERE op.ui_id=? AND op.object_id=? AND p.owner_id = op.owner_id AND p.property_id = op.property_id;',
                              (ui_id, object_id,)):
-            val, property_id, comment, is_object, name = row
+            val, property_id, comment, is_object = row
 
             if is_object:
-                value = f'__cmb__{ui_id}.{val}' if use_id else name
+                if use_id:
+                    value = f'__cmb__{ui_id}.{val}'
+                else:
+                    cc.execute('SELECT name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, val))
+                    value, = cc.fetchone()
             else:
                 value = val
 
