@@ -676,7 +676,7 @@ class CmbDB(GObject.GObject):
         if comment:
             node.addprevious(etree.Comment(comment))
 
-    def _get_object(self, ui_id, object_id, use_id=False, template_id=None):
+    def _export_object(self, ui_id, object_id, use_id=False, template_id=None):
         def node_set(node, attr, val):
             if val is not None:
                 node.set(attr, str(val))
@@ -703,12 +703,12 @@ class CmbDB(GObject.GObject):
         info = self.type_info.get(type_id, None)
 
         # Properties
-        for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object, o.name FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND op.object_id=? AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.object_id = op.object_id;',
+        for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object, o.name FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND op.object_id=? AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.object_id = op.value;',
                              (ui_id, object_id,)):
             val, property_id, comment, is_object, name = row
 
-            if use_id and is_object:
-                value = f'__cmb__{ui_id}.{val}'
+            if is_object:
+                value = f'__cmb__{ui_id}.{val}' if use_id else name
             else:
                 value = val
 
@@ -784,7 +784,7 @@ class CmbDB(GObject.GObject):
         # Children
         for row in c.execute('SELECT object_id, internal, type, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
             child_id, internal, ctype,  comment = row
-            child_obj = self._get_object(ui_id, child_id, use_id=use_id)
+            child_obj = self._export_object(ui_id, child_id, use_id=use_id)
             child = E.child(child_obj)
             node_set(child, 'internal-child', internal)
             node_set(child, 'type', ctype)
@@ -833,7 +833,7 @@ class CmbDB(GObject.GObject):
         for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
             object_id, comment = row
-            child = self._get_object(ui_id, object_id, use_id=use_id, template_id=template_id)
+            child = self._export_object(ui_id, object_id, use_id=use_id, template_id=template_id)
             node.append(child)
             self._node_add_comment(child, comment)
 
