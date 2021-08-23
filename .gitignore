@@ -16,3 +16,4 @@ tools/CmbUtils-4.0.typelib
 tools/libcmbutils3.so
 tools/libcmbutils4.so
 data/gschemas.compiled
+data/mime

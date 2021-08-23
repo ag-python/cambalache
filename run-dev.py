@@ -28,6 +28,7 @@ import signal
 
 # Set GSchema dir before loading GLib
 os.environ['GSETTINGS_SCHEMA_DIR'] = 'data'
+os.environ['XDG_DATA_DIRS'] = os.environ['XDG_DATA_DIRS'] + ':data'
 
 import xml.etree.ElementTree as ET
 from gi.repository import GLib
@@ -37,6 +38,7 @@ sys.path.insert(1, basedir)
 
 glib_compile_resources = GLib.find_program_in_path ('glib-compile-resources')
 glib_compile_schemas = GLib.find_program_in_path ('glib-compile-schemas')
+update_mime_database = GLib.find_program_in_path ('update-mime-database')
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -92,6 +94,32 @@ def compile_schemas(schema_xml):
                         None,
                         None)
 
+def update_mime(mime_xml):
+    if update_mime_database is None:
+        return
+
+    dirname = os.path.dirname(mime_xml)
+    basename = os.path.basename(mime_xml)
+
+    mimedir = os.path.join(dirname, 'mime')
+    packagesdir = os.path.join(mimedir, 'packages')
+    mimefile = os.path.join(packagesdir, basename)
+    mime = os.path.join(mimedir, 'mime.cache')
+
+    if not os.path.exists(mimefile):
+        GLib.mkdir_with_parents(packagesdir, 0o700)
+        os.symlink(os.path.join('..', '..', basename), mimefile)
+
+    if not os.path.exists(mime) or \
+       os.path.getmtime (mime) < os.path.getmtime (mime_xml):
+        print('update-mime-database', mimedir)
+        GLib.spawn_sync('.',
+                        [update_mime_database, mimedir],
+                        None,
+                        GLib.SpawnFlags.DEFAULT,
+                        None,
+                        None)
+
 def configure_file(input_file, output_file, config):
     with open(input_file, 'r') as fd:
         content = fd.read()
@@ -128,6 +156,7 @@ if __name__ == '__main__':
     compile_resource('cambalache/app', 'cambalache/app.gresource', 'cambalache/app/app.gresource.xml')
 
     compile_schemas('data/ar.xjuan.Cambalache.gschema.xml')
+    update_mime('data/ar.xjuan.Cambalache.mime.xml')
 
     # Run Application
     from cambalache.app import CmbApplication
