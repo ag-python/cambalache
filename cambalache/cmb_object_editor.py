@@ -226,24 +226,30 @@ class CmbObjectChooser(Gtk.Entry):
     type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
+        self._value = None
         super().__init__(**kwargs)
         self.connect('notify::text', self._on_text_notify)
         self.props.placeholder_text = f'<{self.type_id}>'
 
     def _on_text_notify(self, obj, pspec):
+        obj = self.object.project._get_object_by_name(self.object.ui_id,
+                                                      self.props.text)
+        if obj:
+            self._value = obj.object_id
+
         self.notify('cmb-value')
 
     @GObject.property(type=str)
     def cmb_value(self):
-        obj = self.object.project._get_object_by_name(self.object.ui_id,
-                                                      self.props.text)
-        return obj.object_id if obj else None
+        return self._value
 
     @cmb_value.setter
     def _set_value(self, value):
-        if value:
+        self._value = int(value) if value else 0
+
+        if self._value:
             obj = self.object.project._get_object_by_id(self.object.ui_id,
-                                                        int(value))
+                                                        self._value)
             self.props.text = obj.name if obj else ''
         else:
             self.props.text = ''
