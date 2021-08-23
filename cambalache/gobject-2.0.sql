@@ -15,9 +15,9 @@ INSERT INTO type_flags VALUES
 
 INSERT INTO property VALUES
 ('GBinding', 'flags', 'GBindingFlags', NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
-('GBinding', 'source', 'GObject', NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'source', 'GObject', 1, NULL, NULL, NULL, NULL, '2.26', NULL),
 ('GBinding', 'source-property', 'gchararray', NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
-('GBinding', 'target', 'GObject', NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'target', 'GObject', 1, NULL, NULL, NULL, NULL, '2.26', NULL),
 ('GBinding', 'target-property', 'gchararray', NULL, NULL, NULL, NULL, NULL, '2.26', NULL);
 
 INSERT INTO signal VALUES
