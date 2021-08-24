@@ -38,24 +38,21 @@ The minimum requirements are Gtk 3 and lxml, Gtk 4 is only needed to have a func
 The preferred way to run Cambalache is using flatpak.
 Instructions on how to install flatpak can be found [here](https://flatpak.org/setup/).
 
-You can get Cambalache prebuilt bundles [here](https://gitlab.gnome.org/jpu/cambalache/-/packages).
-
-Or build your own with the following commands
+Build your bundle with the following commands
 ```
 flatpak-builder --force-clean --repo=repo build ar.xjuan.Cambalache.json
 flatpak build-bundle repo cambalache.flatpak ar.xjuan.Cambalache
 flatpak install --user cambalache.flatpak
 ```
 
-## Flathub Beta
+## Flathub
 
-Flathub is the central place for building and hosting Flatpak builds.
-Cambalache is currently available on Flathub beta
+You can get Cambalache prebuilt bundles [here](https://flathub.org/apps/details/ar.xjuan.Cambalache)
 
-To install it, use the following:
+Use the following to install:
 ```
-flatpak remote-add flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
-flatpak install flathub-beta ar.xjuan.Cambalache
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install --user flathub ar.xjuan.Cambalache
 ```
 
 ## Contributing
