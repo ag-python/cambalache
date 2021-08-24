@@ -21,10 +21,22 @@
 #
 
 import os
+import gi
 from .config import *
-from gi.repository import Gio
+
+gi.require_version('Gdk', '3.0')
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gio, Gdk, Gtk
 resource = Gio.Resource.load(os.path.join(pkgdatadir, 'cambalache.gresource'))
 resource._register()
+
+provider = Gtk.CssProvider()
+provider.load_from_resource('/ar/xjuan/Cambalache/cambalache.css')
+Gtk.StyleContext.add_provider_for_screen(
+    Gdk.Screen.get_default(),
+    provider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
 
 from .cmb_ui import CmbUI
 from .cmb_object import CmbObject

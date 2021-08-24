@@ -9,5 +9,6 @@
     <file>gtk-4.0.sql</file>
     <file>cmb_view.ui</file>
     <file>cmb_signal_editor.ui</file>
+    <file>cambalache.css</file>
   </gresource>
 </gresources>

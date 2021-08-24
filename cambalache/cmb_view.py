@@ -136,6 +136,9 @@ class CmbView(Gtk.Stack):
         self._broadwayd = None
         self._port = None
 
+        context = self.get_style_context()
+        context.connect('changed', self._on_style_context_changed)
+
     def do_destroy(self):
         if self._merengue:
             self._merengue.stop()
@@ -143,9 +146,19 @@ class CmbView(Gtk.Stack):
         if self._broadwayd:
             self._broadwayd.stop()
 
+    def _on_style_context_changed(self, ctx):
+        self._update_webview_bg()
+
+    def _update_webview_bg(self):
+        context = self.get_style_context()
+        bg = context.get_background_color(Gtk.StateFlags.NORMAL)
+        self.webview.run_javascript(f"document.body.style.background = '{bg.to_string()}';")
+
     def _on_load_changed(self, webview, event):
         if event != WebKit2.LoadEvent.FINISHED:
             return
+
+        self._update_webview_bg()
 
         # Disable aler() function used when broadwayd get disconnected
         # Monkey patch setupDocument() to avoid disabling document.oncontextmenu
@@ -426,3 +439,5 @@ window.setupDocument = function (document) {
 
         return 0
 
+
+Gtk.WidgetClass.set_css_name(CmbView, 'CmbView')
