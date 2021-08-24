@@ -828,10 +828,22 @@ class CmbDB(GObject.GObject):
         self._node_add_comment(node, comment)
 
         # requires
+        tk_library_id, tk_version = self.target_tk.split('-')
+        has_tk_requires = False
+
         for row in c.execute('SELECT library_id, version, comment FROM ui_library WHERE ui_id=?;', (ui_id,)):
             library_id, version, comment = row
             req = E.requires(lib=library_id, version=version)
             self._node_add_comment(req, comment)
+            node.append(req)
+
+            if library_id == tk_library_id:
+                has_tk_requires = True
+
+        # Ensure we output a requires lib
+        if not has_tk_requires:
+            library_id, version = self.target_tk.split('-')
+            req = E.requires(lib=library_id, version=version)
             node.append(req)
 
         # Iterate over toplovel objects
