@@ -648,7 +648,7 @@ class CmbDB(GObject.GObject):
         ui_id = self.add_ui(basename, relpath, requirements, comment)
 
         # Import objects
-        for child in root.iter():
+        for child in root.iterchildren():
             if child.tag == 'object':
                 self._import_object(ui_id, child, None)
             elif child.tag == 'template':
