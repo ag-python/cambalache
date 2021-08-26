@@ -196,7 +196,7 @@ class GirData:
 
         return None
 
-    def _get_enum_name_by_value(self, gtype, value):
+    def _get_enum_nick_by_value(self, gtype, value):
         name = GObject.type_name(gtype)
         enum = self.enumerations.get(name, None)
 
@@ -204,10 +204,10 @@ class GirData:
             members = enum['members']
             for member in members:
                 if value == int(members[member]['value']):
-                    return member
+                    return members[member]['nick']
         return None
 
-    def _get_flags_names_by_value(self, gtype, value):
+    def _get_flags_nick_by_value(self, gtype, value):
         name = GObject.type_name(gtype)
         enum = self.flags.get(name, None)
         retval = None
@@ -216,7 +216,8 @@ class GirData:
             members = enum['members']
             for member in members:
                 if value & int(members[member]['value']):
-                    retval = member if retval is None else f'{retval} | {member}'
+                    nick = members[member]['nick']
+                    retval = member if retval is None else f'{retval} | {nick}'
 
         return retval
 
@@ -227,9 +228,9 @@ class GirData:
         if pspec.value_type == GObject.TYPE_BOOLEAN:
             return 'True' if pspec.default_value != 0 else 'False'
         elif GObject.type_is_a(pspec.value_type, GObject.TYPE_ENUM):
-            return self._get_enum_name_by_value(pspec.value_type, pspec.default_value)
+            return self._get_enum_nick_by_value(pspec.value_type, pspec.default_value)
         elif GObject.type_is_a(pspec.value_type, GObject.TYPE_FLAGS):
-            return self._get_flags_names_by_value(pspec.value_type, pspec.default_value)
+            return self._get_flags_nick_by_value(pspec.value_type, pspec.default_value)
 
         return pspec.default_value
 
@@ -448,10 +449,10 @@ class GirData:
             if doc is not None:
                 doc_text = ' '.join(doc.text.split())
 
-            retval[child.get('name')] = {
+            # GLib uses the C identifier as the enum/flag name
+            retval[child.get(ns('c','identifier'))] = {
                 'value': child.get('value'),
                 'nick': child.get(ns('glib','nick')),
-                'identifier': child.get(ns('c','identifier')),
                 'doc': doc_text
             }
 
@@ -504,8 +505,8 @@ class GirData:
             members = data['members']
             for member in members:
                 m = members[member]
-                conn.execute(f"INSERT INTO type_{parent} (type_id, name, value, nick, identifier, doc) VALUES (?, ?, ?, ?, ?, ?);",
-                             (name, member, m['value'], m['nick'], m['identifier'], m['doc']))
+                conn.execute(f"INSERT INTO type_{parent} (type_id, name, value, nick, doc) VALUES (?, ?, ?, ?, ?);",
+                             (name, member, m['value'], m['nick'], m['doc']))
 
 
         def db_insert_iface(conn, name, data):
