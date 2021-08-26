@@ -111,7 +111,6 @@ CREATE TABLE IF NOT EXISTS type_enum (
   name TEXT,
   nick TEXT,
   value INTEGER,
-  identifier TEXT,
   doc TEXT,
   PRIMARY KEY(type_id, name)
 ) WITHOUT ROWID;
@@ -125,7 +124,6 @@ CREATE TABLE IF NOT EXISTS type_flags (
   name TEXT,
   nick TEXT,
   value INTEGER,
-  identifier TEXT,
   doc TEXT,
   PRIMARY KEY(type_id, name)
 ) WITHOUT ROWID;
