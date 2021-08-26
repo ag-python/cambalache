@@ -111,8 +111,9 @@ class CmbSwitch(Gtk.Switch):
             self.props.active = False
 
 
-class CmbComboBox(Gtk.ComboBox):
-    text_column = GObject.Property(type=int)
+class CmbEnumComboBox(Gtk.ComboBox):
+    info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    text_column = GObject.Property(type=int, default = 1, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -121,6 +122,9 @@ class CmbComboBox(Gtk.ComboBox):
         renderer_text = Gtk.CellRendererText()
         self.pack_start(renderer_text, True)
         self.add_attribute(renderer_text, "text", self.text_column)
+
+        self.props.id_column = self.text_column
+        self.props.model = self.info.enum
 
     def _on_changed(self, obj):
         self.notify('cmb-value')
@@ -131,14 +135,22 @@ class CmbComboBox(Gtk.ComboBox):
 
     @cmb_value.setter
     def _set_value(self, value):
-        self.props.active_id = value
+        self.props.active_id = None
+
+        for row in self.info.enum:
+            enum_name = row[0]
+            enum_nick = row[1]
+
+            # Always use nick as value
+            if value == enum_name or value == enum_nick:
+                self.props.active_id = enum_nick
 
 
 class CmbFlagsEntry(Gtk.Entry):
     info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    id_column = GObject.Property(type=int, default = 0, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    id_column = GObject.Property(type=int, default = 1, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     text_column = GObject.Property(type=int, default = 1, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    value_column = GObject.Property(type=int, default = 2, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY )
+    value_column = GObject.Property(type=int, default = 2, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -213,10 +225,12 @@ class CmbFlagsEntry(Gtk.Entry):
             for row in self.info.flags:
                 flag = row[self.text_column]
                 flag_id = row[self.id_column]
+                flag_name = row[0]
+                flag_nick = row[1]
 
                 check = self._checks.get(flag_id, None)
                 if check:
-                    val = flag_id in tokens
+                    val = flag_name in tokens or flag_nick in tokens
                     check.props.active = val
                     self.flags[flag_id] = val
 
@@ -446,9 +460,7 @@ class CmbObjectEditor(Gtk.Box):
                                           type_id=type_id)
             elif tinfo:
                 if tinfo.parent_id == 'enum':
-                    editor = CmbComboBox(model=tinfo.enum,
-                                         id_column=0,
-                                         text_column=1)
+                    editor = CmbEnumComboBox(info=tinfo)
                 elif tinfo.parent_id == 'flags':
                     editor = CmbFlagsEntry(info=tinfo)
 
