@@ -35,6 +35,7 @@ class CmbPropertyInfo(CmbBase):
     type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     is_object = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
     construct_only = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
+    save_always = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
     default_value = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     minimum = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     maximum = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -45,13 +46,14 @@ class CmbPropertyInfo(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, owner_id, property_id, type_id, is_object, construct_only, default_value, minimum, maximum, version, deprecated_version):
+    def from_row(cls, project, owner_id, property_id, type_id, is_object, construct_only, save_always, default_value, minimum, maximum, version, deprecated_version):
         return cls(project=project,
                    owner_id=owner_id,
                    property_id=property_id,
                    type_id=type_id,
                    is_object=is_object,
                    construct_only=construct_only,
+                   save_always=save_always,
                    default_value=default_value,
                    minimum=minimum,
                    maximum=maximum,

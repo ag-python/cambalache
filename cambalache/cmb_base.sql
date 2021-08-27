@@ -193,6 +193,7 @@ CREATE TABLE IF NOT EXISTS property (
   type_id TEXT REFERENCES type,
   is_object BOOLEAN,
   construct_only BOOLEAN,
+  save_always BOOLEAN,
   default_value TEXT,
   minimum TEXT,
   maximum TEXT,
