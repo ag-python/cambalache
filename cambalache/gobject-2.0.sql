@@ -14,11 +14,11 @@ INSERT INTO type_flags VALUES
 ('GBindingFlags', 'G_BINDING_SYNC_CREATE', 'sync-create', 2, 'Synchronize the values of the source and target properties when creating the binding; the direction of the synchronization is always from the source to the target.');
 
 INSERT INTO property VALUES
-('GBinding', 'flags', 'GBindingFlags', NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
-('GBinding', 'source', 'GObject', 1, NULL, NULL, NULL, NULL, '2.26', NULL),
-('GBinding', 'source-property', 'gchararray', NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
-('GBinding', 'target', 'GObject', 1, NULL, NULL, NULL, NULL, '2.26', NULL),
-('GBinding', 'target-property', 'gchararray', NULL, NULL, NULL, NULL, NULL, '2.26', NULL);
+('GBinding', 'flags', 'GBindingFlags', NULL, NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'source', 'GObject', 1, NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'source-property', 'gchararray', NULL, NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'target', 'GObject', 1, NULL, NULL, NULL, NULL, NULL, '2.26', NULL),
+('GBinding', 'target-property', 'gchararray', NULL, NULL, NULL, NULL, NULL, NULL, '2.26', NULL);
 
 INSERT INTO signal VALUES
 ('GObject', 'notify', NULL, NULL, 1);

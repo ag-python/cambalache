@@ -30,6 +30,9 @@ from utils import gir
 
 class CambalacheDb:
     def __init__(self):
+        self.lib = None
+        self.target_tk = None
+
         # Create DB file
         self.conn = sqlite3.connect(":memory:")
 
@@ -99,10 +102,10 @@ class CambalacheDb:
         c.close()
 
     def populate_from_gir(self, girfile):
-        lib = gir.GirData(girfile)
-        lib.populate_db(self.conn)
+        self.lib = gir.GirData(girfile)
+        self.target_tk = f'{self.lib.name}-{self.lib.version}'
+        self.lib.populate_db(self.conn)
         self.conn.commit()
-        return lib
 
     def _import_tag(self, c, node, owner_id, parent_id):
         key = node.tag
@@ -139,9 +142,27 @@ class CambalacheDb:
         for klass in root:
             owner_id = klass.tag
 
+            for properties in klass.iterchildren('properties'):
+                target = properties.get('target', None)
+
+                if target is None or target == self.target_tk:
+                    for prop in properties:
+                        property_id = prop.get('name')
+                        save_always = prop.get('save-always', 'false')
+
+                        if property_id and save_always.lower() == 'true':
+                            c.execute("UPDATE property SET save_always=1 WHERE owner_id=? AND property_id=?;",
+                                      (owner_id, property_id))
+
             # Read type custom tags
-            for child in klass.find('data'):
-                self._import_tag(c, child, owner_id, None)
+            for data in klass.iterchildren('data'):
+                target = data.get('target', None)
+
+                if target is not None and target != self.target_tk:
+                    continue
+
+                for child in data:
+                    self._import_tag(c, child, owner_id, None)
 
         c.close()
         self.conn.commit()
@@ -154,10 +175,9 @@ if __name__ == "__main__":
 
     db = CambalacheDb()
 
-    lib = db.populate_from_gir(sys.argv[1])
+    db.populate_from_gir(sys.argv[1])
 
     # Load custom type data from json file
-    db.populate_extra_data_from_xml(f'{lib.name}.xml')
-    db.populate_extra_data_from_xml(f'{lib.name}-{lib.version}.xml')
+    db.populate_extra_data_from_xml(f'{db.lib.name}.xml')
 
     db.dump(sys.argv[2])

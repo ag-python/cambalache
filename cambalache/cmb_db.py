@@ -703,9 +703,30 @@ class CmbDB(GObject.GObject):
 
         info = self.type_info.get(type_id, None)
 
-        # Properties
-        for row in c.execute('SELECT op.value, op.property_id, op.comment, p.is_object FROM object_property AS op, property AS p WHERE op.ui_id=? AND op.object_id=? AND p.owner_id = op.owner_id AND p.property_id = op.property_id;',
-                             (ui_id, object_id,)):
+        # Create class hierarchy list
+        hierarchy = [type_id] + info.hierarchy if info else [type_id]
+
+        # SQL placeholder for every class in the list
+        placeholders = ','.join((['?'] * len(hierarchy)))
+
+        # Properties + save_always default values
+        for row in c.execute(f'''
+                SELECT op.value, op.property_id, op.comment, p.is_object
+                  FROM object_property AS op, property AS p
+                  WHERE op.ui_id=? AND op.object_id=? AND
+                    p.owner_id = op.owner_id AND
+                    p.property_id = op.property_id
+                UNION
+                SELECT default_value, property_id, null, is_object
+                  FROM property
+                  WHERE save_always=1 AND owner_id IN ({placeholders}) AND
+                    property_id NOT IN
+                    (SELECT property_id
+                     FROM object_property
+                     WHERE ui_id=? AND object_id=?)
+                ORDER BY op.property_id
+                ''',
+                (ui_id, object_id) + tuple(hierarchy) + (ui_id, object_id)):
             val, property_id, comment, is_object = row
 
             if is_object:
@@ -786,6 +807,16 @@ class CmbDB(GObject.GObject):
             pinfo = self.type_info[parent]
             export_type_data(parent, pinfo, obj)
 
+        # Layout properties class
+        layout_class = f'{type_id}LayoutChild'
+        linfo = self.type_info.get(layout_class, None)
+
+        # Construct Layout Child class hierarchy list
+        hierarchy = [layout_class] + linfo.hierarchy if linfo else [layout_class]
+
+        # SQL placeholder for every class in the list
+        placeholders = ','.join((['?'] * len(hierarchy)))
+
         # Children
         for row in c.execute('SELECT object_id, internal, type, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
             child_id, internal, ctype,  comment = row
@@ -795,11 +826,30 @@ class CmbDB(GObject.GObject):
             node_set(child, 'type', ctype)
             self._node_add_comment(child_obj, comment)
 
+            obj.append(child)
+
+            if linfo is None:
+                continue
+
             # Packing / Layout
             layout = E('packing' if self.target_tk == 'gtk+-3.0' else 'layout')
 
-            for prop in cc.execute('SELECT value, property_id, comment FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=?;',
-                                 (ui_id, object_id, child_id)):
+            # TODO: support object packing properties
+            for prop in cc.execute(f'''
+                    SELECT value, property_id, comment
+                      FROM object_layout_property
+                      WHERE ui_id=? AND object_id=? AND child_id=?
+                    UNION
+                    SELECT default_value AS value, property_id, null
+                      FROM property
+                      WHERE save_always=1 AND owner_id IN ({placeholders}) AND property_id NOT IN
+                        (SELECT property_id FROM object_layout_property
+                         WHERE ui_id=? AND object_id=? AND child_id=?)
+                    ORDER BY property_id
+                    ''',
+                    (ui_id, object_id, child_id) +
+                    tuple(hierarchy) +
+                    (ui_id, object_id, child_id)):
                 value, property_id, comment = prop
                 node = E.property(value, name=property_id)
                 layout.append(node)
@@ -810,8 +860,6 @@ class CmbDB(GObject.GObject):
                     child.append(layout)
                 else:
                     child_obj.append(layout)
-
-            obj.append(child)
 
         c.close()
         cc.close()

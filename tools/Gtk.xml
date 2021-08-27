@@ -1,9 +1,7 @@
 <!--
- CambalacheDB - Data Model for Cambalache
+ Gtk Extra meta data
 
- Copyright (C) 2021  Juan Pablo Ugarte - All Rights Reserved
-
- Unauthorized copying of this file, via any medium is strictly prohibited.
+ Copyright (C) 2021  Juan Pablo Ugarte
 -->
 <types>
   <GtkWidget>
@@ -11,8 +9,19 @@
       <style>
         <class name="gchararray"/>
       </style>
-  </data>
+    </data>
   </GtkWidget>
+
+  <GtkGridLayoutChild>
+    <properties target="Gtk-3.0">
+      <property name="left-attach" save-always="True"/>
+      <property name="top-attach" save-always="True"/>
+    </properties>
+    <properties target="Gtk-4.0">
+      <property name="column" save-always="True"/>
+      <property name="row" save-always="True"/>
+    </properties>
+  </GtkGridLayoutChild>
 
   <GtkDialog>
     <data>
