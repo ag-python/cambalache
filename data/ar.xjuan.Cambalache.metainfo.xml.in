@@ -4,7 +4,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>LGPL-2.1</project_license>
   <name>Cambalache</name>
-  <summary>Create and edit UI files for Gtk 4 and Gtk 3 applications</summary>
+  <summary>Create GTK User Interfaces</summary>
   <description>
 
     <!-- To translators: AppData description first paragraph -->
