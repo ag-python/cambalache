@@ -557,10 +557,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if p.owner_id == owner_id and p.property_id == property_id:
                 p.notify(prop)
                 if layout:
-                    parent = self._get_object_by_id(obj.ui_id, obj.parent_id)
-                    self.emit('object-layout-property-changed', parent, obj, p)
+                    obj._layout_property_changed(p)
                 else:
-                    self.emit('object-property-changed', obj, p)
+                    obj._property_changed(p)
 
     def _get_history_command(self, history_index):
         c = self.db.cursor()
@@ -810,16 +809,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         info = self._type_info.get(name, None)
         return info.properties if info else None
 
-    def _object_property_changed(self, ui_id, object_id, prop):
-        self.emit('object-property-changed',
-                  self._get_object_by_id(ui_id, object_id),
-                  prop)
+    def _object_property_changed(self, obj, prop):
+        self.emit('object-property-changed', obj, prop)
 
-    def _object_layout_property_changed(self, ui_id, object_id, child_id, prop):
-        self.emit('object-layout-property-changed',
-                  self._get_object_by_id(ui_id, object_id),
-                  self._get_object_by_id(ui_id, child_id),
-                  prop)
+    def _object_layout_property_changed(self, obj, child, prop):
+        self.emit('object-layout-property-changed', obj, child, prop)
 
     def _object_signal_removed(self, obj, signal):
         self.emit('object-signal-removed', obj, signal)
