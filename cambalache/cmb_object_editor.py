@@ -279,6 +279,7 @@ class CmbObjectEditor(Gtk.Box):
     def __init__(self, **kwargs):
         self._object = None
         self._id_label = None
+        self._labels = {}
 
         super().__init__(**kwargs)
 
@@ -333,6 +334,8 @@ class CmbObjectEditor(Gtk.Box):
         revealer.props.reveal_child = expanded
 
     def _update_view(self):
+        self._labels = {}
+
         for child in self.get_children():
             self.remove(child)
 
@@ -373,6 +376,13 @@ class CmbObjectEditor(Gtk.Box):
 
             label = Gtk.Label(label=prop.property_id,
                               xalign=0)
+
+            # Keep a dict of labels
+            self._labels[prop.property_id] = label
+
+            # Update labe status
+            self._update_property_label(prop)
+
             editor = self._create_editor_for_property(prop)
             grid.attach(label, 0, i, 1, 1)
             grid.attach(editor, 1, i, 1, 1)
@@ -380,13 +390,44 @@ class CmbObjectEditor(Gtk.Box):
 
         self.show_all()
 
+    def _on_property_changed(self, obj, prop):
+        self._update_property_label(prop)
+
+    def _on_layout_property_changed(self, obj, child, prop):
+        self._update_property_label(prop)
+
+    def _update_property_label(self, prop):
+        label = self._labels.get(prop.property_id, None)
+
+        if label is None:
+            return
+
+        if prop.value != prop.info.default_value:
+            label.get_style_context().add_class('modified')
+        else:
+            label.get_style_context().remove_class('modified')
+
     @GObject.property(type=CmbObject)
     def object(self):
         return self._object
 
     @object.setter
     def _set_object(self, obj):
+        if obj == self._object:
+            return
+
+        if self._object:
+            self._object.disconnect_by_func(self._on_property_changed)
+            self._object.disconnect_by_func(self._on_layout_property_changed)
+
         self._object = obj
+
+        if obj:
+            self._object.connect('property-changed',
+                                 self._on_property_changed)
+            self._object.connect('layout-property-changed',
+                                 self._on_layout_property_changed)
+
         self._update_view()
 
     def _get_min_max_for_type(self, type_id):
@@ -473,3 +514,6 @@ class CmbObjectEditor(Gtk.Box):
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.BIDIRECTIONAL)
         return editor
+
+
+Gtk.WidgetClass.set_css_name(CmbObjectEditor, 'CmbObjectEditor')
