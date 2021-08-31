@@ -23,8 +23,9 @@
 import os
 import sys
 import sqlite3
-from lxml import etree
+import argparse
 
+from lxml import etree
 from utils import gir
 
 
@@ -101,8 +102,8 @@ class CambalacheDb:
 
         c.close()
 
-    def populate_from_gir(self, girfile):
-        self.lib = gir.GirData(girfile)
+    def populate_from_gir(self, girfile, **kwargs):
+        self.lib = gir.GirData(girfile, **kwargs)
         self.target_tk = f'{self.lib.name}-{self.lib.version}'
         self.lib.populate_db(self.conn)
         self.conn.commit()
@@ -168,16 +169,32 @@ class CambalacheDb:
         self.conn.commit()
 
 if __name__ == "__main__":
-    nargs = len(sys.argv)
-    if nargs < 3:
-        print(f"Ussage: {sys.argv[0]} library.gir database.sqlite")
-        exit()
+    parser = argparse.ArgumentParser(description='Generate Cambalache library data')
+    parser.add_argument('--gir', type=str, required=True,
+                        help="library Gir file")
+    parser.add_argument('--output', type=str, required=True,
+                        help="Output filename")
+    parser.add_argument('--target-gtk4', type=bool,
+                        help="Target version gtk version 4.0 instead of 3.0",
+                        default=False)
+    parser.add_argument('--types', metavar='T', type=str, nargs='+',
+                        help='Types to get extra metadata',
+                        default=None)
+    parser.add_argument('--skip-types', metavar='T', type=str, nargs='+',
+                        help='Types to avoid instantiating to get extra metadata',
+                        default=[])
+
+    args = parser.parse_args()
+
+    print(args)
 
     db = CambalacheDb()
-
-    db.populate_from_gir(sys.argv[1])
+    db.populate_from_gir(args.gir,
+                         target_gtk4=args.target_gtk4,
+                         types=args.types,
+                         skip_types=args.skip_types)
 
     # Load custom type data from json file
     db.populate_extra_data_from_xml(f'{db.lib.name}.xml')
 
-    db.dump(sys.argv[2])
+    db.dump(args.output)

@@ -42,7 +42,10 @@ def ns(namespace, name):
 
 class GirData:
 
-    def __init__(self, gir_file):
+    def __init__(self, gir_file,
+                 types=None,
+                 skip_types=[],
+                 target_gtk4=False):
 
         self._instances = {}
 
@@ -92,26 +95,7 @@ class GirData:
         except ValueError as e:
             print(f"Oops! Could not load {self.name} {self.version} module: {e}")
 
-        types = None
-        skip_types = []
-        if self.name == 'GObject':
-            gi.require_version('CmbUtils', '3.0')
-            types = ['GObject', 'GBinding', 'GBindingFlags']
-            skip_types = ['GBinding']
-        elif self.name == 'Gtk':
-            if self.version == '3.0':
-                gi.require_version('CmbUtils', '3.0')
-            elif self.version == '4.0':
-                gi.require_version('CmbUtils', '4.0')
-                skip_types = ['GtkActivateAction',
-                              'GtkMnemonicAction',
-                              'GtkNamedAction',
-                              'GtkNeverTrigger',
-                              'GtkNothingAction',
-                              'GtkSignalAction',
-                              'GtkPrintJob']
-        else:
-            gi.require_version('CmbUtils', '3.0')
+        gi.require_version('CmbUtils', '4.0' if target_gtk4 else '3.0')
 
         global CmbUtils
         from gi.repository import CmbUtils
@@ -128,12 +112,13 @@ class GirData:
         # Dictionary of all classes/types
         self.types = self._get_types(namespace, types, skip_types)
 
-        if self.name == 'Gtk':
-            if self.version == '3.0':
-                self.lib = 'gtk+'
-                self._gtk3_init()
-            if self.version == '4.0':
-                self._gtk4_init()
+        if self.name == 'Gtk' and self.version == '3.0':
+            self.lib = 'gtk+'
+
+        if target_gtk4:
+            self._gtk4_init()
+        else:
+            self._gtk3_init()
 
         # Types dependency graph
         types_deps = {}
@@ -373,7 +358,7 @@ class GirData:
         for child in element.iterfind('implements', nsmap):
             name = child.get('name')
             if name.find('.') < 0:
-                retval.append(self.name + name)
+                retval.append(self.prefix + name)
 
         return retval
 
@@ -384,6 +369,8 @@ class GirData:
             parent = self.prefix + parent
         elif parent is None:
             parent = 'object'
+        elif parent.startswith('Gtk.'):
+            parent = parent.replace('Gtk.', 'Gtk')
         else:
             parent = 'GObject'
 
@@ -496,6 +483,14 @@ class GirData:
 
         return retval
 
+    def _get_major_minor_from_string(self, string):
+        tokens = string.split('.')
+
+        major = int(tokens[0])
+        minor = int(tokens[1]) if len(tokens) > 1 else 0
+
+        return (major, minor)
+
     def populate_db (self, conn):
         def db_insert_enum_flags(conn, name, data):
             parent = data['parent']
@@ -556,12 +551,6 @@ class GirData:
         conn.execute(f"INSERT INTO library (library_id, version, shared_library) VALUES (?, ?, ?);",
                      (self.lib, self.version, self.shared_library));
 
-        if hasattr(self.mod, 'get_major_version'):
-            major = self.mod.get_major_version()
-            for minor in range(0, self.mod.get_minor_version()+1, 2):
-                conn.execute(f"INSERT INTO library_version (library_id, version) VALUES (?, ?);",
-                             (self.lib, f"{major}.{minor}"));
-
         # Import ifaces
         for name in self.ifaces:
             db_insert_iface(conn, name, self.ifaces[name])
@@ -590,3 +579,23 @@ class GirData:
         # Now insert iface data (properties, signals, etc)
         for name in self.ifaces:
             db_insert_type_data(conn, name, self.ifaces[name])
+
+        # Get versions from all types, properties and signal of this library
+        mod_major, mod_minor = self._get_major_minor_from_string(self.version)
+        versions = [(mod_major, mod_minor)]
+        for row in conn.execute(f'''
+            SELECT version FROM type WHERE version IS NOT NULL AND library_id=? UNION
+            SELECT p.version FROM property AS p, type AS t WHERE p.version IS NOT NULL AND p.owner_id = t.type_id AND t.library_id=? UNION
+            SELECT s.version FROM signal AS s, type AS t WHERE s.version IS NOT NULL AND s.owner_id = t.type_id AND t.library_id=?;''',
+            (self.lib, self.lib, self.lib)):
+            major, minor = self._get_major_minor_from_string(row[0])
+
+            if major >= mod_major:
+                versions.append((major, minor))
+
+        versions = sorted(list(dict.fromkeys(versions)))
+
+        # Save target versions
+        for major, minor in versions:
+            conn.execute(f"INSERT INTO library_version (library_id, version) VALUES (?, ?);",
+                         (self.lib, f"{major}.{minor}"));
