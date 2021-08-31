@@ -483,15 +483,24 @@ class GirData:
 
         return retval
 
-    def _get_major_minor_from_string(self, string):
-        tokens = string.split('.')
-
-        major = int(tokens[0])
-        minor = int(tokens[1]) if len(tokens) > 1 else 0
-
-        return (major, minor)
-
     def populate_db (self, conn):
+        def major_minor_from_string(string):
+            if string is None:
+                return (0, 0)
+
+            tokens = string.split('.')
+
+            major = int(tokens[0])
+            minor = int(tokens[1]) if len(tokens) > 1 else 0
+
+            return (major, minor)
+
+        mod_major, mod_minor = major_minor_from_string(self.version)
+
+        def clean_ver(version):
+            major, minor = major_minor_from_string(version)
+            return version if major >= mod_major else None
+
         def db_insert_enum_flags(conn, name, data):
             parent = data['parent']
             conn.execute(f"INSERT INTO type (library_id, type_id, parent_id) VALUES (?, ?, ?);",
@@ -517,7 +526,11 @@ class GirData:
                 parent = 'object'
 
             conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                         (self.lib, name, parent, data['version'], data['deprecated_version'], data['abstract'], data['layout']))
+                         (self.lib, name, parent,
+                          clean_ver(data['version']),
+                          clean_ver(data['deprecated_version']),
+                          data['abstract'],
+                          data['layout']))
 
 
         def db_insert_type_data(conn, name, data):
@@ -535,13 +548,22 @@ class GirData:
                     continue
 
                 conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                             (name, prop, prop_type, p['construct'], p.get('default_value', None), p.get('minimum', None), p.get('maximum', None), p['version'], p['deprecated_version']))
+                             (name, prop, prop_type,
+                              p['construct'],
+                              p.get('default_value', None),
+                              p.get('minimum', None),
+                              p.get('maximum', None),
+                              clean_ver(p['version']),
+                              clean_ver(p['deprecated_version'])))
 
             signals = data['signals']
             for signal in signals:
                 s = signals[signal]
                 conn.execute(f"INSERT INTO signal (owner_id, signal_id, version, deprecated_version, detailed) VALUES (?, ?, ?, ?, ?);",
-                             (name, signal, s['version'], s['deprecated_version'], s['detailed']))
+                             (name, signal,
+                              clean_ver(s['version']),
+                              clean_ver(s['deprecated_version']),
+                              s['detailed']))
 
             for iface in data.get('interfaces', []):
                 conn.execute(f"INSERT INTO type_iface (type_id, iface_id) VALUES (?, ?);",
@@ -581,14 +603,13 @@ class GirData:
             db_insert_type_data(conn, name, self.ifaces[name])
 
         # Get versions from all types, properties and signal of this library
-        mod_major, mod_minor = self._get_major_minor_from_string(self.version)
         versions = [(mod_major, mod_minor)]
         for row in conn.execute(f'''
             SELECT version FROM type WHERE version IS NOT NULL AND library_id=? UNION
             SELECT p.version FROM property AS p, type AS t WHERE p.version IS NOT NULL AND p.owner_id = t.type_id AND t.library_id=? UNION
             SELECT s.version FROM signal AS s, type AS t WHERE s.version IS NOT NULL AND s.owner_id = t.type_id AND t.library_id=?;''',
             (self.lib, self.lib, self.lib)):
-            major, minor = self._get_major_minor_from_string(row[0])
+            major, minor = major_minor_from_string(row[0])
 
             if major >= mod_major:
                 versions.append((major, minor))

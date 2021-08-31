@@ -174,9 +174,9 @@ if __name__ == "__main__":
                         help="library Gir file")
     parser.add_argument('--output', type=str, required=True,
                         help="Output filename")
-    parser.add_argument('--target-gtk4', type=bool,
+    parser.add_argument('--target-gtk4',
                         help="Target version gtk version 4.0 instead of 3.0",
-                        default=False)
+                        action='store_true')
     parser.add_argument('--types', metavar='T', type=str, nargs='+',
                         help='Types to get extra metadata',
                         default=None)
