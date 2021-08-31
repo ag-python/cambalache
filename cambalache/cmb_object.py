@@ -36,6 +36,10 @@ class CmbObject(CmbBaseObject):
     info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     __gsignals__ = {
+        'property-changed': (GObject.SIGNAL_RUN_FIRST, None, (CmbProperty, )),
+
+        'layout-property-changed': (GObject.SIGNAL_RUN_FIRST, None, (GObject.GObject, CmbLayoutProperty)),
+
         'signal-added': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, )),
 
         'signal-removed': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, ))
@@ -55,6 +59,9 @@ class CmbObject(CmbBaseObject):
         self._populate_layout_properties()
         self._populate_signals()
 
+    def __str__(self):
+        return f'CmbObject<{self.type_id}> {self.ui_id}:{self.object_id}'
+
     def _populate_type_properties(self, name):
         property_info = self.project.get_type_properties(name)
         if property_info is None:
@@ -63,7 +70,8 @@ class CmbObject(CmbBaseObject):
         for property_name in property_info:
             info = property_info[property_name]
 
-            prop = CmbProperty(project=self.project,
+            prop = CmbProperty(object=self,
+                               project=self.project,
                                ui_id=self.ui_id,
                                object_id=self.object_id,
                                owner_id=name,
@@ -87,7 +95,8 @@ class CmbObject(CmbBaseObject):
         for property_name in property_info:
             info = property_info[property_name]
 
-            prop = CmbLayoutProperty(project=self.project,
+            prop = CmbLayoutProperty(object=self,
+                                     project=self.project,
                                      ui_id=self.ui_id,
                                      object_id=parent_id,
                                      child_id=self.object_id,
@@ -96,6 +105,15 @@ class CmbObject(CmbBaseObject):
                                      info=info)
 
             self.layout.append(prop)
+
+    def _property_changed(self, prop):
+        self.emit('property-changed', prop)
+        self.project._object_property_changed(self, prop)
+
+    def _layout_property_changed(self, prop):
+        parent = self.project._get_object_by_id(self.ui_id, self.parent_id)
+        self.emit('layout-property-changed', parent, prop)
+        self.project._object_layout_property_changed(parent, self, prop)
 
     def _add_signal_object(self, signal):
         self.signals.append(signal)
