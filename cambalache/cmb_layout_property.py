@@ -28,6 +28,7 @@ from .cmb_objects_base import CmbBaseLayoutProperty, CmbPropertyInfo
 
 
 class CmbLayoutProperty(CmbBaseLayoutProperty):
+    object = GObject.Property(type=GObject.GObject, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     info = GObject.Property(type=CmbPropertyInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
@@ -66,10 +67,7 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, value))
 
         if self._init == False:
-            self.project._object_layout_property_changed(self.ui_id,
-                                                         self.object_id,
-                                                         self.child_id,
-                                                         self)
+            self.object._layout_property_changed(self)
 
         c.close()
 

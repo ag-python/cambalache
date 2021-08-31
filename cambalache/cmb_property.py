@@ -28,6 +28,7 @@ from .cmb_objects_base import CmbBaseProperty, CmbPropertyInfo
 
 
 class CmbProperty(CmbBaseProperty):
+    object = GObject.Property(type=GObject.GObject, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     info = GObject.Property(type=CmbPropertyInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
@@ -38,10 +39,10 @@ class CmbProperty(CmbBaseProperty):
     @GObject.property(type=str)
     def value(self):
         c = self.project.db.execute("SELECT value FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
-                                        (self.ui_id,
-                                         self.object_id,
-                                         self.owner_id,
-                                         self.property_id))
+                                    (self.ui_id,
+                                     self.object_id,
+                                     self.owner_id,
+                                     self.property_id))
         row = c.fetchone()
         return row[0] if row is not None else self.info.default_value
 
@@ -65,6 +66,7 @@ class CmbProperty(CmbBaseProperty):
                           (self.ui_id, self.object_id, self.owner_id, self.property_id, value))
 
         if self._init == False:
-            self.project._object_property_changed(self.ui_id, self.object_id, self)
+            self.object._property_changed(self)
 
         c.close()
+
