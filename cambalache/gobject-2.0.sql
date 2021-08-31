@@ -2,6 +2,10 @@ PRAGMA foreign_keys = OFF;
 INSERT INTO library VALUES
 ('gobject', '2.0', 'libgobject-2.0.so.0', NULL, NULL);
 
+INSERT INTO library_version VALUES
+('gobject', '2.0'),
+('gobject', '2.26');
+
 INSERT INTO type VALUES
 ('GBinding', 'GObject', 'gobject', '2.26', NULL, NULL, NULL),
 ('GBindingFlags', 'flags', 'gobject', NULL, NULL, NULL, NULL),
