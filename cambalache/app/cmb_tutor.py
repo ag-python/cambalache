@@ -105,8 +105,7 @@ class CmbTutor(GObject.GObject):
             GLib.source_remove(self.timeout_id)
 
         self.timeout_id = None
-        self.hiding_node = False
-        self._hide_current_node()
+        self._hide_node(self.current)
         self.notify('state')
 
     def stop(self):
@@ -141,24 +140,30 @@ class CmbTutor(GObject.GObject):
 
         return GLib.SOURCE_REMOVE
 
-    def _hide_current_node(self):
-        if self.hiding_node:
-            return
-
-        self.hiding_node = True;
+    def _hide_node(self, index):
         if self.popover:
-            self.popover.popdown();
+            self.popover.popdown()
             self.popover = None
 
-        if self.current is not None:
-            node = self.script[self.current]
+        if index is not None:
+            node = self.script[index]
 
             if node.widget:
                 node.widget.get_style_context().remove_class("cmb-tutor-highlight")
 
+    def _hide_current_node(self):
+        if self.hiding_node:
+            return
+
+        self.hiding_node = True
+
+        self._hide_node(self.current)
+
+        if self.current is not None:
+            node = self.script[self.current]
             self.emit('hide-node', node.name, node.widget)
 
-        self.hiding_node = False;
+        self.hiding_node = False
 
     def _script_play(self):
         self.timeout_id = None;
