@@ -31,7 +31,6 @@ localedir = '@localedir@'
 
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-print(pkgdatadir, localedir)
 
 import locale
 locale.bindtextdomain("cambalache", localedir)
