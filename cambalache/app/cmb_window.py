@@ -530,18 +530,30 @@ class CmbWindow(Gtk.ApplicationWindow):
     def do_cmb_action(self, action):
         self._actions[action].activate()
 
+    def _clear_tutor(self):
+        try:
+            self.disconnect_by_func(self._on_project_notify)
+            self.project.disconnect_by_func(self._on_ui_added)
+            self.project.disconnect_by_func(self._on_object_added)
+        except:
+            pass
+        self.tutor = None
+
     def _on_project_notify(self, obj, pspec):
         if self.project:
             self.turor_waiting_for_user_action = False
             self.tutor.play()
+            self.disconnect_by_func(self._on_project_notify)
 
     def _on_object_added(self, project, obj):
         if obj.type_id == 'GtkWindow':
+            project.disconnect_by_func(self._on_object_added)
             self.turor_waiting_for_user_action = False
             self.tutor.play()
 
     def _on_ui_added(self, project, ui):
         self.turor_waiting_for_user_action = False
+        project.disconnect_by_func(self._on_ui_added)
         self.tutor.play()
 
     def _on_tutor_show_node(self, tutor, node, widget):
@@ -558,8 +570,9 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_tutor_hide_node(self, tutor, node, widget):
         if node == 'intro-end':
             self.completed_intro = True
+            self._clear_tutor()
         elif node == 'add-project':
-            if self.project is None:
+            if self._project is None:
                 self.turor_waiting_for_user_action = True
                 self.tutor.pause()
         elif node == 'add-ui' or node == 'add-window':
@@ -574,8 +587,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         self._update_actions()
 
     def _on_intro_activate(self, action, data):
-        self.intro_button.set_visible(True)
-
         if self.turor_waiting_for_user_action:
             return
 
@@ -585,6 +596,11 @@ class CmbWindow(Gtk.ApplicationWindow):
             else:
                 self.tutor.play()
             return
+
+        # Ensure button is visible and reset config flag since we are playing
+        # the tutorial from start
+        self.intro_button.set_visible(True)
+        self.completed_intro = False
 
         self.tutor = CmbTutor(script=cmb_tutorial.intro, window=self)
         self.tutor.connect('show-node', self._on_tutor_show_node)
