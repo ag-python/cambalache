@@ -44,9 +44,10 @@ def _get_text_resource(name):
 BASE_SQL = _get_text_resource('cmb_base.sql')
 PROJECT_SQL = _get_text_resource('cmb_project.sql')
 HISTORY_SQL = _get_text_resource('cmb_history.sql')
-GOBJECT_SQL = _get_text_resource('gobject-2.0.sql')
-GTK3_SQL = _get_text_resource('gtk+-3.0.sql')
-GTK4_SQL = _get_text_resource('gtk-4.0.sql')
+
+GOBJECT_XML = os.path.join(catalogsdir, 'gobject-2.0.xml')
+GTK3_XML = os.path.join(catalogsdir, 'gtk+-3.0.xml')
+GTK4_XML = os.path.join(catalogsdir, 'gtk-4.0.xml')
 
 
 class CmbDB(GObject.GObject):
@@ -74,7 +75,7 @@ class CmbDB(GObject.GObject):
         # Initialize history (Undo/Redo) tables
         self._init_history_and_triggers()
 
-        self._init_data(c)
+        self._init_data()
 
         c.execute("PRAGMA foreign_keys = ON;")
 
@@ -236,18 +237,18 @@ class CmbDB(GObject.GObject):
         self.conn.commit()
         c.close()
 
-    def _init_data(self, c):
+    def _init_data(self):
         if self.target_tk not in ['gtk+-3.0', 'gtk-4.0']:
             raise Exception(f'Unknown target tk {self.target_tk}')
 
         # Add GObject data
-        c.executescript(GOBJECT_SQL)
+        self.load_catalog(GOBJECT_XML)
 
         # Add gtk data
         if self.target_tk == 'gtk+-3.0':
-            c.executescript(GTK3_SQL)
+            self.load_catalog(GTK3_XML)
         elif self.target_tk == 'gtk-4.0':
-            c.executescript(GTK4_SQL)
+            self.load_catalog(GTK4_XML)
 
         # TODO: Load all libraries that depend on self.target_tk
 
@@ -281,6 +282,13 @@ class CmbDB(GObject.GObject):
     def set_data(self, key, value):
         self.execute("UPDATE global SET value=? WHERE key=?;", (value, key))
 
+    def _load_table_from_tuples(self, c, table, tuples):
+        data = ast.literal_eval(f'[{tuples}]') if tuples else []
+
+        if len(data):
+            cols = ', '.join(['?' for col in data[0]])
+            c.executemany(f'INSERT INTO {table} VALUES ({cols})', data)
+
     def load(self, filename):
         # TODO: drop all data before loading?
 
@@ -303,13 +311,41 @@ class CmbDB(GObject.GObject):
         c.execute("PRAGMA foreign_keys=OFF;")
 
         for child in root.getchildren():
-            data = ast.literal_eval(f'[{child.text}]') if child.text else []
+            self._load_table_from_tuples(c, child.tag, child.text)
 
-            if len(data) == 0:
+        c.execute("PRAGMA foreign_keys = ON;")
+        c.execute("COMMIT;")
+        c.close()
+
+    def load_catalog(self, filename):
+        tree = etree.parse(filename)
+        root = tree.getroot()
+
+        # Get dependencies
+        deps = {}
+        for dep in root.get('dependencies', '').split(','):
+            tokens = dep.split('-')
+            if len(tokens) == 2:
+                lib, ver = tokens
+                deps[lib] = ver
+
+        c = self.conn.cursor()
+
+        # Load dependencies
+        for dep in deps:
+            c.execute("SELECT version FROM library WHERE library_id=?;",
+                      (dep,))
+            row = c.fetchone()
+            if row and row[0] == deps[dep]:
                 continue
+            else:
+                print(f'Missing dependency {dep} for {filename}')
 
-            cols = ', '.join(['?' for col in data[0]])
-            c.executemany(f'INSERT INTO {child.tag} VALUES ({cols})', data)
+        # Avoid circular dependencies errors
+        c.execute("PRAGMA foreign_keys=OFF;")
+
+        for child in root.getchildren():
+            self._load_table_from_tuples(c, child.tag, child.text)
 
         c.execute("PRAGMA foreign_keys = ON;")
         c.execute("COMMIT;")
