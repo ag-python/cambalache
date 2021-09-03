@@ -6,6 +6,8 @@ project(
 
 python = import('python')
 python_bin = python.find_installation('python3')
+pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalache')
+catalogsdir = join_paths(pkgdatadir, 'catalogs')
 localedir = join_paths(get_option('prefix'), get_option('localedir'))
 gnome = import('gnome')
 
@@ -66,6 +68,7 @@ find_program('gtk4-broadwayd', required: true)
 
 subdir('data')
 subdir('cambalache')
+subdir('plugins')
 subdir('po')
 
 meson.add_install_script('postinstall.py')

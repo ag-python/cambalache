@@ -1,4 +1,3 @@
-pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalache')
 moduledir = join_paths(merenguedir, 'merengue')
 
 gnome.compile_resources('merengue',

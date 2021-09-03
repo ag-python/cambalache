@@ -1,4 +1,3 @@
-pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalache')
 moduledir = join_paths(get_option('prefix'), python_bin.get_install_dir(), 'cambalache', 'app')
 
 gnome.compile_resources('app',

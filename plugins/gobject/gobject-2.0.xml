@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<catalog>
+  <library>
+	("gobject","2.0","libgobject-2.0.so.0",None,None)
+  </library>
+  <library_version>
+	("gobject","2.0"),
+	("gobject","2.26")
+  </library_version>
+  <type>
+	("GBinding","GObject","gobject","2.26",None,None,None),
+	("GBindingFlags","flags","gobject",None,None,None,None),
+	("GObject","object","gobject",None,None,None,None)
+  </type>
+  <type_flags>
+	("GBindingFlags","G_BINDING_BIDIRECTIONAL","bidirectional",1,"Bidirectional binding; if either the property of the source or the property of the target changes, the other is updated."),
+	("GBindingFlags","G_BINDING_DEFAULT","default",None,"The default binding; if the source property changes, the target property is updated with its value."),
+	("GBindingFlags","G_BINDING_INVERT_BOOLEAN","invert-boolean",4,"If the two properties being bound are booleans, setting one to %TRUE will result in the other being set to %FALSE and vice versa. This flag will only work for boolean properties, and cannot be used when passing custom transformation functions to g_object_bind_property_full()."),
+	("GBindingFlags","G_BINDING_SYNC_CREATE","sync-create",2,"Synchronize the values of the source and target properties when creating the binding; the direction of the synchronization is always from the source to the target.")
+  </type_flags>
+  <property>
+	("GBinding","flags","GBindingFlags",None,None,None,None,None,None,"2.26",None),
+	("GBinding","source","GObject",1,None,None,None,None,None,"2.26",None),
+	("GBinding","source-property","gchararray",None,None,None,None,None,None,"2.26",None),
+	("GBinding","target","GObject",1,None,None,None,None,None,"2.26",None),
+	("GBinding","target-property","gchararray",None,None,None,None,None,None,"2.26",None)
+  </property>
+  <signal>
+	("GObject","notify",None,None,1)
+  </signal>
+</catalog>

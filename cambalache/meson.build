@@ -1,4 +1,3 @@
-pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'cambalache')
 moduledir = join_paths(get_option('prefix'), python_bin.get_install_dir(), 'cambalache')
 merenguedir = join_paths(moduledir, 'priv')
 
@@ -12,6 +11,7 @@ gnome.compile_resources('cambalache',
 conf = configuration_data()
 conf.set('VERSION', meson.project_version())
 conf.set('pkgdatadir', pkgdatadir)
+conf.set('catalogsdir', catalogsdir)
 conf.set('merenguedir', merenguedir)
 
 configure_file(
