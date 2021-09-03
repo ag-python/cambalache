@@ -1,30 +1,4 @@
-CAMBALACHE_DB=flatpak run \
-	--env=LD_LIBRARY_PATH=. \
-	--env=GI_TYPELIB_PATH=. \
-	--share=ipc \
-	--socket=fallback-x11 \
-	--socket=wayland \
-	--device=all \
-	--filesystem=host \
-	--command=python3 \
-	org.gnome.Sdk//40 \
-	cambalache-db.py
-
 all: CmbUtils-3.0.typelib CmbUtils-4.0.typelib
-
-update: ../cambalache/gobject-2.0.sql ../cambalache/gtk+-3.0.sql ../cambalache/gtk-4.0.sql
-
-../cambalache/gobject-2.0.sql: CmbUtils-3.0.typelib
-	${CAMBALACHE_DB} --gir /usr/share/gir-1.0/GObject-2.0.gir --output ../cambalache/gobject-2.0.sql \
-	--types GObject GBinding GBindingFlags \
-	--skip-types GBinding
-
-../cambalache/gtk+-3.0.sql: CmbUtils-3.0.typelib
-	${CAMBALACHE_DB} --gir /usr/share/gir-1.0/Gtk-3.0.gir --output ../cambalache/gtk+-3.0.sql && true
-
-../cambalache/gtk-4.0.sql: CmbUtils-4.0.typelib
-	${CAMBALACHE_DB} --target-gtk4 --gir /usr/share/gir-1.0/Gtk-4.0.gir --output ../cambalache/gtk-4.0.sql \
-	--skip-types GtkActivateAction GtkMnemonicAction GtkNamedAction GtkNeverTrigger GtkNothingAction GtkSignalAction GtkPrintJob
 
 libcmbutils3.so: utils/utils.h utils/utils.c
 	cc -c -fpic -Wall `pkg-config gtk+-3.0 --cflags` -Iutils utils/utils.c -o utils.o
@@ -44,7 +18,7 @@ CmbUtils-4.0.gir: libcmbutils4.so
 	LD_LIBRARY_PATH=. \
 	g-ir-scanner -i Gtk-4.0 -n CmbUtils --nsversion=4.0 --identifier-prefix=cmb_utils --library=cmbutils4 --symbol-prefix=cmb_utils utils/utils.c utils/utils.h --warn-all -o CmbUtils-4.0.gir
 
-.PHONY: all update clean
+.PHONY: all clean
 
 clean:
 	rm -f libcmbutils.so CmbUtils*.gir CmbUtils*.typelib

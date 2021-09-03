@@ -26,13 +26,15 @@ import sqlite3
 import argparse
 
 from lxml import etree
+from lxml.builder import E
 from utils import gir
 
 
 class CambalacheDb:
-    def __init__(self):
+    def __init__(self, dependencies=None):
         self.lib = None
         self.target_tk = None
+        self.dependencies = dependencies if dependencies else []
 
         # Create DB file
         self.conn = sqlite3.connect(":memory:")
@@ -44,61 +46,78 @@ class CambalacheDb:
             self.conn.executescript(sql.read())
             self.conn.commit()
 
-    def _dump_table(self, fd, table):
+    def dump(self, filename):
+        # Copy/Paste from CmbDB
         def get_row(row):
-            r = '('
-            first = True
+            r = None
 
             for c in row:
-                if first:
-                    first = False
+                if r:
+                    r += ','
                 else:
-                    r += ', '
+                    r = ''
 
                 if type(c)  == str:
-                    val = c.replace("'", "''")
-                    r += f"'{val}'"
-                elif c is None:
-                    r += 'NULL'
-                else:
+                    # FIXME: find a better way to escape string
+                    val = c.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+                    r += f'"{val}"'
+                elif c:
                     r += str(c)
+                else:
+                    r += 'None'
 
-            r += ')'
+            return f'\t({r})'
 
-            return r
-
-        c = self.conn.cursor()
-
-        if table == 'type':
-            c.execute("SELECT * FROM type WHERE parent_id IS NOT NULL;")
-        else:
-            c.execute(f"SELECT * FROM {table};")
-        row = c.fetchone()
-
-        if row is not None:
-            fd.write(f"INSERT INTO {table} VALUES\n")
-
-        while row is not None:
-            fd.write(get_row(row))
+        def _dump_table(c, query):
+            c.execute(query)
             row = c.fetchone()
-            if row is not None:
-                fd.write(',\n')
-            else:
-                fd.write(';\n\n')
 
-        c.close()
+            if row is None:
+                return None
 
-    def dump(self, filename):
+            retval = ''
+            while row is not None:
+                retval += get_row(row)
+                row = c.fetchone()
+
+                if row:
+                    retval += ',\n'
+
+            return f'\n{retval}\n  '
+
+        catalog = E.catalog()
+
+        if self.dependencies and len(self.dependencies):
+            catalog.set('dependencies', ','.join(self.dependencies))
+
         c = self.conn.cursor()
+        for table in ['license',
+                      'library', 'library_dependency', 'library_version',
+                      'type', 'type_iface', 'type_enum', 'type_flags',
+                      'type_data', 'type_data_arg',
+                      'property',
+                      'signal']:
 
-        with open(filename, 'w') as fd:
-            fd.write("PRAGMA foreign_keys = OFF;\n")
+            if table == 'type':
+                data = _dump_table(c, "SELECT * FROM type WHERE parent_id IS NOT NULL;")
+            else:
+                data = _dump_table(c, f"SELECT * FROM {table};")
 
-            for row in c.execute("SELECT name FROM sqlite_master WHERE type = 'table';"):
-                self._dump_table(fd, row[0])
+            if data is None:
+                continue
 
-            fd.write("PRAGMA foreign_keys = ON;\n")
-            fd.close();
+            element = etree.Element(table)
+            element.text = data
+            catalog.append(element)
+
+        # Dump xml to file
+        with open(filename, 'wb') as fd:
+            tree = etree.ElementTree(catalog)
+            tree.write(fd,
+                       pretty_print=True,
+                       xml_declaration=True,
+                       encoding='UTF-8')
+            fd.close()
 
         c.close()
 
@@ -170,31 +189,43 @@ class CambalacheDb:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate Cambalache library data')
+
     parser.add_argument('--gir', type=str, required=True,
                         help="library Gir file")
+
     parser.add_argument('--output', type=str, required=True,
-                        help="Output filename")
+                        help="Output xml filename")
+
     parser.add_argument('--target-gtk4',
                         help="Target version gtk version 4.0 instead of 3.0",
                         action='store_true')
+
+    parser.add_argument('--dependencies', metavar='T', type=str, nargs='+',
+                        help='Catalog dependencies lib-ver (gtk-4.0)',
+                        default=[])
+
+    parser.add_argument('--extra-data', type=str,
+                        help="Extra data for catalog",
+                        default=None)
+
     parser.add_argument('--types', metavar='T', type=str, nargs='+',
                         help='Types to get extra metadata',
                         default=None)
+
     parser.add_argument('--skip-types', metavar='T', type=str, nargs='+',
                         help='Types to avoid instantiating to get extra metadata',
                         default=[])
 
     args = parser.parse_args()
 
-    print(args)
-
-    db = CambalacheDb()
+    db = CambalacheDb(dependencies=args.dependencies)
     db.populate_from_gir(args.gir,
                          target_gtk4=args.target_gtk4,
                          types=args.types,
                          skip_types=args.skip_types)
 
     # Load custom type data from json file
-    db.populate_extra_data_from_xml(f'{db.lib.name}.xml')
+    if args.extra_data:
+        db.populate_extra_data_from_xml(args.extra_data)
 
     db.dump(args.output)
