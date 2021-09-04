@@ -130,6 +130,21 @@ def configure_file(input_file, output_file, config):
         with open(output_file, 'w') as outfd:
             outfd.write(content)
 
+def create_catalogs_dir():
+    def link_plugin(filename):
+        basename = os.path.basename(filename)
+        link = os.path.join('.catalogs', basename)
+        if not os.path.islink(link):
+            print(f'Setting up {basename} catalog link')
+            os.symlink(os.path.abspath(filename), os.path.abspath(link))
+
+    if not os.path.exists('.catalogs'):
+        GLib.mkdir_with_parents('.catalogs', 0o700)
+
+    link_plugin('plugins/gobject/gobject-2.0.xml')
+    link_plugin('plugins/gtk/gtk+-3.0.xml')
+    link_plugin('plugins/gtk/gtk-4.0.xml')
+
 if __name__ == '__main__':
     if glib_compile_resources is None:
         print('Could not find glib-compile-resources in PATH')
@@ -137,7 +152,7 @@ if __name__ == '__main__':
 
     # Create config files pointing to source directories
     dev_config('cambalache/config.py',
-               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'")
+               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'\ncatalogsdir = '{os.path.abspath('.catalogs')}'")
 
     # Create config files pointing to source directories
     dev_config('cambalache/merengue/config.py',
@@ -157,6 +172,8 @@ if __name__ == '__main__':
 
     compile_schemas('data/ar.xjuan.Cambalache.gschema.xml')
     update_mime('data/ar.xjuan.Cambalache.mime.xml')
+
+    create_catalogs_dir()
 
     # Run Application
     from cambalache.app import CmbApplication
