@@ -65,6 +65,7 @@ class CmbDB(GObject.GObject):
         super().__init__(**kwargs)
 
         c = self.conn.cursor()
+        self.foreign_keys = True
 
         # Create type system tables
         c.executescript(BASE_SQL)
@@ -72,19 +73,31 @@ class CmbDB(GObject.GObject):
         # Create project tables
         c.executescript(PROJECT_SQL)
 
-        # Initialize history (Undo/Redo) tables
-        self._init_history_and_triggers()
-
-        self._init_data()
-
-        c.execute("PRAGMA foreign_keys = ON;")
-
         self.conn.commit()
         c.close()
+
+        # Initialize history (Undo/Redo) tables
+        self._init_history_and_triggers()
+        self._init_data()
+
 
     def __del__(self):
         self.conn.commit()
         self.conn.close()
+
+    @GObject.Property(type=bool, default=True)
+    def foreign_keys(self):
+        self.conn.commit()
+        c = self.conn.execute("PRAGMA foreign_keys;")
+        fk = c.fetchone()[0]
+        c.close()
+        return fk
+
+    @foreign_keys.setter
+    def _set_foreign_keys(self, value):
+        fk = 'ON' if value else 'OFF'
+        self.conn.commit()
+        self.conn.execute(f"PRAGMA foreign_keys={fk};")
 
     def _create_support_table(self, c, table):
         _table = table.replace('_', '-')
@@ -307,14 +320,12 @@ class CmbDB(GObject.GObject):
         c = self.conn.cursor()
 
         # Avoid circular dependencies errors
-        c.execute("COMMIT;")
-        c.execute("PRAGMA foreign_keys=OFF;")
+        self.foreign_keys = False
 
         for child in root.getchildren():
             self._load_table_from_tuples(c, child.tag, child.text)
 
-        c.execute("PRAGMA foreign_keys = ON;")
-        c.execute("COMMIT;")
+        self.foreign_keys = True
         c.close()
 
     def load_catalog(self, filename):
@@ -342,13 +353,12 @@ class CmbDB(GObject.GObject):
                 print(f'Missing dependency {dep} for {filename}')
 
         # Avoid circular dependencies errors
-        c.execute("PRAGMA foreign_keys=OFF;")
+        self.foreign_keys = False
 
         for child in root.getchildren():
             self._load_table_from_tuples(c, child.tag, child.text)
 
-        c.execute("PRAGMA foreign_keys = ON;")
-        c.execute("COMMIT;")
+        self.foreign_keys = True
         c.close()
 
     def save(self, filename):
