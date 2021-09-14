@@ -1,23 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<catalog dependencies="gobject-2.0">
-  <library>
-	("gtk+","3.0","libgtk-3.so.0",None,None)
-  </library>
-  <library_version>
-	("gtk+","3.0"),
-	("gtk+","3.10"),
-	("gtk+","3.12"),
-	("gtk+","3.14"),
-	("gtk+","3.16"),
-	("gtk+","3.18"),
-	("gtk+","3.2"),
-	("gtk+","3.20"),
-	("gtk+","3.22"),
-	("gtk+","3.24"),
-	("gtk+","3.4"),
-	("gtk+","3.6"),
-	("gtk+","3.8")
-  </library_version>
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
+<cambalache-catalog name="gtk+" version="3.0" targets="3.0,3.10,3.12,3.14,3.16,3.18,3.2,3.20,3.22,3.24,3.4,3.6,3.8" depends="gobject-2.0">
   <type>
 	("GtkAboutDialog","GtkDialog","gtk+",None,None,None,"container"),
 	("GtkAccelFlags","flags","gtk+",None,None,None,None),
@@ -1769,8 +1752,8 @@
 	("GtkGrid","row-homogeneous","gboolean",None,None,None,"False",None,None,None,None),
 	("GtkGrid","row-spacing","gint",None,None,None,"0","0","32767",None,None),
 	("GtkGridLayoutChild","height","gint",None,None,None,"1","1","2147483647",None,None),
-	("GtkGridLayoutChild","left-attach","gint",None,None,1,"0","-2147483648","2147483647",None,None),
-	("GtkGridLayoutChild","top-attach","gint",None,None,1,"0","-2147483648","2147483647",None,None),
+	("GtkGridLayoutChild","left-attach","gint",None,None,None,"0","-2147483648","2147483647",None,None),
+	("GtkGridLayoutChild","top-attach","gint",None,None,None,"0","-2147483648","2147483647",None,None),
 	("GtkGridLayoutChild","width","gint",None,None,None,"1","1","2147483647",None,None),
 	("GtkHandleBox","handle-position","GtkPositionType",None,None,None,"left",None,None,None,None),
 	("GtkHandleBox","shadow-type","GtkShadowType",None,None,None,"out",None,None,None,None),
@@ -2861,4 +2844,4 @@
 	("GtkWindow","keys-changed",None,None,None),
 	("GtkWindow","set-focus",None,None,None)
   </signal>
-</catalog>
+</cambalache-catalog>

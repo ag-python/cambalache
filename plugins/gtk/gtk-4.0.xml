@@ -1,12 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<catalog dependencies="gobject-2.0">
-  <library>
-	("gtk","4.0","libgtk-4.so.1",None,None)
-  </library>
-  <library_version>
-	("gtk","4.0"),
-	("gtk","4.2")
-  </library_version>
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
+<cambalache-catalog name="gtk" version="4.0" targets="4.0,4.2" depends="gobject-2.0">
   <type>
 	("GtkATContext","GObject","gtk",None,None,1,None),
 	("GtkAboutDialog","GtkWindow","gtk",None,None,None,"container"),
@@ -2781,4 +2775,4 @@
 	("GtkWindow","enable-debugging",None,None,None),
 	("GtkWindow","keys-changed",None,None,None)
   </signal>
-</catalog>
+</cambalache-catalog>

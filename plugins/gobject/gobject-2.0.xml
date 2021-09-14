@@ -1,12 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<catalog>
-  <library>
-	("gobject","2.0","libgobject-2.0.so.0",None,None)
-  </library>
-  <library_version>
-	("gobject","2.0"),
-	("gobject","2.26")
-  </library_version>
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
+<cambalache-catalog name="gobject" version="2.0" targets="2.0,2.26">
   <type>
 	("GBinding","GObject","gobject","2.26",None,None,None),
 	("GBindingFlags","flags","gobject",None,None,None,None),
@@ -28,4 +22,4 @@
   <signal>
 	("GObject","notify",None,None,1)
   </signal>
-</catalog>
+</cambalache-catalog>
