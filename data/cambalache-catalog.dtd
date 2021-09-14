@@ -1,0 +1,27 @@
+<!-- Root element -->
+<!ELEMENT cambalache-catalog (type,
+                              type_iface?,
+                              type_enum?,
+                              type_flags?,
+                              type_data?,
+                              type_data_arg?,
+                              property?,
+                              signal?)>
+
+<!-- Required catalog attrs -->
+<!ATTLIST cambalache-catalog name CDATA #REQUIRED>
+<!ATTLIST cambalache-catalog version CDATA #REQUIRED>
+<!ATTLIST cambalache-catalog targets CDATA>
+<!ATTLIST cambalache-catalog depends CDATA>
+
+<!-- Required child tags -->
+<!ELEMENT type (#PCDATA)>
+
+<!-- Optinal child tags -->
+<!ELEMENT type_iface (#PCDATA)>
+<!ELEMENT type_enum (#PCDATA)>
+<!ELEMENT type_flags (#PCDATA)>
+<!ELEMENT type_data (#PCDATA)>
+<!ELEMENT type_data_arg (#PCDATA)>
+<!ELEMENT property (#PCDATA)>
+<!ELEMENT signal (#PCDATA)>

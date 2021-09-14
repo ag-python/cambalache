@@ -1,0 +1,23 @@
+<!-- Root element -->
+<!ELEMENT cambalache-project (ui?,
+                              ui_library?,
+                              object?,
+                              object_property?,
+                              object_layout_property?,
+                              object_signal?,
+                              object_data?,
+                              object_data_arg?)>
+
+<!-- Required project attrs -->
+<!ATTLIST cambalache-project version CDATA #REQUIRED>
+<!ATTLIST cambalache-project target_tk CDATA #REQUIRED>
+
+<!-- Optinal child tags -->
+<!ELEMENT ui (#PCDATA)>
+<!ELEMENT ui_library (#PCDATA)>
+<!ELEMENT object (#PCDATA)>
+<!ELEMENT object_property (#PCDATA)>
+<!ELEMENT object_layout_property (#PCDATA)>
+<!ELEMENT object_signal (#PCDATA)>
+<!ELEMENT object_data (#PCDATA)>
+<!ELEMENT object_data_arg (#PCDATA)>
