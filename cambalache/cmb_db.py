@@ -275,8 +275,8 @@ class CmbDB(GObject.GObject):
 
                 # FIXME: find a robust way of doing this without parsing the
                 # whole file
-                if line.startswith('<project'):
-                    root = etree.fromstring(line + '</project>')
+                if line.startswith('<cambalache-project'):
+                    root = etree.fromstring(line + '</cambalache-project>')
                     retval = root.get('target_tk', None)
                     break
 
@@ -332,9 +332,25 @@ class CmbDB(GObject.GObject):
         tree = etree.parse(filename)
         root = tree.getroot()
 
+        name = root.get('name', None)
+        version = root.get('version', None)
+        targets = root.get('targets', '')
+        depends = root.get('depends', '')
+
+        c = self.conn.cursor()
+
+        # Insert library
+        c.execute("INSERT INTO library(library_id, version) VALUES (?, ?);",
+                  (name, version))
+
+        # Insert target versions
+        for target in targets.split(','):
+            c.execute("INSERT INTO library_version(library_id, version) VALUES (?, ?);",
+                  (name, target))
+
         # Get dependencies
         deps = {}
-        for dep in root.get('dependencies', '').split(','):
+        for dep in root.get('depends', '').split(','):
             tokens = dep.split('-')
             if len(tokens) == 2:
                 lib, ver = tokens
@@ -351,6 +367,17 @@ class CmbDB(GObject.GObject):
                 continue
             else:
                 print(f'Missing dependency {dep} for {filename}')
+                deps.pop(dep)
+
+        # Insert dependencies
+        for dep in deps:
+            try:
+                c.execute("INSERT INTO library_dependency(library_id, dependency_id) VALUES (?, ?);",
+                          (name, dep))
+            except Exception as e:
+                print(e)
+                # TODO: should we try to load the module?
+                #pass
 
         # Avoid circular dependencies errors
         self.foreign_keys = False
@@ -360,6 +387,8 @@ class CmbDB(GObject.GObject):
 
         self.foreign_keys = True
         c.close()
+
+        self.commit()
 
     def save(self, filename):
         def get_row(row):
@@ -402,7 +431,9 @@ class CmbDB(GObject.GObject):
         self.conn.commit()
         c = self.conn.cursor()
 
-        project = E.project(version=VERSION, target_tk=self.target_tk)
+        project = E('cambalache-project',
+                    version=VERSION,
+                    target_tk=self.target_tk)
 
         for table in ['ui', 'ui_library', 'object', 'object_property',
                       'object_layout_property', 'object_signal',
@@ -422,7 +453,9 @@ class CmbDB(GObject.GObject):
             tree.write(fd,
                        pretty_print=True,
                        xml_declaration=True,
-                       encoding='UTF-8')
+                       encoding='UTF-8',
+                       standalone=False,
+                       doctype='<!DOCTYPE cambalache-project SYSTEM "cambalache-project.dtd">')
             fd.close()
 
         c.close()
