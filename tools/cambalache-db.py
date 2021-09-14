@@ -33,7 +33,6 @@ from utils import gir
 class CambalacheDb:
     def __init__(self, dependencies=None):
         self.lib = None
-        self.target_tk = None
         self.dependencies = dependencies if dependencies else []
 
         # Create DB file
@@ -85,15 +84,25 @@ class CambalacheDb:
 
             return f'\n{retval}\n  '
 
-        catalog = E.catalog()
+        c = self.conn.cursor()
+
+        libid = self.lib.lib
+        catalog = E('cambalache-catalog',
+                    name=libid,
+                    version=self.lib.version)
+
+        targets = []
+        for row in c.execute("SELECT version FROM library_version WHERE library_id=?;",
+                             (libid, )):
+            targets.append(row[0])
+
+        if len(targets):
+            catalog.set('targets', ','.join(targets))
 
         if self.dependencies and len(self.dependencies):
-            catalog.set('dependencies', ','.join(self.dependencies))
+            catalog.set('depends', ','.join(self.dependencies))
 
-        c = self.conn.cursor()
-        for table in ['license',
-                      'library', 'library_dependency', 'library_version',
-                      'type', 'type_iface', 'type_enum', 'type_flags',
+        for table in ['type', 'type_iface', 'type_enum', 'type_flags',
                       'type_data', 'type_data_arg',
                       'property',
                       'signal']:
@@ -116,14 +125,15 @@ class CambalacheDb:
             tree.write(fd,
                        pretty_print=True,
                        xml_declaration=True,
-                       encoding='UTF-8')
+                       encoding='UTF-8',
+                       standalone=False,
+                       doctype='<!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">')
             fd.close()
 
         c.close()
 
     def populate_from_gir(self, girfile, **kwargs):
         self.lib = gir.GirData(girfile, **kwargs)
-        self.target_tk = f'{self.lib.name}-{self.lib.version}'
         self.lib.populate_db(self.conn)
         self.conn.commit()
 
@@ -165,7 +175,7 @@ class CambalacheDb:
             for properties in klass.iterchildren('properties'):
                 target = properties.get('target', None)
 
-                if target is None or target == self.target_tk:
+                if target is None or target == self.lib.target_tk:
                     for prop in properties:
                         property_id = prop.get('name')
                         save_always = prop.get('save-always', 'false')
@@ -178,7 +188,7 @@ class CambalacheDb:
             for data in klass.iterchildren('data'):
                 target = data.get('target', None)
 
-                if target is not None and target != self.target_tk:
+                if target is not None and target != self.lib.target_tk:
                     continue
 
                 for child in data:

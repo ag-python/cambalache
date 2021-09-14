@@ -86,6 +86,7 @@ class GirData:
         self.lib = self.name.lower()
         self.version = namespace.get('version')
         self.shared_library = namespace.get('shared-library')
+        self.target_tk = 'Gtk-4.0' if target_gtk4 else 'Gtk+-3.0'
 
         # Load Module described by gir
         try:
