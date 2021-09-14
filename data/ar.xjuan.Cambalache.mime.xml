@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-  <mime-type type="application/x-cambalache">
+  <mime-type type="application/x-cambalache-project">
     <comment>Cambalache Project File</comment>
+    <sub-class-of type="application/xml"/>
+    <magic priority="60">
+      <match type="string" value="&lt;!DOCTYPE cambalache-project SYSTEM &quot;cambalache-project.dtd&quot;&gt;" offset="0:256"/>
+      <match type="string" value="&lt;cambalache-project" offset="0:256"/>
+    </magic>
     <glob pattern="*.cmb"/>
     <generic-icon name="ar.xjuan.Cambalache.mime"/>
   </mime-type>
