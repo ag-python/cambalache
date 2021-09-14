@@ -49,4 +49,5 @@
   <update_contact>juanpablougarte@gmail.com</update_contact>
   <url type="homepage">https://gitlab.gnome.org/jpu/cambalache</url>
   <url type="bugtracker">https://gitlab.gnome.org/jpu/cambalache/issues</url>
+  <url type="donation">https://www.patreon.com/cambalache</url>
 </component>
