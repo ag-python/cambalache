@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache git -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow" id="gtkwindow01">
+    <property name="can-focus">False</property>
+    <property name="can-target">False</property>
+    <property name="decorated">False</property>
+    <property name="default-height">100</property>
+    <property name="default-width">100</property>
+    <property name="deletable">False</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="focus-on-click">False</property>
+    <property name="focus-visible">False</property>
+    <property name="focusable">True</property>
+    <property name="fullscreened">True</property>
+    <property name="halign">center</property>
+    <property name="handle-menubar-accel">False</property>
+    <property name="has-tooltip">True</property>
+    <property name="height-request">100</property>
+    <property name="hexpand">True</property>
+    <property name="hexpand-set">True</property>
+    <property name="hide-on-close">True</property>
+    <property name="margin-bottom">11</property>
+    <property name="margin-end">11</property>
+    <property name="margin-start">11</property>
+    <property name="margin-top">11</property>
+    <property name="maximized">True</property>
+    <property name="mnemonics-visible">True</property>
+    <property name="modal">True</property>
+    <property name="opacity">0.9</property>
+    <property name="overflow">hidden</property>
+    <property name="receives-default">True</property>
+    <property name="resizable">False</property>
+    <property name="sensitive">False</property>
+    <property name="valign">center</property>
+    <property name="vexpand">True</property>
+    <property name="vexpand-set">True</property>
+    <property name="visible">False</property>
+    <property name="width-request">100</property>
+  </object>
+</interface>
