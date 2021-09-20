@@ -490,6 +490,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             try:
                 self.project.import_file(filename)
             except Exception as e:
+                filename = os.path.basename(filename)
                 self.present_message_to_user(_(f"Error importing {filename}: {e}"))
         else:
             dialog.destroy()
