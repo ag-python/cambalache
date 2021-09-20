@@ -20,10 +20,52 @@
     </p>
   </description>
   <releases>
-    <release date="2021-08-24" version="0.7.4"/>
-    <release date="2021-08-18" version="0.7.3"/>
-    <release date="2021-08-08" version="0.7.0"/>
-    <release date="2021-07-21" version="0.6.0"/>
+    <release date="2021-08-24" version="0.7.4">
+      <description>
+        <ul>
+          <li>Add sponsors credit section</li>
+          <li>Theme workspace background</li>
+          <li>Fix various bugs and regresions</li>
+        </ul>
+      </description>
+      <issues>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/17">Issue #17: Numeric IDs instead of names in exported XML file</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/18">Issue #18: Theming for workspace background</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/19">Issue #19: Importing .ui file does not work properly</issue>
+      </issues>
+    </release>
+    <release date="2021-08-18" version="0.7.3">
+      <description>
+        <p>Flathub release!</p>
+        <ul>
+          <li>Add basic interactive tutorial</li>
+          <li>Add workspace Gtk theme chooser</li>
+          <li>Add support for templates</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2021-08-08" version="0.7.0">
+      <description>
+        <ul>
+          <li>Add Czech translation. Vojtěch Perník</li>
+          <li>Add German translation. PhilProg</li>
+          <li>Add x-cambalache mimetype with icon</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2021-07-21" version="0.6.0">
+      <description>
+        <p>First public release!</p>
+        <ul>
+          <li>Suport for both Gtk 3 and 4 versions</li>
+          <li>Import and export multiple UI at once</li>
+          <li>Support plain (no custom tags) GtkBuilder features </li>
+          <li>Undo / Redo stack</li>
+          <li>LGPL version 2.1</li>
+        </ul>
+      </description>
+      <url>https://blogs.gnome.org/xjuan/2021/05/18/merengue-cambalaches-workspace/</url>
+    </release>
   </releases>
   <translation type="gettext">cambalache</translation>
   <screenshots>
