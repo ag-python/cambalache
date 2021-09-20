@@ -705,15 +705,36 @@ class CmbDB(GObject.GObject):
 
         return retval
 
+    def _get_target_from_node(self, root, requirements):
+        # Look for explicit gtk version first
+        for lib in ['gtk', 'gtk+']:
+            if lib in requirements:
+                return (lib, requirements[lib]['version'], False)
+
+        # Infer target by looking for layout/packing tags
+        if root.find('.//layout') is not None:
+            return ('gtk', '4.0', True)
+
+        if root.find('.//packing') is not None:
+            return ('gtk+', '3.0', True)
+
+        return (None, None, None)
+
     def import_file(self, filename, projectdir='.'):
         tree = etree.parse(filename)
         root = tree.getroot()
 
         requirements = self._node_get_requirements(root)
 
-        # TODO: look for layout properties tag to infer if its for gtk 4 or 3
-        if self.target_tk == 'gtk-4.0' and 'gtk' not in requirements:
-            raise Exception(_('Target version mismatch'))
+        target_tk = self.target_tk
+        lib, ver, inferred = self._get_target_from_node(root, requirements)
+
+        if (target_tk == 'gtk-4.0' and lib != 'gtk') or \
+           (target_tk == 'gtk+-3.0' and lib != 'gtk+'):
+            if inferred:
+                raise Exception(_(f'Can not import what looks like a {lib}-{ver} file in a {target_tk} project.'))
+            else:
+                raise Exception(_(f'Can not import a {lib}-{ver} file in a {target_tk} project.'))
 
         c = self.conn.cursor()
 
