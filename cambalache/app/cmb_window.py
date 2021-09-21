@@ -347,13 +347,14 @@ class CmbWindow(Gtk.ApplicationWindow):
         for theme in sorted(themes):
             self.theme_combobox.append(theme, theme)
 
-    def present_message_to_user(self, message):
+    def present_message_to_user(self, message, secondary_text=None):
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=0,
             message_type=Gtk.MessageType.INFO,
             buttons=Gtk.ButtonsType.OK,
-            text=message
+            text=message,
+            secondary_text=secondary_text
         )
         dialog.run()
         dialog.destroy()
@@ -491,7 +492,8 @@ class CmbWindow(Gtk.ApplicationWindow):
                 self.project.import_file(filename)
             except Exception as e:
                 filename = os.path.basename(filename)
-                self.present_message_to_user(_(f"Error importing {filename}: {e}"))
+                self.present_message_to_user(_(f"Error importing {filename}"),
+                                             secondary_text=str(e))
         else:
             dialog.destroy()
 
