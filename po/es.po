@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-31 18:00-0400\n"
-"PO-Revision-Date: 2021-08-31 18:01-0400\n"
+"POT-Creation-Date: 2021-09-21 20:17-0400\n"
+"PO-Revision-Date: 2021-09-21 20:32-0400\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -57,25 +57,117 @@ msgstr ""
 "El objetivo principal de Cambalache es Gtk 4 pero fue diseñado desde un "
 "principio para soportar otras versiones."
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:31
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:26
+msgid "Add sponsors credit section"
+msgstr "Agregar sección de crédito de patrocinadores"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:27
+msgid "Theme workspace background"
+msgstr "Aplica tema al fondo del área de trabajo"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+msgid "Fix various bugs and regresions"
+msgstr "Corrige varios errores y regresiones"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:39
+msgid "Flathub release!"
+msgstr "Lanzamiento en Flathub!"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:41
+msgid "Add basic interactive tutorial"
+msgstr "Agrega introducción interactiva basica"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:42
+msgid "Add workspace Gtk theme chooser"
+msgstr "Agrega selector de tema en área de trabajo"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:43
+msgid "Add support for templates"
+msgstr "Agrega soporte para plantillas"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:50
+msgid "Add Czech translation. Vojtěch Perník"
+msgstr "Agrega traducción Checa. Vojtěch Perník"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:51
+msgid "Add German translation. PhilProg"
+msgstr "Agrega traducción Alemán. PhilProg"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:52
+msgid "Add x-cambalache mimetype with icon"
+msgstr "Agrega mime x-cambalache con icono"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:58
+msgid "First public release!"
+msgstr "¡Primer lanzamiento público!"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:60
+msgid "Suport for both Gtk 3 and 4 versions"
+msgstr "Soporte para las versiones Gtk 3 y 4"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:61
+msgid "Import and export multiple UI at once"
+msgstr "Importar y exportar múltiples UI a la vez"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:62
+msgid "Support plain (no custom tags) GtkBuilder features"
+msgstr ""
+"Admite características genéricas de GtkBuilder (sin etiquetas personalizadas)"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:63
+msgid "Undo / Redo stack"
+msgstr "Pila deshacer / rehacer"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:64
+msgid "LGPL version 2.1"
+msgstr "LGPL versión 2.1 "
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:73
 msgid "Cambalache start window"
 msgstr "Ventana de inicio de Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:35
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:77
 msgid "Cambalache new project page"
 msgstr "Ventana nuevo proyecto de Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:39
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:81
 msgid "Cambalache workspace"
 msgstr "Área de trabajo de Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:43
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:85
 msgid "Workspace gtk dark theme"
 msgstr "Tema GTK oscuro en Área de trabajo"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:48
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:90
 msgid "Juan Pablo Ugarte"
 msgstr "Juan Pablo Ugarte"
+
+#. Translators: This text will be used in the next two string as {convert}
+#: cambalache/cmb_db.py:735
+msgid ""
+"\n"
+"Use gtk4-builder-tool first to convert file."
+msgstr ""
+"\n"
+"Use gtk4-builder-tool para convertir el archivo."
+
+#. Translators: {convert} will be replaced with the gtk4-builder-tool string
+#: cambalache/cmb_db.py:739
+#, python-brace-format
+msgid ""
+"Can not import what looks like a {lib}-{ver} file in a {target_tk} project."
+"{convert}"
+msgstr ""
+"No se puede importar un archivo que parece ser de {lib}-{ver} en un proyecto "
+"de {target_tk}.{convert}"
+
+#. Translators: {convert} will be replaced with the gtk4-builder-tool string
+#: cambalache/cmb_db.py:742
+#, python-brace-format
+msgid "Can not import a {lib}-{ver} file in a {target_tk} project.{convert}"
+msgstr ""
+"No se puede importar un archivo de {lib}-{ver} en un proyecto de {target_tk}."
+"{convert}"
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -358,39 +450,39 @@ msgstr "Comenzar introducción interactiva"
 msgid "Sponsors"
 msgstr "Patrocinadores"
 
-#: cambalache/app/cmb_window.py:373
+#: cambalache/app/cmb_window.py:374
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Error abriendo {filename}"
 
-#: cambalache/app/cmb_window.py:376
+#: cambalache/app/cmb_window.py:377
 msgid "Choose project to open"
 msgstr "Elija un proyecto para abrir"
 
-#: cambalache/app/cmb_window.py:414
+#: cambalache/app/cmb_window.py:415
 msgid "File name already exists, choose a different name."
 msgstr "El archivo ya existe, elija un nombre diferente."
 
-#: cambalache/app/cmb_window.py:439
+#: cambalache/app/cmb_window.py:440
 msgid "Choose a new file to save the project"
 msgstr "Elija un nuevo archivo para guardar el proyecto"
 
-#: cambalache/app/cmb_window.py:451
+#: cambalache/app/cmb_window.py:452
 msgid "Choose a file name for the new UI"
 msgstr "Elija un nombre de archivo para la UI nueva"
 
-#: cambalache/app/cmb_window.py:471
+#: cambalache/app/cmb_window.py:472
 msgid "Do you want to delete selected UI?"
 msgstr "Querés borrar la UI seleccionada?"
 
-#: cambalache/app/cmb_window.py:485
+#: cambalache/app/cmb_window.py:486
 msgid "Choose file to import"
 msgstr "Elija un archivo para importar"
 
-#: cambalache/app/cmb_window.py:493
+#: cambalache/app/cmb_window.py:495
 #, python-brace-format
-msgid "Error importing {filename}: {e}"
-msgstr "Error importando {filename}: {e}"
+msgid "Error importing {filename}"
+msgstr "Error importando {filename}"
 
 #: cambalache/app/cmb_window.ui:52
 msgid "Import"

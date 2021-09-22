@@ -1,6 +1,7 @@
 data/ar.xjuan.Cambalache.desktop.in
 data/ar.xjuan.Cambalache.metainfo.xml.in
 cambalache/cmb_base.py
+cambalache/cmb_db.py
 cambalache/cmb_object.py
 cambalache/cmb_signal_editor.py
 cambalache/cmb_signal_editor.ui

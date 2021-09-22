@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-31 18:00-0400\n"
+"POT-Creation-Date: 2021-09-21 20:17-0400\n"
 "PO-Revision-Date: 2021-08-18 22:59+0200\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
@@ -55,28 +55,114 @@ msgstr ""
 "Cambalaches Hauptziel ist die Gtk-Version 4, es jedoch von Grund auf für die "
 "Unterstützung anderer Versionen entwickelt wurde."
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:31
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:26
+msgid "Add sponsors credit section"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:27
+msgid "Theme workspace background"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+msgid "Fix various bugs and regresions"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:39
+msgid "Flathub release!"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:41
+#, fuzzy
+msgid "Add basic interactive tutorial"
+msgstr "Starte interaktive Tour"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:42
+msgid "Add workspace Gtk theme chooser"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:43
+msgid "Add support for templates"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:50
+msgid "Add Czech translation. Vojtěch Perník"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:51
+msgid "Add German translation. PhilProg"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:52
+msgid "Add x-cambalache mimetype with icon"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:58
+msgid "First public release!"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:60
+msgid "Suport for both Gtk 3 and 4 versions"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:61
+msgid "Import and export multiple UI at once"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:62
+msgid "Support plain (no custom tags) GtkBuilder features"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:63
+msgid "Undo / Redo stack"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:64
+msgid "LGPL version 2.1"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:73
 #, fuzzy
 msgid "Cambalache start window"
 msgstr "Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:35
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:77
 #, fuzzy
 msgid "Cambalache new project page"
 msgstr "Neues Projekt erstellen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:39
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:81
 #, fuzzy
 msgid "Cambalache workspace"
 msgstr "Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:43
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:85
 msgid "Workspace gtk dark theme"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:48
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:90
 msgid "Juan Pablo Ugarte"
 msgstr "Juan Pablo Ugarte"
+
+#. Translators: This text will be used in the next two string as {convert}
+#: cambalache/cmb_db.py:735
+msgid ""
+"\n"
+"Use gtk4-builder-tool first to convert file."
+msgstr ""
+
+#. Translators: {convert} will be replaced with the gtk4-builder-tool string
+#: cambalache/cmb_db.py:739
+#, python-brace-format
+msgid ""
+"Can not import what looks like a {lib}-{ver} file in a {target_tk} project."
+"{convert}"
+msgstr ""
+
+#. Translators: {convert} will be replaced with the gtk4-builder-tool string
+#: cambalache/cmb_db.py:742
+#, python-brace-format
+msgid "Can not import a {lib}-{ver} file in a {target_tk} project.{convert}"
+msgstr ""
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -362,38 +448,38 @@ msgstr "Starte interaktive Tour"
 msgid "Sponsors"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:373
+#: cambalache/app/cmb_window.py:374
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Fehler beim Laden von {filename}"
 
-#: cambalache/app/cmb_window.py:376
+#: cambalache/app/cmb_window.py:377
 msgid "Choose project to open"
 msgstr "Projekt zum Öffnen auswählen"
 
-#: cambalache/app/cmb_window.py:414
+#: cambalache/app/cmb_window.py:415
 msgid "File name already exists, choose a different name."
 msgstr "Dateiname existiert bereits, wählen Sie einen anderen Namen."
 
-#: cambalache/app/cmb_window.py:439
+#: cambalache/app/cmb_window.py:440
 msgid "Choose a new file to save the project"
 msgstr "Wählen Sie eine neue Datei, um das Projekt zu speichern"
 
-#: cambalache/app/cmb_window.py:451
+#: cambalache/app/cmb_window.py:452
 msgid "Choose a file name for the new UI"
 msgstr "Wählen Sie einen Dateinamen für die neue Benutzeroberfläche"
 
-#: cambalache/app/cmb_window.py:471
+#: cambalache/app/cmb_window.py:472
 msgid "Do you want to delete selected UI?"
 msgstr "Möchten Sie die ausgewählte Benutzeroberfläche löschen?"
 
-#: cambalache/app/cmb_window.py:485
+#: cambalache/app/cmb_window.py:486
 msgid "Choose file to import"
 msgstr "Datei zum Importieren auswählen"
 
-#: cambalache/app/cmb_window.py:493
-#, python-brace-format
-msgid "Error importing {filename}: {e}"
+#: cambalache/app/cmb_window.py:495
+#, fuzzy, python-brace-format
+msgid "Error importing {filename}"
 msgstr "Fehler beim Importieren von {filename}: {e}"
 
 #: cambalache/app/cmb_window.ui:52
