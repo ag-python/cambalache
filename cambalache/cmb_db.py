@@ -279,7 +279,11 @@ class CmbDB(GObject.GObject):
                     root = etree.fromstring(line + '</cambalache-project>')
                     retval = root.get('target_tk', None)
                     break
-
+                elif line.startswith('<project'):
+                    # Support old file format root tag
+                    root = etree.fromstring(line + '</project>')
+                    retval = root.get('target_tk', None)
+                    break
             f.close()
         except:
             pass
