@@ -36,7 +36,7 @@ class CmbProperty(CmbBaseProperty):
         super().__init__(**kwargs)
         self._init = False
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def value(self):
         c = self.project.db.execute("SELECT value FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
                                     (self.ui_id,

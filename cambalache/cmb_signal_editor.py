@@ -81,7 +81,7 @@ class CmbSignalEditor(Gtk.Box):
                                              self._data_func,
                                              Col.AFTER.value)
 
-    @GObject.property(type=CmbObject)
+    @GObject.Property(type=CmbObject)
     def object(self):
         return self._object
 

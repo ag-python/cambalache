@@ -45,9 +45,9 @@ GObject.type_ensure(WebKit2.WebView.__gtype__)
 
 class CmbProcess(GObject.Object):
     __gsignals__ = {
-        'stdout': (GObject.SIGNAL_RUN_LAST, bool, (GLib.IOCondition, )),
+        'stdout': (GObject.SignalFlags.RUN_LAST, bool, (GLib.IOCondition, )),
 
-        'exit': (GObject.SIGNAL_RUN_LAST, None, ()),
+        'exit': (GObject.SignalFlags.RUN_LAST, None, ()),
     }
 
     file = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -277,7 +277,7 @@ window.setupDocument = function (document) {
             self._update_view()
             self._merengue_command('selection_changed', args={ 'ui_id': 0, 'selection': [] })
 
-    @GObject.property(type=GObject.GObject)
+    @GObject.Property(type=GObject.GObject)
     def project(self):
         return self._project
 
@@ -317,7 +317,7 @@ window.setupDocument = function (document) {
             display = self._port - 8080
             self._broadwayd.run([f':{display}'])
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def gtk_theme(self):
         return self._theme
 

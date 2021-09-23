@@ -36,13 +36,13 @@ class CmbObject(CmbBaseObject):
     info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     __gsignals__ = {
-        'property-changed': (GObject.SIGNAL_RUN_FIRST, None, (CmbProperty, )),
+        'property-changed': (GObject.SignalFlags.RUN_FIRST, None, (CmbProperty, )),
 
-        'layout-property-changed': (GObject.SIGNAL_RUN_FIRST, None, (GObject.GObject, CmbLayoutProperty)),
+        'layout-property-changed': (GObject.SignalFlags.RUN_FIRST, None, (GObject.GObject, CmbLayoutProperty)),
 
-        'signal-added': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, )),
+        'signal-added': (GObject.SignalFlags.RUN_FIRST, None, (CmbSignal, )),
 
-        'signal-removed': (GObject.SIGNAL_RUN_FIRST, None, (CmbSignal, ))
+        'signal-removed': (GObject.SignalFlags.RUN_FIRST, None, (CmbSignal, ))
     }
 
     def __init__(self, **kwargs):

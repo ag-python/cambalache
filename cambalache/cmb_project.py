@@ -46,33 +46,33 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     __gtype_name__ = 'CmbProject'
 
     __gsignals__ = {
-        'changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
 
-        'ui-added': (GObject.SIGNAL_RUN_FIRST, None,
+        'ui-added': (GObject.SignalFlags.RUN_FIRST, None,
                      (CmbUI,)),
 
-        'ui-removed': (GObject.SIGNAL_RUN_FIRST, None,
+        'ui-removed': (GObject.SignalFlags.RUN_FIRST, None,
                        (CmbUI,)),
 
-        'object-added': (GObject.SIGNAL_RUN_FIRST, None,
+        'object-added': (GObject.SignalFlags.RUN_FIRST, None,
                          (CmbObject,)),
 
-        'object-removed': (GObject.SIGNAL_RUN_FIRST, None,
+        'object-removed': (GObject.SignalFlags.RUN_FIRST, None,
                            (CmbObject,)),
 
-        'object-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
+        'object-property-changed': (GObject.SignalFlags.RUN_FIRST, None,
                                     (CmbObject, CmbProperty)),
 
-        'object-layout-property-changed': (GObject.SIGNAL_RUN_FIRST, None,
+        'object-layout-property-changed': (GObject.SignalFlags.RUN_FIRST, None,
                                            (CmbObject, CmbObject, CmbLayoutProperty)),
 
-        'object-signal-added': (GObject.SIGNAL_RUN_FIRST, None,
+        'object-signal-added': (GObject.SignalFlags.RUN_FIRST, None,
                                 (CmbObject, CmbSignal)),
 
-        'object-signal-removed': (GObject.SIGNAL_RUN_FIRST, None,
+        'object-signal-removed': (GObject.SignalFlags.RUN_FIRST, None,
                                   (CmbObject, CmbSignal)),
 
-        'selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ())
+        'selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ())
     }
 
     target_tk = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT)

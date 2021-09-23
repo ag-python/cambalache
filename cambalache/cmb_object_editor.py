@@ -41,7 +41,7 @@ class CmbEntry(Gtk.Entry):
     def _on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def cmb_value(self):
         return self.props.text if self.props.text != '' else None
 
@@ -61,7 +61,7 @@ class CmbSpinButton(Gtk.SpinButton):
     def _on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def cmb_value(self):
         # FIXME: value should always use C locale
         if self.props.digits == 0:
@@ -91,7 +91,7 @@ class CmbSwitch(Gtk.Switch):
     def _on_notify(self, obj, pspec):
         self.notify('cmb-value')
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def cmb_value(self):
         return 'True' if self.props.active else 'False'
 
@@ -129,7 +129,7 @@ class CmbEnumComboBox(Gtk.ComboBox):
     def _on_changed(self, obj):
         self.notify('cmb-value')
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def cmb_value(self):
         return self.props.active_id
 
@@ -207,7 +207,7 @@ class CmbFlagsEntry(Gtk.Entry):
 
         return retval if retval is not None else ''
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def cmb_value(self):
         return self.props.text if self.props.text != '' else None
 
@@ -253,7 +253,7 @@ class CmbObjectChooser(Gtk.Entry):
 
         self.notify('cmb-value')
 
-    @GObject.property(type=str)
+    @GObject.Property(type=str)
     def cmb_value(self):
         return self._value
 
@@ -407,7 +407,7 @@ class CmbObjectEditor(Gtk.Box):
         else:
             label.get_style_context().remove_class('modified')
 
-    @GObject.property(type=CmbObject)
+    @GObject.Property(type=CmbObject)
     def object(self):
         return self._object
 
