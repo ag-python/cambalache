@@ -175,12 +175,12 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
   </object>
   <object class="GtkFileFilter" id="open_filter">
     <mime-types>
-      <mime-type>application/x-cambalache</mime-type>
+      <mime-type>application/x-cambalache-project</mime-type>
     </mime-types>
   </object>
   <object class="GtkRecentFilter" id="recent_filter">
     <mime-types>
-      <mime-type>application/x-cambalache</mime-type>
+      <mime-type>application/x-cambalache-project</mime-type>
     </mime-types>
   </object>
   <object class="GtkRecentChooserMenu" id="recent_menu">
