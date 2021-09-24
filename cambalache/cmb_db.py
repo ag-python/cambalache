@@ -749,7 +749,7 @@ class CmbDB(GObject.GObject):
 
         # Update interface comment
         comment = self._node_get_comment(root)
-        if comment and comment.startswith('Created with Cambalache'):
+        if comment and comment.strip().startswith('Created with Cambalache'):
             comment = None
 
         basename = os.path.basename(filename)
