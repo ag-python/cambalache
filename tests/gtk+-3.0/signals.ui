@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache git -->
+<interface>
+  <requires lib="gtk+" version="3.0"/>
+  <object class="GtkWindow">
+    <signal name="activate-default" handler="on_activate_default"/>
+    <signal name="activate-default" handler="on_activate_default2"/>
+    <signal name="add" handler="on_add"/>
+    <signal name="focus" handler="on_focus" swapped="yes"/>
+    <signal name="focus-in-event" handler="on_focus_in_event" after="yes"/>
+    <signal name="focus-out-event" handler="on_focus_out_event" swapped="yes" after="yes"/>
+  </object>
+  <object class="GtkDialog" id="dialog1"/>
+</interface>
