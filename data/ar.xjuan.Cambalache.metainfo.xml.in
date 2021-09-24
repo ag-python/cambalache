@@ -22,6 +22,7 @@
   <releases>
     <release date="2021-08-24" version="0.7.4">
       <description>
+        <p>Bugfix release!</p>
         <ul>
           <li>Add sponsors credit section</li>
           <li>Theme workspace background</li>
@@ -46,6 +47,7 @@
     </release>
     <release date="2021-08-08" version="0.7.0">
       <description>
+        <p>New translations release!</p>
         <ul>
           <li>Add Czech translation. Vojtěch Perník</li>
           <li>Add German translation. PhilProg</li>
