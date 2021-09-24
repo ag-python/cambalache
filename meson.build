@@ -72,3 +72,8 @@ subdir('plugins')
 subdir('po')
 
 meson.add_install_script('postinstall.py')
+
+test('Running PyTest',
+     python_bin, args : ['-m', 'pytest'],
+     workdir: meson.current_source_dir())
+
