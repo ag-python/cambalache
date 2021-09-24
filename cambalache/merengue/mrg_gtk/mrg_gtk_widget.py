@@ -55,6 +55,9 @@ class MrgGtkWidgetController(MrgController):
         self.on_selected_changed(obj, pspec)
 
         if self.object is None:
+            if self.window:
+                self.window.destroy()
+                self.window = None
             return
 
         parent = self.object.get_parent()
