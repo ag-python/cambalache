@@ -152,6 +152,10 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         self._update_actions()
 
+        settings = Gtk.Settings.get_default()
+        settings.connect('notify::gtk-theme-name', lambda o, p: self._update_dark_mode())
+        self._update_dark_mode()
+
     @GObject.Property(type=CmbProject)
     def project(self):
         return self._project
@@ -213,6 +217,24 @@ class CmbWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback('on_np_cancel_button_clicked')
     def _on_np_cancel_button_clicked(self, button):
         self._set_page('workspace' if self.project is not None else 'cambalache')
+
+    def _update_dark_mode(self):
+        # https://en.wikipedia.org/wiki/Relative_luminance
+        def linear(c):
+            return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+        def luminance(rgb):
+            r, g, b = linear(rgb.red), linear(rgb.green), linear(rgb.blue)
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+        ctx = self.get_style_context()
+        bg_found, bg = ctx.lookup_color('theme_bg_color')
+        fg_found, fg = ctx.lookup_color('theme_fg_color')
+
+        if bg_found and fg_found and luminance(bg) < luminance(fg):
+            ctx.add_class('dark')
+        else:
+            ctx.remove_class('dark')
 
     def _np_name_to_ui(self, binding, value):
         if len(value):

@@ -36,9 +36,13 @@ CmbWindow {
 }
 
 CmbWindow .logo {
-  background: url('resource:///ar/xjuan/Cambalache/app/images/logo.svg') no-repeat 50% 35% / 40%
+  background: url('resource:///ar/xjuan/Cambalache/app/images/logo-symbolic.svg') no-repeat 50% 35% / 40%
 }
 
+CmbWindow.dark .logo {
+  color: white;
+  background: -gtk-recolor(url('resource:///ar/xjuan/Cambalache/app/images/logo-symbolic.svg'), success #ffcb85, error #1a1a1a) no-repeat 50% 35% / 40%
+}
 
 popover.cmb-tutor {
   padding: 1em;
