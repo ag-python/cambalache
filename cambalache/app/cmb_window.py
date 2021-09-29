@@ -223,15 +223,17 @@ class CmbWindow(Gtk.ApplicationWindow):
         def linear(c):
             return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
 
-        def luminance(rgb):
-            r, g, b = linear(rgb.red), linear(rgb.green), linear(rgb.blue)
+        def luminance(c):
+            r, g, b = (linear(c.red), linear(c.green), linear(c.blue))
             return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
         ctx = self.get_style_context()
-        bg_found, bg = ctx.lookup_color('theme_bg_color')
-        fg_found, fg = ctx.lookup_color('theme_fg_color')
 
-        if bg_found and fg_found and luminance(bg) < luminance(fg):
+        # Get foreground color
+        fg = ctx.get_color(Gtk.StateFlags.NORMAL)
+
+        # If foreground luminance is closer to 1 then the background must be dark
+        if luminance(fg) > 0.5:
             ctx.add_class('dark')
         else:
             ctx.remove_class('dark')
