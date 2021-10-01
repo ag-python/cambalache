@@ -41,6 +41,34 @@ def test_gtk3_signals():
 def test_gtk3_template():
     assert_original_and_exported("gtk+-3.0", "template.ui")
 
+def test_gtk3_comboboxtext():
+    assert_original_and_exported("gtk+-3.0", "comboboxtext.ui")
+
+def test_gtk3_dialog():
+    assert_original_and_exported("gtk+-3.0", "dialog.ui")
+
+def test_gtk3_label():
+    assert_original_and_exported("gtk+-3.0", "label.ui")
+
+def test_gtk3_levelbar():
+    assert_original_and_exported("gtk+-3.0", "levelbar.ui")
+
+def test_gtk3_liststore():
+    assert_original_and_exported("gtk+-3.0", "liststore.ui")
+
+def test_gtk3_scale():
+    assert_original_and_exported("gtk+-3.0", "scale.ui")
+
+def test_gtk3_sizegroup():
+    assert_original_and_exported("gtk+-3.0", "sizegroup.ui")
+
+def test_gtk3_style():
+    assert_original_and_exported("gtk+-3.0", "style.ui")
+
+def test_gtk3_treestore():
+    assert_original_and_exported("gtk+-3.0", "treestore.ui")
+
+
 #
 # Gtk 4.0 Tests
 #

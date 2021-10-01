@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache git -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkWindow">
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkScale">
+        <property name="can-focus">True</property>
+        <property name="orientation">vertical</property>
+        <property name="round-digits">1</property>
+        <property name="visible">True</property>
+        <marks>
+          <mark position="left" value="left">Left mark</mark>
+          <mark position="right" value="right">right mark</mark>
+          <mark position="top" value="top"/>
+        </marks>
+      </object>
+    </child>
+  </object>
+</interface>
