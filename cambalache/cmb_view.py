@@ -25,6 +25,7 @@ import os
 import gi
 import json
 import socket
+import logging
 
 from time import sleep
 from lxml import etree
@@ -138,6 +139,12 @@ class CmbView(Gtk.Stack):
 
         context = self.get_style_context()
         context.connect('changed', self._on_style_context_changed)
+
+        if self._broadwayd_bin is None:
+            logging.warning("broadwayd not found, Gtk 3 workspace wont work.")
+
+        if self._gtk4_broadwayd_bin is None:
+            logging.warning("gtk4-broadwayd not found, Gtk 4 workspace wont work.")
 
     def do_destroy(self):
         if self._merengue:
