@@ -366,20 +366,40 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         print('Import took:', import_end - start,
               'UI update:', time.monotonic() - import_end)
 
+    def get_import_error_message(self):
+        unknown_tags = len(self.db.unknown_tags)
+        unknown_attrs = len(self.db.unknown_attrs)
+        missing_attrs = len(self.db.missing_attrs)
+
+        if unknown_tags or unknown_attrs or missing_attrs:
+            msg = ""
+
+            if unknown_tags:
+                msg += "\n\t• " + _(f"{unknown_tags} unknown tags.")
+            if unknown_attrs:
+                msg += "\n\t• " + _(f"{unknown_attrs} unknown attributes.")
+            if missing_attrs:
+                msg += "\n\t• " + _(f"{missing_attrs} missing attributes.")
+
+            # TODO: show details to user
+
+            return msg
+
+        return None
+
     def export(self):
         c = self.db.cursor()
 
         dirname = os.path.dirname(self.filename)
 
-        # FIXME: remove cmb suffix once we have full GtkBuilder support
         for row in c.execute('SELECT ui_id, filename FROM ui;'):
-            filename = os.path.splitext(row[1])[0] + '.cmb.ui'
+            ui_id, filename = row
 
             if not os.path.isabs(filename):
                 filename = os.path.join(dirname, filename)
 
             # Get XML tree
-            ui = self.db.export_ui(row[0])
+            ui = self.db.export_ui(ui_id)
 
             # Dump xml to file
             with open(filename, 'wb') as fd:
