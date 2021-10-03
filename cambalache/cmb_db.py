@@ -26,6 +26,7 @@ import sys
 import sqlite3
 import ast
 import gi
+import logging
 
 from lxml import etree
 from lxml.builder import E
@@ -370,7 +371,7 @@ class CmbDB(GObject.GObject):
             if row and row[0] == deps[dep]:
                 continue
             else:
-                print(f'Missing dependency {dep} for {filename}')
+                logging.warning(f'Missing dependency {dep} for {filename}')
                 deps.pop(dep)
 
         # Insert dependencies
@@ -379,7 +380,7 @@ class CmbDB(GObject.GObject):
                 c.execute("INSERT INTO library_dependency(library_id, dependency_id) VALUES (?, ?);",
                           (name, dep))
             except Exception as e:
-                print(e)
+                logging.warning(e)
                 # TODO: should we try to load the module?
                 #pass
 
@@ -508,15 +509,195 @@ class CmbDB(GObject.GObject):
 
         return object_id
 
+    def _parsing_error_save(self, errors, node, msg=""):
+        logging.warning(f"XML:{node.sourceline} - {msg}")
+
+        # Ensure list
+        if node.tag not in errors:
+            errors[node.tag] = []
+
+        # Add unknown tag occurence
+        errors[node.tag].append(node.sourceline)
+
+    def _unknown_tag(self, node):
+        self._parsing_error_save(self.unknown_tags, node,
+                                 f"Unknown tag {node.tag}")
+
+    def _node_get(self, node, *args):
+        keys = node.keys()
+        knowns = []
+        retval = []
+
+        for attr in args:
+            if isinstance(attr, list):
+                for opt in attr:
+                    retval.append(node.get(opt, None))
+                    knowns.append(opt)
+            elif attr in keys:
+                retval.append(node.get(attr))
+                knowns.append(attr)
+            else:
+                self._parsing_error_save(self.missing_attrs, node,
+                                         f"Missing required attr {attr} in {node.tag}")
+
+        unknown = list(set(keys) - set(knowns))
+
+        for attr in unknown:
+            self._parsing_error_save(self.unknown_attrs, node,
+                                     f"Unknown attr {attr} in {node.tag}")
+
+        return retval
+
+    def _import_property(self, c, info, ui_id, object_id, prop):
+        name, translatable = self._node_get(prop, 'name', ['translatable'])
+
+        property_id = name.replace('_', '-')
+        comment = self._node_get_comment(prop)
+
+        pinfo = None
+
+        # Find owner type for property
+        if property_id in info.properties:
+            pinfo = info.properties[property_id]
+        else:
+            for parent in info.hierarchy:
+                type_info = self.type_info[parent]
+                if property_id in type_info.properties:
+                    pinfo = type_info.properties[property_id]
+                    break
+
+        # Insert property
+        if not pinfo:
+            logging.warning(f'XML:{prop.sourceline} - Could not find owner type for {info.type_id}:{property_id} property')
+            return
+
+        try:
+            c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                      (ui_id, object_id, pinfo.owner_id, property_id, prop.text, translatable, comment))
+        except Exception as e:
+            raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {pinfo.owner_id}:{property_id} property: {e}')
+
+    def _import_signal(self, c, info, ui_id, object_id, signal):
+        name, handler, user_data, swap, after, = self._node_get(signal, 'name', ['handler', 'object', 'swapped', 'after'])
+
+        tokens = name.split('::')
+
+        if len(tokens) > 1:
+            signal_id = tokens[0]
+            detail = tokens[1]
+        else:
+            signal_id = tokens[0]
+            detail = None
+
+        comment = self._node_get_comment(signal)
+
+        # Find owner type for signal
+        if signal_id in info.signals:
+            owner_id = info.type_id
+        else:
+            for parent in info.hierarchy:
+                pinfo = self.type_info[parent]
+                if signal_id in pinfo.signals:
+                    owner_id = parent
+                    break
+
+        # Insert signal
+        if owner_id:
+            try:
+                c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
+                          (ui_id, object_id, owner_id, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
+            except Exception as e:
+                raise Exception(f'XML:{signal.sourceline} - Can not import object {object_id} {owner_id}:{signal_id} signal: {e}')
+        else:
+            logging.warning(f'XML:{signal.sourceline} - Could not find owner type for {info.type_id}:{signal_id} signal')
+
+    def _import_child(self, c, info, ui_id, parent_id, child):
+        ctype, internal = self._node_get(child, ['type', 'internal-child'])
+        object_id = None
+        packing = None
+
+        for node in child.iterchildren():
+            if node.tag == 'object':
+                object_id = self._import_object(ui_id, node, parent_id, internal, ctype)
+            elif node.tag == 'packing' and self.target_tk == 'gtk+-3.0':
+                # Gtk 3, packing props are sibling to <object>
+                packing = node
+            else:
+                self._unknown_tag(node)
+
+        if packing is not None and object_id:
+            self._import_layout_properties(c, info, ui_id, parent_id, object_id, packing)
+
+    def _import_layout_properties(self, c, info, ui_id, parent_id, object_id, layout):
+        c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
+        parent_type = c.fetchone()
+
+        if parent_type is None:
+            return
+
+        if self.target_tk == 'gtk+-3.0':
+            # For Gtk 3 we fake a LayoutChild class for each GtkContainer
+            # FIXME: look in parent classes too
+            owner_id = f'{parent_type[0]}LayoutChild'
+        else:
+            # FIXME: Need to get layout-manager-type from class
+            owner_id = f'{parent_type[0]}LayoutChild'
+
+        for prop in layout.iterchildren():
+            if prop.tag != 'property':
+                self._unknown_tag(prop)
+                continue
+
+            name, translatable = self._node_get(prop, 'name', ['translatable'])
+            property_id = name.replace('_', '-')
+            comment = self._node_get_comment(prop)
+
+            try:
+                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                          (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment))
+            except Exception as e:
+                raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {owner_id}:{property_id} layout property: {e}')
+
+    def _import_object_data(self, ui_id, object_id, owner_id, taginfo, ntag, parent_id):
+        c = self.conn.cursor()
+
+        data_id = taginfo.data_id
+        text = ntag.text.strip() if ntag.text else None
+        value = text if text and len(text) > 0 else None
+        comment = self._node_get_comment(ntag)
+
+        c.execute("SELECT coalesce((SELECT id FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? ORDER BY id DESC LIMIT 1), 0) + 1;",
+                  (ui_id, object_id, owner_id, data_id))
+        id = c.fetchone()[0]
+
+        c.execute("INSERT INTO object_data (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                  (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment))
+
+        for key in taginfo.args:
+            val = ntag.get(key, None)
+            c.execute("INSERT INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                          (ui_id, object_id, owner_id, data_id, id, key, val))
+
+        for child in ntag.iterchildren():
+            if child.tag in taginfo.children:
+                self._import_object_data(ui_id,
+                                         object_id,
+                                         owner_id,
+                                         taginfo.children[child.tag],
+                                         child,
+                                         id)
+            else:
+                self._unknown_tag(child)
+
+        c.close()
+
     def _import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False):
         is_template = node.tag == 'template'
 
         if is_template:
-            klass = node.get('parent')
-            name = node.get('class')
+            klass, name = self._node_get(node, 'parent', 'class')
         else:
-            klass = node.get('class')
-            name = node.get('id')
+            klass, name = self._node_get(node, 'class', ['id'])
 
         comment = self._node_get_comment(node)
         info = self.type_info.get(klass, None)
@@ -526,7 +707,7 @@ class CmbDB(GObject.GObject):
             assert info
             object_id = self.add_object(ui_id, klass, name, parent_id, internal_child, child_type, comment)
         except:
-            print('Error importing', klass)
+            logging.warning(f'XML:{node.sourceline} - Error importing', klass)
             return
 
         c = self.conn.cursor()
@@ -534,159 +715,39 @@ class CmbDB(GObject.GObject):
         if is_template:
             c.execute("UPDATE ui SET template_id=? WHERE ui_id=?", (object_id, ui_id))
 
-        # Properties
-        for prop in node.iterfind('property'):
-            property_id = prop.get('name').replace('_', '-')
-            translatable = prop.get('translatable', None)
-            comment = self._node_get_comment(prop)
+        def find_data_info(info, tag):
+            if tag in info.data:
+                return info
 
-            pinfo = None
+            for parent in info.hierarchy:
+                pinfo = self.type_info[parent]
 
-            # Find owner type for property
-            if property_id in info.properties:
-                pinfo = info.properties[property_id]
+                if tag in pinfo.data:
+                    return pinfo
+
+        for child in node.iterchildren():
+            if child.tag == 'property':
+                self._import_property(c, info, ui_id, object_id, child)
+            elif child.tag == 'signal':
+                self._import_signal(c, info, ui_id, object_id, child)
+            elif child.tag == 'child':
+                self._import_child(c, info, ui_id, object_id, child)
+            elif child.tag == 'layout' and self.target_tk == 'gtk-4.0':
+                # Gtk 4, layout props are children of <object>
+                self._import_layout_properties(c, info, ui_id, parent_id, object_id, child)
             else:
-                for parent in info.hierarchy:
-                    type_info = self.type_info[parent]
-                    if property_id in type_info.properties:
-                        pinfo = type_info.properties[property_id]
-                        break
+                # Custom buildable tags
+                dinfo = find_data_info(info, child.tag)
 
-            # Insert property
-            if not pinfo:
-                print(f'Could not find owner type for {klass}:{property_id} property')
-                continue
-
-            try:
-                c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                          (ui_id, object_id, pinfo.owner_id, property_id, prop.text, translatable, comment))
-            except Exception as e:
-                raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} property: {e}')
-
-        # Signals
-        for signal in node.iterfind('signal'):
-            tokens = signal.get('name').split('::')
-
-            if len(tokens) > 1:
-                signal_id = tokens[0]
-                detail = tokens[1]
-            else:
-                signal_id = tokens[0]
-                detail = None
-
-            handler = signal.get('handler')
-            user_data = signal.get('object')
-            swap = signal.get('swapped')
-            after = signal.get('after')
-            comment = self._node_get_comment(signal)
-
-            # Find owner type for signal
-            if signal_id in info.signals:
-                owner_id = klass
-            else:
-                for parent in info.hierarchy:
-                    pinfo = self.type_info[parent]
-                    if signal_id in pinfo.signals:
-                        owner_id = parent
-                        break
-
-            # Insert signal
-            if owner_id:
-                try:
-                    c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
-                              (ui_id, object_id, owner_id, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
-                except Exception as e:
-                    raise Exception(f'Can not save object {object_id} {owner_id}:{signal_id} signal: {e}')
-            else:
-                print(f'Could not find owner type for {klass}:{signal_id} signal')
-
-        # Children
-        for child in node.iterfind('child'):
-            obj = child.find('object')
-            ctype = child.get('type', None)
-            internal = child.get('internal-child', None)
-
-            if obj is not None:
-                self._import_object(ui_id, obj, object_id, internal, ctype)
-
-        # Packing properties
-        if self.target_tk == 'gtk+-3.0':
-            # Gtk 3, packing props are sibling to <object>
-            packing = node.getnext()
-            if packing is not None and packing.tag != 'packing':
-                packing = None
-        else:
-            # Gtk 4, layout props are children of <object>
-            packing = node.find('layout')
-
-        if parent_id and packing is not None:
-            c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
-            parent_type = c.fetchone()
-
-            if parent_type is None:
-                return
-
-            if self.target_tk == 'gtk+-3.0':
-                # For Gtk 3 we fake a LayoutChild class for each GtkContainer
-                owner_id = f'{parent_type[0]}LayoutChild'
-            else:
-                # FIXME: Need to get layout-manager-type from class
-                owner_id = f'{parent_type[0]}LayoutChild'
-
-            for prop in packing.iterfind('property'):
-                comment = self._node_get_comment(prop)
-                property_id = prop.get('name').replace('_', '-')
-                translatable = prop.get('translatable', None)
-                try:
-                    c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                              (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment))
-                except Exception as e:
-                    raise Exception(f'Can not save object {object_id} {owner_id}:{property_id} layout property: {e}')
-
-        # Custom buildable tags
-        def import_object_data(owner_id, taginfo, ntag, parent_id):
-            data_id = taginfo.data_id
-            text = ntag.text.strip() if ntag.text else None
-            value = text if text and len(text) > 0 else None
-            comment = self._node_get_comment(ntag)
-
-            c.execute("SELECT coalesce((SELECT id FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? ORDER BY id DESC LIMIT 1), 0) + 1;",
-                      (ui_id, object_id, owner_id, data_id))
-            id = c.fetchone()[0]
-
-            c.execute("INSERT INTO object_data (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                      (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment))
-
-            for key in taginfo.args:
-                val = ntag.get(key, None)
-                c.execute("INSERT INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                          (ui_id, object_id, owner_id, data_id, id, key, val))
-
-            for child in taginfo.children:
-                for nchild in ntag.iterfind(child):
-                    import_object_data(owner_id,
-                                       taginfo.children[child],
-                                       nchild,
-                                       id)
-
-        def import_type_data(info, node):
-            if len(info.data.keys()) == 0:
-                return
-
-            for tag in info.data:
-                taginfo = info.data[tag]
-
-                for ntag in node.iterfind(tag):
-                    if ntag is not None:
-                        import_object_data(info.type_id, taginfo, ntag, None)
-
-        # Iterate over all hierarchy extra data
-        import_type_data(info, node)
-        for parent in info.hierarchy:
-            pinfo = self.type_info[parent]
-            import_type_data(pinfo, node)
+                if dinfo is not None:
+                    taginfo = dinfo.data[child.tag]
+                    self._import_object_data(ui_id, object_id, dinfo.type_id, taginfo, child, None)
+                else:
+                    self._unknown_tag(child)
 
         c.close()
+
+        return object_id
 
     def _node_get_comment(self, node):
         prev = node.getprevious()
@@ -699,8 +760,7 @@ class CmbDB(GObject.GObject):
 
         # Collect requirements and comments
         for req in root.iterfind('requires'):
-            lib = req.get('lib')
-            version = req.get('version')
+            lib, version = self._node_get(req, 'lib', 'version')
 
             retval[lib] = {
               'version': version,
@@ -725,6 +785,11 @@ class CmbDB(GObject.GObject):
         return (None, None, None)
 
     def import_file(self, filename, projectdir='.'):
+        # Clear parsing errors
+        self.unknown_tags = {}
+        self.unknown_attrs = {}
+        self.missing_attrs = {}
+
         tree = etree.parse(filename)
         root = tree.getroot()
 
@@ -752,6 +817,9 @@ class CmbDB(GObject.GObject):
         if comment and comment.strip().startswith('Created with Cambalache'):
             comment = None
 
+        # Make sure there is no attributes in root tag
+        self._node_get(root)
+
         basename = os.path.basename(filename)
         relpath = os.path.relpath(filename, projectdir)
         ui_id = self.add_ui(basename, relpath, requirements, comment)
@@ -762,6 +830,10 @@ class CmbDB(GObject.GObject):
                 self._import_object(ui_id, child, None)
             elif child.tag == 'template':
                 self._import_object(ui_id, child, None)
+            elif child.tag == 'requires':
+                pass
+            else:
+                self._unknown_tag(child)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
@@ -774,6 +846,11 @@ class CmbDB(GObject.GObject):
         for row in c.execute("SELECT o.object_id, ?, op.object_id, op.owner_id, op.property_id FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;",
                              (ui_id, ui_id)):
             cc.execute("UPDATE object_property SET value=? WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?", row)
+
+        # Check for parsing errors and append .cmb if something is not supported
+        if len(self.unknown_tags) or len(self.unknown_attrs) or len(self.missing_attrs):
+            filename, etx = os.path.splitext(relpath)
+            c.execute("UPDATE ui SET filename=? WHERE ui_id=?", (f"{filename}.cmb.ui", ui_id))
 
         self.conn.commit()
         cc.close()
@@ -866,56 +943,6 @@ class CmbDB(GObject.GObject):
             obj.append(node)
             self._node_add_comment(node, comment)
 
-        # Custom buildable tags
-        def export_object_data(owner_id, name, info, node, parent_id):
-            c = self.conn.cursor()
-            cc = self.conn.cursor()
-
-            for row in c.execute('SELECT id, value, comment FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND parent_id=?;',
-                                 (ui_id, object_id, owner_id, info.data_id, parent_id)):
-                id, value, comment = row
-                ntag = etree.Element(name)
-                if value:
-                    ntag.text = value
-                node.append(ntag)
-                self._node_add_comment(ntag, comment)
-
-                for row in cc.execute('SELECT key, value FROM object_data_arg WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND value IS NOT NULL;',
-                                      (ui_id, object_id, owner_id, info.data_id, id)):
-                    key, value = row
-                    ntag.set(key, value)
-
-                for tag in info.children:
-                    export_object_data(owner_id, tag, info.children[tag], ntag, id)
-
-            c.close()
-            cc.close()
-
-        def export_type_data(owner_id, info, node):
-            if len(info.data.keys()) == 0:
-                return
-
-            for tag in info.data:
-                taginfo = info.data[tag]
-
-                for row in c.execute('SELECT id, value, comment FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=?;',
-                                     (ui_id, object_id, owner_id, taginfo.data_id)):
-                    id, value, comment = row
-                    ntag = etree.Element(tag)
-                    if value:
-                        ntag.text = value
-                    node.append(ntag)
-                    self._node_add_comment(ntag, comment)
-
-                    for child in taginfo.children:
-                        export_object_data(owner_id, child, taginfo.children[child], ntag, id)
-
-        # Iterate over all hierarchy extra data
-        export_type_data(type_id, info, obj)
-        for parent in info.hierarchy:
-            pinfo = self.type_info[parent]
-            export_type_data(parent, pinfo, obj)
-
         # Layout properties class
         layout_class = f'{type_id}LayoutChild'
         linfo = self.type_info.get(layout_class, None)
@@ -970,8 +997,59 @@ class CmbDB(GObject.GObject):
                 else:
                     child_obj.append(layout)
 
+        # Custom buildable tags
+        def export_object_data(owner_id, name, info, node, parent_id):
+            c = self.conn.cursor()
+            cc = self.conn.cursor()
+
+            for row in c.execute('SELECT id, value, comment FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND parent_id=?;',
+                                 (ui_id, object_id, owner_id, info.data_id, parent_id)):
+                id, value, comment = row
+                ntag = etree.Element(name)
+                if value:
+                    ntag.text = value
+                node.append(ntag)
+                self._node_add_comment(ntag, comment)
+
+                for row in cc.execute('SELECT key, value FROM object_data_arg WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND value IS NOT NULL;',
+                                      (ui_id, object_id, owner_id, info.data_id, id)):
+                    key, value = row
+                    ntag.set(key, value)
+
+                for tag in info.children:
+                    export_object_data(owner_id, tag, info.children[tag], ntag, id)
+
+            c.close()
+            cc.close()
+
+        def export_type_data(owner_id, info, node):
+            if len(info.data.keys()) == 0:
+                return
+
+            for tag in info.data:
+                taginfo = info.data[tag]
+
+                for row in c.execute('SELECT id, value, comment FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=?;',
+                                     (ui_id, object_id, owner_id, taginfo.data_id)):
+                    id, value, comment = row
+                    ntag = etree.Element(tag)
+                    if value:
+                        ntag.text = value
+                    node.append(ntag)
+                    self._node_add_comment(ntag, comment)
+
+                    for child in taginfo.children:
+                        export_object_data(owner_id, child, taginfo.children[child], ntag, id)
+
+        # Iterate over all hierarchy extra data
+        export_type_data(type_id, info, obj)
+        for parent in info.hierarchy:
+            pinfo = self.type_info[parent]
+            export_type_data(parent, pinfo, obj)
+
         c.close()
         cc.close()
+
         return obj
 
     def export_ui(self, ui_id, use_id=False):
@@ -993,7 +1071,6 @@ class CmbDB(GObject.GObject):
             req = E.requires(lib=library_id, version=version)
             self._node_add_comment(req, comment)
             node.append(req)
-
             if library_id == tk_library_id:
                 has_tk_requires = True
 
