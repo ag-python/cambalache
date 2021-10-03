@@ -21,7 +21,7 @@ def assert_original_and_exported(target_tk, filename):
                       xml_declaration=True,
                       encoding='UTF-8').decode('UTF-8')
     
-    assert str_original == str_exported
+    assert str_exported == str_original
 
 #
 # Gtk+ 3.0 Tests
