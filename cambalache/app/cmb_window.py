@@ -521,6 +521,13 @@ class CmbWindow(Gtk.ApplicationWindow):
         else:
             dialog.destroy()
 
+        msg = self.project.get_import_error_message()
+        if msg:
+            filename = os.path.basename(filename)
+            text = _("Cambalache will export to a filename ending with '.cmb.ui' to avoid data loss.") + msg
+            self.present_message_to_user(_(f"There are unsuported features in {filename}"),
+                                         secondary_text=text)
+
     def _on_export_activate(self, action, data):
         if self.project is not None:
             self.project.export()
