@@ -25,8 +25,10 @@ import os
 import sys
 import gi
 import time
+import logging
 
-from locale import gettext as _
+from gettext import gettext as _
+from gettext import ngettext
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
@@ -344,6 +346,59 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def save(self):
         self.db.save(self.filename)
 
+    def _get_import_errors(self):
+        errors = self.db.errors
+
+        if not len(errors):
+            return (None, None)
+
+        msgs = []
+        detail_msg = []
+
+        msgs_strings = {
+            'unknown-type': ("one unknown class '{detail}'", "{n} unknown classes ({detail})"),
+            'unknown-property': ("one unknown property '{detail}'", "{n} unknown properties ({detail})"),
+            'unknown-signal': ("one unknown signal '{detail}'", "{n} unknown signals ({detail})"),
+            'unknown-tag': ("one unknown tag '{detail}'", "{n} unknown tags ({detail})"),
+            'unknown-attr': ("one unknown attribute '{detail}'", "{n} unknown attributes ({detail})"),
+            'missing-tag': ("one missing attribute '{detail}'", "{n} missing attributes ({detail})")
+        }
+
+        detail_strings = {
+            'unknown-type': _("xml:{line} unknown class '{detail}'"),
+            'unknown-property': _("xml:{line} unknown property '{detail}'"),
+            'unknown-signal': _("xml:{line} unknown signal '{detail}'"),
+            'unknown-tag': _("xml:{line} unknown tag '{detail}'"),
+            'unknown-attr': _("xml:{line} unknown attribute '{detail}'"),
+            'missing-tag': _("xml:{line} missing attribute '{detail}'")
+        }
+
+        detail = []
+
+        # Line by line details
+        for error_type in errors:
+            error = errors[error_type]
+
+            # Error summary
+            n = len(error)
+            list = ', '.join(error.keys())
+            msgs.append(ngettext(*msgs_strings[error_type], n).format(n=n, detail=list))
+
+            # Error details
+            for key in error:
+                lines = error[key]
+                for line in lines:
+                    detail.append((line, error_type, key))
+
+        # Sort errors by line
+        detail = sorted(detail, key=lambda x: x[0])
+
+        # Generate errors by line
+        for line, error_type, key in detail:
+            detail_msg.append(detail_strings[error_type].format(line=line, detail=key))
+
+        return (msgs, detail_msg)
+
     def import_file(self, filename, overwrite=False):
         start = time.monotonic()
 
@@ -363,29 +418,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.history_pop()
 
-        print('Import took:', import_end - start,
-              'UI update:', time.monotonic() - import_end)
+        logging.info('Import took:', import_end - start)
+        logging.info('UI update:', time.monotonic() - import_end)
 
-    def get_import_error_message(self):
-        unknown_tags = len(self.db.unknown_tags)
-        unknown_attrs = len(self.db.unknown_attrs)
-        missing_attrs = len(self.db.missing_attrs)
+        # Get parsing errors
+        retval = self._get_import_errors()
+        self.db.errors = None
 
-        if unknown_tags or unknown_attrs or missing_attrs:
-            msg = ""
-
-            if unknown_tags:
-                msg += "\n\t• " + _(f"{unknown_tags} unknown tags.")
-            if unknown_attrs:
-                msg += "\n\t• " + _(f"{unknown_attrs} unknown attributes.")
-            if missing_attrs:
-                msg += "\n\t• " + _(f"{missing_attrs} missing attributes.")
-
-            # TODO: show details to user
-
-            return msg
-
-        return None
+        return retval
 
     def export(self):
         c = self.db.cursor()
