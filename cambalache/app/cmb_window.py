@@ -25,11 +25,14 @@ import os
 import sys
 import gi
 import traceback
+import logging
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gio, Gdk, Gtk
+from gi.repository import GLib, GObject, Gio, Gdk, Gtk, Pango
 
-from locale import gettext as _
+from gettext import gettext as _
+from gettext import ngettext
+
 from cambalache import *
 from .cmb_tutor import CmbTutor, CmbTutorState
 from . import cmb_tutorial
@@ -371,7 +374,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         for theme in sorted(themes):
             self.theme_combobox.append(theme, theme)
 
-    def present_message_to_user(self, message, secondary_text=None):
+    def present_message_to_user(self, message, secondary_text=None, details=None):
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=0,
@@ -380,6 +383,23 @@ class CmbWindow(Gtk.ApplicationWindow):
             text=message,
             secondary_text=secondary_text
         )
+
+        if details:
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL,
+                          spacing=4)
+
+            for detail in details:
+                box.add(Gtk.Label(label=detail,
+                                  halign=Gtk.Align.START,
+                                  xalign=0.0,
+                                  lines=2,
+                                  max_width_chars=80,
+                                  wrap_mode=Pango.WrapMode.CHAR,
+                                  ellipsize=Pango.EllipsizeMode.END))
+
+            box.show_all()
+            dialog.props.message_area.add(box)
+
         dialog.run()
         dialog.destroy()
 
@@ -509,24 +529,47 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         dialog = self._file_open_dialog_new(_("Choose file to import"),
                                             filter_obj=self.import_filter)
+
         if dialog.run() == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
             dialog.destroy()
             try:
-                self.project.import_file(filename)
+                msg, detail = self.project.import_file(filename)
+
+                if msg:
+                    details = '\n'.join(detail)
+                    logging.warning(f"Error parsing {filename}\n{details}")
+
+                    filename = os.path.basename(filename)
+                    name, ext = os.path.splitext(filename)
+                    unsupported_features_list = None
+                    text = None
+
+                    if len(msg) > 1:
+                        # Translators: This is used to create a unordered list of unsupported features to show the user
+                        list = [_(f"    • {message}") for message in msg]
+
+                        # Translators: This will be the heading of a list of unsupported features
+                        first_msg = _("Cambalache encounter the following issues:")
+
+                        # Translators: this is the last message after the list of unsupported features
+                        last_msg = _(f"Your file will be exported as '{name}.cmb.ui' to avoid data loss.")
+
+                        unsupported_features_list = [first_msg] + list + [last_msg]
+                    else:
+                        unsupported_feature = msg[0]
+                        text = _(f"Cambalache encounter {unsupported_feature}\nYour file will be exported as '{name}.cmb.ui' to avoid data loss.")
+
+                    self.present_message_to_user(_(f"Error importing {filename}"),
+                                                 secondary_text=text,
+                                                 details=unsupported_features_list)
+
             except Exception as e:
                 filename = os.path.basename(filename)
                 self.present_message_to_user(_(f"Error importing {filename}"),
                                              secondary_text=str(e))
         else:
             dialog.destroy()
-
-        msg = self.project.get_import_error_message()
-        if msg:
-            filename = os.path.basename(filename)
-            text = _("Cambalache will export to a filename ending with '.cmb.ui' to avoid data loss.") + msg
-            self.present_message_to_user(_(f"There are unsuported features in {filename}"),
-                                         secondary_text=text)
 
     def _on_export_activate(self, action, data):
         if self.project is not None:
