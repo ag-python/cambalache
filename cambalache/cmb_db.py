@@ -509,19 +509,25 @@ class CmbDB(GObject.GObject):
 
         return object_id
 
-    def _parsing_error_save(self, errors, node, msg=""):
-        logging.warning(f"XML:{node.sourceline} - {msg}")
+    def _collect_error(self, error, node, name):
+        # Ensure error object
+        if error not in self.errors:
+            self.errors[error] = {}
+
+        errors = self.errors[error]
 
         # Ensure list
-        if node.tag not in errors:
-            errors[node.tag] = []
+        if name not in errors:
+            errors[name] = []
 
         # Add unknown tag occurence
-        errors[node.tag].append(node.sourceline)
+        errors[name].append(node.sourceline)
 
-    def _unknown_tag(self, node):
-        self._parsing_error_save(self.unknown_tags, node,
-                                 f"Unknown tag {node.tag}")
+    def _unknown_tag(self, node, owner, name):
+        if node.tag is etree.Comment:
+            return;
+
+        self._collect_error('unknown-tag', node, f'{owner}:{name}' if owner and name else name)
 
     def _node_get(self, node, *args):
         keys = node.keys()
@@ -537,14 +543,12 @@ class CmbDB(GObject.GObject):
                 retval.append(node.get(attr))
                 knowns.append(attr)
             else:
-                self._parsing_error_save(self.missing_attrs, node,
-                                         f"Missing required attr {attr} in {node.tag}")
+                self._collect_error('missing-attr', node, attr)
 
         unknown = list(set(keys) - set(knowns))
 
         for attr in unknown:
-            self._parsing_error_save(self.unknown_attrs, node,
-                                     f"Unknown attr {attr} in {node.tag}")
+            self._collect_error('unknown-attr', node, attr)
 
         return retval
 
@@ -568,7 +572,7 @@ class CmbDB(GObject.GObject):
 
         # Insert property
         if not pinfo:
-            logging.warning(f'XML:{prop.sourceline} - Could not find owner type for {info.type_id}:{property_id} property')
+            self._collect_error('unknown-property', prop, f'{info.type_id}:{property_id}')
             return
 
         try:
@@ -602,14 +606,15 @@ class CmbDB(GObject.GObject):
                     break
 
         # Insert signal
-        if owner_id:
-            try:
-                c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
-                          (ui_id, object_id, owner_id, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
-            except Exception as e:
-                raise Exception(f'XML:{signal.sourceline} - Can not import object {object_id} {owner_id}:{signal_id} signal: {e}')
-        else:
-            logging.warning(f'XML:{signal.sourceline} - Could not find owner type for {info.type_id}:{signal_id} signal')
+        if not owner_id:
+            self._collect_error('unknown-signal', signal, f'{info.type_id}:{signal_id}')
+            return
+
+        try:
+            c.execute("INSERT INTO object_signal (ui_id, object_id, owner_id, signal_id, handler, detail, user_data, swap, after, comment) VALUES (?, ?, ?, ?, ?, ?, (SELECT object_id FROM object WHERE ui_id=? AND name=?), ?, ?, ?);",
+                      (ui_id, object_id, owner_id, signal_id, handler, detail, ui_id, user_data, swap, after, comment))
+        except Exception as e:
+            raise Exception(f'XML:{signal.sourceline} - Can not import object {object_id} {owner_id}:{signal_id} signal: {e}')
 
     def _import_child(self, c, info, ui_id, parent_id, child):
         ctype, internal = self._node_get(child, ['type', 'internal-child'])
@@ -623,7 +628,7 @@ class CmbDB(GObject.GObject):
                 # Gtk 3, packing props are sibling to <object>
                 packing = node
             else:
-                self._unknown_tag(node)
+                self._unknown_tag(node, ctype, node.tag)
 
         if packing is not None and object_id:
             self._import_layout_properties(c, info, ui_id, parent_id, object_id, packing)
@@ -645,7 +650,7 @@ class CmbDB(GObject.GObject):
 
         for prop in layout.iterchildren():
             if prop.tag != 'property':
-                self._unknown_tag(prop)
+                self._unknown_tag(prop, owner_id, prop.tag)
                 continue
 
             name, translatable = self._node_get(prop, 'name', ['translatable'])
@@ -687,7 +692,7 @@ class CmbDB(GObject.GObject):
                                          child,
                                          id)
             else:
-                self._unknown_tag(child)
+                self._unknown_tag(child, owner_id, child.tag)
 
         c.close()
 
@@ -702,12 +707,15 @@ class CmbDB(GObject.GObject):
         comment = self._node_get_comment(node)
         info = self.type_info.get(klass, None)
 
+        if not info:
+            self._collect_error('unknown-type', node, klass)
+            return
+
         # Insert object
         try:
-            assert info
             object_id = self.add_object(ui_id, klass, name, parent_id, internal_child, child_type, comment)
         except:
-            logging.warning(f'XML:{node.sourceline} - Error importing', klass)
+            logging.warning(f'XML:{node.sourceline} - Error importing {klass}')
             return
 
         c = self.conn.cursor()
@@ -743,7 +751,7 @@ class CmbDB(GObject.GObject):
                     taginfo = dinfo.data[child.tag]
                     self._import_object_data(ui_id, object_id, dinfo.type_id, taginfo, child, None)
                 else:
-                    self._unknown_tag(child)
+                    self._unknown_tag(child, klass, child.tag)
 
         c.close()
 
@@ -786,9 +794,7 @@ class CmbDB(GObject.GObject):
 
     def import_file(self, filename, projectdir='.'):
         # Clear parsing errors
-        self.unknown_tags = {}
-        self.unknown_attrs = {}
-        self.missing_attrs = {}
+        self.errors = {}
 
         tree = etree.parse(filename)
         root = tree.getroot()
@@ -833,7 +839,7 @@ class CmbDB(GObject.GObject):
             elif child.tag == 'requires':
                 pass
             else:
-                self._unknown_tag(child)
+                self._unknown_tag(child, None, child.tag)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
@@ -848,7 +854,7 @@ class CmbDB(GObject.GObject):
             cc.execute("UPDATE object_property SET value=? WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?", row)
 
         # Check for parsing errors and append .cmb if something is not supported
-        if len(self.unknown_tags) or len(self.unknown_attrs) or len(self.missing_attrs):
+        if len(self.errors):
             filename, etx = os.path.splitext(relpath)
             c.execute("UPDATE ui SET filename=? WHERE ui_id=?", (f"{filename}.cmb.ui", ui_id))
 
