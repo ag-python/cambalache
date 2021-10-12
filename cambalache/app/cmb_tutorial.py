@@ -21,7 +21,7 @@
 #   Juan Pablo Ugarte <juanpablougarte@gmail.com>
 #
 
-from locale import gettext as _
+from gettext import gettext as _
 from .cmb_tutor import CmbTutorPosition
 
 intro = [

@@ -27,7 +27,7 @@ import math
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
-from locale import gettext as _
+from gettext import gettext as _
 
 from .cmb_object import CmbObject
 from .cmb_type_info import CmbTypeInfo

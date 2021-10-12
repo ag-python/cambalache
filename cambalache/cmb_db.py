@@ -30,7 +30,7 @@ import logging
 
 from lxml import etree
 from lxml.builder import E
-from locale import gettext as _
+from gettext import gettext as _
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
