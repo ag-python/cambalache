@@ -25,7 +25,6 @@ import os
 import sys
 import gi
 import time
-import logging
 
 from gettext import gettext as _
 from gettext import ngettext
@@ -42,6 +41,9 @@ from .cmb_type_info import CmbTypeInfo, CmbTypeData
 from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
+from cambalache import getLogger
+
+logger = getLogger(__name__)
 
 
 class CmbProject(GObject.GObject, Gtk.TreeModel):
@@ -180,7 +182,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             elif col_type == 'BOOLEAN':
                 col_type = GObject.TYPE_BOOLEAN
             else:
-                print('Error unknown type', col_type)
+                logger.warning(f'Unknown column type {col_type}')
 
             columns.append(col)
             types.append(col_type)
@@ -418,8 +420,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.history_pop()
 
-        logging.info('Import took:', import_end - start)
-        logging.info('UI update:', time.monotonic() - import_end)
+        logger.info('Import took: {import_end - start}')
+        logger.info('UI update: {time.monotonic() - import_end}')
 
         # Get parsing errors
         retval = self._get_import_errors()
@@ -657,7 +659,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         elif command == 'PUSH' or command == 'POP':
             pass
         else:
-            print('Error unknown history command')
+            logger.warning(f'Error unknown history command {command}')
 
         c.close()
 
@@ -746,14 +748,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                     self._undo_redo_do(True)
                     self.history_index -= 1
             else:
-                print("Error on undo/redo stack: we should not try to redo a POP command")
+                logger.warning("Error on undo/redo stack: we should not try to redo a POP command")
         elif command == 'PUSH':
             if not undo:
                 while range_id > self.history_index:
                     self.history_index += 1
                     self._undo_redo_do(undo)
             else:
-                print("Error on undo/redo stack: we should not try to undo a PUSH command")
+                logger.warning("Error on undo/redo stack: we should not try to undo a PUSH command")
         else:
             # Undo / Redo in DB
             self._undo_redo_do(undo)

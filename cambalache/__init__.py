@@ -22,6 +22,8 @@
 
 import os
 import gi
+import logging
+
 from .config import *
 
 gi.require_version('Gdk', '3.0')
@@ -37,6 +39,18 @@ Gtk.StyleContext.add_provider_for_screen(
     provider,
     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
 )
+
+def getLogger(name):
+    formatter = logging.Formatter('%(levelname)s:%(name)s %(message)s')
+
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+
+    logger = logging.getLogger(name)
+    logger.setLevel(os.environ.get('MERENGUE_LOGLEVEL', 'WARNING').upper())
+    logger.addHandler(ch)
+
+    return logger
 
 from .cmb_ui import CmbUI
 from .cmb_object import CmbObject

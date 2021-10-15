@@ -25,7 +25,6 @@ import os
 import sys
 import gi
 import traceback
-import logging
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gio, Gdk, Gtk, Pango
@@ -36,6 +35,8 @@ from gettext import ngettext
 from cambalache import *
 from .cmb_tutor import CmbTutor, CmbTutorState
 from . import cmb_tutorial
+
+logger = getLogger(__name__)
 
 
 @Gtk.Template(resource_path='/ar/xjuan/Cambalache/app/cmb_window.ui')
@@ -436,7 +437,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             self._set_page('workspace')
             self._update_actions()
         except Exception as e:
-            print(traceback.format_exc())
+            logger.warning(f'Error loading {filename} {traceback.format_exc()}')
             self.present_message_to_user(_(f'Error loading {filename}'))
 
     def _on_open_activate(self, action, data):
@@ -564,7 +565,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
                 if msg:
                     details = '\n'.join(detail)
-                    logging.warning(f"Error parsing {filename}\n{details}")
+                    logger.warning(f"Error parsing {filename}\n{details}")
 
                     filename = os.path.basename(filename)
                     name, ext = os.path.splitext(filename)

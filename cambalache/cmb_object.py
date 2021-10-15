@@ -22,6 +22,7 @@
 #
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
@@ -30,7 +31,9 @@ from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
 from .cmb_type_info import CmbTypeInfo
 from .cmb_ui import CmbUI
+from cambalache import getLogger
 
+logger = getLogger(__name__)
 
 class CmbObject(CmbBaseObject):
     info = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -181,7 +184,7 @@ class CmbObject(CmbBaseObject):
             c.close()
             self.project.db.commit()
         except Exception as e:
-            print('add_signal', e)
+            logger.warning(f'Error adding signal handler {owner_id}:{signal_id} {handler} to object {self.ui_id}.{{self.object_id}} {e}')
             return None
         else:
             return self._add_signal(signal_pk,
@@ -204,7 +207,7 @@ class CmbObject(CmbBaseObject):
                                     (signal.signal_pk, ))
             self.project.db.commit()
         except Exception as e:
-            print('remove_signal', e)
+            logger.warning(f'Error removing signal handler {signal.owner_id}:{signal.signal_id} {signal.handler} from object {self.ui_id}.{{self.object_id}} {e}')
             return False
         else:
             self._remove_signal(signal)

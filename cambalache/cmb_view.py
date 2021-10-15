@@ -25,7 +25,6 @@ import os
 import gi
 import json
 import socket
-import logging
 
 from time import sleep
 from lxml import etree
@@ -37,6 +36,9 @@ from gi.repository import GObject, GLib, Gio, Gdk, Gtk, WebKit2
 from . import config
 from .cmb_object import CmbObject
 from .cmb_project import CmbProject
+from cambalache import getLogger
+
+logger = getLogger(__name__)
 
 basedir = os.path.dirname(__file__) or '.'
 
@@ -75,7 +77,7 @@ class CmbProcess(GObject.Object):
                 os.kill(self.pid, 9)
                 self.pid = 0
             except Exception as e:
-                print(e)
+                logger.warning(f'Error stoping {self.file} {e}')
 
     def run(self, args, env=[]):
         if self.file is None or self.pid > 0:
@@ -141,10 +143,10 @@ class CmbView(Gtk.Stack):
         context.connect('changed', self._on_style_context_changed)
 
         if self._broadwayd_bin is None:
-            logging.warning("broadwayd not found, Gtk 3 workspace wont work.")
+            logger.warning("broadwayd not found, Gtk 3 workspace wont work.")
 
         if self._gtk4_broadwayd_bin is None:
-            logging.warning("gtk4-broadwayd not found, Gtk 4 workspace wont work.")
+            logger.warning("gtk4-broadwayd not found, Gtk 4 workspace wont work.")
 
     def do_destroy(self):
         if self._merengue:
@@ -394,13 +396,12 @@ window.setupDocument = function (document) {
                 self._merengue_command('gtk_settings_get',
                                        args={ 'property': 'gtk-theme-name' })
             elif command == 'gtk_settings_get':
-                print(args)
                 if args['property'] == 'gtk-theme-name':
                     self._theme = args['value']
                     self.notify('gtk_theme')
 
         except Exception as e:
-            print(e)
+            logger.warning('Merenge output error: {e}')
 
         return GLib.SOURCE_CONTINUE
 

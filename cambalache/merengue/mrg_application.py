@@ -29,7 +29,9 @@ import json
 from gi.repository import GLib, Gio, Gdk, Gtk
 
 from merengue.controller import MrgControllerRegistry
-from merengue import utils
+from merengue import utils, getLogger
+
+logger = getLogger(__name__)
 
 
 class MrgApplication(Gtk.Application):
@@ -51,9 +53,6 @@ class MrgApplication(Gtk.Application):
         self.preselected_widget = None
 
         self.settings = Gtk.Settings.get_default()
-
-    def print(self, *args):
-        print(*args, file=sys.stderr)
 
     def get_controller(self, ui_id, object_id):
         return self.controllers.get(f'{ui_id}.{object_id}', None)
@@ -81,7 +80,7 @@ class MrgApplication(Gtk.Application):
         try:
             builder.add_from_string(payload)
         except Exception as e:
-            self.print(e)
+            logger.warning(f'Error updating UI {ui_id}: {e}')
 
         # Keep dict of all object controllers by id
         for obj in builder.get_objects():
@@ -183,7 +182,7 @@ class MrgApplication(Gtk.Application):
                             })
 
     def run_command(self, command, args, payload):
-        self.print(command, args)
+        logger.debug(f'{command} {args}')
 
         if command == 'clear_all':
             self.clear_all()
@@ -202,7 +201,7 @@ class MrgApplication(Gtk.Application):
         elif command == 'gtk_settings_get':
             self.gtk_settings_get(**args)
         else:
-            self.print('Unknown command', command)
+            logger.warning(f'Unknown command {command}')
 
     def on_stdin(self, channel, condition):
         if condition == GLib.IOCondition.HUP:
@@ -216,7 +215,7 @@ class MrgApplication(Gtk.Application):
             # Command is a Json string with a command, args and payload_length fields
             cmd = json.loads(retval)
         except Exception as e:
-            print(e)
+            logger.warning(f'Error parsing command {e}')
         else:
             payload_length = cmd.get('payload_length', 0)
 

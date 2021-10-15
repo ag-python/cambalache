@@ -26,7 +26,6 @@ import sys
 import sqlite3
 import ast
 import gi
-import logging
 
 from lxml import etree
 from lxml.builder import E
@@ -35,6 +34,9 @@ from gettext import gettext as _
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 from .config import *
+from cambalache import getLogger
+
+logger = getLogger(__name__)
 
 
 def _get_text_resource(name):
@@ -371,7 +373,7 @@ class CmbDB(GObject.GObject):
             if row and row[0] == deps[dep]:
                 continue
             else:
-                logging.warning(f'Missing dependency {dep} for {filename}')
+                logger.warning(f'Missing dependency {dep} for {filename}')
                 deps.pop(dep)
 
         # Insert dependencies
@@ -380,7 +382,7 @@ class CmbDB(GObject.GObject):
                 c.execute("INSERT INTO library_dependency(library_id, dependency_id) VALUES (?, ?);",
                           (name, dep))
             except Exception as e:
-                logging.warning(e)
+                logger.warning(e)
                 # TODO: should we try to load the module?
                 #pass
 
@@ -715,7 +717,7 @@ class CmbDB(GObject.GObject):
         try:
             object_id = self.add_object(ui_id, klass, name, parent_id, internal_child, child_type, comment)
         except:
-            logging.warning(f'XML:{node.sourceline} - Error importing {klass}')
+            logger.warning(f'XML:{node.sourceline} - Error importing {klass}')
             return
 
         c = self.conn.cursor()
