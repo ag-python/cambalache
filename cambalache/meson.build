@@ -29,6 +29,7 @@ install_data([
     'cmb_tree_view.py',
     'cmb_list_store.py',
     'cmb_ui.py',
+    'cmb_ui_editor.py',
     'cmb_property.py',
     'cmb_property_controls.py',
     'cmb_layout_property.py',

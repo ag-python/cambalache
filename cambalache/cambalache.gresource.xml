@@ -5,6 +5,7 @@
     <file>cmb_project.sql</file>
     <file>cmb_history.sql</file>
     <file>cmb_view.ui</file>
+    <file>cmb_ui_editor.ui</file>
     <file>cmb_signal_editor.ui</file>
     <file>cambalache.css</file>
   </gresource>
