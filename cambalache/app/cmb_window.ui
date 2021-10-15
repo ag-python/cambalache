@@ -639,102 +639,162 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkStack" id="editor_stack">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="orientation">vertical</property>
+                <property name="transition-type">crossfade</property>
                 <child>
-                  <object class="GtkStackSwitcher">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="halign">center</property>
-                    <property name="border-width">4</property>
-                    <property name="stack">property_stack</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkStack" id="property_stack">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="transition-type">crossfade</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkScrolledWindow">
+                      <object class="GtkStackSwitcher">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <child>
-                          <object class="GtkViewport">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">4</property>
-                            <property name="margin-end">4</property>
-                            <child>
-                              <object class="CmbObjectEditor" id="object_editor">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
+                        <property name="can-focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="border-width">4</property>
+                        <property name="stack">property_stack</property>
                       </object>
                       <packing>
-                        <property name="name">properties</property>
-                        <property name="title" translatable="yes">Properties</property>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkScrolledWindow">
+                      <object class="GtkStack" id="property_stack">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="margin-start">4</property>
-                        <property name="margin-end">4</property>
+                        <property name="can-focus">False</property>
+                        <property name="transition-type">crossfade</property>
                         <child>
-                          <object class="GtkViewport">
+                          <object class="GtkScrolledWindow">
                             <property name="visible">True</property>
-                            <property name="can-focus">False</property>
+                            <property name="can-focus">True</property>
                             <child>
-                              <object class="CmbObjectEditor" id="object_layout_editor">
+                              <object class="GtkViewport">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="layout">True</property>
+                                <property name="margin-start">4</property>
+                                <property name="margin-end">4</property>
                                 <child>
-                                  <placeholder/>
+                                  <object class="CmbObjectEditor" id="object_editor">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                  </object>
                                 </child>
                               </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="name">properties</property>
+                            <property name="title" translatable="yes">Properties</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="margin-start">4</property>
+                            <property name="margin-end">4</property>
+                            <child>
+                              <object class="GtkViewport">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="CmbObjectEditor" id="object_layout_editor">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="layout">True</property>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="name">layout</property>
+                            <property name="title" translatable="yes">Layout</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="CmbSignalEditor" id="signal_editor">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">4</property>
+                            <property name="margin-end">4</property>
+                            <property name="margin-bottom">4</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">4</property>
+                          </object>
+                          <packing>
+                            <property name="name">signals</property>
+                            <property name="title" translatable="yes">Signals</property>
+                            <property name="position">2</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
-                        <property name="name">layout</property>
-                        <property name="title" translatable="yes">Layout</property>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
                         <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="CmbSignalEditor" id="signal_editor">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">4</property>
-                        <property name="margin-end">4</property>
-                        <property name="margin-bottom">4</property>
-                        <property name="orientation">vertical</property>
-                        <property name="spacing">4</property>
-                      </object>
-                      <packing>
-                        <property name="name">signals</property>
-                        <property name="title" translatable="yes">Signals</property>
-                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="name">object</property>
+                    <property name="title" translatable="yes">Object Editor</property>
+                  </packing>
+                </child>
+                <child>
+                  <!-- n-columns=3 n-rows=9 -->
+                  <object class="CmbUIEditor" id="ui_editor">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="border-width">4</property>
+                    <signal name="remove_ui" handler="on_ui_editor_remove_ui"/>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">ui</property>
+                    <property name="title" translatable="yes">UI Editor</property>
                     <property name="position">1</property>
                   </packing>
                 </child>

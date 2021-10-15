@@ -74,6 +74,8 @@ class CmbWindow(Gtk.ApplicationWindow):
     type_entry = Gtk.Template.Child()
     type_entrycompletion = Gtk.Template.Child()
     theme_combobox = Gtk.Template.Child()
+    editor_stack = Gtk.Template.Child()
+    ui_editor = Gtk.Template.Child()
     object_editor = Gtk.Template.Child()
     object_layout_editor = Gtk.Template.Child()
     signal_editor = Gtk.Template.Child()
@@ -175,6 +177,12 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.tree_view.props.model = project
         self.type_entrycompletion.props.model = self.project.type_list if project else None
 
+        # Clear Editors
+        self.ui_editor.object = None
+        self.object_editor.object = None
+        self.object_layout_editor.object = None
+        self.signal_editor.object = None
+
         if project is not None:
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
@@ -220,6 +228,11 @@ class CmbWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback('on_np_cancel_button_clicked')
     def _on_np_cancel_button_clicked(self, button):
         self._set_page('workspace' if self.project is not None else 'cambalache')
+
+    @Gtk.Template.Callback('on_ui_editor_remove_ui')
+    def _on_ui_editor_remove_ui(self, editor):
+        self._remove_ui_with_confirmation(editor.object)
+        return True
 
     def _update_dark_mode(self):
         # https://en.wikipedia.org/wiki/Relative_luminance
@@ -282,7 +295,16 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_project_selection_changed(self, project):
         sel = project.get_selection()
         self._update_action_delete()
-        obj = sel[0] if len(sel) > 0 and type(sel[0]) == CmbObject else None
+
+        obj = sel[0] if len(sel) > 0 else None
+
+        if type(obj) == CmbUI:
+            self.ui_editor.object = obj
+            self.editor_stack.set_visible_child_name('ui')
+            obj = None
+        else:
+            self.editor_stack.set_visible_child_name('object')
+
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
         self.signal_editor.object = obj
@@ -501,6 +523,21 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         dialog.destroy()
 
+    def _remove_ui_with_confirmation(self, ui):
+        filename = ui.filename
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.QUESTION,
+            buttons=Gtk.ButtonsType.YES_NO,
+            text=_(f"Do you really want to remove {filename}?"),
+        )
+
+        if dialog.run() == Gtk.ResponseType.YES:
+            self.project.remove_ui(ui)
+
+        dialog.destroy()
+
     def _on_delete_activate(self, action, data):
         if self.project is None:
             return
@@ -508,18 +545,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         selection = self.project.get_selection()
         for obj in selection:
             if type(obj) == CmbUI:
-                dialog = Gtk.MessageDialog(
-                    transient_for=self,
-                    flags=0,
-                    message_type=Gtk.MessageType.QUESTION,
-                    buttons=Gtk.ButtonsType.YES_NO,
-                    text=_(f"Do you want to delete selected UI?"),
-                )
-
-                if dialog.run() == Gtk.ResponseType.YES:
-                    self.project.remove_ui(obj)
-
-                dialog.destroy()
+                self._remove_ui_with_confirmation(obj)
             elif type(obj) == CmbObject:
                 self.project.remove_object(obj)
 
