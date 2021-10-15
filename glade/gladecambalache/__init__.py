@@ -13,5 +13,6 @@ from cambalache import *
 GObject.type_ensure(CmbProject)
 GObject.type_ensure(CmbView)
 GObject.type_ensure(CmbTreeView)
+GObject.type_ensure(CmbUIEditor)
 GObject.type_ensure(CmbObjectEditor)
 GObject.type_ensure(CmbSignalEditor)
