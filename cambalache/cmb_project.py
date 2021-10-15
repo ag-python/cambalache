@@ -427,6 +427,26 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         return retval
 
+    def _export(self, ui_id, filename, dirname=None):
+        if not os.path.isabs(filename):
+            if dirname is None:
+                dirname = os.path.dirname(self.filename)
+            filename = os.path.join(dirname, filename)
+
+        # Get XML tree
+        ui = self.db.export_ui(ui_id)
+
+        # Dump xml to file
+        with open(filename, 'wb') as fd:
+            ui.write(fd,
+                     pretty_print=True,
+                     xml_declaration=True,
+                     encoding='UTF-8')
+            fd.close()
+
+    def export_ui(self, ui):
+        self._export(ui.ui_id, ui.filename)
+
     def export(self):
         c = self.db.cursor()
 
@@ -434,20 +454,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         for row in c.execute('SELECT ui_id, filename FROM ui;'):
             ui_id, filename = row
-
-            if not os.path.isabs(filename):
-                filename = os.path.join(dirname, filename)
-
-            # Get XML tree
-            ui = self.db.export_ui(ui_id)
-
-            # Dump xml to file
-            with open(filename, 'wb') as fd:
-                ui.write(fd,
-                         pretty_print=True,
-                         xml_declaration=True,
-                         encoding='UTF-8')
-                fd.close()
+            self._export(ui_id, filename, dirname=dirname)
 
         c.close()
 
@@ -728,6 +735,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c = self.db.cursor()
 
         self.history_enabled = False
+        self.db.foreign_keys = False
 
         command, range_id, table, column = self._get_history_command(self.history_index)
 
@@ -750,6 +758,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             # Undo / Redo in DB
             self._undo_redo_do(undo)
 
+        self.db.foreign_keys = True
         self.history_enabled = True
         c.close()
 
