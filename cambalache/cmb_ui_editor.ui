@@ -70,6 +70,7 @@
     </child>
     <child>
       <object class="CmbEntry" id="filename">
+        <property name="hexpand">True</property>
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="placeholder-text" translatable="yes">&lt;file name relative to project&gt;</property>
