@@ -29,6 +29,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
    <glade-widget-class title="CmbUIEditor" name="CmbUIEditor" generic-name="cmbuiditor"/>
    <glade-widget-class title="CmbObjectEditor" name="CmbObjectEditor" generic-name="cmbobjecteditor"/>
    <glade-widget-class title="CmbSignalEditor" name="CmbSignalEditor" generic-name="cmbsignaleditor"/>
+   <glade-widget-class title="CmbTypeChooser" name="CmbTypeChooser" generic-name="typechooser"/>
+   <glade-widget-class title="CmbTypeChooserPopover" name="CmbTypeChooserPopover" generic-name="typechooserpopover"/>
  </glade-widget-classes>
 
  <glade-widget-group name="cambalache" title="Cambalache">
@@ -38,5 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
    <glade-widget-class-ref name="CmbUIEditor"/>
    <glade-widget-class-ref name="CmbObjectEditor"/>
    <glade-widget-class-ref name="CmbSignalEditor"/>
+   <glade-widget-class-ref name="CmbTypeChooser"/>
+   <glade-widget-class-ref name="CmbTypeChooserPopover"/>
  </glade-widget-group>
 </glade-catalog>
