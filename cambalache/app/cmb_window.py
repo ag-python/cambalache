@@ -69,8 +69,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     # Workspace
     view = Gtk.Template.Child()
     tree_view = Gtk.Template.Child()
-    type_entry = Gtk.Template.Child()
-    type_entrycompletion = Gtk.Template.Child()
+    type_popover = Gtk.Template.Child()
     theme_combobox = Gtk.Template.Child()
     editor_stack = Gtk.Template.Child()
     ui_editor = Gtk.Template.Child()
@@ -173,20 +172,20 @@ class CmbWindow(Gtk.ApplicationWindow):
         self._project = project
         self.view.project = project
         self.tree_view.props.model = project
-        self.type_entrycompletion.props.model = self.project.type_list if project else None
 
         # Clear Editors
         self.ui_editor.object = None
         self.object_editor.object = None
         self.object_layout_editor.object = None
         self.signal_editor.object = None
+        self.type_popover.chooser.model = None
 
         if project is not None:
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
             self._project.connect('selection-changed', self._on_project_selection_changed)
             self._project.connect('changed', self._on_project_changed)
-            self.type_entry.set_placeholder_text(project.target_tk)
+            self.type_popover.chooser.model = self._project.type_list
 
             # Populate gtk theme combo
             if self._project.target_tk == 'gtk+-3.0':
@@ -207,14 +206,14 @@ class CmbWindow(Gtk.ApplicationWindow):
         widget.hide()
         return True
 
-    @Gtk.Template.Callback('on_type_entry_activate')
-    def _on_type_entry_activate(self, entry):
+    @Gtk.Template.Callback('on_type_popover_type_selected')
+    def _on_type_popover_type_selected(self, popover, type_id):
         selection = self.project.get_selection()
 
         if len(selection) > 0:
             obj = selection[0]
             parent_id = obj.object_id if type(obj) == CmbObject else None
-            self.project.add_object(obj.ui_id, entry.get_text(), parent_id=parent_id)
+            self.project.add_object(obj.ui_id, type_id, parent_id=parent_id)
 
     @Gtk.Template.Callback('on_open_recent_action_item_activated')
     def _on_open_recent_action_item_activated(self, recent):

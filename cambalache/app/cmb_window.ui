@@ -203,6 +203,10 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
       </attributes>
     </child>
   </object>
+  <object class="CmbTypeChooserPopover" id="type_popover">
+    <property name="can-focus">False</property>
+    <signal name="type-selected" handler="on_type_popover_type_selected" swapped="no"/>
+  </object>
   <template class="CmbWindow" parent="GtkApplicationWindow">
     <property name="can-focus">False</property>
     <child>
@@ -580,21 +584,30 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="border-width">4</property>
+                        <property name="spacing">6</property>
                         <child>
-                          <object class="GtkSearchEntry" id="type_entry">
+                          <object class="GtkMenuButton">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
-                            <property name="primary-icon-name">edit-find-symbolic</property>
-                            <property name="primary-icon-activatable">False</property>
-                            <property name="primary-icon-sensitive">False</property>
-                            <property name="completion">type_entrycompletion</property>
-                            <signal name="activate" handler="on_type_entry_activate" swapped="no"/>
+                            <property name="focus-on-click">False</property>
+                            <property name="receives-default">True</property>
+                            <property name="popover">type_popover</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="icon-name">edit-find-symbolic</property>
+                              </object>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
                         </child>
                         <child>
                           <object class="GtkComboBoxText" id="theme_combobox">
@@ -605,7 +618,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="pack-type">end</property>
-                            <property name="position">1</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
@@ -750,47 +763,14 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=3 n-rows=9 -->
+                  <!-- n-columns=2 n-rows=7 -->
                   <object class="CmbUIEditor" id="ui_editor">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
                     <property name="border-width">4</property>
-                    <signal name="remove_ui" handler="on_ui_editor_remove_ui"/>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
+                    <signal name="remove-ui" handler="on_ui_editor_remove_ui" swapped="no"/>
                   </object>
                   <packing>
                     <property name="name">ui</property>
