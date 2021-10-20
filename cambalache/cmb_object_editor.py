@@ -26,7 +26,6 @@ import math
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
-from gettext import gettext as _
 
 from .cmb_object import CmbObject
 from .cmb_property_controls import *

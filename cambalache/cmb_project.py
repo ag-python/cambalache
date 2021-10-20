@@ -26,9 +26,6 @@ import sys
 import gi
 import time
 
-from gettext import gettext as _
-from gettext import ngettext
-
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 
@@ -358,12 +355,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         detail_msg = []
 
         msgs_strings = {
-            'unknown-type': ("one unknown class '{detail}'", "{n} unknown classes ({detail})"),
-            'unknown-property': ("one unknown property '{detail}'", "{n} unknown properties ({detail})"),
-            'unknown-signal': ("one unknown signal '{detail}'", "{n} unknown signals ({detail})"),
-            'unknown-tag': ("one unknown tag '{detail}'", "{n} unknown tags ({detail})"),
-            'unknown-attr': ("one unknown attribute '{detail}'", "{n} unknown attributes ({detail})"),
-            'missing-tag': ("one missing attribute '{detail}'", "{n} missing attributes ({detail})")
+            'unknown-type': (_("one unknown class '{detail}'"), _("{n} unknown classes ({detail})")),
+            'unknown-property': (_("one unknown property '{detail}'"), _("{n} unknown properties ({detail})")),
+            'unknown-signal': (_("one unknown signal '{detail}'"), _("{n} unknown signals ({detail})")),
+            'unknown-tag': (_("one unknown tag '{detail}'"), _("{n} unknown tags ({detail})")),
+            'unknown-attr': (_("one unknown attribute '{detail}'"), _("{n} unknown attributes ({detail})")),
+            'missing-tag': (_("one missing attribute '{detail}'"), _("{n} missing attributes ({detail})"))
         }
 
         detail_strings = {
@@ -384,7 +381,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             # Error summary
             n = len(error)
             list = ', '.join(error.keys())
-            msgs.append(ngettext(*msgs_strings[error_type], n).format(n=n, detail=list))
+            msgs.append(N_(*msgs_strings[error_type], n).format(n=n, detail=list))
 
             # Error details
             for key in error:
@@ -404,7 +401,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def import_file(self, filename, overwrite=False):
         start = time.monotonic()
 
-        self.history_push(_(f'Import file "{filename}"'))
+        self.history_push(_('Import file "{filename}"').format(filename=filename))
 
         # Remove old UI
         if overwrite:
@@ -483,7 +480,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         dirname = os.path.dirname(self.filename)
         relpath = os.path.relpath(filename, dirname)
         try:
-            self.history_push(_(f"Add UI {basename}"))
+            self.history_push(_("Add UI {basename}").format(basename=basename))
             ui_id = self.db.add_ui(basename, relpath, requirements)
             self.db.commit()
             self.history_pop()
@@ -502,7 +499,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def remove_ui(self, ui):
         try:
-            self.history_push(_(f'Remove UI "{ui.name}"'))
+            self.history_push(_('Remove UI "{name}"').format(name=ui.name))
             self.db.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
             self.history_pop()
             self.db.commit()
@@ -575,7 +572,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def remove_object(self, obj):
         try:
             name = obj.name if obj.name is not None else obj.type_id
-            self.history_push(_(f'Remove object {name}'))
+            self.history_push(_('Remove object {name}').format(name=name))
             self.db.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;",
                             (obj.ui_id, obj.object_id))
             self.history_pop()

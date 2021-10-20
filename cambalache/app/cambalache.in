@@ -25,6 +25,8 @@
 import os
 import sys
 import signal
+import locale
+import builtins
 
 pkgdatadir = '@pkgdatadir@'
 localedir = '@localedir@'
@@ -32,10 +34,9 @@ localedir = '@localedir@'
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-import locale
 locale.bindtextdomain("cambalache", localedir)
 locale.textdomain("cambalache")
-
+builtins.__dict__['_'] = locale.gettext
 
 from cambalache.app import CmbApplication
 

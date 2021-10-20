@@ -23,6 +23,15 @@
 import os
 import gi
 import logging
+import locale
+import builtins
+
+# Ensure _() builtin
+if '_' not in builtins.__dict__:
+    builtins.__dict__['_'] = locale.gettext
+
+if 'N_' not in builtins.__dict__:
+    builtins.__dict__['N_'] = lambda s, p, n: _(p) if n > 1 else _(s)
 
 from .config import *
 

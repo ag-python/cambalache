@@ -29,7 +29,6 @@ import gi
 
 from lxml import etree
 from lxml.builder import E
-from gettext import gettext as _
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
@@ -809,14 +808,14 @@ class CmbDB(GObject.GObject):
         if (target_tk == 'gtk-4.0' and lib != 'gtk') or \
            (target_tk == 'gtk+-3.0' and lib != 'gtk+'):
             # Translators: This text will be used in the next two string as {convert}
-            convert = _(f'\nUse gtk4-builder-tool first to convert file.') if target_tk == 'gtk-4.0' else ''
+            convert = _('\nUse gtk4-builder-tool first to convert file.') if target_tk == 'gtk-4.0' else ''
 
             if inferred:
                 # Translators: {convert} will be replaced with the gtk4-builder-tool string
-                raise Exception(_(f'Can not import what looks like a {lib}-{ver} file in a {target_tk} project.{convert}'))
+                raise Exception(_('Can not import what looks like a {lib}-{ver} file in a {target_tk} project.{convert}').format(lib=lib, ver=ver, target_tk=target_tk, convert=convert))
             else:
                 # Translators: {convert} will be replaced with the gtk4-builder-tool string
-                raise Exception(_(f'Can not import a {lib}-{ver} file in a {target_tk} project.{convert}'))
+                raise Exception(_('Can not import a {lib}-{ver} file in a {target_tk} project.{convert}'))
 
         c = self.conn.cursor()
 
