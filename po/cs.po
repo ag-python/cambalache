@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 20:17-0400\n"
+"POT-Creation-Date: 2021-10-20 18:31-0400\n"
 "PO-Revision-Date: 2021-08-02 10:53+0200\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
@@ -54,102 +54,110 @@ msgstr ""
 "Hlavním cílem Cambalache je Gtk verze 4, ale byl od základu navržen tak, aby "
 "podporoval i jiné verze."
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:26
-msgid "Add sponsors credit section"
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:25
+msgid "Bugfix release!"
 msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
-msgid "Theme workspace background"
+msgid "Add sponsors credit section"
 msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+msgid "Theme workspace background"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Fix various bugs and regresions"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:39
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:40
 msgid "Flathub release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:41
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:42
 msgid "Add basic interactive tutorial"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:42
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:43
 msgid "Add workspace Gtk theme chooser"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:43
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:44
 msgid "Add support for templates"
 msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:50
-msgid "Add Czech translation. Vojtěch Perník"
-msgstr ""
-
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:51
-msgid "Add German translation. PhilProg"
+msgid "New translations release!"
 msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:52
+msgid "Add Czech translation. Vojtěch Perník"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:53
+msgid "Add German translation. PhilProg"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:54
 msgid "Add x-cambalache mimetype with icon"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:58
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:60
 msgid "First public release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:60
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:62
 msgid "Suport for both Gtk 3 and 4 versions"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:61
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:63
 msgid "Import and export multiple UI at once"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:62
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:64
 msgid "Support plain (no custom tags) GtkBuilder features"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:63
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:65
 msgid "Undo / Redo stack"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:64
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:66
 msgid "LGPL version 2.1"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:73
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:75
 #, fuzzy
 msgid "Cambalache start window"
 msgstr "Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:77
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:79
 #, fuzzy
 msgid "Cambalache new project page"
 msgstr "Vytvořit nový projekt"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:81
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:83
 #, fuzzy
 msgid "Cambalache workspace"
 msgstr "Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:85
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:87
 msgid "Workspace gtk dark theme"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:90
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:92
 msgid "Juan Pablo Ugarte"
 msgstr "Juan Pablo Ugarte"
 
 #. Translators: This text will be used in the next two string as {convert}
-#: cambalache/cmb_db.py:735
+#: cambalache/cmb_db.py:811
 msgid ""
 "\n"
 "Use gtk4-builder-tool first to convert file."
 msgstr ""
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
-#: cambalache/cmb_db.py:739
+#: cambalache/cmb_db.py:815
 #, python-brace-format
 msgid ""
 "Can not import what looks like a {lib}-{ver} file in a {target_tk} project."
@@ -157,7 +165,7 @@ msgid ""
 msgstr ""
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
-#: cambalache/cmb_db.py:742
+#: cambalache/cmb_db.py:818
 #, python-brace-format
 msgid "Can not import a {lib}-{ver} file in a {target_tk} project.{convert}"
 msgstr ""
@@ -222,261 +230,414 @@ msgstr "Restartovat prostředí"
 msgid "Inspect UI definition"
 msgstr "Prozkoumat definici UI"
 
-#: cambalache/cmb_project.py:350
+#: cambalache/cmb_project.py:358
+#, python-brace-format
+msgid "one unknown class '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:358
+#, python-brace-format
+msgid "{n} unknown classes ({detail})"
+msgstr ""
+
+#: cambalache/cmb_project.py:359
+#, python-brace-format
+msgid "one unknown property '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:359
+#, python-brace-format
+msgid "{n} unknown properties ({detail})"
+msgstr ""
+
+#: cambalache/cmb_project.py:360
+#, python-brace-format
+msgid "one unknown signal '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:360
+#, python-brace-format
+msgid "{n} unknown signals ({detail})"
+msgstr ""
+
+#: cambalache/cmb_project.py:361
+#, python-brace-format
+msgid "one unknown tag '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:361
+#, python-brace-format
+msgid "{n} unknown tags ({detail})"
+msgstr ""
+
+#: cambalache/cmb_project.py:362
+#, python-brace-format
+msgid "one unknown attribute '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:362
+#, python-brace-format
+msgid "{n} unknown attributes ({detail})"
+msgstr ""
+
+#: cambalache/cmb_project.py:363
+#, python-brace-format
+msgid "one missing attribute '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:363
+#, python-brace-format
+msgid "{n} missing attributes ({detail})"
+msgstr ""
+
+#: cambalache/cmb_project.py:367
+#, python-brace-format
+msgid "xml:{line} unknown class '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:368
+#, python-brace-format
+msgid "xml:{line} unknown property '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:369
+#, python-brace-format
+msgid "xml:{line} unknown signal '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:370
+#, python-brace-format
+msgid "xml:{line} unknown tag '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:371
+#, python-brace-format
+msgid "xml:{line} unknown attribute '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:372
+#, python-brace-format
+msgid "xml:{line} missing attribute '{detail}'"
+msgstr ""
+
+#: cambalache/cmb_project.py:404
 #, python-brace-format
 msgid "Import file \"{filename}\""
 msgstr "Importovat soubor \"{filename}\""
 
-#: cambalache/cmb_project.py:417
+#: cambalache/cmb_project.py:483
 #, python-brace-format
 msgid "Add UI {basename}"
 msgstr "Přidat UI {basename}"
 
-#: cambalache/cmb_project.py:436
-#, python-brace-format
-msgid "Remove UI \"{ui.name}\""
+#: cambalache/cmb_project.py:502
+#, fuzzy, python-brace-format
+msgid "Remove UI \"{name}\""
 msgstr "Odebrat UI \"{ui.name}\""
 
-#: cambalache/cmb_project.py:509
+#: cambalache/cmb_project.py:575
 #, python-brace-format
 msgid "Remove object {name}"
 msgstr "Odebrat objekt {name}"
 
-#: cambalache/cmb_project.py:756
+#: cambalache/cmb_project.py:824
 #, python-brace-format
 msgid "Create UI {ui}"
 msgstr "Vytvořit UI {ui}"
 
-#: cambalache/cmb_project.py:757
+#: cambalache/cmb_project.py:825
 #, python-brace-format
 msgid "Remove UI {ui}"
 msgstr "Odebrat UI {ui}"
 
-#: cambalache/cmb_project.py:758
+#: cambalache/cmb_project.py:826
 #, python-brace-format
 msgid "Update UI {ui}"
 msgstr "Aktualizovat UI {ui}"
 
-#: cambalache/cmb_project.py:761
+#: cambalache/cmb_project.py:829
 #, python-brace-format
 msgid "Create object {obj}"
 msgstr "Vytvořit objekt {obj}"
 
-#: cambalache/cmb_project.py:762
+#: cambalache/cmb_project.py:830
 #, python-brace-format
 msgid "Remove object {obj}"
 msgstr "Odebrat objekt {obj}"
 
-#: cambalache/cmb_project.py:763
+#: cambalache/cmb_project.py:831
 #, python-brace-format
 msgid "Update object {obj}"
 msgstr "Aktualizovat objekt {obj}"
 
-#: cambalache/cmb_project.py:766
+#: cambalache/cmb_project.py:834
 #, python-brace-format
 msgid "Set property \"{prop}\" of {obj} to {value}"
 msgstr "Nastavit vlastnost \"{prop}\" objektu {obj} na hodnotu {value}"
 
-#: cambalache/cmb_project.py:767
+#: cambalache/cmb_project.py:835
 #, python-brace-format
 msgid "Unset property \"{prop}\" of {obj}"
 msgstr "Zrušit nastavení vlastnosti \"{prop}\" objektu {obj} "
 
-#: cambalache/cmb_project.py:768
+#: cambalache/cmb_project.py:836
 #, python-brace-format
 msgid "Update property \"{prop}\" of {obj} to {value}"
 msgstr "Aktualizovat vlastnost \"{prop}\" objektu {obj} na hodnotu {value}"
 
-#: cambalache/cmb_project.py:771
+#: cambalache/cmb_project.py:839
 #, python-brace-format
 msgid "Set layout property \"{prop}\" of {obj} to {value}"
 msgstr ""
 "Nastavit vlastnost rozložení \"{prop}\" objektu {obj} na hodnotu {value}"
 
-#: cambalache/cmb_project.py:772
+#: cambalache/cmb_project.py:840
 #, python-brace-format
 msgid "Unset layout property \"{prop}\" of {obj}"
 msgstr "Zrušit nastavení vlastnost rozložení \"{prop}\" objektu {obj}"
 
-#: cambalache/cmb_project.py:773
+#: cambalache/cmb_project.py:841
 #, python-brace-format
 msgid "Update layout property \"{prop}\" of {obj} to {value}"
 msgstr ""
 "Aktualizovat vlastnost rozložení \"{prop}\" objektu {obj} na hodnotu {value}"
 
-#: cambalache/cmb_project.py:776
+#: cambalache/cmb_project.py:844
 #, python-brace-format
 msgid "Add {signal} signal to {obj}"
 msgstr "Přidat signál {signal} objektu {obj}"
 
-#: cambalache/cmb_project.py:777
+#: cambalache/cmb_project.py:845
 #, python-brace-format
 msgid "Remove {signal} signal from {obj}"
 msgstr "Odebrat signál {signal} objektu {obj}"
 
-#: cambalache/cmb_project.py:778
+#: cambalache/cmb_project.py:846
 #, python-brace-format
 msgid "Update {signal} signal of {obj}"
 msgstr "Aktualizovat signál {signal} objektu {obj}"
 
 #. Label
-#: cambalache/cmb_object_editor.py:293 cambalache/cmb_object_editor.py:324
+#: cambalache/cmb_object_editor.py:55 cambalache/cmb_object_editor.py:82
 msgid "Object Id"
 msgstr ""
 
-#: cambalache/cmb_object_editor.py:300
+#: cambalache/cmb_object_editor.py:62
 msgid "Switch between object and template"
 msgstr ""
 
-#: cambalache/cmb_object_editor.py:321
+#: cambalache/cmb_object_editor.py:82
 msgid "Template"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:28
+#: cambalache/cmb_ui_editor.ui:16
+#, fuzzy
+msgid "Filename:"
+msgstr "Jméno souboru UI"
+
+#: cambalache/cmb_ui_editor.ui:28
+msgid "Description:"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:40
+msgid "Copyright:"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:52
+msgid "Authors:"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:64
+msgid "Domain:"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:75
+msgid "<file name relative to project>"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:88
+msgid "<translation domain>"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:151
+msgid "Template:"
+msgstr ""
+
+#: cambalache/cmb_ui_editor.ui:187 cambalache/cmb_ui_editor.ui:191
+#, fuzzy
+msgid "Export"
+msgstr "Exportovat vše"
+
+#: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:31
+#: cambalache/app/cmb_tutorial.py:30
 #, fuzzy
 msgid "You can open a project"
 msgstr "Otevřít projekt"
 
-#: cambalache/app/cmb_tutorial.py:32
+#: cambalache/app/cmb_tutorial.py:31
 msgid "find recently used"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:33
+#: cambalache/app/cmb_tutorial.py:32
 #, fuzzy
 msgid "or create a new one"
 msgstr "Vytvořit nový projekt"
 
-#: cambalache/app/cmb_tutorial.py:35
+#: cambalache/app/cmb_tutorial.py:34
 msgid "Common actions like Undo"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:36
+#: cambalache/app/cmb_tutorial.py:35
 msgid "Redo"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:37
+#: cambalache/app/cmb_tutorial.py:36
 #, fuzzy
 msgid "Add new UI file"
 msgstr "Přidat do projektu nové UI"
 
-#: cambalache/app/cmb_tutorial.py:38
+#: cambalache/app/cmb_tutorial.py:37
 msgid "and Save are directly accessible in the headerbar"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:39
+#: cambalache/app/cmb_tutorial.py:38
 msgid "just like Save As"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:40
+#: cambalache/app/cmb_tutorial.py:39
 msgid "and the main menu"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:42
+#: cambalache/app/cmb_tutorial.py:41
 #, fuzzy
 msgid "Create a project to continue"
 msgstr "Vytvořit nový projekt"
 
-#: cambalache/app/cmb_tutorial.py:43
+#: cambalache/app/cmb_tutorial.py:42
 #, fuzzy
 msgid "Great!"
 msgstr "Vytvořit"
 
-#: cambalache/app/cmb_tutorial.py:45
+#: cambalache/app/cmb_tutorial.py:44
 msgid ""
 "This is the project workspace, where you can see and select the widgets to "
 "edit"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:47
+#: cambalache/app/cmb_tutorial.py:46
 msgid "Project tree, with multiple UI support"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:50
+#: cambalache/app/cmb_tutorial.py:49
 msgid "Class selector"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:51
+#: cambalache/app/cmb_tutorial.py:50
 #, fuzzy
 msgid "And the object editor"
 msgstr "Aktualizovat objekt {obj}"
 
-#: cambalache/app/cmb_tutorial.py:54
+#: cambalache/app/cmb_tutorial.py:53
 msgid "Now let's add a new UI file"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:56
+#: cambalache/app/cmb_tutorial.py:55
 msgid "Good, now try to create a window"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:57
+#: cambalache/app/cmb_tutorial.py:56
 msgid "Make sure a UI is selected, type 'GtkWindow' and press enter"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:60
+#: cambalache/app/cmb_tutorial.py:59
 msgid "Excelent!"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:62
+#: cambalache/app/cmb_tutorial.py:61
 msgid "Once you finish, you can export all UI files to xml here"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:64
+#: cambalache/app/cmb_tutorial.py:63
 msgid ""
 "That is all for now.\n"
 "If you find Cambalache usefull please consider donating"
 msgstr ""
 
-#: cambalache/app/cmb_tutorial.py:66
+#: cambalache/app/cmb_tutorial.py:65
 msgid "Have a nice day!"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:221
+#: cambalache/app/cmb_window.py:259
 msgid "<Choose a UI filename to create>"
 msgstr "<Vyberte jméno souboru UI k vytvoření>"
 
-#: cambalache/app/cmb_window.py:268 cambalache/app/cmb_window.ui:930
+#: cambalache/app/cmb_window.py:315 cambalache/app/cmb_window.ui:990
 msgid "Start interactive introduction"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:316
+#: cambalache/app/cmb_window.py:363
 msgid "Sponsors"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:374
+#: cambalache/app/cmb_window.py:438
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Chyba při načítání {filename}"
 
-#: cambalache/app/cmb_window.py:377
+#: cambalache/app/cmb_window.py:441
 #, fuzzy
 msgid "Choose project to open"
 msgstr "Vyberte soubor k otevření"
 
-#: cambalache/app/cmb_window.py:415
+#: cambalache/app/cmb_window.py:479
 msgid "File name already exists, choose a different name."
 msgstr "Jméno souboru již existuje, vyberte jiné jméno."
 
-#: cambalache/app/cmb_window.py:440
+#: cambalache/app/cmb_window.py:504
 msgid "Choose a new file to save the project"
 msgstr "Vyberte nové jméno souboru k uložení projektu"
 
-#: cambalache/app/cmb_window.py:452
+#: cambalache/app/cmb_window.py:516
 msgid "Choose a file name for the new UI"
 msgstr "Vyberte jméno souboru  pro nové UI"
 
-#: cambalache/app/cmb_window.py:472
-msgid "Do you want to delete selected UI?"
-msgstr "Chcete smazat vybrané UI?"
+#: cambalache/app/cmb_window.py:531
+#, python-brace-format
+msgid "Do you really want to remove {filename}?"
+msgstr ""
 
-#: cambalache/app/cmb_window.py:486
+#: cambalache/app/cmb_window.py:554
 msgid "Choose file to import"
 msgstr "Vyberte soubor k importu"
 
-#: cambalache/app/cmb_window.py:495
+#. Translators: This is used to create a unordered list of unsupported features to show the user
+#: cambalache/app/cmb_window.py:574
+#, python-brace-format
+msgid "    • {message}"
+msgstr ""
+
+#. Translators: This will be the heading of a list of unsupported features
+#: cambalache/app/cmb_window.py:577
+msgid "Cambalache encounter the following issues:"
+msgstr ""
+
+#. Translators: this is the last message after the list of unsupported features
+#: cambalache/app/cmb_window.py:580
+#, python-brace-format
+msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
+msgstr ""
+
+#: cambalache/app/cmb_window.py:585
+#, python-brace-format
+msgid ""
+"Cambalache encounter {unsupported_feature}\n"
+"Your file will be exported as '{name}.cmb.ui' to avoid data loss."
+msgstr ""
+
+#: cambalache/app/cmb_window.py:587 cambalache/app/cmb_window.py:593
 #, fuzzy, python-brace-format
 msgid "Error importing {filename}"
 msgstr "Chyba při importování {filename}: {e}"
@@ -561,49 +722,61 @@ msgstr "Jméno souboru UI"
 msgid "New Project"
 msgstr "Nový projekt"
 
-#: cambalache/app/cmb_window.ui:686
+#: cambalache/app/cmb_window.ui:691
 msgid "Properties"
 msgstr "Vlastnosti"
 
-#: cambalache/app/cmb_window.ui:714
+#: cambalache/app/cmb_window.ui:719
 msgid "Layout"
 msgstr "Rozložení"
 
-#: cambalache/app/cmb_window.ui:730
+#: cambalache/app/cmb_window.ui:735
 msgid "Signals"
 msgstr "Signály"
 
-#: cambalache/app/cmb_window.ui:788
+#: cambalache/app/cmb_window.ui:749
+#, fuzzy
+msgid "Object Editor"
+msgstr "Aktualizovat objekt {obj}"
+
+#: cambalache/app/cmb_window.ui:797
+msgid "UI Editor"
+msgstr ""
+
+#: cambalache/app/cmb_window.ui:848
 msgid "_Open"
 msgstr "_Otevřít"
 
-#: cambalache/app/cmb_window.ui:792
+#: cambalache/app/cmb_window.ui:852
 msgid "Open a project"
 msgstr "Otevřít projekt"
 
-#: cambalache/app/cmb_window.ui:833
+#: cambalache/app/cmb_window.ui:893
 msgid "Create a new project"
 msgstr "Vytvořit nový projekt"
 
-#: cambalache/app/cmb_window.ui:854
+#: cambalache/app/cmb_window.ui:914
 msgid "Save"
 msgstr "Uložit"
 
-#: cambalache/app/cmb_window.ui:858
+#: cambalache/app/cmb_window.ui:918
 msgid "Save project"
 msgstr "Uložit projekt"
 
-#: cambalache/app/cmb_window.ui:873
+#: cambalache/app/cmb_window.ui:933
 msgid "Save project with a different file name"
 msgstr "Uložit projekt s jiným jménem souboru"
 
-#: cambalache/app/cmb_window.ui:910
+#: cambalache/app/cmb_window.ui:970
 msgid "Add new UI to project"
 msgstr "Přidat do projektu nové UI"
 
-#: cambalache/app/cmb_window.ui:1007
+#: cambalache/app/cmb_window.ui:1067
 msgid "User Interface Maker"
 msgstr ""
+
+#~ msgid "Do you want to delete selected UI?"
+#~ msgstr "Chcete smazat vybrané UI?"
 
 #, fuzzy
 #~ msgid "© 2020-2021 Juan Pablo Ugarte"
