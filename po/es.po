@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-20 18:31-0400\n"
-"PO-Revision-Date: 2021-09-21 20:32-0400\n"
+"POT-Creation-Date: 2021-10-20 11:20-0400\n"
+"PO-Revision-Date: 2021-10-20 18:32-0400\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -58,9 +58,8 @@ msgstr ""
 "principio para soportar otras versiones."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
-#, fuzzy
 msgid "Bugfix release!"
-msgstr "Lanzamiento en Flathub!"
+msgstr "Nuevas correcciones!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
 msgid "Add sponsors credit section"
@@ -92,7 +91,7 @@ msgstr "Agrega soporte para plantillas"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:50
 msgid "New translations release!"
-msgstr ""
+msgstr "Lanzamiento de nuevas traducciones!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:52
 msgid "Add Czech translation. Vojtěch Perník"
@@ -241,92 +240,92 @@ msgstr "Inspeccionar UI"
 #: cambalache/cmb_project.py:358
 #, python-brace-format
 msgid "one unknown class '{detail}'"
-msgstr ""
+msgstr "una clase desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:358
 #, python-brace-format
 msgid "{n} unknown classes ({detail})"
-msgstr ""
+msgstr "{n} clases desconocidas ({detail})"
 
 #: cambalache/cmb_project.py:359
 #, python-brace-format
 msgid "one unknown property '{detail}'"
-msgstr ""
+msgstr "una propiedad desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:359
 #, python-brace-format
 msgid "{n} unknown properties ({detail})"
-msgstr ""
+msgstr "{n} propiedades desconocidas ({detail})"
 
 #: cambalache/cmb_project.py:360
 #, python-brace-format
 msgid "one unknown signal '{detail}'"
-msgstr ""
+msgstr "una señal desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:360
 #, python-brace-format
 msgid "{n} unknown signals ({detail})"
-msgstr ""
+msgstr "{n} señales desconocidas ({detail})"
 
 #: cambalache/cmb_project.py:361
 #, python-brace-format
 msgid "one unknown tag '{detail}'"
-msgstr ""
+msgstr "una etiqueta desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:361
 #, python-brace-format
 msgid "{n} unknown tags ({detail})"
-msgstr ""
+msgstr "{n} etiquetas desconocidas ({detail})"
 
 #: cambalache/cmb_project.py:362
 #, python-brace-format
 msgid "one unknown attribute '{detail}'"
-msgstr ""
+msgstr "un atributo desconocido '{detail}'"
 
 #: cambalache/cmb_project.py:362
 #, python-brace-format
 msgid "{n} unknown attributes ({detail})"
-msgstr ""
+msgstr "{n} atributos desconocidos ({detail})"
 
 #: cambalache/cmb_project.py:363
 #, python-brace-format
 msgid "one missing attribute '{detail}'"
-msgstr ""
+msgstr "un atributo faltante '{detail}'"
 
 #: cambalache/cmb_project.py:363
 #, python-brace-format
 msgid "{n} missing attributes ({detail})"
-msgstr ""
+msgstr "{n} atributos faltantes ({detail})"
 
 #: cambalache/cmb_project.py:367
 #, python-brace-format
 msgid "xml:{line} unknown class '{detail}'"
-msgstr ""
+msgstr "xml:{line} clase desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:368
 #, python-brace-format
 msgid "xml:{line} unknown property '{detail}'"
-msgstr ""
+msgstr "xml:{line} etiqueta desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:369
 #, python-brace-format
 msgid "xml:{line} unknown signal '{detail}'"
-msgstr ""
+msgstr "xml:{line} señal desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:370
 #, python-brace-format
 msgid "xml:{line} unknown tag '{detail}'"
-msgstr ""
+msgstr "xml:{line} etiqueta desconocida '{detail}'"
 
 #: cambalache/cmb_project.py:371
 #, python-brace-format
 msgid "xml:{line} unknown attribute '{detail}'"
-msgstr ""
+msgstr "xml:{line} atributo desconocido '{detail}'"
 
 #: cambalache/cmb_project.py:372
 #, python-brace-format
 msgid "xml:{line} missing attribute '{detail}'"
-msgstr ""
+msgstr "xml:{line} atributo faltante '{detail}'"
 
 #: cambalache/cmb_project.py:404
 #, python-brace-format
@@ -339,9 +338,9 @@ msgid "Add UI {basename}"
 msgstr "Agregar UI {basename}"
 
 #: cambalache/cmb_project.py:502
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Remove UI \"{name}\""
-msgstr "Borrar UI \"{ui.name}\""
+msgstr "Borrar UI \"{name}\""
 
 #: cambalache/cmb_project.py:575
 #, python-brace-format
@@ -437,43 +436,40 @@ msgid "Template"
 msgstr "Plantilla"
 
 #: cambalache/cmb_ui_editor.ui:16
-#, fuzzy
 msgid "Filename:"
-msgstr "Archivo de UI"
+msgstr "Archivo:"
 
 #: cambalache/cmb_ui_editor.ui:28
 msgid "Description:"
-msgstr ""
+msgstr "Descripción:"
 
 #: cambalache/cmb_ui_editor.ui:40
 msgid "Copyright:"
-msgstr ""
+msgstr "Derechos de autor:"
 
 #: cambalache/cmb_ui_editor.ui:52
 msgid "Authors:"
-msgstr ""
+msgstr "Autores:"
 
 #: cambalache/cmb_ui_editor.ui:64
 msgid "Domain:"
-msgstr ""
+msgstr "Dominio:"
 
 #: cambalache/cmb_ui_editor.ui:75
 msgid "<file name relative to project>"
-msgstr ""
+msgstr "<nombre relativo al proyecto>"
 
 #: cambalache/cmb_ui_editor.ui:88
 msgid "<translation domain>"
-msgstr ""
+msgstr "<dominio de traducción>"
 
 #: cambalache/cmb_ui_editor.ui:151
-#, fuzzy
 msgid "Template:"
-msgstr "Plantilla"
+msgstr "Plantilla:"
 
 #: cambalache/cmb_ui_editor.ui:187 cambalache/cmb_ui_editor.ui:191
-#, fuzzy
 msgid "Export"
-msgstr "Exportar todo"
+msgstr "Exportar"
 
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
@@ -612,7 +608,7 @@ msgstr "Elija un nombre de archivo para la UI nueva"
 #: cambalache/app/cmb_window.py:531
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
-msgstr ""
+msgstr "¿Realmente desea borrar {filename}?"
 
 #: cambalache/app/cmb_window.py:554
 msgid "Choose file to import"
@@ -622,18 +618,19 @@ msgstr "Elija un archivo para importar"
 #: cambalache/app/cmb_window.py:574
 #, python-brace-format
 msgid "    • {message}"
-msgstr ""
+msgstr "    • {message}"
 
 #. Translators: This will be the heading of a list of unsupported features
 #: cambalache/app/cmb_window.py:577
 msgid "Cambalache encounter the following issues:"
-msgstr ""
+msgstr "Cambalache encontró los siguientes problemas:"
 
 #. Translators: this is the last message after the list of unsupported features
 #: cambalache/app/cmb_window.py:580
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
+"El archivo sera exportado como '{name}.cmb.ui' para evitar perder datos."
 
 #: cambalache/app/cmb_window.py:585
 #, python-brace-format
@@ -641,6 +638,8 @@ msgid ""
 "Cambalache encounter {unsupported_feature}\n"
 "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
+"Cambalache encontró {unsupported_feature}\n"
+"El archivo sera exportado como '{name}.cmb.ui' para evitar perder datos."
 
 #: cambalache/app/cmb_window.py:587 cambalache/app/cmb_window.py:593
 #, python-brace-format
@@ -740,13 +739,12 @@ msgid "Signals"
 msgstr "Señales"
 
 #: cambalache/app/cmb_window.ui:749
-#, fuzzy
 msgid "Object Editor"
-msgstr "ID de objeto"
+msgstr "Editor de Objeto"
 
 #: cambalache/app/cmb_window.ui:797
 msgid "UI Editor"
-msgstr ""
+msgstr "Editor de Interfaz"
 
 #: cambalache/app/cmb_window.ui:848
 msgid "_Open"
@@ -779,6 +777,10 @@ msgstr "Agregar nueva UI al proyecto"
 #: cambalache/app/cmb_window.ui:1067
 msgid "User Interface Maker"
 msgstr "Creador de Interfaces Gráficas"
+
+#, fuzzy, python-brace-format
+#~ msgid "xml:{line} unknown property "
+#~ msgstr "xml:{line} propiedad desconocida '{detail}'"
 
 #~ msgid "Do you want to delete selected UI?"
 #~ msgstr "Querés borrar la UI seleccionada?"
