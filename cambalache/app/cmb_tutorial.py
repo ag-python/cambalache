@@ -46,15 +46,15 @@ intro = [
     (_('Project tree, with multiple UI support'),
      'tree_view', 4, None, CmbTutorPosition.CENTER),
 
-    (_('Class selector'), 'type_entry', 3),
+    (_('Class selector'), 'type_chooser_button', 3, 'show-type-popover', CmbTutorPosition.RIGHT),
     (_('And the object editor'),
-      'object_editor', 3, None, CmbTutorPosition.CENTER),
+      'editor_stack', 3, None, CmbTutorPosition.CENTER),
 
     (_('Now let\'s add a new UI file'), 'add_button', 5, 'add-ui'),
 
     (_('Good, now try to create a window'), 'intro_button', 4),
     (_('Make sure a UI is selected, type \'GtkWindow\' and press enter'),
-      'type_entry', 6, 'add-window'),
+      'type_chooser_button', 6, 'add-window', CmbTutorPosition.RIGHT),
 
     (_('Excelent!'), 'intro_button', 2),
 

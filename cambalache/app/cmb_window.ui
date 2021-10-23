@@ -586,7 +586,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                         <property name="border-width">4</property>
                         <property name="spacing">6</property>
                         <child>
-                          <object class="GtkMenuButton">
+                          <object class="GtkMenuButton" id="type_chooser_button">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="focus-on-click">False</property>
