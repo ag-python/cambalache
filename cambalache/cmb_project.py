@@ -84,9 +84,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def __init__(self, **kwargs):
         # Type Information
-        self._type_info = {}
-
-        self.type_list = None
+        self.type_info = {}
 
         # Selection
         self._selection = []
@@ -120,7 +118,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         # DataModel is only used internally
         self.db = CmbDB(target_tk=self.target_tk)
-        self.db.type_info = self._type_info
+        self.db.type_info = self.type_info
         self._init_data()
 
         self._load()
@@ -194,18 +192,6 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             'types': types,
             'pks': pks
         }
-
-
-    def _init_list_stores(self):
-        # Public List Stores
-        type_query = '''SELECT * FROM type
-                          WHERE
-                            parent_id IS NOT NULL AND
-                            abstract IS NOT True AND
-                            parent_id NOT IN ('interface', 'enum', 'flags') AND
-                            (layout IS NULL OR layout = 'container')
-                          ORDER BY type_id;'''
-        self.type_list = CmbListStore(project=self, table='type', query=type_query)
 
     def _type_get_data(self, type_id, data_id, parent_id, key, value_type_id):
         args = {}
@@ -296,16 +282,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             info.properties = type_properties.get(type_id, {})
             info.signals = type_signals.get(type_id, {})
             info.data = type_data.get(type_id, {})
-            self._type_info[type_id] = info
+            self.type_info[type_id] = info
 
     def _init_data(self):
         if self.target_tk is None:
             return
 
         c = self.db.cursor()
-
-        # Init GtkListStore wrappers for different tables
-        self._init_list_stores()
 
         self._init_type_info(c)
 
@@ -511,7 +494,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,
-                        info=self._type_info[obj_type])
+                        info=self.type_info[obj_type])
 
         if parent_id:
             parent = self._object_id.get(f'{ui_id}.{parent_id}', None)
@@ -526,8 +509,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         return obj
 
     def _check_can_add(self, obj_type, parent_type):
-        obj_info = self._type_info.get(obj_type, None)
-        parent_info = self._type_info.get(parent_type, None)
+        obj_info = self.type_info.get(obj_type, None)
+        parent_info = self.type_info.get(parent_type, None)
 
         if obj_info is None or parent_info is None:
             return False
@@ -874,7 +857,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self._undo_redo(False)
 
     def get_type_properties(self, name):
-        info = self._type_info.get(name, None)
+        info = self.type_info.get(name, None)
         return info.properties if info else None
 
     def _object_property_changed(self, obj, prop):

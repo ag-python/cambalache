@@ -219,7 +219,7 @@ class CmbObjectEditor(Gtk.Box):
         if prop.info is not None:
             info = prop.info
             type_id = info.type_id
-            tinfo = self._object.project._type_info.get(type_id, None)
+            tinfo = self._object.project.type_info.get(type_id, None)
 
             if type_id == 'gboolean':
                 editor = CmbSwitch()

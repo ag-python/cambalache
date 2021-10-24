@@ -228,7 +228,7 @@ class CmbSignalEditor(Gtk.Box):
 
         # Populate all hierarchy signals
         for type_id in self._object.info.hierarchy:
-            info = self._object.project._type_info.get(type_id, None)
+            info = self._object.project.type_info.get(type_id, None)
             if info:
                 self._populate_from_type(info)
 
