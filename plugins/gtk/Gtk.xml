@@ -3,92 +3,220 @@
 
  Copyright (C) 2021  Juan Pablo Ugarte
 -->
-<types>
-  <GtkWidget>
-    <data>
-      <style>
-        <class name="gchararray"/>
-      </style>
-    </data>
-  </GtkWidget>
-
-  <GtkGridLayoutChild>
-    <properties target="Gtk-3.0">
-      <property name="left-attach" save-always="True"/>
-      <property name="top-attach" save-always="True"/>
-    </properties>
-    <properties target="Gtk-4.0">
-      <property name="column" save-always="True"/>
-      <property name="row" save-always="True"/>
-    </properties>
-  </GtkGridLayoutChild>
-
-  <GtkDialog>
-    <data>
-      <action-widgets>
-        <action-widget response="gint">GtkWidget</action-widget>
-      </action-widgets>
-    </data>
-  </GtkDialog>
-
-  <GtkListStore>
-    <data>
-      <columns>
-        <column type="type"/>
-      </columns>
+<meta>
+  <types>
+    <GtkWidget>
       <data>
-        <row>
-          <col id="gint">gchararray</col>
-        </row>
+        <style>
+          <class name="gchararray"/>
+        </style>
       </data>
-    </data>
-  </GtkListStore>
+    </GtkWidget>
 
-  <GtkTreeStore>
-    <data>
-      <columns>
-        <column type="type"/>
-      </columns>
-    </data>
-  </GtkTreeStore>
+    <GtkGridLayoutChild>
+      <properties target="Gtk-3.0">
+        <property name="left-attach" save-always="True"/>
+        <property name="top-attach" save-always="True"/>
+      </properties>
+      <properties target="Gtk-4.0">
+        <property name="column" save-always="True"/>
+        <property name="row" save-always="True"/>
+      </properties>
+    </GtkGridLayoutChild>
 
-  <GtkLabel>
-    <data>
-      <attributes>
-        <attribute name="gchararray" value="gchararray" start="gint" end="gint"/>
-      </attributes>
-    </data>
-  </GtkLabel>
+    <GtkDialog>
+      <data>
+        <action-widgets>
+          <action-widget response="gint">GtkWidget</action-widget>
+        </action-widgets>
+      </data>
+    </GtkDialog>
 
-  <GtkLevelBar>
-    <data>
-      <offsets>
-        <offset name="gchararray" value="gdouble"/>
-      </offsets>
-    </data>
-  </GtkLevelBar>
+    <GtkListStore>
+      <data>
+        <columns>
+          <column type="type"/>
+        </columns>
+        <data>
+          <row>
+            <col id="gint">gchararray</col>
+          </row>
+        </data>
+      </data>
+    </GtkListStore>
 
-  <GtkScale>
-    <data>
-      <marks>
-        <mark value="gdouble" position="GtkPositionType">gchararray</mark>
-      </marks>
-    </data>
-  </GtkScale>
+    <GtkTreeStore>
+      <data>
+        <columns>
+          <column type="type"/>
+        </columns>
+      </data>
+    </GtkTreeStore>
 
-  <GtkComboBoxText>
-    <data>
-      <items>
-        <item id="gchararray">gchararray</item>
-      </items>
-    </data>
-  </GtkComboBoxText>
+    <GtkLabel>
+      <data>
+        <attributes>
+          <attribute name="gchararray" value="gchararray" start="gint" end="gint"/>
+        </attributes>
+      </data>
+    </GtkLabel>
 
-  <GtkSizeGroup>
-    <data>
-      <widgets>
-        <widget name="GtkWidget"/>
-      </widgets>
-    </data>
-  </GtkSizeGroup>
-</types>
+    <GtkLevelBar>
+      <data>
+        <offsets>
+          <offset name="gchararray" value="gdouble"/>
+        </offsets>
+      </data>
+    </GtkLevelBar>
+
+    <GtkScale>
+      <data>
+        <marks>
+          <mark value="gdouble" position="GtkPositionType">gchararray</mark>
+        </marks>
+      </data>
+    </GtkScale>
+
+    <GtkComboBoxText>
+      <data>
+        <items>
+          <item id="gchararray">gchararray</item>
+        </items>
+      </data>
+    </GtkComboBoxText>
+
+    <GtkSizeGroup>
+      <data>
+        <widgets>
+          <widget name="GtkWidget"/>
+        </widgets>
+      </data>
+    </GtkSizeGroup>
+  </types>
+  <categories>
+
+    <category name="toplevel">
+      <GtkWindow/>
+      <GtkOffscreenWindow/>
+      <GtkApplicationWindow/>
+      <GtkDialog/>
+      <GtkAboutDialog/>
+      <GtkFileChooserDialog/>
+      <GtkColorChooserDialog/>
+      <GtkFontChooserDialog/>
+      <GtkMessageDialog/>
+      <GtkRecentChooserDialog/>
+      <GtkAssistant/>
+      <GtkAppChooserDialog/>
+      <GtkFileChooserNative/>
+    </category>
+
+    <category name="layout">
+      <GtkBin/>
+      <GtkBox/>
+      <GtkGrid/>
+      <GtkNotebook/>
+      <GtkFrame/>
+      <GtkAspectFrame/>
+      <GtkListBox/>
+      <GtkFlowBox/>
+      <GtkOverlay/>
+      <GtkMenuBar/>
+      <GtkToolbar/>
+      <GtkStatusbar/>
+      <GtkToolPalette/>
+      <GtkPaned/>
+      <GtkButtonBox/>
+      <GtkLayout/>
+      <GtkFixed/>
+      <GtkEventBox/>
+      <GtkExpander/>
+      <GtkViewport/>
+      <GtkScrolledWindow/>
+      <GtkAlignment/>
+      <GtkRevealer/>
+      <GtkSearchBar/>
+      <GtkHeaderBar/>
+      <GtkStack/>
+      <GtkPopover/>
+      <GtkPopoverMenu/>
+      <GtkActionBar/>
+    </category>
+
+    <category name="control">
+      <GtkButton/>
+      <GtkEntry/>
+      <GtkSearchEntry/>
+      <GtkSpinButton/>
+      <GtkToggleButton/>
+      <GtkCheckButton/>
+      <GtkRadioButton/>
+      <GtkMenuButton/>
+      <GtkLockButton/>
+      <GtkSwitch/>
+      <GtkModelButton/>
+      <GtkStackSwitcher/>
+      <GtkStackSidebar/>
+      <GtkComboBox/>
+      <GtkComboBoxText/>
+      <GtkFileChooserButton/>
+      <GtkColorButton/>
+      <GtkFontButton/>
+      <GtkLinkButton/>
+      <GtkScaleButton/>
+      <GtkVolumeButton/>
+      <GtkAppChooserButton/>
+      <GtkScale/>
+      <GtkScrollbar/>
+    </category>
+
+    <category name="display">
+      <GtkLabel/>
+      <GtkAccelLabel/>
+      <GtkImage/>
+      <GtkTextView/>
+      <GtkTreeView/>
+      <GtkIconView/>
+      <GtkProgressBar/>
+      <GtkLevelBar/>
+      <GtkSpinner/>
+      <GtkMenu/>
+      <GtkRecentChooserMenu/>
+      <GtkCalendar/>
+      <GtkSeparator/>
+      <GtkDrawingArea/>
+      <GtkGLArea/>
+      <GtkInfoBar/>
+      <GtkColorChooserWidget/>
+      <GtkFontChooserWidget/>
+      <GtkRecentChooserWidget/>
+      <GtkFileChooserWidget/>
+      <GtkAppChooserWidget/>
+      <GtkPlacesSidebar/>
+    </category>
+
+    <category name="model">
+      <GtkListStore/>
+      <GtkTreeStore/>
+      <GtkTreeModelFilter/>
+      <GtkTreeModelSort/>
+      <GtkEntryBuffer/>
+      <GtkTextBuffer/>
+      <GtkTextTag/>
+      <GtkTextTagTable/>
+      <GtkSizeGroup/>
+      <GtkWindowGroup/>
+      <GtkAccelGroup/>
+      <GtkAdjustment/>
+      <GtkEntryCompletion/>
+      <GtkIconFactory/>
+      <GtkStatusIcon/>
+      <GtkFileFilter/>
+      <GtkRecentFilter/>
+      <GtkRecentManager/>
+      <GThemedIcon/>
+      <GFileIcon/>
+    </category>
+
+  </categories>
+</meta>
