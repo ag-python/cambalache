@@ -160,16 +160,8 @@ class CambalacheDb:
         for child in node:
             self._import_tag(c, child, owner_id, data_id)
 
-    def populate_extra_data_from_xml(self, filename):
-        if not os.path.exists(filename):
-            return
-
-        tree = etree.parse(filename)
-        root = tree.getroot()
-
-        c = self.conn.cursor()
-
-        for klass in root:
+    def populate_types(self, c, types):
+        for klass in types:
             owner_id = klass.tag
 
             for properties in klass.iterchildren('properties'):
@@ -193,6 +185,29 @@ class CambalacheDb:
 
                 for child in data:
                     self._import_tag(c, child, owner_id, None)
+
+    def populate_categories(self, c, categories):
+        for category in categories:
+            name = category.get('name')
+
+            for klass in category:
+                c.execute("UPDATE type SET category=? WHERE type_id=?;",
+                          (name, klass.tag))
+
+    def populate_extra_data_from_xml(self, filename):
+        if not os.path.exists(filename):
+            return
+
+        tree = etree.parse(filename)
+        root = tree.getroot()
+
+        c = self.conn.cursor()
+
+        for node in root:
+            if node.tag == 'types':
+                self.populate_types(c, node)
+            elif node.tag == 'categories':
+                self.populate_categories(c, node)
 
         c.close()
         self.conn.commit()
