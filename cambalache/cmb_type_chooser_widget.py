@@ -40,6 +40,7 @@ class CmbTypeChooserWidget(Gtk.Box):
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
     category = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+    uncategorized_only = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
     show_categories = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
 
     entrycompletion = Gtk.Template.Child()
@@ -90,12 +91,16 @@ class CmbTypeChooserWidget(Gtk.Box):
         last_category = None
 
         for i in infos:
+            # Append category
             if show_categories and last_category != i.category:
                 last_category = i.category
                 category = categories.get(i.category, _('Others'))
                 store.append([f'<i>▾ {category}</i>', '', None, False])
 
-            store.append([i.type_id, i.type_id.lower(), i, True])
+            append = i.category is None if self.uncategorized_only else \
+                     (self.category != '' and i.category == self.category) or  self.category == ''
+            if append:
+                store.append([i.type_id, i.type_id.lower(), i, True])
 
         return store
 
@@ -135,10 +140,6 @@ class CmbTypeChooserWidget(Gtk.Box):
         # Always show categories if we are not searching
         if self._search_text == '' and info is None:
             return True
-
-        # Filter by category
-        if len(self.category) > 0 and info.category != self.category:
-            return False
 
         return type_id_lower.find(self._search_text) >= 0
 

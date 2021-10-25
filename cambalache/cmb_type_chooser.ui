@@ -17,6 +17,7 @@
   </object>
   <object class="CmbTypeChooserPopover" id="extra">
     <property name="can-focus">False</property>
+    <property name="uncategorized-only">True</property>
   </object>
   <object class="CmbTypeChooserPopover" id="layout">
     <property name="can-focus">False</property>
