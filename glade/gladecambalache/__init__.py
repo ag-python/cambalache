@@ -18,3 +18,5 @@ GObject.type_ensure(CmbObjectEditor)
 GObject.type_ensure(CmbSignalEditor)
 GObject.type_ensure(CmbTypeChooser)
 GObject.type_ensure(CmbTypeChooserPopover)
+GObject.type_ensure(CmbTypeChooserBar)
+

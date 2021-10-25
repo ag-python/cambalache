@@ -36,6 +36,8 @@ install_data([
     'cmb_signal_editor.py',
     'cmb_tree_view.py',
     'cmb_type_chooser.py',
+    'cmb_type_chooser_popover.py',
+    'cmb_type_chooser_widget.py',
     'cmb_type_info.py',
     'cmb_ui.py',
     'cmb_ui_editor.py',

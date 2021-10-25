@@ -1,5 +1,5 @@
 #
-# CmbTypeChooserBar - Cambalache Type Chooser Bar
+# CmbTypeChooserPopover - Cambalache Type Chooser Popover
 #
 # Copyright (C) 2021  Juan Pablo Ugarte
 #
@@ -27,44 +27,33 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
 from .cmb_project import CmbProject
+from .cmb_type_chooser_widget import CmbTypeChooserWidget
 
 
-@Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_type_chooser.ui')
-class CmbTypeChooser(Gtk.Box):
-    __gtype_name__ = 'CmbTypeChooser'
+class CmbTypeChooserPopover(Gtk.Popover):
+    __gtype_name__ = 'CmbTypeChooserPopover'
 
     __gsignals__ = {
         'type-selected': (GObject.SignalFlags.RUN_LAST, None, (str, )),
     }
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
-
-    all = Gtk.Template.Child()
-    toplevel = Gtk.Template.Child()
-    layout = Gtk.Template.Child()
-    control = Gtk.Template.Child()
-    display = Gtk.Template.Child()
-    model = Gtk.Template.Child()
-    extra = Gtk.Template.Child()
+    category = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self._choosers = [
-            self.all,
-            self.toplevel,
-            self.layout,
-            self.control,
-            self.display,
-            self.model,
-            self.extra
-        ]
-        self.connect('notify::project', self._on_project_notify)
+        self._chooser = CmbTypeChooserWidget()
+        self._chooser.connect('type-selected', self._on_type_selected)
+        self._chooser.show_all()
+        self.add(self._chooser)
 
-        for chooser in self._choosers:
-            chooser.connect('type-selected', lambda o, t: self.emit('type-selected', t))
+        for prop in ['project', 'category']:
+            GObject.Object.bind_property(self, prop,
+                                         self._chooser, prop,
+                                         GObject.BindingFlags.SYNC_CREATE)
 
-    def _on_project_notify(self, object, pspec):
-        project = self.project
-        for chooser in self._choosers:
-            chooser.project = project
+    def _on_type_selected(self, chooser, type):
+        self.emit('type-selected', type)
+        self.popdown()
+

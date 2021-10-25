@@ -73,4 +73,6 @@ from .cmb_tree_view import CmbTreeView
 from .cmb_object_editor import CmbObjectEditor
 from .cmb_signal_editor import CmbSignalEditor
 from .cmb_ui_editor import CmbUIEditor
-from .cmb_type_chooser import CmbTypeChooser, CmbTypeChooserPopover
+from .cmb_type_chooser import CmbTypeChooser
+from .cmb_type_chooser_widget import CmbTypeChooserWidget
+from .cmb_type_chooser_popover import CmbTypeChooserPopover

@@ -69,8 +69,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     # Workspace
     view = Gtk.Template.Child()
     tree_view = Gtk.Template.Child()
-    type_chooser_button = Gtk.Template.Child()
-    type_popover = Gtk.Template.Child()
+    type_chooser = Gtk.Template.Child()
     theme_combobox = Gtk.Template.Child()
     editor_stack = Gtk.Template.Child()
     ui_editor = Gtk.Template.Child()
@@ -173,20 +172,19 @@ class CmbWindow(Gtk.ApplicationWindow):
         self._project = project
         self.view.project = project
         self.tree_view.props.model = project
+        self.type_chooser.project = project
 
         # Clear Editors
         self.ui_editor.object = None
         self.object_editor.object = None
         self.object_layout_editor.object = None
         self.signal_editor.object = None
-        self.type_popover.chooser.model = None
 
         if project is not None:
             self._on_project_filename_notify(None, None)
             self._project.connect("notify::filename", self._on_project_filename_notify)
             self._project.connect('selection-changed', self._on_project_selection_changed)
             self._project.connect('changed', self._on_project_changed)
-            self.type_popover.chooser.model = self._project.type_list
 
             # Populate gtk theme combo
             if self._project.target_tk == 'gtk+-3.0':
@@ -207,8 +205,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         widget.hide()
         return True
 
-    @Gtk.Template.Callback('on_type_popover_type_selected')
-    def _on_type_popover_type_selected(self, popover, type_id):
+    @Gtk.Template.Callback('on_type_chooser_type_selected')
+    def _on_type_chooser_type_selected(self, popover, type_id):
         selection = self.project.get_selection()
 
         if len(selection) > 0:
