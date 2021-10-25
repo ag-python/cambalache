@@ -40,6 +40,7 @@ class CmbTypeChooserWidget(Gtk.Box):
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
     category = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+    show_categories = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
 
     entrycompletion = Gtk.Template.Child()
     scrolledwindow = Gtk.Template.Child()
@@ -58,8 +59,24 @@ class CmbTypeChooserWidget(Gtk.Box):
         if project is None:
             return None
 
-        # type_id, type_id.lower(), CmbTypeInfo
-        store = Gtk.ListStore(str, str, CmbTypeInfo)
+        categories = {
+            'toplevel': _('Toplevel'),
+            'layout': _('Layout'),
+            'control': _('Control'),
+            'display': _('Display'),
+            'model': _('Model')
+        }
+
+        order = {
+            'toplevel': 0,
+            'layout': 1,
+            'control': 2,
+            'display': 3,
+            'model': 4
+        }
+
+        # type_id, type_id.lower(), CmbTypeInfo, sensitive
+        store = Gtk.ListStore(str, str, CmbTypeInfo, bool)
         infos = []
 
         for key in project.type_info:
@@ -68,10 +85,17 @@ class CmbTypeChooserWidget(Gtk.Box):
             if not i.abstract and i.parent_id not in [None, 'interface', 'enum', 'flags'] and i.layout in [None, 'container']:
                 infos.append(i)
 
-        infos = sorted(infos, key=lambda i: (i.category or '', i.type_id))
+        infos = sorted(infos, key=lambda i: (order.get(i.category, 99), i.type_id))
+        show_categories = self.show_categories
+        last_category = None
 
         for i in infos:
-            store.append([i.type_id, i.type_id.lower(), i])
+            if show_categories and last_category != i.category:
+                last_category = i.category
+                category = categories.get(i.category, _('Others'))
+                store.append([f'<i>▾ {category}</i>', '', None, False])
+
+            store.append([i.type_id, i.type_id.lower(), i, True])
 
         return store
 
@@ -100,16 +124,23 @@ class CmbTypeChooserWidget(Gtk.Box):
     @Gtk.Template.Callback('on_treeview_row_activated')
     def _on_treeview_row_activated(self, treeview, path, column):
         model = treeview.props.model
-        type_id = model[model.get_iter(path)][0]
-        self.emit('type-selected', type_id)
+        info = model[model.get_iter(path)][2]
+
+        if info is not None:
+            self.emit('type-selected', info.type_id)
 
     def _visible_func(self, model, iter, data):
-        info = model[iter][2]
+        type_id, type_id_lower, info, sensitive = model[iter]
 
-        if self.category and info.category != self.category:
+        # Always show categories if we are not searching
+        if self._search_text == '' and info is None:
+            return True
+
+        # Filter by category
+        if len(self.category) > 0 and info.category != self.category:
             return False
 
-        return info.type_id.find(self._search_text) >= 0
+        return type_id_lower.find(self._search_text) >= 0
 
     def _on_map(self, widget):
         toplevel = widget.get_toplevel()
