@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-20 18:31-0400\n"
+"POT-Creation-Date: 2021-10-25 16:05-0400\n"
 "PO-Revision-Date: 2021-08-18 22:59+0200\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
@@ -232,190 +232,215 @@ msgstr "Arbeitsbereich neu starten"
 msgid "Inspect UI definition"
 msgstr "UI-Definition überprüfen"
 
-#: cambalache/cmb_project.py:358
+#: cambalache/cmb_project.py:341
 #, python-brace-format
 msgid "one unknown class '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:358
+#: cambalache/cmb_project.py:341
 #, python-brace-format
 msgid "{n} unknown classes ({detail})"
 msgstr ""
 
-#: cambalache/cmb_project.py:359
+#: cambalache/cmb_project.py:342
 #, python-brace-format
 msgid "one unknown property '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:359
+#: cambalache/cmb_project.py:342
 #, python-brace-format
 msgid "{n} unknown properties ({detail})"
 msgstr ""
 
-#: cambalache/cmb_project.py:360
+#: cambalache/cmb_project.py:343
 #, python-brace-format
 msgid "one unknown signal '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:360
+#: cambalache/cmb_project.py:343
 #, python-brace-format
 msgid "{n} unknown signals ({detail})"
 msgstr ""
 
-#: cambalache/cmb_project.py:361
+#: cambalache/cmb_project.py:344
 #, python-brace-format
 msgid "one unknown tag '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:361
+#: cambalache/cmb_project.py:344
 #, python-brace-format
 msgid "{n} unknown tags ({detail})"
 msgstr ""
 
-#: cambalache/cmb_project.py:362
+#: cambalache/cmb_project.py:345
 #, python-brace-format
 msgid "one unknown attribute '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:362
+#: cambalache/cmb_project.py:345
 #, python-brace-format
 msgid "{n} unknown attributes ({detail})"
 msgstr ""
 
-#: cambalache/cmb_project.py:363
+#: cambalache/cmb_project.py:346
 #, python-brace-format
 msgid "one missing attribute '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:363
+#: cambalache/cmb_project.py:346
 #, python-brace-format
 msgid "{n} missing attributes ({detail})"
 msgstr ""
 
-#: cambalache/cmb_project.py:367
+#: cambalache/cmb_project.py:350
 #, python-brace-format
 msgid "xml:{line} unknown class '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:368
+#: cambalache/cmb_project.py:351
 #, python-brace-format
 msgid "xml:{line} unknown property '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:369
+#: cambalache/cmb_project.py:352
 #, python-brace-format
 msgid "xml:{line} unknown signal '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:370
+#: cambalache/cmb_project.py:353
 #, python-brace-format
 msgid "xml:{line} unknown tag '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:371
+#: cambalache/cmb_project.py:354
 #, python-brace-format
 msgid "xml:{line} unknown attribute '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:372
+#: cambalache/cmb_project.py:355
 #, python-brace-format
 msgid "xml:{line} missing attribute '{detail}'"
 msgstr ""
 
-#: cambalache/cmb_project.py:404
+#: cambalache/cmb_project.py:387
 #, python-brace-format
 msgid "Import file \"{filename}\""
 msgstr "Datei \"{filename}\" importieren"
 
-#: cambalache/cmb_project.py:483
+#: cambalache/cmb_project.py:466
 #, python-brace-format
 msgid "Add UI {basename}"
 msgstr "Benutzeroberfläche {basename} hinzufügen"
 
-#: cambalache/cmb_project.py:502
+#: cambalache/cmb_project.py:485
 #, fuzzy, python-brace-format
 msgid "Remove UI \"{name}\""
 msgstr "Benutzeroberfläche \"{ui.name}\" entfernen"
 
-#: cambalache/cmb_project.py:575
+#: cambalache/cmb_project.py:558
 #, python-brace-format
 msgid "Remove object {name}"
 msgstr "Objekt {name} entfernen"
 
-#: cambalache/cmb_project.py:824
+#: cambalache/cmb_project.py:807
 #, python-brace-format
 msgid "Create UI {ui}"
 msgstr "Benutzeroberfläche {ui} erstellen"
 
-#: cambalache/cmb_project.py:825
+#: cambalache/cmb_project.py:808
 #, python-brace-format
 msgid "Remove UI {ui}"
 msgstr "Benutzeroberfläche {ui} entfernen"
 
-#: cambalache/cmb_project.py:826
+#: cambalache/cmb_project.py:809
 #, python-brace-format
 msgid "Update UI {ui}"
 msgstr "Benutzeroberfläche {ui} aktualisieren"
 
-#: cambalache/cmb_project.py:829
+#: cambalache/cmb_project.py:812
 #, python-brace-format
 msgid "Create object {obj}"
 msgstr "Objekt {obj} erstellen"
 
-#: cambalache/cmb_project.py:830
+#: cambalache/cmb_project.py:813
 #, python-brace-format
 msgid "Remove object {obj}"
 msgstr "Objekt {obj} entfernen"
 
-#: cambalache/cmb_project.py:831
+#: cambalache/cmb_project.py:814
 #, python-brace-format
 msgid "Update object {obj}"
 msgstr "Objekt {obj} aktualisieren"
 
-#: cambalache/cmb_project.py:834
+#: cambalache/cmb_project.py:817
 #, python-brace-format
 msgid "Set property \"{prop}\" of {obj} to {value}"
 msgstr "Eigenschaft \"{prop}\" von {obj} auf {value} setzen"
 
-#: cambalache/cmb_project.py:835
+#: cambalache/cmb_project.py:818
 #, python-brace-format
 msgid "Unset property \"{prop}\" of {obj}"
 msgstr "Eigenschaft \"{prop}\" von {obj} aufheben"
 
-#: cambalache/cmb_project.py:836
+#: cambalache/cmb_project.py:819
 #, python-brace-format
 msgid "Update property \"{prop}\" of {obj} to {value}"
 msgstr "Eigenschaft \"{prop}\" von {obj} auf {value} aktualisieren"
 
-#: cambalache/cmb_project.py:839
+#: cambalache/cmb_project.py:822
 #, python-brace-format
 msgid "Set layout property \"{prop}\" of {obj} to {value}"
 msgstr "Layouteigenschaft \"{prop}\" von {obj} auf {value} setzen"
 
-#: cambalache/cmb_project.py:840
+#: cambalache/cmb_project.py:823
 #, python-brace-format
 msgid "Unset layout property \"{prop}\" of {obj}"
 msgstr "Layout-Eigenschaft \"{prop}\" von {obj} aufheben"
 
-#: cambalache/cmb_project.py:841
+#: cambalache/cmb_project.py:824
 #, python-brace-format
 msgid "Update layout property \"{prop}\" of {obj} to {value}"
 msgstr "Layout-Eigenschaft \"{prop}\" von {obj} auf {value} aktualisieren"
 
-#: cambalache/cmb_project.py:844
+#: cambalache/cmb_project.py:827
 #, python-brace-format
 msgid "Add {signal} signal to {obj}"
 msgstr "{signal}-Signal zu {obj} hinzufügen"
 
-#: cambalache/cmb_project.py:845
+#: cambalache/cmb_project.py:828
 #, python-brace-format
 msgid "Remove {signal} signal from {obj}"
 msgstr "{signal}-Signal von {obj} entfernen"
 
-#: cambalache/cmb_project.py:846
+#: cambalache/cmb_project.py:829
 #, python-brace-format
 msgid "Update {signal} signal of {obj}"
 msgstr "{signal}-Signal von {obj} aktualisieren"
+
+#: cambalache/cmb_type_chooser.ui:76 cambalache/cmb_type_chooser_widget.py:63
+msgid "Toplevel"
+msgstr ""
+
+#: cambalache/cmb_type_chooser.ui:97 cambalache/cmb_type_chooser_widget.py:64
+#: cambalache/app/cmb_window.ui:706
+msgid "Layout"
+msgstr "Layout"
+
+#: cambalache/cmb_type_chooser.ui:118 cambalache/cmb_type_chooser_widget.py:65
+msgid "Control"
+msgstr ""
+
+#: cambalache/cmb_type_chooser.ui:139 cambalache/cmb_type_chooser_widget.py:66
+msgid "Display"
+msgstr ""
+
+#: cambalache/cmb_type_chooser.ui:160 cambalache/cmb_type_chooser_widget.py:67
+msgid "Model"
+msgstr ""
+
+#: cambalache/cmb_type_chooser_widget.py:95
+msgid "Others"
+msgstr ""
 
 #. Label
 #: cambalache/cmb_object_editor.py:55 cambalache/cmb_object_editor.py:82
@@ -451,20 +476,20 @@ msgstr ""
 msgid "Domain:"
 msgstr ""
 
-#: cambalache/cmb_ui_editor.ui:75
+#: cambalache/cmb_ui_editor.ui:76
 msgid "<file name relative to project>"
 msgstr ""
 
-#: cambalache/cmb_ui_editor.ui:88
+#: cambalache/cmb_ui_editor.ui:89
 msgid "<translation domain>"
 msgstr ""
 
-#: cambalache/cmb_ui_editor.ui:151
+#: cambalache/cmb_ui_editor.ui:152
 #, fuzzy
 msgid "Template:"
 msgstr "Vorlage"
 
-#: cambalache/cmb_ui_editor.ui:187 cambalache/cmb_ui_editor.ui:191
+#: cambalache/cmb_ui_editor.ui:188 cambalache/cmb_ui_editor.ui:192
 #, fuzzy
 msgid "Export"
 msgstr "Alles exportieren"
@@ -573,73 +598,73 @@ msgstr ""
 msgid "Have a nice day!"
 msgstr "Habe einen schönen Tag!"
 
-#: cambalache/app/cmb_window.py:259
+#: cambalache/app/cmb_window.py:257
 msgid "<Choose a UI filename to create>"
 msgstr "<Wählen Sie einen zu erstellenden UI-Dateinamen>"
 
-#: cambalache/app/cmb_window.py:315 cambalache/app/cmb_window.ui:990
+#: cambalache/app/cmb_window.py:313 cambalache/app/cmb_window.ui:944
 msgid "Start interactive introduction"
 msgstr "Starte interaktive Tour"
 
-#: cambalache/app/cmb_window.py:363
+#: cambalache/app/cmb_window.py:361
 msgid "Sponsors"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:438
+#: cambalache/app/cmb_window.py:436
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Fehler beim Laden von {filename}"
 
-#: cambalache/app/cmb_window.py:441
+#: cambalache/app/cmb_window.py:439
 msgid "Choose project to open"
 msgstr "Projekt zum Öffnen auswählen"
 
-#: cambalache/app/cmb_window.py:479
+#: cambalache/app/cmb_window.py:477
 msgid "File name already exists, choose a different name."
 msgstr "Dateiname existiert bereits, wählen Sie einen anderen Namen."
 
-#: cambalache/app/cmb_window.py:504
+#: cambalache/app/cmb_window.py:502
 msgid "Choose a new file to save the project"
 msgstr "Wählen Sie eine neue Datei, um das Projekt zu speichern"
 
-#: cambalache/app/cmb_window.py:516
+#: cambalache/app/cmb_window.py:514
 msgid "Choose a file name for the new UI"
 msgstr "Wählen Sie einen Dateinamen für die neue Benutzeroberfläche"
 
-#: cambalache/app/cmb_window.py:531
+#: cambalache/app/cmb_window.py:529
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:554
+#: cambalache/app/cmb_window.py:552
 msgid "Choose file to import"
 msgstr "Datei zum Importieren auswählen"
 
 #. Translators: This is used to create a unordered list of unsupported features to show the user
-#: cambalache/app/cmb_window.py:574
+#: cambalache/app/cmb_window.py:572
 #, python-brace-format
 msgid "    • {message}"
 msgstr ""
 
 #. Translators: This will be the heading of a list of unsupported features
-#: cambalache/app/cmb_window.py:577
+#: cambalache/app/cmb_window.py:575
 msgid "Cambalache encounter the following issues:"
 msgstr ""
 
 #. Translators: this is the last message after the list of unsupported features
-#: cambalache/app/cmb_window.py:580
+#: cambalache/app/cmb_window.py:578
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 
-#: cambalache/app/cmb_window.py:585
+#: cambalache/app/cmb_window.py:583
 #, python-brace-format
 msgid ""
 "Cambalache encounter {unsupported_feature}\n"
 "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 
-#: cambalache/app/cmb_window.py:587 cambalache/app/cmb_window.py:593
+#: cambalache/app/cmb_window.py:585 cambalache/app/cmb_window.py:591
 #, fuzzy, python-brace-format
 msgid "Error importing {filename}"
 msgstr "Fehler beim Importieren von {filename}: {e}"
@@ -676,7 +701,7 @@ msgstr "Über"
 msgid "Quit"
 msgstr "Beenden"
 
-#: cambalache/app/cmb_window.ui:254
+#: cambalache/app/cmb_window.ui:244
 msgid ""
 "<b>\n"
 "\n"
@@ -688,92 +713,88 @@ msgstr ""
 "<span size=\"18000\">Neues Projekt</span>\n"
 "</b>"
 
-#: cambalache/app/cmb_window.ui:282
+#: cambalache/app/cmb_window.ui:272
 msgid "Name"
 msgstr "Name"
 
-#: cambalache/app/cmb_window.ui:294
+#: cambalache/app/cmb_window.ui:284
 msgid "Toolkit target"
 msgstr "Toolkit"
 
-#: cambalache/app/cmb_window.ui:306
+#: cambalache/app/cmb_window.ui:296
 msgid "Location"
 msgstr "Speicherort"
 
-#: cambalache/app/cmb_window.ui:318
+#: cambalache/app/cmb_window.ui:308
 msgid "<project basename>"
 msgstr "<Projektbasisname>"
 
-#: cambalache/app/cmb_window.ui:330
+#: cambalache/app/cmb_window.ui:320
 msgid "Create"
 msgstr "Erstellen"
 
-#: cambalache/app/cmb_window.ui:460
+#: cambalache/app/cmb_window.ui:450
 msgid "Choose a location to save the project"
 msgstr "Wählen Sie einen Speicherort zum Speichern des Projekts"
 
-#: cambalache/app/cmb_window.ui:470
+#: cambalache/app/cmb_window.ui:460
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: cambalache/app/cmb_window.ui:487
+#: cambalache/app/cmb_window.ui:477
 msgid "UI Filename"
 msgstr "UI-Dateiname"
 
-#: cambalache/app/cmb_window.ui:524
+#: cambalache/app/cmb_window.ui:514
 msgid "New Project"
 msgstr "Neues Projekt"
 
-#: cambalache/app/cmb_window.ui:691
+#: cambalache/app/cmb_window.ui:678
 msgid "Properties"
 msgstr "Eigenschaften"
 
-#: cambalache/app/cmb_window.ui:719
-msgid "Layout"
-msgstr "Layout"
-
-#: cambalache/app/cmb_window.ui:735
+#: cambalache/app/cmb_window.ui:722
 msgid "Signals"
 msgstr "Signale"
 
-#: cambalache/app/cmb_window.ui:749
+#: cambalache/app/cmb_window.ui:736
 #, fuzzy
 msgid "Object Editor"
 msgstr "Objekt-ID"
 
-#: cambalache/app/cmb_window.ui:797
+#: cambalache/app/cmb_window.ui:751
 msgid "UI Editor"
 msgstr ""
 
-#: cambalache/app/cmb_window.ui:848
+#: cambalache/app/cmb_window.ui:802
 msgid "_Open"
 msgstr "_Öffnen"
 
-#: cambalache/app/cmb_window.ui:852
+#: cambalache/app/cmb_window.ui:806
 msgid "Open a project"
 msgstr "Projekt öffnen"
 
-#: cambalache/app/cmb_window.ui:893
+#: cambalache/app/cmb_window.ui:847
 msgid "Create a new project"
 msgstr "Neues Projekt erstellen"
 
-#: cambalache/app/cmb_window.ui:914
+#: cambalache/app/cmb_window.ui:868
 msgid "Save"
 msgstr "Speichern"
 
-#: cambalache/app/cmb_window.ui:918
+#: cambalache/app/cmb_window.ui:872
 msgid "Save project"
 msgstr "Projekt speichern"
 
-#: cambalache/app/cmb_window.ui:933
+#: cambalache/app/cmb_window.ui:887
 msgid "Save project with a different file name"
 msgstr "Projekt unter anderem Dateinamen speichern"
 
-#: cambalache/app/cmb_window.ui:970
+#: cambalache/app/cmb_window.ui:924
 msgid "Add new UI to project"
 msgstr "Neue Benutzeroberfläche zum Projekt hinzufügen"
 
-#: cambalache/app/cmb_window.ui:1067
+#: cambalache/app/cmb_window.ui:1021
 msgid "User Interface Maker"
 msgstr "Benutzeroberflächen-Ersteller"
 

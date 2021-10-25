@@ -10,6 +10,8 @@ cambalache/cmb_layout_property.py
 cambalache/cmb_tree_view.py
 cambalache/cmb_list_store.py
 cambalache/cmb_project.py
+cambalache/cmb_type_chooser.ui
+cambalache/cmb_type_chooser_widget.py
 cambalache/cmb_type_info.py
 cambalache/cmb_object_editor.py
 cambalache/cmb_property.py
