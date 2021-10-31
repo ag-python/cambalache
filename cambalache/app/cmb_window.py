@@ -659,12 +659,9 @@ class CmbWindow(Gtk.ApplicationWindow):
         if node == 'add-project':
             if self.project is None:
                 self.connect('notify::project', self._on_project_notify)
-        elif node == 'show-type-popover':
-            self.type_popover.popup()
         elif node == 'add-ui':
             self.project.connect('ui-added', self._on_ui_added)
         elif node == 'add-window':
-            self.type_popover.popup()
             self.project.connect('object-added', self._on_object_added)
         elif node == 'main-menu':
             self.main_menu.props.modal = False
@@ -680,8 +677,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         elif node == 'add-ui' or node == 'add-window':
             self.turor_waiting_for_user_action = True
             self.tutor.pause()
-        elif node == 'show-type-popover':
-            self.type_popover.popdown()
         elif node == 'main-menu':
             self.export_all.get_style_context().remove_class("cmb-tutor-highlight")
         elif node == 'donate':
