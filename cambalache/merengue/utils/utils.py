@@ -25,7 +25,7 @@ import sys
 import json
 
 import gi
-from gi.repository import GLib, Gtk
+from gi.repository import GLib, Gdk, Gtk
 
 
 def write_command(command, payload=None, args=None):
@@ -72,6 +72,26 @@ def object_get_id(obj):
 
     return None
 
+
+def gesture_click_new(widget, **kwargs):
+    if Gtk.MAJOR_VERSION == 4:
+        retval = Gtk.GestureClick(**kwargs)
+        widget.add_controller(retval)
+    else:
+        widget.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
+                          Gdk.EventMask.BUTTON_RELEASE_MASK)
+        retval = Gtk.GestureMultiPress(widget=widget, **kwargs)
+    return retval
+
+
+def scroll_controller_new(widget, **kwargs):
+    if Gtk.MAJOR_VERSION == 4:
+        retval = Gtk.EventControllerScroll(**kwargs)
+        widget.add_controller(retval)
+    else:
+        widget.add_events(Gdk.EventMask.SCROLL_MASK)
+        retval = Gtk.EventControllerScroll(widget=widget, **kwargs)
+    return retval
 
 #
 # CTYPES HACKS
