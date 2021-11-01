@@ -29,6 +29,10 @@
   bind "Delete"             { "cmb-action" ("delete") };
   bind "<Control>n"         { "cmb-action" ("create_new") };
   bind "<Control>o"         { "cmb-action" ("open") };
+  bind "<Control>Insert"    { "cmb-action-bool" ("add_placeholder", 0) };
+  bind "<Control>Delete"    { "cmb-action-bool" ("remove_placeholder", 0) };
+  bind "<Control><shift>Insert" { "cmb-action-bool" ("add_placeholder", 1) };
+  bind "<Control><shift>Delete" { "cmb-action-bool" ("remove_placeholder", 1) };
 }
 
 CmbWindow {

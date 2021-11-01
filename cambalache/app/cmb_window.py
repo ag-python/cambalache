@@ -43,6 +43,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     __gsignals__ = {
         'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str, str)),
         'cmb-action': (GObject.SIGNAL_RUN_LAST | GObject.SIGNAL_ACTION, None, (str, )),
+        'cmb-action-bool': (GObject.SIGNAL_RUN_LAST | GObject.SIGNAL_ACTION, None, (str, bool))
     }
 
     open_filter = Gtk.Template.Child()
@@ -104,13 +105,20 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.open_button_box.props.homogeneous = False
         self.import_button_box.props.homogeneous = False
 
+        actions_params = {
+            'add_placeholder': 'b',
+            'remove_placeholder': 'b',
+        }
+
         for action in ['open', 'create_new', 'new',
                        'undo', 'redo', 'intro',
                        'save', 'save_as',
                        'add_ui', 'delete',
+                       'add_placeholder', 'remove_placeholder',
                        'import', 'export',
                        'close', 'debug', 'donate', 'about']:
-            gaction = Gio.SimpleAction.new(action, None)
+            params = actions_params.get(action, None)
+            gaction = Gio.SimpleAction.new(action, GLib.VariantType(params) if params else None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self._actions[action] = gaction
             self.add_action(gaction)
@@ -206,13 +214,30 @@ class CmbWindow(Gtk.ApplicationWindow):
         return True
 
     @Gtk.Template.Callback('on_type_chooser_type_selected')
-    def _on_type_chooser_type_selected(self, popover, type_id):
+    def _on_type_chooser_type_selected(self, popover, info):
         selection = self.project.get_selection()
 
-        if len(selection) > 0:
+        # Windows and non widgets do not need a parent
+        if info.is_a('GtkWidget') and not info.is_a('GtkWindow'):
+            # Select type and let user choose which placeholder to use
+            self.type_chooser.props.selected_type = info
+        elif len(selection) > 0:
             obj = selection[0]
-            parent_id = obj.object_id if type(obj) == CmbObject else None
-            self.project.add_object(obj.ui_id, type_id, parent_id=parent_id)
+            # Create toplevel object/window
+            self.project.add_object(obj.ui_id, info.type_id)
+
+    @Gtk.Template.Callback('on_view_placeholder_selected')
+    def _on_view_placeholder_selected(self, view, ui_id, object_id, position, layout):
+        info = self.type_chooser.selected_type
+
+        if info is not None:
+            self.project.add_object(ui_id, info.type_id, None, object_id, layout)
+
+        self.type_chooser.selected_type = None
+
+    @Gtk.Template.Callback('on_view_placeholder_activated')
+    def _on_view_placeholder_activated(self, view, ui_id, object_id, position, layout):
+        print('_on_view_placeholder_activated', ui_id, object_id, position, layout)
 
     @Gtk.Template.Callback('on_open_recent_action_item_activated')
     def _on_open_recent_action_item_activated(self, recent):
@@ -626,8 +651,17 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_donate_activate(self, action, data):
         Gtk.show_uri_on_window(self, "https://www.patreon.com/cambalache", Gdk.CURRENT_TIME)
 
+    def _on_add_placeholder_activate(self, action, data):
+        self.view.add_placeholder(modifier=data.get_boolean())
+
+    def _on_remove_placeholder_activate(self, action, data):
+        self.view.remove_placeholder(modifier=data.get_boolean())
+
     def do_cmb_action(self, action):
         self._actions[action].activate()
+
+    def do_cmb_action_bool(self, action, mod):
+        self._actions[action].activate(GLib.Variant.new_boolean(mod))
 
     def _clear_tutor(self):
         try:

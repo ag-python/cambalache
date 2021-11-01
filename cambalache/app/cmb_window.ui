@@ -606,6 +606,8 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                       <object class="CmbView" id="view">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <signal name="placeholder-selected" handler="on_view_placeholder_selected" swapped="no"/>
+                        <signal name="placeholder-activated" handler="on_view_placeholder_activated" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
