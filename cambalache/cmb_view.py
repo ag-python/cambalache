@@ -118,6 +118,11 @@ class CmbProcess(GObject.Object):
 class CmbView(Gtk.Stack):
     __gtype_name__ = 'CmbView'
 
+    __gsignals__ = {
+        'placeholder-selected': (GObject.SignalFlags.RUN_LAST, None, (int, int, int, object)),
+        'placeholder-activated': (GObject.SignalFlags.RUN_LAST, None, (int, int, int, object))
+    }
+
     webview = Gtk.Template.Child()
     buffer = Gtk.Template.Child()
     menu = Gtk.Template.Child()
@@ -395,13 +400,17 @@ window.setupDocument = function (document) {
 
                 self._merengue_command('gtk_settings_get',
                                        args={ 'property': 'gtk-theme-name' })
+            elif command == 'placeholder_selected':
+                self.emit('placeholder-selected', args['ui_id'], args['object_id'], args['position'], args['layout'])
+            elif command == 'placeholder_activated':
+                self.emit('placeholder-activated', args['ui_id'], args['object_id'], args['position'], args['layout'])
             elif command == 'gtk_settings_get':
                 if args['property'] == 'gtk-theme-name':
                     self._theme = args['value']
                     self.notify('gtk_theme')
 
         except Exception as e:
-            logger.warning('Merenge output error: {e}')
+            logger.warning(f'Merenge output error: {e}')
 
         return GLib.SOURCE_CONTINUE
 
@@ -446,6 +455,28 @@ window.setupDocument = function (document) {
                 return port
 
         return 0
+
+    def _add_remove_placeholder(self, command, modifier):
+        if self.project is None:
+            return
+
+        selection = self.project.get_selection()
+        if len(selection) < 0:
+            return
+
+        obj = selection[0]
+        self._merengue_command(command,
+                               args={
+                                   'ui_id': obj.ui_id,
+                                   'object_id': obj.object_id,
+                                   'modifier': modifier
+                               })
+
+    def add_placeholder(self, modifier=False):
+        self._add_remove_placeholder('add_placeholder', modifier)
+
+    def remove_placeholder(self, modifier=False):
+        self._add_remove_placeholder('remove_placeholder', modifier)
 
 
 Gtk.WidgetClass.set_css_name(CmbView, 'CmbView')
