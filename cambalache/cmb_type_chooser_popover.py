@@ -27,6 +27,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
 from .cmb_project import CmbProject
+from .cmb_type_info import CmbTypeInfo
 from .cmb_type_chooser_widget import CmbTypeChooserWidget
 
 
@@ -34,7 +35,7 @@ class CmbTypeChooserPopover(Gtk.Popover):
     __gtype_name__ = 'CmbTypeChooserPopover'
 
     __gsignals__ = {
-        'type-selected': (GObject.SignalFlags.RUN_LAST, None, (str, )),
+        'type-selected': (GObject.SignalFlags.RUN_LAST, None, (CmbTypeInfo, )),
     }
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
@@ -55,7 +56,7 @@ class CmbTypeChooserPopover(Gtk.Popover):
                                          self._chooser, prop,
                                          GObject.BindingFlags.SYNC_CREATE)
 
-    def _on_type_selected(self, chooser, type):
-        self.emit('type-selected', type)
+    def _on_type_selected(self, chooser, info):
+        self.emit('type-selected', info)
         self.popdown()
 

@@ -27,6 +27,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
 from .cmb_project import CmbProject
+from .cmb_type_info import CmbTypeInfo
 
 
 @Gtk.Template(resource_path='/ar/xjuan/Cambalache/cmb_type_chooser.ui')
@@ -34,11 +35,13 @@ class CmbTypeChooser(Gtk.Box):
     __gtype_name__ = 'CmbTypeChooser'
 
     __gsignals__ = {
-        'type-selected': (GObject.SignalFlags.RUN_LAST, None, (str, )),
+        'type-selected': (GObject.SignalFlags.RUN_LAST, None, (CmbTypeInfo, )),
     }
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
+    selected_type = GObject.Property(type=CmbTypeInfo, flags = GObject.ParamFlags.READWRITE)
 
+    type_label = Gtk.Template.Child()
     all = Gtk.Template.Child()
     toplevel = Gtk.Template.Child()
     layout = Gtk.Template.Child()
@@ -59,7 +62,9 @@ class CmbTypeChooser(Gtk.Box):
             self.model,
             self.extra
         ]
+
         self.connect('notify::project', self._on_project_notify)
+        self.connect('notify::selected-type', self._on_selected_type_notify)
 
         for chooser in self._choosers:
             chooser.connect('type-selected', lambda o, t: self.emit('type-selected', t))
@@ -68,3 +73,7 @@ class CmbTypeChooser(Gtk.Box):
         project = self.project
         for chooser in self._choosers:
             chooser.project = project
+
+    def _on_selected_type_notify(self, object, pspec):
+        self.type_label.props.label = self.selected_type.type_id if self.selected_type else ''
+

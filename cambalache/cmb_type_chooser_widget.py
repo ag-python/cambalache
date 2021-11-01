@@ -35,7 +35,7 @@ class CmbTypeChooserWidget(Gtk.Box):
     __gtype_name__ = 'CmbTypeChooserWidget'
 
     __gsignals__ = {
-        'type-selected': (GObject.SignalFlags.RUN_LAST, None, (str, )),
+        'type-selected': (GObject.SignalFlags.RUN_LAST, None, (CmbTypeInfo, )),
     }
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
@@ -119,7 +119,7 @@ class CmbTypeChooserWidget(Gtk.Box):
 
         info = self.project.type_info.get(search_text, None)
         if info:
-            self.emit('type-selected', info.type_id)
+            self.emit('type-selected', info)
 
     @Gtk.Template.Callback('on_searchentry_search_changed')
     def _on_searchentry_search_changed(self, entry):
@@ -132,7 +132,7 @@ class CmbTypeChooserWidget(Gtk.Box):
         info = model[model.get_iter(path)][2]
 
         if info is not None:
-            self.emit('type-selected', info.type_id)
+            self.emit('type-selected', info)
 
     def _visible_func(self, model, iter, data):
         type_id, type_id_lower, info, sensitive = model[iter]
