@@ -31,6 +31,7 @@ configure_file(
 
 install_data([
   'mrg_application.py',
+  'mrg_placeholder.py',
   '__init__.py',
   ],
   install_dir: moduledir

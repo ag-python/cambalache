@@ -20,3 +20,11 @@
 .gtk3.merengue_selected > decoration {
   box-shadow: 0 3px 9px 1px @theme_selected_bg_color, 0 0 0 1px rgba(0, 0, 0, 0.23);
 }
+
+MrgPlaceholder {
+  background: url('resource:///ar/xjuan/Merengue/placeholder.svg');
+  margin: 2px;
+  border-bottom: solid 1px gray;
+  border-right: solid 1px gray;
+}
+

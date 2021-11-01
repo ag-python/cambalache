@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/ar/xjuan/Merengue/">
     <file>merengue.css</file>
+    <file>placeholder.svg</file>
   </gresource>
 </gresources>
