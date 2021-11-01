@@ -498,7 +498,7 @@ class CmbDB(GObject.GObject):
 
         return ui_id
 
-    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None):
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, layout=None):
         c = self.conn.cursor()
 
         c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
@@ -506,6 +506,17 @@ class CmbDB(GObject.GObject):
 
         c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, internal, type, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
                   (ui_id, object_id, obj_type, name, parent_id, internal_child, child_type, comment))
+
+        if layout:
+            c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
+            parent_type = c.fetchone()
+
+            if parent_type:
+                for property_id in layout:
+                    owner_id = self._get_layout_property_owner(parent_type[0], property_id)
+                    c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
+                              (ui_id, parent_id, object_id, owner_id, property_id, layout[property_id]))
+
         c.close()
 
         return object_id
@@ -634,6 +645,22 @@ class CmbDB(GObject.GObject):
         if packing is not None and object_id:
             self._import_layout_properties(c, info, ui_id, parent_id, object_id, packing)
 
+    def _get_layout_property_owner(self, type_id, property):
+        info = self.type_info.get(type_id, None)
+
+        if info is None:
+            return None
+
+        if self.target_tk == 'gtk+-3.0':
+            # For Gtk 3 we fake a LayoutChild class for each GtkContainer
+            # FIXME: look in parent classes too
+            owner_id = f'{type_id}LayoutChild'
+        else:
+            # FIXME: Need to get layout-manager-type from class
+            owner_id = f'{type_id}LayoutChild'
+
+        return owner_id
+
     def _import_layout_properties(self, c, info, ui_id, parent_id, object_id, layout):
         c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
         parent_type = c.fetchone()
@@ -641,13 +668,7 @@ class CmbDB(GObject.GObject):
         if parent_type is None:
             return
 
-        if self.target_tk == 'gtk+-3.0':
-            # For Gtk 3 we fake a LayoutChild class for each GtkContainer
-            # FIXME: look in parent classes too
-            owner_id = f'{parent_type[0]}LayoutChild'
-        else:
-            # FIXME: Need to get layout-manager-type from class
-            owner_id = f'{parent_type[0]}LayoutChild'
+        owner_id = self._get_layout_property_owner(parent_type[0])
 
         for prop in layout.iterchildren():
             if prop.tag != 'property':
