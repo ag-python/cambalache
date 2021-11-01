@@ -23,6 +23,7 @@
 
 import gi
 from gi.repository import GObject
+from merengue import utils
 
 
 class MrgController(GObject.Object):
@@ -41,6 +42,10 @@ class MrgController(GObject.Object):
         self.property_ignore_list = set()
 
         super().__init__(**kwargs)
+
+        ui_id, object_id = utils.object_get_id(self.object).split('.')
+        self.ui_id = int(ui_id)
+        self.object_id = int(object_id)
 
     def remove_object(self):
         self.object = None
