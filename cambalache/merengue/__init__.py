@@ -40,4 +40,5 @@ def getLogger(name):
 
     return logger
 
+from .mrg_placeholder import MrgPlaceholder
 from .mrg_application import MrgApplication

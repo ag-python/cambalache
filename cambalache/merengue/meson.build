@@ -47,9 +47,12 @@ install_data([
 
 install_data([
   'mrg_gtk/__init__.py',
-  'mrg_gtk/mrg_selection.py',
+  'mrg_gtk/mrg_gtk_bin.py',
+  'mrg_gtk/mrg_gtk_box.py',
+  'mrg_gtk/mrg_gtk_grid.py',
   'mrg_gtk/mrg_gtk_widget.py',
   'mrg_gtk/mrg_gtk_window.py',
+  'mrg_gtk/mrg_selection.py',
   ],
   install_dir: join_paths(moduledir, 'mrg_gtk')
 )

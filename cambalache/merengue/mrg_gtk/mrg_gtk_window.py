@@ -23,13 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_bin import MrgGtkBinController
 from .mrg_selection import MrgSelection
 
-from merengue import utils
 
-
-class MrgGtkWindowController(MrgGtkWidgetController):
+class MrgGtkWindowController(MrgGtkBinController):
     def __init__(self, **kwargs):
         self._object = None
         self._position = None

@@ -23,7 +23,7 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from merengue import utils
+from merengue import utils, MrgPlaceholder
 
 preselected_widget = None
 
@@ -56,28 +56,18 @@ class MrgSelection(GObject.GObject):
         self._window = obj
 
         if self.window:
-            if Gtk.MAJOR_VERSION == 4:
-                gesture = Gtk.GestureClick(propagation_phase=Gtk.PropagationPhase.CAPTURE)
-                self.window.add_controller(gesture)
-            else:
-                self.window.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
-                                       Gdk.EventMask.BUTTON_RELEASE_MASK)
-                gesture = Gtk.GestureMultiPress(widget=self.window,
-                                                propagation_phase=Gtk.PropagationPhase.CAPTURE)
-
-            self.gesture = gesture
-            gesture.connect('pressed', self._on_gesture_button_pressed)
-            gesture.connect('released', self._on_gesture_button_released)
+            self.gesture = utils.gesture_click_new(self.window, propagation_phase=Gtk.PropagationPhase.CAPTURE)
+            self.gesture.connect('pressed', self.__on_gesture_button_pressed)
+            self.gesture.connect('released', self.__on_gesture_button_released)
         else:
             self.gesture = None
 
-    def _on_gesture_button_pressed(self, gesture, n_press, x, y):
+    def __on_gesture_button_pressed(self, gesture, n_press, x, y):
         global preselected_widget
 
         child = self.get_child_at_position(self.window, x, y)
 
-        object_id = utils.object_get_id(child)
-        if object_id is None:
+        if not self.is_widget_from_ui(child):
             return
 
         # Pre select a widget on button press
@@ -85,29 +75,39 @@ class MrgSelection(GObject.GObject):
             preselected_widget = child
             gesture.set_state(Gtk.EventSequenceState.CLAIMED)
 
-    def _on_gesture_button_released(self, gesture, n_press, x, y):
+    def __on_gesture_button_released(self, gesture, n_press, x, y):
         global preselected_widget
 
         child = self.get_child_at_position(self.window, x, y)
-
-        object_id = utils.object_get_id(child)
-        if object_id is None:
+        if child != preselected_widget:
             return
 
-        controller = self.app.get_controller_from_object(child)
+        if isinstance(child, MrgPlaceholder):
+            controller = child.controller
+
+            # Write placeholder selected message
+            child.selected()
+        else:
+            controller = self.app.get_controller_from_object(child)
+
         if controller.selected:
             return
 
+        object_id = utils.object_get_id(controller.object)
+        if object_id is None:
+            return
+
         # Select widget on button release only if its preselected
-        if child == preselected_widget:
-            utils.write_command('selection_changed', args={ 'selection': [object_id] })
-            controller.selected = True
-            gesture.set_state(Gtk.EventSequenceState.CLAIMED)
+        utils.write_command('selection_changed', args={ 'selection': [object_id] })
+        controller.selected = True
+        gesture.set_state(Gtk.EventSequenceState.CLAIMED)
 
     def is_widget_from_ui(self, obj):
+        if isinstance(obj, MrgPlaceholder):
+            return True
+
         object_id = utils.object_get_builder_id(obj)
         return object_id is not None and object_id.startswith('__cmb__')
-
 
     def _find_first_child_inside_container (self, widget, data):
         if data.child is not None or not widget.get_mapped():

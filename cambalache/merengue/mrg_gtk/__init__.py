@@ -20,6 +20,14 @@
 #   Juan Pablo Ugarte <juanpablougarte@gmail.com>
 #
 
-from .mrg_selection import MrgSelection
+import gi
+from gi.repository import Gtk
+
+if Gtk.MAJOR_VERSION == 3:
+    from .mrg_gtk_bin import MrgGtkBinController
+
+from .mrg_gtk_box import MrgGtkBoxController
+from .mrg_gtk_grid import MrgGtkGridController
 from .mrg_gtk_widget import MrgGtkWidgetController
 from .mrg_gtk_window import MrgGtkWindowController
+from .mrg_selection import MrgSelection

@@ -26,7 +26,10 @@ from gi.repository import GObject, Gdk, Gtk
 from merengue.controller import MrgController
 from .mrg_selection import MrgSelection
 
-import sys
+from merengue import getLogger, utils
+
+logger = getLogger(__name__)
+
 
 class MrgGtkWidgetController(MrgController):
     object = GObject.Property(type=Gtk.Widget,
@@ -42,17 +45,17 @@ class MrgGtkWidgetController(MrgController):
 
         self.child_property_ignore_list = set()
 
-        self.connect("notify::selected", self.on_selected_changed)
-        self.connect("notify::object", self.on_object_changed)
+        self.connect("notify::selected", self.__on_selected_changed)
+        self.connect("notify::object", self.__on_object_changed)
 
         # Make sure show_all() always works
         if Gtk.MAJOR_VERSION == 3:
             self.property_ignore_list.add('no-show-all')
 
-        self.on_object_changed(self.object, None)
+        self.__on_object_changed(self.object, None)
 
-    def on_object_changed(self, obj, pspec):
-        self.on_selected_changed(obj, pspec)
+    def __on_object_changed(self, obj, pspec):
+        self.__on_selected_changed(obj, pspec)
 
         if self.object is None:
             if self.window:
@@ -80,7 +83,7 @@ class MrgGtkWidgetController(MrgController):
             self.window.add(self.object)
             self.window.show_all()
 
-    def on_selected_changed(self, obj, pspec):
+    def __on_selected_changed(self, obj, pspec):
         if self.object is None:
             return
 
@@ -98,6 +101,70 @@ class MrgGtkWidgetController(MrgController):
         if toplevel:
             state = Gtk.StateFlags.NORMAL if self.selected else Gtk.StateFlags.BACKDROP
             toplevel.set_state_flags(state, True)
+
+    def get_children(self):
+        if self.object is None:
+            return []
+
+        if Gtk.MAJOR_VERSION == 4:
+            retval = []
+
+            child = self.object.get_first_child()
+            while child is not None:
+                retval.append(child)
+                child = child.get_next_sibling()
+
+            return retval
+        else:
+            return self.object.get_children() if isinstance(self.object, Gtk.Container) else []
+
+    def child_get(self, child, properties):
+        if self.object is None:
+            return None
+
+        if Gtk.MAJOR_VERSION == 4:
+            layout_child = None
+            manager = self.object.get_layout_manager()
+            if manager:
+                layout_child = manager.get_layout_child(child)
+
+            return [layout_child.get_property(x) for x in properties] if layout_child else None
+        else:
+            return self.object.child_get(child, properties)
+
+    def get_child_position(self, child):
+        return -1
+
+    def get_child_layout(self, child, layout):
+        return layout
+
+    def placeholder_selected(self, placeholder):
+        position = self.get_child_position(placeholder)
+        layout = self.get_child_layout(placeholder, {})
+        utils.write_command('placeholder_selected',
+                            args={
+                                'ui_id': self.ui_id,
+                                'object_id': self.object_id,
+                                'position': position,
+                                'layout': layout
+                            })
+
+    def placeholder_activated(self, placeholder):
+        position = self.get_child_position(placeholder)
+        layout = self.get_child_layout(placeholder, {})
+        utils.write_command('placeholder_activated',
+                            args={
+                                'ui_id': self.ui_id,
+                                'object_id': self.object_id,
+                                'position': position,
+                                'layout': layout
+                            })
+
+    def add_placeholder(self, mod):
+        pass
+
+    def remove_placeholder(self, mod):
+        pass
 
     def remove_object(self):
         if self.object is None:

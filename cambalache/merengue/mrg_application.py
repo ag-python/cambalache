@@ -191,6 +191,16 @@ class MrgApplication(Gtk.Application):
                                 'value': self.settings.get_property(property)
                             })
 
+    def add_placeholder(self, ui_id, object_id, modifier):
+        controller = self.get_controller(ui_id, object_id)
+        if controller:
+            controller.add_placeholder(modifier)
+
+    def remove_placeholder(self, ui_id, object_id, modifier):
+        controller = self.get_controller(ui_id, object_id)
+        if controller:
+            controller.remove_placeholder(modifier)
+
     def run_command(self, command, args, payload):
         logger.debug(f'{command} {args}')
 
@@ -210,6 +220,10 @@ class MrgApplication(Gtk.Application):
             self.gtk_settings_set(**args)
         elif command == 'gtk_settings_get':
             self.gtk_settings_get(**args)
+        elif command == 'add_placeholder':
+            self.add_placeholder(**args)
+        elif command == 'remove_placeholder':
+            self.remove_placeholder(**args)
         else:
             logger.warning(f'Unknown command {command}')
 
