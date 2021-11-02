@@ -490,7 +490,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             pass
 
-    def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None):
+    def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=None):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,

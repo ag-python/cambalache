@@ -78,6 +78,7 @@ CREATE TABLE object (
   internal TEXT,
   type TEXT,
   comment TEXT,
+  position INTEGER,
   PRIMARY KEY(ui_id, object_id),
   FOREIGN KEY(ui_id, parent_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE
 ) WITHOUT ROWID;
@@ -99,6 +100,8 @@ CREATE TABLE object_property (
   value TEXT,
   translatable BOOLEAN,
   comment TEXT,
+  translation_context TEXT,
+  translation_comments TEXT,
   PRIMARY KEY(ui_id, object_id, owner_id, property_id),
   FOREIGN KEY(ui_id, object_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE,
   FOREIGN KEY(owner_id, property_id) REFERENCES property
@@ -122,6 +125,8 @@ CREATE TABLE object_layout_property (
   value TEXT,
   translatable BOOLEAN,
   comment TEXT,
+  translation_context TEXT,
+  translation_comments TEXT,
   PRIMARY KEY(ui_id, object_id, child_id, owner_id, property_id),
   FOREIGN KEY(ui_id, object_id) REFERENCES object ON DELETE CASCADE,
   FOREIGN KEY(ui_id, child_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE,

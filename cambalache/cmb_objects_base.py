@@ -227,7 +227,7 @@ class CmbBaseProperty(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable, comment):
+    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id,
@@ -264,6 +264,26 @@ class CmbBaseProperty(CmbBase):
         self.db_set('UPDATE object_property SET comment=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
                     (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
 
+    @GObject.Property(type=str)
+    def translation_context(self):
+        return self.db_get('SELECT translation_context FROM object_property WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.property_id, ))
+
+    @translation_context.setter
+    def _set_translation_context(self, value):
+        self.db_set('UPDATE object_property SET translation_context=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def translation_comments(self):
+        return self.db_get('SELECT translation_comments FROM object_property WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.property_id, ))
+
+    @translation_comments.setter
+    def _set_translation_comments(self, value):
+        self.db_set('UPDATE object_property SET translation_comments=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
+
 
 class CmbBaseLayoutProperty(CmbBase):
     __gtype_name__ = 'CmbBaseLayoutProperty'
@@ -278,7 +298,7 @@ class CmbBaseLayoutProperty(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment):
+    def from_row(cls, project, ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id,
@@ -314,6 +334,26 @@ class CmbBaseLayoutProperty(CmbBase):
     @comment.setter
     def _set_comment(self, value):
         self.db_set('UPDATE object_layout_property SET comment=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def translation_context(self):
+        return self.db_get('SELECT translation_context FROM object_layout_property WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ))
+
+    @translation_context.setter
+    def _set_translation_context(self, value):
+        self.db_set('UPDATE object_layout_property SET translation_context=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=str)
+    def translation_comments(self):
+        return self.db_get('SELECT translation_comments FROM object_layout_property WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ))
+
+    @translation_comments.setter
+    def _set_translation_comments(self, value):
+        self.db_set('UPDATE object_layout_property SET translation_comments=? WHERE (ui_id, object_id, child_id, owner_id, property_id) IS (?, ?, ?, ?, ?);',
                     (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, ), value)
 
 
@@ -441,7 +481,7 @@ class CmbBaseObject(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, internal, type, comment):
+    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, internal, type, comment, position):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id)
@@ -504,4 +544,14 @@ class CmbBaseObject(CmbBase):
     @comment.setter
     def _set_comment(self, value):
         self.db_set('UPDATE object SET comment=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=int)
+    def position(self):
+        return self.db_get('SELECT position FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @position.setter
+    def _set_position(self, value):
+        self.db_set('UPDATE object SET position=? WHERE (ui_id, object_id) IS (?, ?);',
                     (self.ui_id, self.object_id, ), value)

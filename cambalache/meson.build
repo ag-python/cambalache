@@ -25,6 +25,7 @@ configure_file(
 install_data([
     'cmb_base.py',
     'cmb_db.py',
+    'cmb_db_migration.py',
     'cmb_layout_property.py',
     'cmb_list_store.py',
     'cmb_object.py',

@@ -34,6 +34,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 from .config import *
 from cambalache import getLogger
+from . import cmb_db_migration
 
 logger = getLogger(__name__)
 
@@ -301,12 +302,43 @@ class CmbDB(GObject.GObject):
     def set_data(self, key, value):
         self.execute("UPDATE global SET value=? WHERE key=?;", (value, key))
 
-    def _load_table_from_tuples(self, c, table, tuples):
+    def _parse_version(self, version):
+        if version is None or version == 'git':
+            return (0, 0, 0)
+
+        return tuple([int(x) for x in version.split('.')])
+
+    def _ensure_table_data_columns(self, version, table, data):
+        if version is None:
+            return data
+
+        if version < (0, 7, 5):
+            return cmb_db_migration.ensure_columns_for_0_7_5(table, data)
+
+        return data
+
+    def _migrate_table_data(self, c, version, table, data):
+        if version is None:
+            return
+
+        if version < (0, 7, 5):
+            cmb_db_migration.migrate_table_data_to_0_7_5(c, table, data)
+
+    def _load_table_from_tuples(self, c, table, tuples, version=None):
         data = ast.literal_eval(f'[{tuples}]') if tuples else []
 
-        if len(data):
-            cols = ', '.join(['?' for col in data[0]])
-            c.executemany(f'INSERT INTO {table} VALUES ({cols})', data)
+        if len(data) == 0:
+            return
+
+        # Ensure table data has the right ammount of columns
+        data = self._ensure_table_data_columns(version, table, data)
+
+        # Load table data
+        cols = ', '.join(['?' for col in data[0]])
+        c.executemany(f'INSERT INTO {table} VALUES ({cols})', data)
+
+        # Migrate data to current format
+        self._migrate_table_data(c, version, table, data)
 
     def load(self, filename):
         # TODO: drop all data before loading?
@@ -323,13 +355,15 @@ class CmbDB(GObject.GObject):
             raise Exception(f'Can not load a {target_tk} target in {self.target_tk} project.')
 
 
+        version = self._parse_version(root.get('version', None))
+
         c = self.conn.cursor()
 
         # Avoid circular dependencies errors
         self.foreign_keys = False
 
         for child in root.getchildren():
-            self._load_table_from_tuples(c, child.tag, child.text)
+            self._load_table_from_tuples(c, child.tag, child.text, version)
 
         self.foreign_keys = True
         c.close()
@@ -498,14 +532,18 @@ class CmbDB(GObject.GObject):
 
         return ui_id
 
-    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, layout=None):
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, layout=None, position=None):
         c = self.conn.cursor()
 
         c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
         object_id = c.fetchone()[0]
 
-        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, internal, type, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                  (ui_id, object_id, obj_type, name, parent_id, internal_child, child_type, comment))
+        if position is None:
+            c.execute("SELECT count(object_id) + 1 FROM object WHERE ui_id=? AND parent_id=?;",(ui_id, parent_id))
+            position = c.fetchone()[0]
+
+        c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, internal, type, comment, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                  (ui_id, object_id, obj_type, name, parent_id, internal_child, child_type, comment, position))
 
         if layout:
             c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
@@ -565,7 +603,7 @@ class CmbDB(GObject.GObject):
         return retval
 
     def _import_property(self, c, info, ui_id, object_id, prop):
-        name, translatable = self._node_get(prop, 'name', ['translatable'])
+        name, translatable, context, comments = self._node_get(prop, 'name', ['translatable', 'context', 'comments'])
 
         property_id = name.replace('_', '-')
         comment = self._node_get_comment(prop)
@@ -588,8 +626,8 @@ class CmbDB(GObject.GObject):
             return
 
         try:
-            c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                      (ui_id, object_id, pinfo.owner_id, property_id, prop.text, translatable, comment))
+            c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                      (ui_id, object_id, pinfo.owner_id, property_id, prop.text, translatable, comment, context, comments))
         except Exception as e:
             raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {pinfo.owner_id}:{property_id} property: {e}')
 
@@ -668,20 +706,19 @@ class CmbDB(GObject.GObject):
         if parent_type is None:
             return
 
-        owner_id = self._get_layout_property_owner(parent_type[0])
-
         for prop in layout.iterchildren():
             if prop.tag != 'property':
                 self._unknown_tag(prop, owner_id, prop.tag)
                 continue
 
-            name, translatable = self._node_get(prop, 'name', ['translatable'])
+            name, translatable, context, comments = self._node_get(prop, 'name', ['translatable', 'context', 'comments'])
             property_id = name.replace('_', '-')
             comment = self._node_get_comment(prop)
+            owner_id = self._get_layout_property_owner(parent_type[0], property_id)
 
             try:
-                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                          (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment))
+                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                          (ui_id, parent_id, object_id, owner_id, property_id, prop.text, translatable, comment, context, comments))
             except Exception as e:
                 raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {owner_id}:{property_id} layout property: {e}')
 
