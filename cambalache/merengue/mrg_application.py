@@ -29,7 +29,7 @@ import json
 from gi.repository import GLib, Gio, Gdk, Gtk
 
 from merengue.controller import MrgControllerRegistry
-from merengue import utils, getLogger
+from merengue import MrgPlaceholder, utils, getLogger
 
 logger = getLogger(__name__)
 
@@ -82,8 +82,13 @@ class MrgApplication(Gtk.Application):
         except Exception as e:
             logger.warning(f'Error updating UI {ui_id}: {e}')
 
+        placeholders = []
+
         # Keep dict of all object controllers by id
         for obj in builder.get_objects():
+            if isinstance(obj, MrgPlaceholder):
+                placeholders.append(obj)
+
             object_id = utils.object_get_id(obj)
 
             if object_id is None:
@@ -99,6 +104,11 @@ class MrgApplication(Gtk.Application):
                 controller = self.registry.new_controller_for_object(obj, self)
 
             self.controllers[object_id] = controller
+
+        # Set controller for placeholders created by Builder
+        for obj in placeholders:
+            parent_id = utils.object_get_id(obj.props.parent)
+            obj.controller = self.controllers.get(parent_id, None)
 
     def object_removed(self, ui_id, object_id):
         controller = self.get_controller(ui_id, object_id)
