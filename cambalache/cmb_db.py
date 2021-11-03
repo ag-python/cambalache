@@ -927,7 +927,7 @@ class CmbDB(GObject.GObject):
         if comment:
             node.addprevious(etree.Comment(comment))
 
-    def _export_object(self, ui_id, object_id, use_id=False, template_id=None):
+    def _export_object(self, ui_id, object_id, merengue=False, template_id=None):
 
         def node_set(node, attr, val):
             if val is not None:
@@ -939,7 +939,7 @@ class CmbDB(GObject.GObject):
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         type_id, name = c.fetchone()
 
-        if not use_id and template_id == object_id:
+        if not merengue and template_id == object_id:
             obj = E.template()
             node_set(obj, 'class', name)
             node_set(obj, 'parent', type_id)
@@ -947,7 +947,7 @@ class CmbDB(GObject.GObject):
             obj = E.object()
             node_set(obj, 'class', type_id)
 
-            if use_id:
+            if merengue:
                 node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
             else:
                 node_set(obj, 'id', name)
@@ -981,7 +981,7 @@ class CmbDB(GObject.GObject):
             val, property_id, comment, is_object = row
 
             if is_object:
-                if use_id:
+                if merengue:
                     value = f'__cmb__{ui_id}.{val}'
                 else:
                     cc.execute('SELECT name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, val))
@@ -1018,10 +1018,22 @@ class CmbDB(GObject.GObject):
         # SQL placeholder for every class in the list
         placeholders = ','.join((['?'] * len(hierarchy)))
 
+        child_position = 0
+
         # Children
-        for row in c.execute('SELECT object_id, internal, type, comment FROM object WHERE ui_id=? AND parent_id=?;', (ui_id, object_id)):
-            child_id, internal, ctype,  comment = row
-            child_obj = self._export_object(ui_id, child_id, use_id=use_id)
+        for row in c.execute('SELECT object_id, internal, type, comment, position FROM object WHERE ui_id=? AND parent_id=? ORDER BY position;', (ui_id, object_id)):
+            child_id, internal, ctype,  comment, position = row
+
+            if merengue:
+                while child_position < position:
+                    placeholder = E.object()
+                    placeholder.set('class', 'MrgPlaceholder')
+                    obj.append(E.child(placeholder))
+                    child_position += 1
+
+                child_position += 1
+
+            child_obj = self._export_object(ui_id, child_id, merengue=merengue)
             child = E.child(child_obj)
             node_set(child, 'internal-child', internal)
             node_set(child, 'type', ctype)
@@ -1117,7 +1129,7 @@ class CmbDB(GObject.GObject):
 
         return obj
 
-    def export_ui(self, ui_id, use_id=False):
+    def export_ui(self, ui_id, merengue=False):
         c = self.conn.cursor()
 
         node = E.interface()
@@ -1149,7 +1161,7 @@ class CmbDB(GObject.GObject):
         for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
             object_id, comment = row
-            child = self._export_object(ui_id, object_id, use_id=use_id, template_id=template_id)
+            child = self._export_object(ui_id, object_id, merengue=merengue, template_id=template_id)
             node.append(child)
             self._node_add_comment(child, comment)
 

@@ -213,8 +213,8 @@ window.setupDocument = function (document) {
         # Flush
         self._merengue.stdin.flush()
 
-    def _get_ui_xml(self, ui_id, use_id=False):
-        ui = self._project.db.export_ui(ui_id, use_id=use_id)
+    def _get_ui_xml(self, ui_id, merengue=False):
+        ui = self._project.db.export_ui(ui_id, merengue=merengue)
         return etree.tostring(ui,
                               pretty_print=True,
                               xml_declaration=True,
@@ -223,7 +223,7 @@ window.setupDocument = function (document) {
     def _update_view(self):
         if self._project is not None and self._ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self._get_ui_xml(self._ui_id)
+                ui = self._get_ui_xml(self._ui_id, merengue=True)
                 self.buffer.set_text(ui)
             return
 
@@ -231,7 +231,7 @@ window.setupDocument = function (document) {
         self._ui_id = 0
 
     def _merengue_update_ui(self, ui_id):
-        ui = self._get_ui_xml(ui_id, use_id=True)
+        ui = self._get_ui_xml(ui_id, merengue=True)
 
         self._merengue_command('update_ui',
                                payload=ui,

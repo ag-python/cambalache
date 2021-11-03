@@ -15,7 +15,7 @@ def assert_original_and_exported(target_tk, filename):
 
     project = CmbProject(target_tk=target_tk)
     ui_id = project.db.import_file(path)
-    tree_exported = project.db.export_ui(ui_id, use_id=False)
+    tree_exported = project.db.export_ui(ui_id)
     str_exported = etree.tostring(tree_exported,
                       pretty_print=True,
                       xml_declaration=True,
