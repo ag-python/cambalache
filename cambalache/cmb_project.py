@@ -528,7 +528,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         else:
             return True
 
-    def add_object(self, ui_id, obj_type, name=None, parent_id=None, layout=None):
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, layout=None, position=None):
         if parent_id:
             parent = self._get_object_by_id(ui_id, parent_id)
             if parent is None:
@@ -541,7 +541,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         try:
             self.history_push(_('Add object {name}').format(name=obj_name))
-            object_id = self.db.add_object(ui_id, obj_type, name, parent_id, layout=layout)
+            object_id = self.db.add_object(ui_id, obj_type, name, parent_id, layout=layout, position=position)
             self.history_pop()
             self.db.commit()
         except Exception as e:

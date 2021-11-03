@@ -231,7 +231,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         info = self.type_chooser.selected_type
 
         if info is not None:
-            self.project.add_object(ui_id, info.type_id, None, object_id, layout)
+            self.project.add_object(ui_id, info.type_id, None, object_id, layout, position)
 
         self.type_chooser.selected_type = None
 
