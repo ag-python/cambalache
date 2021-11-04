@@ -29,8 +29,8 @@ msgstr "UI-Ersteller"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/ar.xjuan.Cambalache.desktop.in:14
-msgid "UI Maker;GUI designer;user interface;ui builder;"
-msgstr "UI-Ersteller;GUI-Designer;Benutzeroberfläche;UI-Builder;"
+msgid "UI Maker,GUI designer,user interface,ui builder;"
+msgstr "UI-Ersteller,GUI-Designer,Benutzeroberfläche,UI-Builder;"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:7
 msgid "Create GTK User Interfaces"
@@ -151,7 +151,9 @@ msgstr "Juan Pablo Ugarte"
 msgid ""
 "\n"
 "Use gtk4-builder-tool first to convert file."
-msgstr "Benutze erst gtk4-builder-tool um die Datei zu konvertieren"
+msgstr ""
+"\n"
+"Benutze erst gtk4-builder-tool um die Datei zu konvertieren"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
 #: cambalache/cmb_db.py:815
@@ -658,7 +660,7 @@ msgid ""
 "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 "Cambalache hat folgendes festgestellt: {unsupported_feature}\n"
-msgstr "Die Datei wird als '{name}.cmb.ui' exportiert um Datenverlust zu vermeiden."
+"Die Datei wird als '{name}.cmb.ui' exportiert um Datenverlust zu vermeiden."
 
 #: cambalache/app/cmb_window.py:585 cambalache/app/cmb_window.py:591
 #, python-brace-format
