@@ -30,12 +30,11 @@ msgstr "UI-Ersteller"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/ar.xjuan.Cambalache.desktop.in:14
 msgid "UI Maker;GUI designer;user interface;ui builder;"
-msgstr "UI-Ersteller, GUI-Designer, Benutzeroberfläche, UI-Builder;"
+msgstr "UI-Ersteller;GUI-Designer;Benutzeroberfläche;UI-Builder;"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:7
-#, fuzzy
 msgid "Create GTK User Interfaces"
-msgstr "Benutzeroberflächen-Ersteller"
+msgstr "Erstelle GTK Benutzeroberflächen"
 
 #. To translators: AppData description first paragraph
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:11
@@ -52,8 +51,8 @@ msgid ""
 "Cambalache's main target is Gtk version 4 but it has been designed from the "
 "ground up to support other versions."
 msgstr ""
-"Cambalaches Hauptziel ist die Gtk-Version 4, es jedoch von Grund auf für die "
-"Unterstützung anderer Versionen entwickelt wurde."
+"Cambalaches Zielplattform ist Gtk-Version 4, es wurde jedoch von Grund auf für die "
+"Unterstützung anderer Versionen entwickelt."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
 msgid "Bugfix release!"
@@ -76,9 +75,8 @@ msgid "Flathub release!"
 msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:42
-#, fuzzy
 msgid "Add basic interactive tutorial"
-msgstr "Starte interaktive Tour"
+msgstr "Interaktives Tutorial hinzugefügt"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:43
 msgid "Add workspace Gtk theme chooser"
@@ -129,23 +127,20 @@ msgid "LGPL version 2.1"
 msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:75
-#, fuzzy
 msgid "Cambalache start window"
-msgstr "Cambalache"
+msgstr "Cambalache Startfenster"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:79
-#, fuzzy
 msgid "Cambalache new project page"
 msgstr "Neues Projekt erstellen"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:83
-#, fuzzy
 msgid "Cambalache workspace"
-msgstr "Cambalache"
+msgstr "Cambalache Workspace"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:87
 msgid "Workspace gtk dark theme"
-msgstr ""
+msgstr "Workspace Gtk Dark Theme"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:92
 msgid "Juan Pablo Ugarte"
@@ -156,7 +151,7 @@ msgstr "Juan Pablo Ugarte"
 msgid ""
 "\n"
 "Use gtk4-builder-tool first to convert file."
-msgstr ""
+msgstr "Benutze erst gtk4-builder-tool um die Datei zu konvertieren"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
 #: cambalache/cmb_db.py:815
@@ -165,12 +160,14 @@ msgid ""
 "Can not import what looks like a {lib}-{ver} file in a {target_tk} project."
 "{convert}"
 msgstr ""
+"Eine Datei im {lib}-{ver} Format kann nicht in ein {target_tk} Projekt umgewandelt werden."
+"{convert}"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
 #: cambalache/cmb_db.py:818
 #, python-brace-format
 msgid "Can not import a {lib}-{ver} file in a {target_tk} project.{convert}"
-msgstr ""
+msgstr "Eine {lib}-{ver} Datei kann nicht in ein {target_tk} Projekt importiert werden.{convert}"
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -235,92 +232,92 @@ msgstr "UI-Definition überprüfen"
 #: cambalache/cmb_project.py:341
 #, python-brace-format
 msgid "one unknown class '{detail}'"
-msgstr ""
+msgstr "Eine unbekannte Klasse '{detail}'"
 
 #: cambalache/cmb_project.py:341
 #, python-brace-format
 msgid "{n} unknown classes ({detail})"
-msgstr ""
+msgstr "{n} unbekannte Klassen ({detail})"
 
 #: cambalache/cmb_project.py:342
 #, python-brace-format
 msgid "one unknown property '{detail}'"
-msgstr ""
+msgstr "Eine unbekannte Property '{detail}'"
 
 #: cambalache/cmb_project.py:342
 #, python-brace-format
 msgid "{n} unknown properties ({detail})"
-msgstr ""
+msgstr "{n} unbekannte Properties ({detail})"
 
 #: cambalache/cmb_project.py:343
 #, python-brace-format
 msgid "one unknown signal '{detail}'"
-msgstr ""
+msgstr "Ein unbekanntes Signal '{detail}'"
 
 #: cambalache/cmb_project.py:343
 #, python-brace-format
 msgid "{n} unknown signals ({detail})"
-msgstr ""
+msgstr "{n} unbekannte Signale ({detail})"
 
 #: cambalache/cmb_project.py:344
 #, python-brace-format
 msgid "one unknown tag '{detail}'"
-msgstr ""
+msgstr "Ein unbekanntes Tag '{detail}'"
 
 #: cambalache/cmb_project.py:344
 #, python-brace-format
 msgid "{n} unknown tags ({detail})"
-msgstr ""
+msgstr "{n} unbekannte Tags ({detail})"
 
 #: cambalache/cmb_project.py:345
 #, python-brace-format
 msgid "one unknown attribute '{detail}'"
-msgstr ""
+msgstr "Ein unbekanntes Attribut '{detail}'"
 
 #: cambalache/cmb_project.py:345
 #, python-brace-format
 msgid "{n} unknown attributes ({detail})"
-msgstr ""
+msgstr "{n} unbekannte Attribute ({detail})"
 
 #: cambalache/cmb_project.py:346
 #, python-brace-format
 msgid "one missing attribute '{detail}'"
-msgstr ""
+msgstr "Ein fehlendes Attribut '{detail}'"
 
 #: cambalache/cmb_project.py:346
 #, python-brace-format
 msgid "{n} missing attributes ({detail})"
-msgstr ""
+msgstr "{n} fehlende Attribute ({detail})"
 
 #: cambalache/cmb_project.py:350
 #, python-brace-format
 msgid "xml:{line} unknown class '{detail}'"
-msgstr ""
+msgstr "xml:{line} Unbekannte Klasse '{detail}'"
 
 #: cambalache/cmb_project.py:351
 #, python-brace-format
 msgid "xml:{line} unknown property '{detail}'"
-msgstr ""
+msgstr "xml:{line} Unbekannte Property '{detail}'"
 
 #: cambalache/cmb_project.py:352
 #, python-brace-format
 msgid "xml:{line} unknown signal '{detail}'"
-msgstr ""
+msgstr "xml:{line} Unbekanntes Signal '{detail}'"
 
 #: cambalache/cmb_project.py:353
 #, python-brace-format
 msgid "xml:{line} unknown tag '{detail}'"
-msgstr ""
+msgstr "xml:{line} Unbekanntest Tag '{detail}'"
 
 #: cambalache/cmb_project.py:354
 #, python-brace-format
 msgid "xml:{line} unknown attribute '{detail}'"
-msgstr ""
+msgstr "xml:{line} Unbekanntes Attribut '{detail}'"
 
 #: cambalache/cmb_project.py:355
 #, python-brace-format
 msgid "xml:{line} missing attribute '{detail}'"
-msgstr ""
+msgstr "xml:{line} Fehlendes Attribut '{detail}'"
 
 #: cambalache/cmb_project.py:387
 #, python-brace-format
@@ -333,7 +330,7 @@ msgid "Add UI {basename}"
 msgstr "Benutzeroberfläche {basename} hinzufügen"
 
 #: cambalache/cmb_project.py:485
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Remove UI \"{name}\""
 msgstr "Benutzeroberfläche \"{ui.name}\" entfernen"
 
@@ -419,7 +416,7 @@ msgstr "{signal}-Signal von {obj} aktualisieren"
 
 #: cambalache/cmb_type_chooser.ui:76 cambalache/cmb_type_chooser_widget.py:63
 msgid "Toplevel"
-msgstr ""
+msgstr "Toplevel"
 
 #: cambalache/cmb_type_chooser.ui:97 cambalache/cmb_type_chooser_widget.py:64
 #: cambalache/app/cmb_window.ui:706
@@ -428,19 +425,19 @@ msgstr "Layout"
 
 #: cambalache/cmb_type_chooser.ui:118 cambalache/cmb_type_chooser_widget.py:65
 msgid "Control"
-msgstr ""
+msgstr "Control"
 
 #: cambalache/cmb_type_chooser.ui:139 cambalache/cmb_type_chooser_widget.py:66
 msgid "Display"
-msgstr ""
+msgstr "Bildschirm"
 
 #: cambalache/cmb_type_chooser.ui:160 cambalache/cmb_type_chooser_widget.py:67
 msgid "Model"
-msgstr ""
+msgstr "Model"
 
 #: cambalache/cmb_type_chooser_widget.py:95
 msgid "Others"
-msgstr ""
+msgstr "Andere"
 
 #. Label
 #: cambalache/cmb_object_editor.py:55 cambalache/cmb_object_editor.py:82
@@ -456,43 +453,40 @@ msgid "Template"
 msgstr "Vorlage"
 
 #: cambalache/cmb_ui_editor.ui:16
-#, fuzzy
 msgid "Filename:"
-msgstr "UI-Dateiname"
+msgstr "Dateiname:"
 
 #: cambalache/cmb_ui_editor.ui:28
 msgid "Description:"
-msgstr ""
+msgstr "Beschreibung:"
 
 #: cambalache/cmb_ui_editor.ui:40
 msgid "Copyright:"
-msgstr ""
+msgstr "Copyright:"
 
 #: cambalache/cmb_ui_editor.ui:52
 msgid "Authors:"
-msgstr ""
+msgstr "Autoren:"
 
 #: cambalache/cmb_ui_editor.ui:64
 msgid "Domain:"
-msgstr ""
+msgstr "Domain:"
 
 #: cambalache/cmb_ui_editor.ui:76
 msgid "<file name relative to project>"
-msgstr ""
+msgstr "<Dateiname relativ zum Projekt>"
 
 #: cambalache/cmb_ui_editor.ui:89
 msgid "<translation domain>"
-msgstr ""
+msgstr "<Übersetzungs Domain>"
 
 #: cambalache/cmb_ui_editor.ui:152
-#, fuzzy
 msgid "Template:"
-msgstr "Vorlage"
+msgstr "Vorlage:"
 
 #: cambalache/cmb_ui_editor.ui:188 cambalache/cmb_ui_editor.ui:192
-#, fuzzy
 msgid "Export"
-msgstr "Alles exportieren"
+msgstr "Exportieren"
 
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
@@ -512,11 +506,11 @@ msgstr "oder ein neues Projekt erstellen"
 
 #: cambalache/app/cmb_tutorial.py:34
 msgid "Common actions like Undo"
-msgstr "Häufige Aktionen wie Rückgängig machen"
+msgstr "Häufige Aktionen wie Rückgängig"
 
 #: cambalache/app/cmb_tutorial.py:35
 msgid "Redo"
-msgstr "Wiederholen"
+msgstr "Wiederherstellen"
 
 #: cambalache/app/cmb_tutorial.py:36
 msgid "Add new UI file"
@@ -528,7 +522,7 @@ msgstr "und Speichern sind direkt in der Headerleiste zugänglich"
 
 #: cambalache/app/cmb_tutorial.py:38
 msgid "just like Save As"
-msgstr "genau wie Speichern unter"
+msgstr "genau wie Speichern Unter"
 
 #: cambalache/app/cmb_tutorial.py:39
 msgid "and the main menu"
@@ -573,12 +567,12 @@ msgstr "Gut, jetzt versuche ein Fenster zu erstellen"
 #: cambalache/app/cmb_tutorial.py:56
 msgid "Make sure a UI is selected, type 'GtkWindow' and press enter"
 msgstr ""
-"Stelle sicher, dass eine Benutzeroberfläche ausgewählt ist, geben "
+"Stelle sicher, dass eine Benutzeroberfläche ausgewählt ist, gib "
 "'GtkWindow' ein und drücke die Entertaste"
 
 #: cambalache/app/cmb_tutorial.py:59
 msgid "Excelent!"
-msgstr "Exellent!"
+msgstr "Ausgezeichnet!"
 
 #: cambalache/app/cmb_tutorial.py:61
 msgid "Once you finish, you can export all UI files to xml here"
@@ -591,12 +585,12 @@ msgid ""
 "That is all for now.\n"
 "If you find Cambalache usefull please consider donating"
 msgstr ""
-"Das war alles für jetzt.\n"
+"Das war alles fürs Erste.\n"
 "Wenn du Cambalache nützlich findest, denke bitte über eine Spende nach"
 
 #: cambalache/app/cmb_tutorial.py:65
 msgid "Have a nice day!"
-msgstr "Habe einen schönen Tag!"
+msgstr "Einen schönen Tag!"
 
 #: cambalache/app/cmb_window.py:257
 msgid "<Choose a UI filename to create>"
@@ -608,7 +602,7 @@ msgstr "Starte interaktive Tour"
 
 #: cambalache/app/cmb_window.py:361
 msgid "Sponsors"
-msgstr ""
+msgstr "Sponsoren"
 
 #: cambalache/app/cmb_window.py:436
 #, python-brace-format
@@ -634,7 +628,7 @@ msgstr "Wählen Sie einen Dateinamen für die neue Benutzeroberfläche"
 #: cambalache/app/cmb_window.py:529
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
-msgstr ""
+msgstr "Wollen Sie die Datei {filename} wirklich löschen?"
 
 #: cambalache/app/cmb_window.py:552
 msgid "Choose file to import"
@@ -649,13 +643,13 @@ msgstr ""
 #. Translators: This will be the heading of a list of unsupported features
 #: cambalache/app/cmb_window.py:575
 msgid "Cambalache encounter the following issues:"
-msgstr ""
+msgstr "Cambalache hat ein Problem festgestellt:"
 
 #. Translators: this is the last message after the list of unsupported features
 #: cambalache/app/cmb_window.py:578
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
-msgstr ""
+msgstr "Die Datei wird als '{name}.cmb.ui' exportiert um Datenverlust zu vermeiden."
 
 #: cambalache/app/cmb_window.py:583
 #, python-brace-format
@@ -663,11 +657,13 @@ msgid ""
 "Cambalache encounter {unsupported_feature}\n"
 "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
+"Cambalache hat folgendes festgestellt: {unsupported_feature}\n"
+msgstr "Die Datei wird als '{name}.cmb.ui' exportiert um Datenverlust zu vermeiden."
 
 #: cambalache/app/cmb_window.py:585 cambalache/app/cmb_window.py:591
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Error importing {filename}"
-msgstr "Fehler beim Importieren von {filename}: {e}"
+msgstr "Fehler beim Importieren von {filename}"
 
 #: cambalache/app/cmb_window.ui:52
 msgid "Import"
@@ -675,15 +671,15 @@ msgstr "Importieren"
 
 #: cambalache/app/cmb_window.ui:66
 msgid "Export all"
-msgstr "Alles exportieren"
+msgstr "Alles Exportieren"
 
 #: cambalache/app/cmb_window.ui:80
 msgid "Close Project"
-msgstr "Projekt schließen"
+msgstr "Projekt Schließen"
 
 #: cambalache/app/cmb_window.ui:94
 msgid "Debug Project Data"
-msgstr "Projektdaten debuggen"
+msgstr "Projektdaten Debuggen"
 
 #: cambalache/app/cmb_window.ui:119
 msgid "Interactive intro"
@@ -719,7 +715,7 @@ msgstr "Name"
 
 #: cambalache/app/cmb_window.ui:284
 msgid "Toolkit target"
-msgstr "Toolkit"
+msgstr "Ziel Toolkit"
 
 #: cambalache/app/cmb_window.ui:296
 msgid "Location"
@@ -758,9 +754,8 @@ msgid "Signals"
 msgstr "Signale"
 
 #: cambalache/app/cmb_window.ui:736
-#, fuzzy
 msgid "Object Editor"
-msgstr "Objekt-ID"
+msgstr "Objekt Editor"
 
 #: cambalache/app/cmb_window.ui:751
 msgid "UI Editor"
