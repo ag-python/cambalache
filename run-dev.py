@@ -43,8 +43,10 @@ update_mime_database = GLib.find_program_in_path ('update-mime-database')
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 def dev_config(filename, content):
+    meson_mtime = os.path.getmtime(os.path.join(basedir, 'meson.build'))
+
     abspath = os.path.join(basedir, filename)
-    if not os.path.exists(abspath):
+    if not os.path.exists(abspath) or meson_mtime > os.path.getmtime(abspath):
         with open(abspath, 'w') as fd:
             fd.write(content)
 
@@ -145,18 +147,34 @@ def create_catalogs_dir():
     link_plugin('plugins/gtk/gtk+-3.0.xml')
     link_plugin('plugins/gtk/gtk-4.0.xml')
 
+
+def get_version():
+    meson = open(os.path.join(basedir, 'meson.build'))
+
+    for line in meson:
+        line = line.strip()
+        if line.startswith('version'):
+            tokens = line.split(':')
+            return tokens[1].strip().replace('\'', '').replace(',', '')
+
+    meson.close()
+
+    return 'git'
+
 if __name__ == '__main__':
     if glib_compile_resources is None:
         print('Could not find glib-compile-resources in PATH')
         exit()
 
+    version = get_version()
+
     # Create config files pointing to source directories
     dev_config('cambalache/config.py',
-               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'\ncatalogsdir = '{os.path.abspath('.catalogs')}'")
+               f"VERSION = '{version}'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'\ncatalogsdir = '{os.path.abspath('.catalogs')}'")
 
     # Create config files pointing to source directories
     dev_config('cambalache/merengue/config.py',
-               f"VERSION = 'git'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'")
+               f"VERSION = '{version}'\npkgdatadir = '{os.path.abspath('cambalache')}'\nmerenguedir = '{os.path.abspath('cambalache')}'")
 
     # Create merengue bin script
     configure_file('cambalache/merengue/merengue.in', 'cambalache/merengue/merengue', {

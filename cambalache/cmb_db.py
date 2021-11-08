@@ -303,7 +303,7 @@ class CmbDB(GObject.GObject):
         self.execute("UPDATE global SET value=? WHERE key=?;", (value, key))
 
     def _parse_version(self, version):
-        if version is None or version == 'git':
+        if version is None:
             return (0, 0, 0)
 
         return tuple([int(x) for x in version.split('.')])
