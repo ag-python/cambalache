@@ -217,6 +217,16 @@ class CmbWindow(Gtk.ApplicationWindow):
     def _on_type_chooser_type_selected(self, popover, info):
         selection = self.project.get_selection()
 
+        valid, state = Gtk.get_current_event_state()
+
+        # If alt is pressed, force adding object to selection
+        if valid and bool(state & Gdk.ModifierType.MOD1_MASK):
+            if len(selection) > 0:
+                obj = selection[0]
+                parent_id = obj.object_id if isinstance(obj, CmbObject) else None
+                self.project.add_object(obj.ui_id, info.type_id, None, parent_id)
+                return
+
         # Windows and non widgets do not need a parent
         if info.is_a('GtkWidget') and not info.is_a('GtkWindow'):
             # Select type and let user choose which placeholder to use
