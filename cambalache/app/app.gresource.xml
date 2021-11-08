@@ -3,6 +3,7 @@
   <gresource prefix="/ar/xjuan/Cambalache/app">
     <file>SUPPORTERS.md</file>
     <file>cmb_window.ui</file>
+    <file>cmb_shortcuts.ui</file>
     <file>cambalache.css</file>
     <file>images/logo-symbolic.svg</file>
     <file>images/gtk3.svg</file>

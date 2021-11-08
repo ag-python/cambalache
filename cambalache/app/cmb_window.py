@@ -118,22 +118,28 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         # Add global accelerators
         action_map = [
-            ("win.save",       ["<Control>s"]),
-            ("win.close",      ["<Control>w"]),
-            ("win.undo",       ["<Control>z"]),
-            ("win.redo",       ["<Control><shift>z"]),
+            ("win.save",       ["<Primary>s"]),
+            ("win.close",      ["<Primary>w"]),
+            ("win.undo",       ["<Primary>z"]),
+            ("win.redo",       ["<Primary><shift>z"]),
             ("win.delete",     ["Delete"]),
-            ("win.create_new", ["<Control>n"]),
-            ("win.open",       ["<Control>o"]),
-            ("win.add_placeholder",        ["<Control>Insert"]),
-            ("win.remove_placeholder",     ["<Control>Delete"]),
-            ("win.add_placeholder_row",    ["<Control><shift>Insert"]),
-            ("win.remove_placeholder_row", ["<Control><shift>Delete"])
+            ("win.create_new", ["<Primary>n"]),
+            ("win.open",       ["<Primary>o"]),
+            ("win.add_placeholder",        ["<Primary>Insert"]),
+            ("win.remove_placeholder",     ["<Primary>Delete"]),
+            ("win.add_placeholder_row",    ["<Primary><shift>Insert"]),
+            ("win.remove_placeholder_row", ["<Primary><shift>Delete"]),
+            ("win.show-help-overlay",      ["<Primary>question"])
         ]
 
         app = Gio.Application.get_default()
         for action, accelerators in action_map:
             app.set_accels_for_action(action, accelerators)
+
+        # Set shortcuts window
+        builder = Gtk.Builder()
+        builder.add_from_resource('/ar/xjuan/Cambalache/app/cmb_shortcuts.ui')
+        self.set_help_overlay(builder.get_object("shortcuts"))
 
         self._opensqlite = GLib.find_program_in_path('sqlitebrowser')
         self._opensqlite_pid = None
@@ -583,6 +589,17 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_delete_activate(self, action, data):
         if self.project is None:
+            return
+
+        focus = self.get_focus()
+
+        # Ensure Delete event is only used when focused widget is the webview or
+        # the project treeview, otherwise yhe user wont be able to use delete in
+        # any entry
+        if focus not in [self.view.webview, self.tree_view]:
+            event = Gtk.get_current_event()
+            if event:
+                focus.event(event)
             return
 
         selection = self.project.get_selection()
