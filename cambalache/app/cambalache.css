@@ -35,10 +35,6 @@
   bind "<Control><shift>Delete" { "cmb-action-bool" ("remove_placeholder", 1) };
 }
 
-CmbWindow {
-  -gtk-key-bindings: WindowBindings;
-}
-
 CmbWindow .logo {
   background: url('resource:///ar/xjuan/Cambalache/app/images/logo-symbolic.svg') no-repeat 50% 35% / 40%
 }

@@ -41,9 +41,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'CmbWindow'
 
     __gsignals__ = {
-        'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str, str)),
-        'cmb-action': (GObject.SIGNAL_RUN_LAST | GObject.SIGNAL_ACTION, None, (str, )),
-        'cmb-action-bool': (GObject.SIGNAL_RUN_LAST | GObject.SIGNAL_ACTION, None, (str, bool))
+        'open-project': (GObject.SIGNAL_RUN_FIRST, None, (str, str, str))
     }
 
     open_filter = Gtk.Template.Child()
@@ -105,23 +103,37 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.open_button_box.props.homogeneous = False
         self.import_button_box.props.homogeneous = False
 
-        actions_params = {
-            'add_placeholder': 'b',
-            'remove_placeholder': 'b',
-        }
-
         for action in ['open', 'create_new', 'new',
                        'undo', 'redo', 'intro',
                        'save', 'save_as',
                        'add_ui', 'delete',
                        'add_placeholder', 'remove_placeholder',
+                       'add_placeholder_row', 'remove_placeholder_row',
                        'import', 'export',
                        'close', 'debug', 'donate', 'about']:
-            params = actions_params.get(action, None)
-            gaction = Gio.SimpleAction.new(action, GLib.VariantType(params) if params else None)
+            gaction = Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self._actions[action] = gaction
             self.add_action(gaction)
+
+        # Add global accelerators
+        action_map = [
+            ("win.save",       ["<Control>s"]),
+            ("win.close",      ["<Control>w"]),
+            ("win.undo",       ["<Control>z"]),
+            ("win.redo",       ["<Control><shift>z"]),
+            ("win.delete",     ["Delete"]),
+            ("win.create_new", ["<Control>n"]),
+            ("win.open",       ["<Control>o"]),
+            ("win.add_placeholder",        ["<Control>Insert"]),
+            ("win.remove_placeholder",     ["<Control>Delete"]),
+            ("win.add_placeholder_row",    ["<Control><shift>Insert"]),
+            ("win.remove_placeholder_row", ["<Control><shift>Delete"])
+        ]
+
+        app = Gio.Application.get_default()
+        for action, accelerators in action_map:
+            app.set_accels_for_action(action, accelerators)
 
         self._opensqlite = GLib.find_program_in_path('sqlitebrowser')
         self._opensqlite_pid = None
@@ -662,16 +674,16 @@ class CmbWindow(Gtk.ApplicationWindow):
         Gtk.show_uri_on_window(self, "https://www.patreon.com/cambalache", Gdk.CURRENT_TIME)
 
     def _on_add_placeholder_activate(self, action, data):
-        self.view.add_placeholder(modifier=data.get_boolean())
+        self.view.add_placeholder()
 
     def _on_remove_placeholder_activate(self, action, data):
-        self.view.remove_placeholder(modifier=data.get_boolean())
+        self.view.remove_placeholder()
 
-    def do_cmb_action(self, action):
-        self._actions[action].activate()
+    def _on_add_placeholder_row_activate(self, action, data):
+        self.view.add_placeholder(modifier=True)
 
-    def do_cmb_action_bool(self, action, mod):
-        self._actions[action].activate(GLib.Variant.new_boolean(mod))
+    def _on_remove_placeholder_row_activate(self, action, data):
+        self.view.remove_placeholder(modifier=True)
 
     def _clear_tutor(self):
         try:
