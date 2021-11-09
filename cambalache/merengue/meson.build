@@ -31,18 +31,13 @@ configure_file(
 
 install_data([
   'mrg_application.py',
+  'mrg_controller.py',
+  'mrg_controller_registry.py',
   'mrg_placeholder.py',
+  'utils.py',
   '__init__.py',
   ],
   install_dir: moduledir
-)
-
-install_data([
-  'controller/__init__.py',
-  'controller/mrg_controller.py',
-  'controller/mrg_controller_registry.py',
-  ],
-  install_dir: join_paths(moduledir, 'controller')
 )
 
 install_data([
@@ -55,12 +50,5 @@ install_data([
   'mrg_gtk/mrg_selection.py',
   ],
   install_dir: join_paths(moduledir, 'mrg_gtk')
-)
-
-install_data([
-  'utils/__init__.py',
-  'utils/utils.py',
-  ],
-  install_dir: join_paths(moduledir, 'utils')
 )
 

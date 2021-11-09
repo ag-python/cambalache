@@ -23,10 +23,9 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from merengue.controller import MrgController
 from .mrg_selection import MrgSelection
 
-from merengue import getLogger, utils
+from merengue import MrgController, getLogger, utils
 
 logger = getLogger(__name__)
 

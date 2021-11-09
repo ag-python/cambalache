@@ -23,7 +23,7 @@
 
 import gi
 from gi.repository import GObject
-from merengue import utils
+from . import utils
 
 
 class MrgController(GObject.Object):

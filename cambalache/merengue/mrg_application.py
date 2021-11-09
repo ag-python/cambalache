@@ -28,8 +28,11 @@ import json
 
 from gi.repository import GLib, Gio, Gdk, Gtk
 
-from merengue.controller import MrgControllerRegistry
-from merengue import MrgPlaceholder, utils, getLogger
+from .mrg_controller_registry import MrgControllerRegistry
+from .mrg_placeholder import MrgPlaceholder
+from . import utils
+
+from merengue import getLogger
 
 logger = getLogger(__name__)
 
