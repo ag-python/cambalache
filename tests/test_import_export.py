@@ -3,7 +3,7 @@ import .ui files into cambalache and export to compare results
 """
 import os
 
-from cambalache import CmbProject
+from cambalache import CmbProject, config
 
 def assert_original_and_exported(target_tk, filename):
     """
@@ -16,6 +16,9 @@ def assert_original_and_exported(target_tk, filename):
     ui_id = project.db.import_file(path)
     str_exported = project.db.tostring(ui_id)
     
+    # Remove "Created with" comment since version will not match
+    str_exported = str_exported.replace(f"<!-- Created with Cambalache {config.VERSION} -->\n", '')
+
     assert str_exported == str_original
 
 #
