@@ -1168,3 +1168,10 @@ class CmbDB(GObject.GObject):
         c.close()
 
         return etree.ElementTree(node)
+
+    def tostring(self, ui_id, merengue=False):
+        ui = self.export_ui(ui_id, merengue=merengue)
+        return etree.tostring(ui,
+                              pretty_print=True,
+                              xml_declaration=True,
+                              encoding='UTF-8').decode('UTF-8')

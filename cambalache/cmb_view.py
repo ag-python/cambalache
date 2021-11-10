@@ -26,9 +26,6 @@ import gi
 import json
 import socket
 
-from time import sleep
-from lxml import etree
-
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 from gi.repository import GObject, GLib, Gio, Gdk, Gtk, WebKit2
@@ -214,16 +211,12 @@ window.setupDocument = function (document) {
         self._merengue.stdin.flush()
 
     def _get_ui_xml(self, ui_id, merengue=False):
-        ui = self._project.db.export_ui(ui_id, merengue=merengue)
-        return etree.tostring(ui,
-                              pretty_print=True,
-                              xml_declaration=True,
-                              encoding='UTF-8').decode('UTF-8')
+        return self._project.db.tostring(ui_id, merengue=merengue)
 
     def _update_view(self):
         if self._project is not None and self._ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self._get_ui_xml(self._ui_id, merengue=True)
+                ui = self._get_ui_xml(self._ui_id, merengue=False)
                 self.buffer.set_text(ui)
             return
 
