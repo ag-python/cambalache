@@ -129,7 +129,7 @@ class MrgGtkWidgetController(MrgController):
 
             return [layout_child.get_property(x) for x in properties] if layout_child else None
         else:
-            return self.object.child_get(child, properties)
+            return self.object.child_get(child, *properties)
 
     def get_child_position(self, child):
         return -1
