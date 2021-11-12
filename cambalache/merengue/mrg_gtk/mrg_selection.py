@@ -85,8 +85,11 @@ class MrgSelection(GObject.GObject):
         if isinstance(child, MrgPlaceholder):
             controller = child.controller
 
-            # Write placeholder selected message
-            child.selected()
+            # Write placeholder selected/activated message
+            if n_press == 2:
+                child.activated()
+            else:
+                child.selected()
         else:
             controller = self.app.get_controller_from_object(child)
 
