@@ -42,6 +42,7 @@ class CmbTypeChooserPopover(Gtk.Popover):
     category = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
     uncategorized_only = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
     show_categories = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
+    parent_type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -51,7 +52,7 @@ class CmbTypeChooserPopover(Gtk.Popover):
         self._chooser.show_all()
         self.add(self._chooser)
 
-        for prop in ['project', 'category', 'uncategorized_only', 'show_categories']:
+        for prop in ['project', 'category', 'uncategorized_only', 'show_categories', 'parent_type_id']:
             GObject.Object.bind_property(self, prop,
                                          self._chooser, prop,
                                          GObject.BindingFlags.SYNC_CREATE)
