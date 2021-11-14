@@ -45,7 +45,7 @@ install_data([
   'mrg_gtk/mrg_gtk_bin.py',
   'mrg_gtk/mrg_gtk_box.py',
   'mrg_gtk/mrg_gtk_grid.py',
-  'mrg_gtk/mrg_gtk_label.py'
+  'mrg_gtk/mrg_gtk_label.py',
   'mrg_gtk/mrg_gtk_widget.py',
   'mrg_gtk/mrg_gtk_window.py',
   'mrg_gtk/mrg_selection.py',
