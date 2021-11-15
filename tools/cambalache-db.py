@@ -161,6 +161,10 @@ class CambalacheDb:
             self._import_tag(c, child, owner_id, data_id)
 
     def populate_types(self, c, types):
+        def get_bool(node, prop):
+            val = node.get(prop, 'false')
+            return 1 if val.lower() in ['true', 'yes', '1', 't', 'y'] else 0
+
         for klass in types:
             owner_id = klass.tag
 
@@ -169,12 +173,15 @@ class CambalacheDb:
 
                 if target is None or target == self.lib.target_tk:
                     for prop in properties:
-                        property_id = prop.get('name')
-                        save_always = prop.get('save-always', 'false')
+                        property_id = prop.get('id', None)
+                        if property_id is None:
+                            continue
 
-                        if property_id and save_always.lower() == 'true':
-                            c.execute("UPDATE property SET save_always=1 WHERE owner_id=? AND property_id=?;",
-                                      (owner_id, property_id))
+                        translatable = get_bool(prop, 'translatable')
+                        save_always = get_bool(prop, 'save-always')
+
+                        c.execute("UPDATE property SET translatable=?, save_always=? WHERE owner_id=? AND property_id=?;",
+                                  (translatable, save_always, owner_id, property_id))
 
             # Read type custom tags
             for data in klass.iterchildren('data'):
