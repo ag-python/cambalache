@@ -99,6 +99,9 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         super().__init__(**kwargs)
 
+        self.maximize()
+        self.editor_stack.set_size_request(420, -1)
+
         self._actions = {}
         self.open_button_box.props.homogeneous = False
         self.import_button_box.props.homogeneous = False

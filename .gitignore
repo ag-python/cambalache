@@ -1,6 +1,7 @@
 *.pyc
 .flatpak-builder
 .catalogs
+.vscode
 build
 repo
 cambalache.flatpak
