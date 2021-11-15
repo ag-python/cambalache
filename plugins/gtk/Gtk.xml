@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Gtk Extra meta data
 
@@ -11,16 +12,20 @@
           <class name="gchararray"/>
         </style>
       </data>
+      <properties>
+        <property id="tooltip-text" translatable="True"/>
+        <property id="tooltip-markup" translatable="True"/>
+      </properties>
     </GtkWidget>
 
     <GtkGridLayoutChild>
       <properties target="Gtk-3.0">
-        <property name="left-attach" save-always="True"/>
-        <property name="top-attach" save-always="True"/>
+        <property id="left-attach" save-always="True"/>
+        <property id="top-attach" save-always="True"/>
       </properties>
       <properties target="Gtk-4.0">
-        <property name="column" save-always="True"/>
-        <property name="row" save-always="True"/>
+        <property id="column" save-always="True"/>
+        <property id="row" save-always="True"/>
       </properties>
     </GtkGridLayoutChild>
 
@@ -53,12 +58,39 @@
       </data>
     </GtkTreeStore>
 
+    <GtkWindow>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkWindow>
+
+    <GtkMenuItem>
+      <properties>
+        <property id="label" translatable="True"/>
+      </properties>
+    </GtkMenuItem>
+
+    <GtkToolItemGroup>
+      <properties>
+        <property id="label" translatable="True"/>
+      </properties>
+    </GtkToolItemGroup>
+
+    <GtkToolButton>
+      <properties>
+        <property id="label" translatable="True"/>
+      </properties>
+    </GtkToolButton>
+
     <GtkLabel>
       <data>
         <attributes>
           <attribute name="gchararray" value="gchararray" start="gint" end="gint"/>
         </attributes>
       </data>
+      <properties>
+        <property id="label" translatable="True"/>
+      </properties>
     </GtkLabel>
 
     <GtkLevelBar>
@@ -92,7 +124,140 @@
         </widgets>
       </data>
     </GtkSizeGroup>
+
+    <GtkEntry>
+      <properties>
+        <property id="text" translatable="True"/>
+        <property id="placeholder-text" translatable="True"/>
+        <property id="primary-icon-tooltip-text" translatable="True"/>
+        <property id="secondary-icon-tooltip-text" translatable="True"/>
+        <property id="primary-icon-tooltip-markup" translatable="True"/>
+        <property id="secondary-icon-tooltip-markup" translatable="True"/>
+      </properties>
+    </GtkEntry>
+
+    <GtkButton>
+      <properties>
+        <property id="label" translatable="True"/>
+      </properties>
+    </GtkButton>
+
+    <GtkFileChooserButton>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkFileChooserButton>
+
+    <GtkAppChooserWidget>
+      <properties>
+        <property id="default-text" translatable="True"/>
+      </properties>
+    </GtkAppChooserWidget>
+
+    <GtkColorButton>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkColorButton>
+
+    <GtkFontButton>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkFontButton>
+
+    <GtkComboBox>
+      <properties>
+        <property id="tearoff-title" translatable="True"/>
+      </properties>
+    </GtkComboBox>
+
+    <GtkAppChooserButton>
+      <properties>
+        <property id="heading" translatable="True"/>
+      </properties>
+    </GtkAppChooserButton>
+
+    <GtkProgressBar>
+      <properties>
+        <property id="text" translatable="True"/>
+      </properties>
+    </GtkProgressBar>
+
+    <GtkLockButton>
+      <properties>
+        <property id="text-lock" translatable="True"/>
+        <property id="text-unlock" translatable="True"/>
+        <property id="tooltip-lock" translatable="True"/>
+        <property id="tooltip-unlock" translatable="True"/>
+        <property id="tooltip-not-authorized" translatable="True"/>
+      </properties>
+    </GtkLockButton>
+
+    <GtkAboutDialog>
+      <properties>
+        <property id="license" translatable="True"/>
+        <property id="website-label" translatable="True"/>
+        <property id="copyright" translatable="True"/>
+        <property id="comments" translatable="True"/>
+        <property id="translator-credits" translatable="True"/>
+      </properties>
+    </GtkAboutDialog>
+
+    <GtkAppChooserDialog>
+      <properties>
+        <property id="heading" translatable="True"/>
+      </properties>
+    </GtkAppChooserDialog>
+
+    <GtkMessageDialog>
+      <properties>
+        <property id="secondary-text" translatable="True"/>
+        <property id="text" translatable="True"/>
+      </properties>
+    </GtkMessageDialog>
+
+    <GtkModelButton>
+      <properties>
+        <property id="text" translatable="True"/>
+      </properties>
+    </GtkModelButton>
+
+    <GtkAction>
+      <properties>
+        <property id="label" translatable="True"/>
+        <property id="short-label" translatable="True"/>
+        <property id="tooltip" translatable="True"/>
+      </properties>
+    </GtkAction>
+
+    <GtkTreeViewColumn>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkTreeViewColumn>
+
+    <GtkStatusIcon>
+      <properties>
+        <property id="title" translatable="True"/>
+        <property id="tooltip-text" translatable="True"/>
+        <property id="tooltip-markup" translatable="True"/>
+      </properties>
+    </GtkStatusIcon>
+
+    <GtkTextBuffer>
+      <properties>
+        <property id="text" translatable="True"/>
+      </properties>
+    </GtkTextBuffer>
+
+    <GtkEntryBuffer>
+      <properties>
+        <property id="text" translatable="True"/>
+      </properties>
+    </GtkEntryBuffer>
   </types>
+
   <categories>
 
     <category name="toplevel">
@@ -220,3 +385,4 @@
 
   </categories>
 </meta>
+
