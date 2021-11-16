@@ -1025,6 +1025,8 @@ class CmbDB(GObject.GObject):
             child_id, internal, ctype,  comment, position = row
 
             if merengue:
+                position = position if position is not None else 0
+
                 while child_position < position:
                     placeholder = E.object()
                     placeholder.set('class', 'MrgPlaceholder')
