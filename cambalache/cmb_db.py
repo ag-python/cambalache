@@ -962,13 +962,13 @@ class CmbDB(GObject.GObject):
 
         # Properties + save_always default values
         for row in c.execute(f'''
-                SELECT op.value, op.property_id, op.comment, p.is_object
+                SELECT op.value, op.property_id, op.comment, op.translatable, op.translation_context, op.translation_comments, p.is_object
                   FROM object_property AS op, property AS p
                   WHERE op.ui_id=? AND op.object_id=? AND
                     p.owner_id = op.owner_id AND
                     p.property_id = op.property_id
                 UNION
-                SELECT default_value, property_id, null, is_object
+                SELECT default_value, property_id, null, null, null, null, is_object
                   FROM property
                   WHERE save_always=1 AND owner_id IN ({placeholders}) AND
                     property_id NOT IN
@@ -978,7 +978,7 @@ class CmbDB(GObject.GObject):
                 ORDER BY op.property_id
                 ''',
                 (ui_id, object_id) + tuple(hierarchy) + (ui_id, object_id)):
-            val, property_id, comment, is_object = row
+            val, property_id, comment, translatable, translation_context, translation_comments, is_object = row
 
             if is_object:
                 if merengue:
@@ -990,6 +990,11 @@ class CmbDB(GObject.GObject):
                 value = val
 
             node = E.property(value, name=property_id)
+
+            if translatable:
+                node_set(node, 'translatable', 'True')
+                node_set(node, 'context', translation_context)
+                node_set(node, 'comments', translation_comments)
 
             obj.append(node)
             self._node_add_comment(node, comment)
