@@ -31,6 +31,7 @@ from gi.repository import GLib, GObject, Gtk
 from .cmb_object import CmbObject
 from .cmb_ui import CmbUI
 from .cmb_type_info import CmbTypeInfo
+from .cmb_translatable_popover import CmbTranslatablePopover
 
 
 class CmbEntry(Gtk.Entry):
@@ -39,6 +40,15 @@ class CmbEntry(Gtk.Entry):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.connect('notify::text', self._on_text_notify)
+
+    def make_translatable(self, target):
+        self._target = target
+        self.props.secondary_icon_name = 'document-edit-symbolic'
+        self.connect("icon-press", self._on_icon_pressed)
+
+    def _on_icon_pressed(self, widget, icon_pos, event):
+        popover = CmbTranslatablePopover(self._target, relative_to=self)
+        popover.popup()
 
     def _on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
