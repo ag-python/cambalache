@@ -93,13 +93,17 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     # Settings
     completed_intro = GObject.Property(type=bool, default=False, flags = GObject.ParamFlags.READWRITE)
+    window_fullscreen = GObject.Property(type=bool, default=True, flags = GObject.ParamFlags.READWRITE)
+    window_width = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
+    window_height = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
+    window_position_x = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
+    window_position_y = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         self.__project = None
 
         super().__init__(**kwargs)
 
-        self.maximize()
         self.editor_stack.set_size_request(420, -1)
 
         self.actions = {}
@@ -175,17 +179,39 @@ class CmbWindow(Gtk.ApplicationWindow):
         # Settings list
         settings = [
             'completed-intro',
+            'window-fullscreen',
+            'window-width',
+            'window-height'
         ]
 
         # Bind settings
         for prop in settings:
             self.settings.bind(prop, self, prop.replace('-', '_'), Gio.SettingsBindFlags.DEFAULT)
 
+        if self.window_fullscreen:
+            self.maximize()
+        else:
+            self.set_default_size(self.window_width, self.window_height)
+
         self.__update_actions()
 
         settings = Gtk.Settings.get_default()
         settings.connect('notify::gtk-theme-name', lambda o, p: self.__update_dark_mode())
         self.__update_dark_mode()
+
+        self.connect('delete_event', self._on_delete_event)
+
+    def _on_delete_event(self, widget, data):
+        if self.window_fullscreen != self.is_maximized():
+            self.window_fullscreen = self.is_maximized()
+
+        size = self.get_size()
+        if self.window_width != size.width:
+            self.window_width = size.width
+        if self.window_height != size.height:
+            self.window_height = size.height
+
+        return False
 
     @GObject.Property(type=CmbProject)
     def project(self):
