@@ -35,6 +35,8 @@ install_data([
     'cmb_property.py',
     'cmb_property_controls.py',
     'cmb_signal_editor.py',
+    'cmb_translatable_popover.py',
+    'cmb_translatable_widget.py',
     'cmb_tree_view.py',
     'cmb_type_chooser.py',
     'cmb_type_chooser_popover.py',
