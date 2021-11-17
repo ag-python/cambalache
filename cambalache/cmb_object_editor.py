@@ -268,7 +268,9 @@ class CmbObjectEditor(Gtk.Box):
 
         if editor is None:
             editor = CmbEntry(hexpand=True,
-                              placeholder_text=f'<{type_id}>')
+                            placeholder_text=f'<{type_id}>')
+            if info.translatable == True:
+                editor.make_translatable(target = prop)
 
         GObject.Object.bind_property(prop, 'value',
                                      editor, 'cmb-value',
