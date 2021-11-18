@@ -539,7 +539,7 @@ class CmbDB(GObject.GObject):
         object_id = c.fetchone()[0]
 
         if position is None:
-            c.execute("SELECT count(object_id) + 1 FROM object WHERE ui_id=? AND parent_id=?;",(ui_id, parent_id))
+            c.execute("SELECT count(object_id) FROM object WHERE ui_id=? AND parent_id=?;",(ui_id, parent_id))
             position = c.fetchone()[0]
 
         c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, internal, type, comment, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
