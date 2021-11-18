@@ -43,7 +43,8 @@ class MrgGtkLabelController(MrgGtkWidgetController):
             return
 
         # Ensure a label so that it can be selected in the workspace
-        self.object.set_label('<label>')
+        if self.object.props.label == '':
+            self.object.set_label('<label>')
 
     def __on_object_changed(self, obj, pspec):
         self.__init_label()
