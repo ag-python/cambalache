@@ -31,19 +31,19 @@ from gi.repository import GObject, Gtk
 class CmbTranslatableWidget(Gtk.Box):
     __gtype_name__ = 'CmbTranslatableWidget'
 
-    text_view_value = Gtk.Template.Child()
+    buffer_text = Gtk.Template.Child()
     check_button_translatable = Gtk.Template.Child()
-    text_view_context = Gtk.Template.Child()
-    text_view_comments = Gtk.Template.Child()
+    buffer_context = Gtk.Template.Child()
+    buffer_comments = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         self._object = None
         super().__init__(**kwargs)
 
-        self.text_view_value.get_buffer().connect('notify::text', self._on_text_notify)
+        self.buffer_text.connect('notify::text', self._on_text_notify)
         self.check_button_translatable.connect('toggled', self._on_translatable_notify)
-        self.text_view_context.get_buffer().connect('notify::text', self._on_context_notify)
-        self.text_view_comments.get_buffer().connect('notify::text', self._on_comments_notify)
+        self.buffer_context.connect('notify::text', self._on_context_notify)
+        self.buffer_comments.connect('notify::text', self._on_comments_notify)
 
     def _on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
@@ -69,11 +69,11 @@ class CmbTranslatableWidget(Gtk.Box):
 
     @GObject.Property(type=str)
     def cmb_value(self):
-        return self.text_view_value.get_buffer().props.text if self.text_view_value.get_buffer().props.text != '' else None
+        return self.buffer_text.props.text if self.buffer_text.props.text != '' else None
 
     @cmb_value.setter
     def _set_cmb_value(self, value):
-        self.text_view_value.get_buffer().props.text = value if value is not None else ''
+        self.buffer_text.props.text = value if value is not None else ''
 
     @GObject.Property(type=bool, default = False)
     def cmb_translatable(self):
@@ -85,16 +85,16 @@ class CmbTranslatableWidget(Gtk.Box):
 
     @GObject.Property(type=str)
     def cmb_context(self):
-        return self.text_view_context.get_buffer().props.text if self.text_view_context.get_buffer().props.text != '' else None
+        return self.buffer_context.props.text if self.buffer_context.props.text != '' else None
 
     @cmb_context.setter
     def _set_cmb_context(self, value):
-        self.text_view_context.get_buffer().props.text = value if value is not None else ''
+        self.buffer_context.props.text = value if value is not None else ''
 
     @GObject.Property(type=str)
     def cmb_comment(self):
-        return self.text_view_comments.get_buffer().props.text if self.text_view_comments.get_buffer().props.text != '' else None
+        return self.buffer_comments.props.text if self.buffer_comments.props.text != '' else None
 
     @cmb_comment.setter
     def _set_cmb_comment(self, value):
-        self.text_view_comments.get_buffer().props.text = value if value is not None else ''
+        self.buffer_comments.props.text = value if value is not None else ''
