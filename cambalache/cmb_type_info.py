@@ -44,11 +44,11 @@ class CmbTypeInfo(CmbBaseTypeInfo):
         super().__init__(**kwargs)
 
         if self.parent_id == 'enum':
-            self.enum = self._init_enum_flags('enum')
+            self.enum = self.__init_enum_flags('enum')
         elif self.parent_id == 'flags':
-            self.flags = self._init_enum_flags('flags')
+            self.flags = self.__init_enum_flags('flags')
 
-    def _init_enum_flags(self, name):
+    def __init_enum_flags(self, name):
         retval = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_INT)
 
         for row in self.project.db.execute(f'SELECT name, nick, value FROM type_{name} WHERE type_id=?', (self.type_id,)):

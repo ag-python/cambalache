@@ -58,14 +58,14 @@ class CmbObject(CmbBaseObject):
         if self.project is None:
             return
 
-        self._populate_properties()
-        self._populate_layout_properties()
-        self._populate_signals()
+        self.__populate_properties()
+        self.__populate_layout_properties()
+        self.__populate_signals()
 
     def __str__(self):
         return f'CmbObject<{self.type_id}> {self.ui_id}:{self.object_id}'
 
-    def _populate_type_properties(self, name):
+    def __populate_type_properties(self, name):
         property_info = self.project.get_type_properties(name)
         if property_info is None:
             return
@@ -83,12 +83,12 @@ class CmbObject(CmbBaseObject):
 
             self.properties.append(prop)
 
-    def _populate_properties(self):
-        self._populate_type_properties(self.type_id)
+    def __populate_properties(self):
+        self.__populate_type_properties(self.type_id)
         for parent_id in self.info.hierarchy:
-            self._populate_type_properties(parent_id)
+            self.__populate_type_properties(parent_id)
 
-    def _populate_layout_properties_from_type(self, name):
+    def __populate_layout_properties_from_type(self, name):
         property_info = self.project.get_type_properties(name)
         if property_info is None:
             return
@@ -114,29 +114,29 @@ class CmbObject(CmbBaseObject):
         self.project._object_property_changed(self, prop)
 
     def _layout_property_changed(self, prop):
-        parent = self.project._get_object_by_id(self.ui_id, self.parent_id)
+        parent = self.project.get_object_by_id(self.ui_id, self.parent_id)
         self.emit('layout-property-changed', parent, prop)
         self.project._object_layout_property_changed(parent, self, prop)
 
-    def _add_signal_object(self, signal):
+    def __add_signal_object(self, signal):
         self.signals.append(signal)
         self.emit('signal-added', signal)
         self.project._object_signal_added(self, signal)
 
-    def _populate_signals(self):
+    def __populate_signals(self):
         c = self.project.db.cursor()
 
         # Populate signals
         for row in c.execute('SELECT * FROM object_signal WHERE ui_id=? AND object_id=?;',
                              (self.ui_id, self.object_id)):
-            self._add_signal_object(CmbSignal.from_row(self.project, *row))
+            self.__add_signal_object(CmbSignal.from_row(self.project, *row))
 
-    def _populate_layout_properties(self):
+    def __populate_layout_properties(self):
         parent_id = self.parent_id
 
         if parent_id > 0:
-            parent = self.project._get_object_by_id(self.ui_id, parent_id)
-            self._populate_layout_properties_from_type(f"{parent.type_id}LayoutChild")
+            parent = self.project.get_object_by_id(self.ui_id, parent_id)
+            self.__populate_layout_properties_from_type(f"{parent.type_id}LayoutChild")
         else:
             self.layout = []
 
@@ -152,13 +152,13 @@ class CmbObject(CmbBaseObject):
                     (self.ui_id, self.object_id, ),
                     value if value != 0 else None)
 
-        self._populate_layout_properties()
+        self.__populate_layout_properties()
 
     @GObject.Property(type=CmbUI)
     def ui(self):
-        return self.project._get_object_by_id(self.ui_id)
+        return self.project.get_object_by_id(self.ui_id)
 
-    def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
+    def __add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         signal = CmbSignal(project=self.project,
                            signal_pk=signal_pk,
                            ui_id=self.ui_id,
@@ -171,7 +171,7 @@ class CmbObject(CmbBaseObject):
                            swap=swap,
                            after=after)
 
-        self._add_signal_object(signal)
+        self.__add_signal_object(signal)
 
         return signal
 
@@ -187,16 +187,16 @@ class CmbObject(CmbBaseObject):
             logger.warning(f'Error adding signal handler {owner_id}:{signal_id} {handler} to object {self.ui_id}.{{self.object_id}} {e}')
             return None
         else:
-            return self._add_signal(signal_pk,
-                                    owner_id,
-                                    signal_id,
-                                    handler,
-                                    detail=detail,
-                                    user_data=user_data,
-                                    swap=swap,
-                                    after=after)
+            return self.__add_signal(signal_pk,
+                                     owner_id,
+                                     signal_id,
+                                     handler,
+                                     detail=detail,
+                                     user_data=user_data,
+                                     swap=swap,
+                                     after=after)
 
-    def _remove_signal(self, signal):
+    def __remove_signal(self, signal):
         self.signals.remove(signal)
         self.emit('signal-removed', signal)
         self.project._object_signal_removed(self, signal)
@@ -210,5 +210,5 @@ class CmbObject(CmbBaseObject):
             logger.warning(f'Error removing signal handler {signal.owner_id}:{signal.signal_id} {signal.handler} from object {self.ui_id}.{{self.object_id}} {e}')
             return False
         else:
-            self._remove_signal(signal)
+            self.__remove_signal(signal)
             return True

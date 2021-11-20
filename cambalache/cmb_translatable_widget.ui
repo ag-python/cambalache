@@ -1,25 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.7.5 -->
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkTextBuffer" id="buffer_text"/>
-  <object class="GtkTextBuffer" id="buffer_context"/>
-  <object class="GtkTextBuffer" id="buffer_comments"/>
   <template class="CmbTranslatableWidget" parent="GtkBox">
-    <property name="visible">True</property>
     <property name="can-focus">False</property>
-    <property name="margin-start">4</property>
-    <property name="margin-end">4</property>
-    <property name="margin-top">4</property>
     <property name="margin-bottom">4</property>
+    <property name="margin-end">4</property>
+    <property name="margin-start">4</property>
+    <property name="margin-top">4</property>
     <property name="orientation">vertical</property>
     <property name="spacing">4</property>
+    <property name="visible">True</property>
     <child>
       <object class="GtkLabel">
-        <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="halign">start</property>
-        <property name="label" translatable="yes">Text:</property>
+        <property name="label" translatable="True">Text:</property>
+        <property name="visible">True</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -29,18 +27,17 @@
     </child>
     <child>
       <object class="GtkScrolledWindow">
-        <property name="width-request">300</property>
-        <property name="height-request">60</property>
-        <property name="visible">True</property>
         <property name="can-focus">True</property>
+        <property name="height-request">60</property>
         <property name="shadow-type">in</property>
+        <property name="visible">True</property>
+        <property name="width-request">300</property>
         <child>
           <object class="GtkTextView" id="text_view_value">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="border-width">2</property>
-            <property name="buffer">buffer_text</property>
             <property name="accepts-tab">False</property>
+            <property name="border-width">2</property>
+            <property name="can-focus">True</property>
+            <property name="visible">True</property>
           </object>
         </child>
       </object>
@@ -52,12 +49,12 @@
     </child>
     <child>
       <object class="GtkCheckButton" id="check_button_translatable">
-        <property name="label" translatable="yes">translatable</property>
-        <property name="visible">True</property>
         <property name="can-focus">True</property>
-        <property name="receives-default">False</property>
-        <property name="halign">start</property>
         <property name="draw-indicator">True</property>
+        <property name="halign">start</property>
+        <property name="label" translatable="True">translatable</property>
+        <property name="receives-default">False</property>
+        <property name="visible">True</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -67,11 +64,11 @@
     </child>
     <child>
       <object class="GtkLabel">
-        <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="halign">start</property>
+        <property name="label" translatable="True">Translation context:</property>
         <property name="margin-top">8</property>
-        <property name="label" translatable="yes">Context for translation:</property>
+        <property name="visible">True</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -81,17 +78,16 @@
     </child>
     <child>
       <object class="GtkScrolledWindow">
-        <property name="height-request">60</property>
-        <property name="visible">True</property>
         <property name="can-focus">True</property>
+        <property name="height-request">60</property>
         <property name="shadow-type">in</property>
+        <property name="visible">True</property>
         <child>
           <object class="GtkTextView" id="text_view_context">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="border-width">2</property>
-            <property name="buffer">buffer_context</property>
             <property name="accepts-tab">False</property>
+            <property name="border-width">2</property>
+            <property name="can-focus">True</property>
+            <property name="visible">True</property>
           </object>
         </child>
       </object>
@@ -103,11 +99,11 @@
     </child>
     <child>
       <object class="GtkLabel">
-        <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="halign">start</property>
+        <property name="label" translatable="True">Comments for translators:</property>
         <property name="margin-top">8</property>
-        <property name="label" translatable="yes">Comments for translation:</property>
+        <property name="visible">True</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -117,17 +113,16 @@
     </child>
     <child>
       <object class="GtkScrolledWindow">
-        <property name="height-request">60</property>
-        <property name="visible">True</property>
         <property name="can-focus">True</property>
+        <property name="height-request">60</property>
         <property name="shadow-type">in</property>
+        <property name="visible">True</property>
         <child>
           <object class="GtkTextView" id="text_view_comments">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="border-width">2</property>
-            <property name="buffer">buffer_comments</property>
             <property name="accepts-tab">False</property>
+            <property name="border-width">2</property>
+            <property name="can-focus">True</property>
+            <property name="visible">True</property>
           </object>
         </child>
       </object>

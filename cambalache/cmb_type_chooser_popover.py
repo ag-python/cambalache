@@ -48,7 +48,7 @@ class CmbTypeChooserPopover(Gtk.Popover):
         super().__init__(**kwargs)
 
         self._chooser = CmbTypeChooserWidget()
-        self._chooser.connect('type-selected', self._on_type_selected)
+        self._chooser.connect('type-selected', self.__on_type_selected)
         self._chooser.show_all()
         self.add(self._chooser)
 
@@ -57,7 +57,7 @@ class CmbTypeChooserPopover(Gtk.Popover):
                                          self._chooser, prop,
                                          GObject.BindingFlags.SYNC_CREATE)
 
-    def _on_type_selected(self, chooser, info):
+    def __on_type_selected(self, chooser, info):
         self.emit('type-selected', info)
         self.popdown()
 

@@ -74,7 +74,7 @@ class CmbTutor(GObject.GObject):
         super().__init__(**kwargs)
 
         for node in script:
-            self._add(*node)
+            self.__add(*node)
 
     @GObject.Property()
     def state(self):
@@ -85,7 +85,7 @@ class CmbTutor(GObject.GObject):
 
         return CmbTutorState.NULL
 
-    def _add(self, text, widget_name, delay, name=None, position=CmbTutorPosition.BOTTOM):
+    def __add(self, text, widget_name, delay, name=None, position=CmbTutorPosition.BOTTOM):
         widget = getattr(self.window, widget_name)
         self.script.append(ScriptNode(widget, text, delay, name, position))
 
@@ -96,7 +96,7 @@ class CmbTutor(GObject.GObject):
         if self.current is None:
           self.current = 0
 
-        self._script_play()
+        self.__script_play()
 
         self.notify('state')
 
@@ -105,7 +105,7 @@ class CmbTutor(GObject.GObject):
             GLib.source_remove(self.timeout_id)
 
         self.timeout_id = None
-        self._hide_node(self.current)
+        self.__hide_node(self.current)
         self.notify('state')
 
     def stop(self):
@@ -113,7 +113,7 @@ class CmbTutor(GObject.GObject):
         self.current = None
         self.notify('state')
 
-    def _popover_new(self, text):
+    def __popover_new(self, text):
         popover = Gtk.Popover(modal=False)
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
                       spacing=6)
@@ -129,10 +129,10 @@ class CmbTutor(GObject.GObject):
 
         return popover
 
-    def _script_transition(self):
-        self.timeout_id = GLib.timeout_add (250, self._script_play)
+    def __script_transition(self):
+        self.timeout_id = GLib.timeout_add (250, self.__script_play)
 
-        self._hide_current_node()
+        self.__hide_current_node()
 
         # Set next node
         if self.current is not None:
@@ -140,7 +140,7 @@ class CmbTutor(GObject.GObject):
 
         return GLib.SOURCE_REMOVE
 
-    def _hide_node(self, index):
+    def __hide_node(self, index):
         if self.popover:
             self.popover.popdown()
             self.popover = None
@@ -151,13 +151,13 @@ class CmbTutor(GObject.GObject):
             if node.widget:
                 node.widget.get_style_context().remove_class("cmb-tutor-highlight")
 
-    def _hide_current_node(self):
+    def __hide_current_node(self):
         if self.hiding_node:
             return
 
         self.hiding_node = True
 
-        self._hide_node(self.current)
+        self.__hide_node(self.current)
 
         if self.current is not None:
             node = self.script[self.current]
@@ -165,7 +165,7 @@ class CmbTutor(GObject.GObject):
 
         self.hiding_node = False
 
-    def _script_play(self):
+    def __script_play(self):
         self.timeout_id = None;
 
         if self.current is None:
@@ -184,7 +184,7 @@ class CmbTutor(GObject.GObject):
             node.widget.get_style_context().add_class("cmb-tutor-highlight")
 
             # Create popover
-            self.popover = self._popover_new(node.text)
+            self.popover = self.__popover_new(node.text)
             self.popover.set_relative_to(node.widget)
 
             if node.position == CmbTutorPosition.BOTTOM:
@@ -206,7 +206,7 @@ class CmbTutor(GObject.GObject):
             self.popover.set_sensitive(True)
             self.popover.popup()
 
-        self.timeout_id = GLib.timeout_add(node.delay * 1000, self._script_transition);
+        self.timeout_id = GLib.timeout_add(node.delay * 1000, self.__script_transition);
 
         return GLib.SOURCE_REMOVE
 

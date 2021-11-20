@@ -39,18 +39,18 @@ class CmbTreeView(Gtk.TreeView):
 
         self._project = None
         self._selection = self.get_selection()
-        self._selection.connect('changed', self._on_selection_changed)
+        self._selection.connect('changed', self.__on_selection_changed)
         self.set_headers_visible (False)
 
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn('Object(Type)', renderer)
-        column.set_cell_data_func(renderer, self._name_cell_data_func, None)
+        column.set_cell_data_func(renderer, self.__name_cell_data_func, None)
         self.append_column(column)
 
-        self.connect('notify::model', self._on_model_notify)
-        self.connect('row-activated', self._on_row_activated)
+        self.connect('notify::model', self.__on_model_notify)
+        self.connect('row-activated', self.__on_row_activated)
 
-    def _name_cell_data_func(self, column, cell, model, iter_, data):
+    def __name_cell_data_func(self, column, cell, model, iter_, data):
         obj = model.get_value(iter_, 0)
 
         if type(obj) == CmbObject:
@@ -60,22 +60,22 @@ class CmbTreeView(Gtk.TreeView):
         elif type(obj) == CmbUI:
             cell.set_property('markup', f'<b>{obj.filename}</b>')
 
-    def _on_model_notify(self, treeview, pspec):
+    def __on_model_notify(self, treeview, pspec):
         if self._project is not None:
-            self._project.disconnect_by_func(self._on_project_selection_changed)
+            self._project.disconnect_by_func(self.__on_project_selection_changed)
 
         self._project = self.props.model
 
         if self._project:
-            self._project.connect('selection-changed', self._on_project_selection_changed)
+            self._project.connect('selection-changed', self.__on_project_selection_changed)
 
-    def _on_row_activated(self, view, path, column):
+    def __on_row_activated(self, view, path, column):
         if self.row_expanded(path):
             self.collapse_row(path)
         else:
             self.expand_row(path, True)
 
-    def _on_project_selection_changed(self, p):
+    def __on_project_selection_changed(self, p):
         project, _iter = self._selection.get_selected()
         current = [project.get_value(_iter, 0)] if _iter is not None else []
         selection = project.get_selection()
@@ -91,9 +91,8 @@ class CmbTreeView(Gtk.TreeView):
         else:
             self._selection.unselect_all()
 
-    def _on_selection_changed(self, selection):
+    def __on_selection_changed(self, selection):
         project, _iter = selection.get_selected()
-
 
         if _iter is not None:
             obj = project.get_value(_iter, 0)

@@ -66,19 +66,19 @@ class CmbSignalEditor(Gtk.Box):
         super().__init__(**kwargs)
 
         self.signal_id_column.set_cell_data_func(self.signal_id,
-                                                 self._signal_id_data_func,
+                                                 self.__signal_id_data_func,
                                                  None)
         self.handler_column.set_cell_data_func(self.handler,
-                                               self._data_func,
+                                               self.__data_func,
                                                Col.HANDLER.value)
         self.user_data_column.set_cell_data_func(self.user_data,
-                                                 self._data_func,
+                                                 self.__data_func,
                                                  Col.USER_DATA.value)
         self.swap_column.set_cell_data_func(self.swap,
-                                            self._data_func,
+                                            self.__data_func,
                                             Col.SWAP.value)
         self.after_column.set_cell_data_func(self.after,
-                                             self._data_func,
+                                             self.__data_func,
                                              Col.AFTER.value)
 
     @GObject.Property(type=CmbObject)
@@ -89,18 +89,18 @@ class CmbSignalEditor(Gtk.Box):
     def _set_object(self, obj):
         if self._object is not None:
             self.treestore.clear()
-            self._object.disconnect_by_func(self._on_signal_added)
-            self._object.disconnect_by_func(self._on_signal_removed)
+            self._object.disconnect_by_func(self.__on_signal_added)
+            self._object.disconnect_by_func(self.__on_signal_removed)
 
         self._object = obj
 
         if obj is not None:
-            self._populate_treestore()
-            self._object.connect('signal-added', self._on_signal_added)
-            self._object.connect('signal-removed', self._on_signal_removed)
+            self.__populate_treestore()
+            self._object.connect('signal-added', self.__on_signal_added)
+            self._object.connect('signal-removed', self.__on_signal_removed)
 
     @Gtk.Template.Callback('on_handler_edited')
-    def _on_handler_edited(self, renderer, path, new_text):
+    def __on_handler_edited(self, renderer, path, new_text):
         iter_ = self.treestore.get_iter(path)
         signal = self.treestore[iter_][Col.SIGNAL.value]
 
@@ -117,7 +117,7 @@ class CmbSignalEditor(Gtk.Box):
                 self._object.remove_signal(signal)
 
     @Gtk.Template.Callback('on_detail_edited')
-    def _on_detail_edited(self, renderer, path, new_text):
+    def __on_detail_edited(self, renderer, path, new_text):
         iter_ = self.treestore.get_iter(path)
         signal = self.treestore[iter_][Col.SIGNAL.value]
 
@@ -134,7 +134,7 @@ class CmbSignalEditor(Gtk.Box):
             self.treestore[iter_][Col.DETAIL.value] = signal.detail
 
     @Gtk.Template.Callback('on_user_data_edited')
-    def _on_user_data_edited(self, renderer, path, new_text):
+    def __on_user_data_edited(self, renderer, path, new_text):
         iter_ = self.treestore.get_iter(path)
         signal = self.treestore[iter_][Col.SIGNAL.value]
 
@@ -147,7 +147,7 @@ class CmbSignalEditor(Gtk.Box):
                 self.treestore[iter_][Col.USER_DATA.value] = ''
 
     @Gtk.Template.Callback('on_swap_toggled')
-    def _on_swap_toggled(self, renderer, path):
+    def __on_swap_toggled(self, renderer, path):
         iter_ = self.treestore.get_iter(path)
         signal = self.treestore[iter_][Col.SIGNAL.value]
 
@@ -156,7 +156,7 @@ class CmbSignalEditor(Gtk.Box):
             self.treestore[iter_][Col.SWAP.value] = signal.swap
 
     @Gtk.Template.Callback('on_after_toggled')
-    def _on_after_toggled(self, renderer, path):
+    def __on_after_toggled(self, renderer, path):
         iter_ = self.treestore.get_iter(path)
         signal = self.treestore[iter_][Col.SIGNAL.value]
 
@@ -164,7 +164,7 @@ class CmbSignalEditor(Gtk.Box):
             signal.after = not self.treestore[iter_][Col.AFTER.value]
             self.treestore[iter_][Col.AFTER.value] = signal.after
 
-    def _on_signal_added(self, obj, signal):
+    def __on_signal_added(self, obj, signal):
         for row in self.treestore:
             if row[Col.OWNER_ID.value] == signal.owner_id:
                 for child in row.iterchildren():
@@ -183,14 +183,14 @@ class CmbSignalEditor(Gtk.Box):
                                                       child[Col.INFO.value]))
                 break
 
-    def _on_signal_removed(self, obj, signal):
+    def __on_signal_removed(self, obj, signal):
         for row in self.treestore:
             for child in row.iterchildren():
                 if child[Col.SIGNAL.value] == signal:
                     self.treestore.remove(child.iter)
                     return
 
-    def _populate_from_type(self, info):
+    def __populate_from_type(self, info):
         if len(info.signals) == 0:
             return None
 
@@ -218,9 +218,9 @@ class CmbSignalEditor(Gtk.Box):
                                    signal))
         return parent
 
-    def _populate_treestore(self):
+    def __populate_treestore(self):
         # Populate object type signals
-        parent = self._populate_from_type(self._object.info)
+        parent = self.__populate_from_type(self._object.info)
 
         # Expand object type signals
         if parent:
@@ -230,13 +230,13 @@ class CmbSignalEditor(Gtk.Box):
         for type_id in self._object.info.hierarchy:
             info = self._object.project.type_info.get(type_id, None)
             if info:
-                self._populate_from_type(info)
+                self.__populate_from_type(info)
 
         # Populate object signals
         for signal in self._object.signals:
-            self._on_signal_added(self._object, signal)
+            self.__on_signal_added(self._object, signal)
 
-    def _signal_id_data_func(self, tree_column, cell, tree_model, iter_, column):
+    def __signal_id_data_func(self, tree_column, cell, tree_model, iter_, column):
         info = tree_model[iter_][Col.INFO.value]
         signal_id = tree_model[iter_][Col.SIGNAL_ID.value]
 
@@ -250,7 +250,7 @@ class CmbSignalEditor(Gtk.Box):
             cell.props.editable = False
             cell.props.text = signal_id
 
-    def _data_func(self, tree_column, cell, tree_model, iter_, column):
+    def __data_func(self, tree_column, cell, tree_model, iter_, column):
         info = tree_model[iter_][Col.INFO.value]
         signal = tree_model[iter_][Col.SIGNAL.value]
 

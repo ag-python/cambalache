@@ -36,13 +36,13 @@ class CmbListStore(Gtk.ListStore):
     project = GObject.Property(type=GObject.GObject)
 
     def __init__(self, **kwargs):
-        GObject.GObject.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
         data = self.project._get_table_data(self.table)
         self.set_column_types(data['types'])
-        self._populate()
+        self.__populate()
 
-    def _populate(self):
+    def __populate(self):
         c = self.project.db.cursor()
         for row in c.execute(self.query):
             self.append(row)

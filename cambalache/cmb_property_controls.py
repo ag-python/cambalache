@@ -39,18 +39,18 @@ class CmbEntry(Gtk.Entry):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect('notify::text', self._on_text_notify)
+        self.connect('notify::text', self.__on_text_notify)
 
     def make_translatable(self, target):
         self._target = target
         self.props.secondary_icon_name = 'document-edit-symbolic'
-        self.connect("icon-press", self._on_icon_pressed)
+        self.connect("icon-press", self.__on_icon_pressed)
 
-    def _on_icon_pressed(self, widget, icon_pos, event):
+    def __on_icon_pressed(self, widget, icon_pos, event):
         popover = CmbTranslatablePopover(self._target, relative_to=self)
         popover.popup()
 
-    def _on_text_notify(self, obj, pspec):
+    def __on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
 
     @GObject.Property(type=str)
@@ -58,7 +58,7 @@ class CmbEntry(Gtk.Entry):
         return self.props.text if self.props.text != '' else None
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         self.props.text = value if value is not None else ''
 
 
@@ -67,9 +67,9 @@ class CmbTextBuffer(Gtk.TextBuffer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect('notify::text', self._on_text_notify)
+        self.connect('notify::text', self.__on_text_notify)
 
-    def _on_text_notify(self, obj, pspec):
+    def __on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
 
     @GObject.Property(type=str)
@@ -77,7 +77,7 @@ class CmbTextBuffer(Gtk.TextBuffer):
         return self.props.text if self.props.text != '' else None
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         self.props.text = value if value is not None else ''
 
 
@@ -86,12 +86,12 @@ class CmbSpinButton(Gtk.SpinButton):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect('notify::value', self._on_text_notify)
+        self.connect('notify::value', self.__on_text_notify)
         self.props.halign=Gtk.Align.START
         self.props.numeric=True
         self.props.width_chars=8
 
-    def _on_text_notify(self, obj, pspec):
+    def __on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
 
     @GObject.Property(type=str)
@@ -104,7 +104,7 @@ class CmbSpinButton(Gtk.SpinButton):
             return str(round(self.props.value, 15))
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         value = float(value)
 
         if value == math.inf:
@@ -120,10 +120,10 @@ class CmbSwitch(Gtk.Switch):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect('notify::active', self._on_notify)
+        self.connect('notify::active', self.__on_notify)
         self.props.halign=Gtk.Align.START
 
-    def _on_notify(self, obj, pspec):
+    def __on_notify(self, obj, pspec):
         self.notify('cmb-value')
 
     @GObject.Property(type=str)
@@ -131,7 +131,7 @@ class CmbSwitch(Gtk.Switch):
         return 'True' if self.props.active else 'False'
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         if value is not None:
             val = value.lower()
 
@@ -154,7 +154,7 @@ class CmbEnumComboBox(Gtk.ComboBox):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect('changed', self._on_changed)
+        self.connect('changed', self.__on_changed)
 
         renderer_text = Gtk.CellRendererText()
         self.pack_start(renderer_text, True)
@@ -163,7 +163,7 @@ class CmbEnumComboBox(Gtk.ComboBox):
         self.props.id_column = self.text_column
         self.props.model = self.info.enum
 
-    def _on_changed(self, obj):
+    def __on_changed(self, obj):
         self.notify('cmb-value')
 
     @GObject.Property(type=str)
@@ -171,7 +171,7 @@ class CmbEnumComboBox(Gtk.ComboBox):
         return self.props.active_id
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         self.props.active_id = None
 
         for row in self.info.enum:
@@ -197,11 +197,11 @@ class CmbFlagsEntry(Gtk.Entry):
         self.props.editable = False
         self.props.secondary_icon_name = 'document-edit-symbolic'
 
-        self.connect('icon-release', self._on_icon_release)
+        self.connect('icon-release', self.__on_icon_release)
 
-        self._init_popover()
+        self.__init_popover()
 
-    def _init_popover(self):
+    def __init_popover(self):
         self.flags = {}
         self._checks = {}
         self._popover = Gtk.Popover(relative_to=self)
@@ -222,22 +222,22 @@ class CmbFlagsEntry(Gtk.Entry):
             flag_id =  row[self.id_column]
 
             check = Gtk.CheckButton(label=flag)
-            check.connect('toggled', self._on_check_toggled, flag_id)
+            check.connect('toggled', self.__on_check_toggled, flag_id)
             vbox.pack_start(check, False, True, 4)
             self._checks[flag_id] = check
 
         box.show_all()
         self._popover.add(box)
 
-    def _on_check_toggled(self, check, flag_id):
+    def __on_check_toggled(self, check, flag_id):
         self.flags[flag_id] = check.props.active
-        self.props.text = self._to_string()
+        self.props.text = self.__to_string()
         self.notify('cmb-value')
 
-    def _on_icon_release(self, obj, pos, event):
+    def __on_icon_release(self, obj, pos, event):
         self._popover.popup()
 
-    def _to_string(self):
+    def __to_string(self):
         retval = None
         for row in self.info.flags:
             flag_id = row[self.id_column]
@@ -251,7 +251,7 @@ class CmbFlagsEntry(Gtk.Entry):
         return self.props.text if self.props.text != '' else None
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         self.props.text = value if value is not None else ''
 
         self.flags = {}
@@ -283,12 +283,12 @@ class CmbObjectChooser(Gtk.Entry):
     def __init__(self, **kwargs):
         self._value = None
         super().__init__(**kwargs)
-        self.connect('notify::text', self._on_text_notify)
+        self.connect('notify::text', self.__on_text_notify)
         self.props.placeholder_text = f'<{self.type_id}>'
 
-    def _on_text_notify(self, obj, pspec):
-        obj = self.object.project._get_object_by_name(self.object.ui_id,
-                                                      self.props.text)
+    def __on_text_notify(self, obj, pspec):
+        obj = self.object.project.get_object_by_name(self.object.ui_id,
+                                                     self.props.text)
         if obj:
             self._value = obj.object_id
 
@@ -299,12 +299,12 @@ class CmbObjectChooser(Gtk.Entry):
         return self._value
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         self._value = int(value) if value else 0
 
         if self._value:
-            obj = self.object.project._get_object_by_id(self.object.ui_id,
-                                                        self._value)
+            obj = self.object.project.get_object_by_id(self.object.ui_id,
+                                                       self._value)
             self.props.text = obj.name if obj else ''
         else:
             self.props.text = ''
@@ -318,8 +318,8 @@ class CmbToplevelChooser(Gtk.ComboBoxText):
     def __init__(self, **kwargs):
         self._value = None
         super().__init__(**kwargs)
-        self.connect('notify::object', self._on_object_notify)
-        self.connect('changed', self._on_changed)
+        self.connect('notify::object', self.__on_object_notify)
+        self.connect('changed', self.__on_changed)
 
     def _filter_func(self, model, iter, data):
         obj = model[iter][0]
@@ -329,7 +329,7 @@ class CmbToplevelChooser(Gtk.ComboBoxText):
 
         return False
 
-    def _on_object_notify(self, obj, pspec):
+    def __on_object_notify(self, obj, pspec):
         self.remove_all()
 
         if self.object is None:
@@ -346,7 +346,7 @@ class CmbToplevelChooser(Gtk.ComboBoxText):
                     name = obj.name or ''
                     self.append(f'{obj.object_id}', f'{name}({obj.type_id})')
 
-    def _on_changed(self, combo):
+    def __on_changed(self, combo):
         self.notify('cmb-value')
 
     @GObject.Property(type=int)
@@ -355,7 +355,7 @@ class CmbToplevelChooser(Gtk.ComboBoxText):
         return int(active_id) if active_id is not None else 0
 
     @cmb_value.setter
-    def _set_value(self, value):
+    def _set_cmb_value(self, value):
         if self.object is None:
             return
 

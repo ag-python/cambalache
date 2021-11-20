@@ -96,18 +96,18 @@ class CmbProcess(GObject.Object):
         self.stdout = GLib.IOChannel.unix_new(stdout)
 
         self.stdout.add_watch(GLib.IOCondition.IN | GLib.IOCondition.HUP,
-                              self._on_stdout)
+                              self.__on_stdout)
 
         GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE,
                              pid,
-                             self._on_exit,
+                             self.__on_exit,
                              None)
 
-    def _on_exit(self, pid, status, data):
+    def __on_exit(self, pid, status, data):
         self.stop()
         self.emit('exit')
 
-    def _on_stdout(self, channel, condition):
+    def __on_stdout(self, channel, condition):
         return self.emit('stdout', condition)
 
 
@@ -125,51 +125,48 @@ class CmbView(Gtk.Stack):
     menu = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
-        self._project = None
-        self._restart_project = None
-        self._ui_id = 0
+        self.__project = None
+        self.__restart_project = None
+        self.__ui_id = 0
 
         super().__init__(**kwargs)
 
-        self._merengue_bin = os.path.join(config.merenguedir, 'merengue', 'merengue')
-        self._broadwayd_bin = GLib.find_program_in_path('broadwayd')
-        self._gtk4_broadwayd_bin = GLib.find_program_in_path('gtk4-broadwayd')
+        self.__merengue_bin = os.path.join(config.merenguedir, 'merengue', 'merengue')
+        self.__broadwayd_bin = GLib.find_program_in_path('broadwayd')
+        self.__gtk4_broadwayd_bin = GLib.find_program_in_path('gtk4-broadwayd')
 
-        self.webview.connect('load-changed', self._on_load_changed)
+        self.webview.connect('load-changed', self.__on_load_changed)
 
-        self._merengue = None
-        self._broadwayd = None
-        self._port = None
+        self.__merengue = None
+        self.__broadwayd = None
+        self.__port = None
 
         context = self.get_style_context()
-        context.connect('changed', self._on_style_context_changed)
+        context.connect('changed', lambda ctx: self.__update_webview_bg())
 
-        if self._broadwayd_bin is None:
+        if self.__broadwayd_bin is None:
             logger.warning("broadwayd not found, Gtk 3 workspace wont work.")
 
-        if self._gtk4_broadwayd_bin is None:
+        if self.__gtk4_broadwayd_bin is None:
             logger.warning("gtk4-broadwayd not found, Gtk 4 workspace wont work.")
 
     def do_destroy(self):
-        if self._merengue:
-            self._merengue.stop()
+        if self.__merengue:
+            self.__merengue.stop()
 
-        if self._broadwayd:
-            self._broadwayd.stop()
+        if self.__broadwayd:
+            self.__broadwayd.stop()
 
-    def _on_style_context_changed(self, ctx):
-        self._update_webview_bg()
-
-    def _update_webview_bg(self):
+    def __update_webview_bg(self):
         context = self.get_style_context()
         bg = context.get_background_color(Gtk.StateFlags.NORMAL)
         self.webview.run_javascript(f"document.body.style.background = '{bg.to_string()}';")
 
-    def _on_load_changed(self, webview, event):
+    def __on_load_changed(self, webview, event):
         if event != WebKit2.LoadEvent.FINISHED:
             return
 
-        self._update_webview_bg()
+        self.__update_webview_bg()
 
         # Disable aler() function used when broadwayd get disconnected
         # Monkey patch setupDocument() to avoid disabling document.oncontextmenu
@@ -187,8 +184,8 @@ window.setupDocument = function (document) {
 }
 ''', None, None)
 
-    def _merengue_command(self, command, payload=None, args=None):
-        if self._merengue is None or self._merengue.stdin is None:
+    def __merengue_command(self, command, payload=None, args=None):
+        if self.__merengue is None or self.__merengue.stdin is None:
             return
 
         cmd = {
@@ -200,50 +197,50 @@ window.setupDocument = function (document) {
             cmd['args'] = args
 
         # Send command in one line as json
-        self._merengue.stdin.write(json.dumps(cmd))
-        self._merengue.stdin.write('\n')
+        self.__merengue.stdin.write(json.dumps(cmd))
+        self.__merengue.stdin.write('\n')
 
         # Send payload if any
         if payload is not None:
-            self._merengue.stdin.write(payload)
+            self.__merengue.stdin.write(payload)
 
         # Flush
-        self._merengue.stdin.flush()
+        self.__merengue.stdin.flush()
 
-    def _get_ui_xml(self, ui_id, merengue=False):
-        return self._project.db.tostring(ui_id, merengue=merengue)
+    def __get_ui_xml(self, ui_id, merengue=False):
+        return self.__project.db.tostring(ui_id, merengue=merengue)
 
-    def _update_view(self):
-        if self._project is not None and self._ui_id > 0:
+    def __update_view(self):
+        if self.__project is not None and self.__ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self._get_ui_xml(self._ui_id, merengue=False)
+                ui = self.__get_ui_xml(self.__ui_id, merengue=False)
                 self.buffer.set_text(ui)
             return
 
         self.buffer.set_text('')
-        self._ui_id = 0
+        self.__ui_id = 0
 
-    def _merengue_update_ui(self, ui_id):
-        ui = self._get_ui_xml(ui_id, merengue=True)
+    def __merengue_update_ui(self, ui_id):
+        ui = self.__get_ui_xml(ui_id, merengue=True)
 
-        self._merengue_command('update_ui',
+        self.__merengue_command('update_ui',
                                payload=ui,
                                args={ 'ui_id': ui_id })
 
-    def _on_object_added(self, project, obj):
-        self._update_view()
-        self._merengue_update_ui(obj.ui_id)
+    def __on_object_added(self, project, obj):
+        self.__update_view()
+        self.__merengue_update_ui(obj.ui_id)
 
-    def _on_object_removed(self, project, obj):
-        self._update_view()
-        self._merengue_command('object_removed', args={
+    def __on_object_removed(self, project, obj):
+        self.__update_view()
+        self.__merengue_command('object_removed', args={
             'ui_id': obj.ui_id,
             'object_id': obj.object_id
         })
 
-    def _on_object_property_changed(self, project, obj, prop):
-        self._update_view()
-        self._merengue_command('object_property_changed', args={
+    def __on_object_property_changed(self, project, obj, prop):
+        self.__update_view()
+        self.__merengue_command('object_property_changed', args={
             'ui_id': obj.ui_id,
             'object_id': obj.object_id,
             'property_id': prop.property_id,
@@ -251,9 +248,9 @@ window.setupDocument = function (document) {
             'value': prop.value
         })
 
-    def _on_object_layout_property_changed(self, project, obj, child, prop):
-        self._update_view()
-        self._merengue_command('object_layout_property_changed', args={
+    def __on_object_layout_property_changed(self, project, obj, child, prop):
+        self.__update_view()
+        self.__merengue_command('object_layout_property_changed', args={
             'ui_id': obj.ui_id,
             'object_id': obj.object_id,
             'child_id': child.object_id,
@@ -261,68 +258,68 @@ window.setupDocument = function (document) {
             'value': prop.value
         })
 
-    def _on_project_selection_changed(self, project):
+    def __on_project_selection_changed(self, project):
         selection = project.get_selection()
 
         if len(selection) > 0:
             ui_id = selection[0].ui_id
 
-            if self._ui_id != ui_id:
-                self._ui_id = ui_id
-                self._update_view()
-                self._merengue_update_ui(ui_id)
+            if self.__ui_id != ui_id:
+                self.__ui_id = ui_id
+                self.__update_view()
+                self.__merengue_update_ui(ui_id)
 
             objects = []
             for obj in selection:
                 if type(obj) == CmbObject and obj.ui_id == ui_id:
                     objects.append(obj.object_id)
 
-            self._merengue_command('selection_changed', args={ 'ui_id': ui_id, 'selection': objects })
+            self.__merengue_command('selection_changed', args={ 'ui_id': ui_id, 'selection': objects })
 
-        elif self._ui_id > 0:
-            self._ui_id = 0
-            self._update_view()
-            self._merengue_command('selection_changed', args={ 'ui_id': 0, 'selection': [] })
+        elif self.__ui_id > 0:
+            self.__ui_id = 0
+            self.__update_view()
+            self.__merengue_command('selection_changed', args={ 'ui_id': 0, 'selection': [] })
 
     @GObject.Property(type=GObject.GObject)
     def project(self):
-        return self._project
+        return self.__project
 
     @project.setter
     def _set_project(self, project):
-        if self._project is not None:
-            self._project.disconnect_by_func(self._on_object_added)
-            self._project.disconnect_by_func(self._on_object_removed)
-            self._project.disconnect_by_func(self._on_object_property_changed)
-            self._project.disconnect_by_func(self._on_object_layout_property_changed)
-            self._project.disconnect_by_func(self._on_project_selection_changed)
-            self._merengue.disconnect_by_func(self._on_merengue_stdout)
-            self._merengue.stop()
-            self._broadwayd.stop()
+        if self.__project is not None:
+            self.__project.disconnect_by_func(self.__on_object_added)
+            self.__project.disconnect_by_func(self.__on_object_removed)
+            self.__project.disconnect_by_func(self.__on_object_property_changed)
+            self.__project.disconnect_by_func(self.__on_object_layout_property_changed)
+            self.__project.disconnect_by_func(self.__on_project_selection_changed)
+            self.__merengue.disconnect_by_func(self.__on_merengue_stdout)
+            self.__merengue.stop()
+            self.__broadwayd.stop()
 
-        self._project = project
+        self.__project = project
 
-        self._update_view()
+        self.__update_view()
 
         if project is not None:
-            project.connect('object-added', self._on_object_added)
-            project.connect('object-removed', self._on_object_removed)
-            project.connect('object-property-changed', self._on_object_property_changed)
-            project.connect('object-layout-property-changed', self._on_object_layout_property_changed)
-            project.connect('selection-changed', self._on_project_selection_changed)
+            project.connect('object-added', self.__on_object_added)
+            project.connect('object-removed', self.__on_object_removed)
+            project.connect('object-property-changed', self.__on_object_property_changed)
+            project.connect('object-layout-property-changed', self.__on_object_layout_property_changed)
+            project.connect('selection-changed', self.__on_project_selection_changed)
 
-            self._merengue = CmbProcess(file=self._merengue_bin)
-            self._merengue.connect('stdout', self._on_merengue_stdout)
-            self._merengue.connect('exit', self._on_process_exit)
+            self.__merengue = CmbProcess(file=self.__merengue_bin)
+            self.__merengue.connect('stdout', self.__on_merengue_stdout)
+            self.__merengue.connect('exit', self.__on_process_exit)
 
-            broadwayd = self._gtk4_broadwayd_bin if self._project.target_tk == 'gtk-4.0' else self._broadwayd_bin
-            self._broadwayd = CmbProcess(file=broadwayd)
-            self._broadwayd.connect('stdout', self._on_broadwayd_stdout)
-            self._broadwayd.connect('exit', self._on_process_exit)
+            broadwayd = self.__gtk4_broadwayd_bin if self.__project.target_tk == 'gtk-4.0' else self.__broadwayd_bin
+            self.__broadwayd = CmbProcess(file=broadwayd)
+            self.__broadwayd.connect('stdout', self.__on_broadwayd_stdout)
+            self.__broadwayd.connect('exit', self.__on_process_exit)
 
-            self._port = self._find_free_port()
-            display = self._port - 8080
-            self._broadwayd.run([f':{display}'])
+            self.__port = self.__find_free_port()
+            display = self.__port - 8080
+            self.__broadwayd.run([f':{display}'])
 
     @GObject.Property(type=str)
     def gtk_theme(self):
@@ -331,14 +328,14 @@ window.setupDocument = function (document) {
     @gtk_theme.setter
     def _set_theme(self, theme):
         self._theme = theme
-        self._merengue_command('gtk_settings_set',
+        self.__merengue_command('gtk_settings_set',
                                args={
                                    'property': 'gtk-theme-name',
                                    'value': theme
                                })
 
     @Gtk.Template.Callback('on_context_menu')
-    def _on_context_menu(self, webview, menu, e, hit_test_result):
+    def __on_context_menu(self, webview, menu, e, hit_test_result):
         r = Gdk.Rectangle()
         r.x, r.y, r.width, r.height = (e.x, e.y, 10, 10)
         self.menu.set_pointing_to(r)
@@ -346,39 +343,39 @@ window.setupDocument = function (document) {
         return True
 
     @Gtk.Template.Callback('on_inspect_button_clicked')
-    def _on_inspect_button_clicked(self, button):
+    def __on_inspect_button_clicked(self, button):
         self.props.visible_child_name = 'ui_xml'
-        self._update_view()
+        self.__update_view()
 
     @Gtk.Template.Callback('on_restart_button_clicked')
-    def _on_restart_button_clicked(self, button):
-        self._restart_project = self._project
+    def __on_restart_button_clicked(self, button):
+        self.__restart_project = self.__project
         self.project = None
 
-    def _on_process_exit(self, process):
-        if self._broadwayd.pid == 0 and self._merengue.pid == 0:
-            self.project = self._restart_project
-            self._restart_project = None
-            self._ui_id = 0
+    def __on_process_exit(self, process):
+        if self.__broadwayd.pid == 0 and self.__merengue.pid == 0:
+            self.project = self.__restart_project
+            self.__restart_project = None
+            self.__ui_id = 0
 
-    def _command_selection_changed(self, selection):
+    def __command_selection_changed(self, selection):
         objects = []
 
         for key in selection:
-            obj = self._project._get_object_by_key(key)
+            obj = self.__project.get_object_by_key(key)
             objects.append(obj)
 
-        self._project.set_selection(objects)
+        self.__project.set_selection(objects)
 
-    def _on_merengue_stdout(self, process, condition):
+    def __on_merengue_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
-            self._merengue.stop()
+            self.__merengue.stop()
             return GLib.SOURCE_REMOVE
 
-        if self._merengue.stdout is None:
+        if self.__merengue.stdout is None:
             return GLib.SOURCE_REMOVE
 
-        retval = self._merengue.stdout.readline()
+        retval = self.__merengue.stdout.readline()
         cmd = None
 
         try:
@@ -387,11 +384,11 @@ window.setupDocument = function (document) {
             args = cmd.get('args', {})
 
             if command == 'selection_changed':
-                self._command_selection_changed(**args)
+                self.__command_selection_changed(**args)
             elif command == 'started':
-                self._on_project_selection_changed(self._project)
+                self.__on_project_selection_changed(self.__project)
 
-                self._merengue_command('gtk_settings_get',
+                self.__merengue_command('gtk_settings_get',
                                        args={ 'property': 'gtk-theme-name' })
             elif command == 'placeholder_selected':
                 self.emit('placeholder-selected', args['ui_id'], args['object_id'], args['position'], args['layout'])
@@ -407,38 +404,38 @@ window.setupDocument = function (document) {
 
         return GLib.SOURCE_CONTINUE
 
-    def _on_broadwayd_stdout(self, process, condition):
+    def __on_broadwayd_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
-            self._broadwayd.stop()
+            self.__broadwayd.stop()
             return GLib.SOURCE_REMOVE
 
-        if self._broadwayd.stdout is None:
+        if self.__broadwayd.stdout is None:
             return GLib.SOURCE_REMOVE
 
-        status, retval, length, terminator = self._broadwayd.stdout.read_line()
+        status, retval, length, terminator = self.__broadwayd.stdout.read_line()
         path = retval.replace('Listening on ', '').strip()
 
         # Run view process
-        if self._project.target_tk == 'gtk+-3.0':
+        if self.__project.target_tk == 'gtk+-3.0':
             version = '3.0'
-        elif self._project.target_tk == 'gtk-4.0':
+        elif self.__project.target_tk == 'gtk-4.0':
             version = '4.0'
 
-        display = self._port - 8080
-        self._merengue.run([version], [
+        display = self.__port - 8080
+        self.__merengue.run([version], [
             'GDK_BACKEND=broadway',
             #'GTK_DEBUG=interactive',
             f'BROADWAY_DISPLAY=:{display}'
         ])
 
         # Load broadway desktop
-        self.webview.load_uri(f'http://127.0.0.1:{self._port}')
+        self.webview.load_uri(f'http://127.0.0.1:{self.__port}')
 
-        self._broadwayd.stdout.shutdown(False)
-        self._broadwayd.stdout = None
+        self.__broadwayd.stdout.shutdown(False)
+        self.__broadwayd.stdout = None
         return GLib.SOURCE_REMOVE
 
-    def _find_free_port(self):
+    def __find_free_port(self):
         for port in range(8080, 8180):
             s = socket.socket()
             retval = s.connect_ex(('127.0.0.1', port))
@@ -449,7 +446,7 @@ window.setupDocument = function (document) {
 
         return 0
 
-    def _add_remove_placeholder(self, command, modifier):
+    def __add_remove_placeholder(self, command, modifier):
         if self.project is None:
             return
 
@@ -458,7 +455,7 @@ window.setupDocument = function (document) {
             return
 
         obj = selection[0]
-        self._merengue_command(command,
+        self.__merengue_command(command,
                                args={
                                    'ui_id': obj.ui_id,
                                    'object_id': obj.object_id,
@@ -466,10 +463,10 @@ window.setupDocument = function (document) {
                                })
 
     def add_placeholder(self, modifier=False):
-        self._add_remove_placeholder('add_placeholder', modifier)
+        self.__add_remove_placeholder('add_placeholder', modifier)
 
     def remove_placeholder(self, modifier=False):
-        self._add_remove_placeholder('remove_placeholder', modifier)
+        self.__add_remove_placeholder('remove_placeholder', modifier)
 
 
 Gtk.WidgetClass.set_css_name(CmbView, 'CmbView')

@@ -87,12 +87,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.type_info = {}
 
         # Selection
-        self._selection = []
+        self.__selection = []
 
         # Create TreeModel store
-        self._object_id = {}
+        self.__object_id = {}
 
-        GObject.GObject.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
         # Target from file take precedence over target_tk property
         if self.filename:
@@ -106,22 +106,22 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         # Use a TreeStore to hold object tree instead of using SQL for every
         # TreeStore call
-        self._store = Gtk.TreeStore(GObject.GObject)
+        self.__store = Gtk.TreeStore(GObject.GObject)
 
         # Foward signals to CmbProject, this way the user can not add data to
         # the TreeModel using Gtk API
-        self._store.connect('row-changed', lambda o, p, i: self.row_changed(p, i))
-        self._store.connect('row-inserted', lambda o, p, i: self.row_inserted(p, i))
-        self._store.connect('row-has-child-toggled', lambda o, p, i: self.row_has_child_toggled(p, i))
-        self._store.connect('row-deleted', lambda o, p: self.row_deleted(p))
-        self._store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
+        self.__store.connect('row-changed', lambda o, p, i: self.row_changed(p, i))
+        self.__store.connect('row-inserted', lambda o, p, i: self.row_inserted(p, i))
+        self.__store.connect('row-has-child-toggled', lambda o, p, i: self.row_has_child_toggled(p, i))
+        self.__store.connect('row-deleted', lambda o, p: self.row_deleted(p))
+        self.__store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
 
         # DataModel is only used internally
         self.db = CmbDB(target_tk=self.target_tk)
         self.db.type_info = self.type_info
-        self._init_data()
+        self.__init_data()
 
-        self._load()
+        self.__load()
 
     @GObject.Property(type=bool, default=False)
     def history_enabled(self):
@@ -193,7 +193,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             'pks': pks
         }
 
-    def _type_get_data(self, type_id, data_id, parent_id, key, value_type_id):
+    def __type_get_data(self, type_id, data_id, parent_id, key, value_type_id):
         args = {}
         children = {}
         retval = CmbTypeData(data_id, value_type_id)
@@ -210,7 +210,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         for row in c.execute('SELECT * FROM type_data WHERE owner_id=? AND parent_id=?;',
                              (type_id, data_id)):
             type_id, data_id, parent_id, key, value_type_id = row
-            children[key] = self._type_get_data(*row)
+            children[key] = self.__type_get_data(*row)
 
         c.close()
 
@@ -219,7 +219,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         return retval
 
-    def _init_type_info(self, c):
+    def __init_type_info(self, c):
         owner_id = None
 
         # Dictionary with all the types hierarchy
@@ -270,7 +270,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 type_data[owner_id] = data
 
             key = row[3]
-            data[key] = self._type_get_data(*row)
+            data[key] = self.__type_get_data(*row)
 
         for row in c.execute('''SELECT * FROM type
                                   WHERE
@@ -284,17 +284,17 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             info.data = type_data.get(type_id, {})
             self.type_info[type_id] = info
 
-    def _init_data(self):
+    def __init_data(self):
         if self.target_tk is None:
             return
 
         c = self.db.cursor()
 
-        self._init_type_info(c)
+        self.__init_type_info(c)
 
         c.close()
 
-    def _load(self):
+    def __load(self):
         if self.filename is None or not os.path.isfile(self.filename):
             return
 
@@ -302,9 +302,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.db.load(self.filename)
         self.history_enabled = True
 
-        self._populate_objects()
+        self.__populate_objects()
 
-    def _populate_objects(self, ui_id=None):
+    def __populate_objects(self, ui_id=None):
         c = self.db.cursor()
         cc = self.db.cursor()
 
@@ -316,11 +316,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # Populate tree view
         for row in rows:
             ui_id = row[0]
-            self._add_ui(False, *row)
+            self.__add_ui(False, *row)
 
             # Update UI objects
             for obj in cc.execute('SELECT * FROM object WHERE ui_id=?;', (ui_id, )):
-                self._add_object(False, *obj)
+                self.__add_object(False, *obj)
 
         c.close()
         cc.close()
@@ -328,7 +328,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def save(self):
         self.db.save(self.filename)
 
-    def _get_import_errors(self):
+    def __get_import_errors(self):
         errors = self.db.errors
 
         if not len(errors):
@@ -396,7 +396,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         import_end = time.monotonic()
 
         # Populate UI
-        self._populate_objects(ui_id)
+        self.__populate_objects(ui_id)
 
         self.history_pop()
 
@@ -404,12 +404,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         logger.info('UI update: {time.monotonic() - import_end}')
 
         # Get parsing errors
-        retval = self._get_import_errors()
+        retval = self.__get_import_errors()
         self.db.errors = None
 
         return retval
 
-    def _export(self, ui_id, filename, dirname=None):
+    def __export(self, ui_id, filename, dirname=None):
         if not os.path.isabs(filename):
             if dirname is None:
                 dirname = os.path.dirname(self.filename)
@@ -427,7 +427,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             fd.close()
 
     def export_ui(self, ui):
-        self._export(ui.ui_id, ui.filename)
+        self.__export(ui.ui_id, ui.filename)
 
     def export(self):
         c = self.db.cursor()
@@ -436,22 +436,22 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         for row in c.execute('SELECT ui_id, filename FROM ui;'):
             ui_id, filename = row
-            self._export(ui_id, filename, dirname=dirname)
+            self.__export(ui_id, filename, dirname=dirname)
 
         c.close()
 
-    def _selection_remove(self, obj):
+    def __selection_remove(self, obj):
         try:
-            self._selection.remove(obj)
+            self.__selection.remove(obj)
         except:
             pass
         else:
             self.emit('selection-changed')
 
-    def _add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
+    def __add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
         ui = CmbUI(project=self, ui_id=ui_id)
 
-        self._object_id[ui_id] = self._store.append(None, [ui])
+        self.__object_id[ui_id] = self.__store.append(None, [ui])
 
         if emit:
             self.emit('ui-added', ui)
@@ -470,14 +470,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             return None
         else:
-            return self._add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None, None)
+            return self.__add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None, None)
 
-    def _remove_ui(self, ui):
-        iter_ = self._object_id.pop(ui.ui_id, None)
+    def __remove_ui(self, ui):
+        iter_ = self.__object_id.pop(ui.ui_id, None)
 
         if iter_ is not None:
-            self._selection_remove(ui)
-            self._store.remove(iter_)
+            self.__selection_remove(ui)
+            self.__store.remove(iter_)
             self.emit('ui-removed', ui)
 
     def remove_ui(self, ui):
@@ -486,22 +486,22 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             self.db.execute("DELETE FROM ui WHERE ui_id=?;", (ui.ui_id, ))
             self.history_pop()
             self.db.commit()
-            self._remove_ui(ui);
+            self.__remove_ui(ui);
         except:
             pass
 
-    def _add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=None):
+    def __add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=None):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,
                         info=self.type_info[obj_type])
 
         if parent_id:
-            parent = self._object_id.get(f'{ui_id}.{parent_id}', None)
+            parent = self.__object_id.get(f'{ui_id}.{parent_id}', None)
         else:
-            parent = self._object_id.get(ui_id, None)
+            parent = self.__object_id.get(ui_id, None)
 
-        self._object_id[f'{ui_id}.{object_id}'] = self._store.append(parent, [obj])
+        self.__object_id[f'{ui_id}.{object_id}'] = self.__store.append(parent, [obj])
 
         if emit:
             self.emit('object-added', obj)
@@ -530,7 +530,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
     def add_object(self, ui_id, obj_type, name=None, parent_id=None, layout=None, position=None):
         if parent_id:
-            parent = self._get_object_by_id(ui_id, parent_id)
+            parent = self.get_object_by_id(ui_id, parent_id)
             if parent is None:
                 return None
 
@@ -548,13 +548,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             logger.warning(f'Error adding object {obj_name}: {e}')
             return None
         else:
-            return self._add_object(True, ui_id, object_id, obj_type, name, parent_id)
+            return self.__add_object(True, ui_id, object_id, obj_type, name, parent_id)
 
-    def _remove_object(self, obj):
-        iter_ = self._object_id.pop(f'{obj.ui_id}.{obj.object_id}', None)
+    def __remove_object(self, obj):
+        iter_ = self.__object_id.pop(f'{obj.ui_id}.{obj.object_id}', None)
         if iter_ is not None:
-            self._selection_remove(obj)
-            self._store.remove(iter_)
+            self.__selection_remove(obj)
+            self.__store.remove(iter_)
             self.emit('object-removed', obj)
 
     def remove_object(self, obj):
@@ -568,43 +568,43 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         except:
             pass
         else:
-            self._remove_object(obj)
+            self.__remove_object(obj)
 
     def get_selection(self):
-        return self._selection
+        return self.__selection
 
     def set_selection(self, selection):
-        if type(selection) != list or self._selection == selection:
+        if type(selection) != list or self.__selection == selection:
             return
 
         for obj in selection:
             if type(obj) != CmbUI and type(obj) != CmbObject:
                 return
 
-        self._selection = selection
+        self.__selection = selection
         self.emit('selection-changed')
 
     def get_iter_from_object(self, obj):
         if type(obj) == CmbObject:
-            return self._object_id.get(f'{obj.ui_id}.{obj.object_id}', None)
+            return self.__object_id.get(f'{obj.ui_id}.{obj.object_id}', None)
         elif type(obj) == CmbUI:
-            return self._object_id.get(obj.ui_id, None)
+            return self.__object_id.get(obj.ui_id, None)
 
-    def _get_object_by_key(self, key):
-        _iter = self._object_id.get(key, None)
-        return self._store.get_value(_iter, 0) if _iter else None
+    def get_object_by_key(self, key):
+        _iter = self.__object_id.get(key, None)
+        return self.__store.get_value(_iter, 0) if _iter else None
 
-    def _get_object_by_id(self, ui_id, object_id = None):
+    def get_object_by_id(self, ui_id, object_id = None):
         key = f'{ui_id}.{object_id}' if object_id is not None else ui_id
-        return self._get_object_by_key(key)
+        return self.get_object_by_key(key)
 
-    def _get_object_by_name(self, ui_id, name):
+    def get_object_by_name(self, ui_id, name):
         c = self.db.execute("SELECT object_id FROM object WHERE ui_id=? AND name=?;",
                             (ui_id, name))
         row = c.fetchone()
-        return self._get_object_by_key(f'{ui_id}.{row[0]}') if row else None
+        return self.get_object_by_key(f'{ui_id}.{row[0]}') if row else None
 
-    def _undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
+    def __undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
         # FIXME:use a dict instead of walking the array
         properties = obj.layout if layout else obj.properties
         for p in properties:
@@ -615,18 +615,18 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 else:
                     obj._property_changed(p)
 
-    def _get_history_command(self, history_index):
+    def __get_history_command(self, history_index):
         c = self.db.cursor()
         c.execute("SELECT command, range_id, table_name, column_name FROM history WHERE history_id=?", (history_index, ))
         retval = c.fetchone()
         c.close()
         return retval
 
-    def _undo_redo_do(self, undo):
+    def __undo_redo_do(self, undo):
         c = self.db.cursor()
 
         # Get last command
-        command, range_id, table, column = self._get_history_command(self.history_index)
+        command, range_id, table, column = self.__get_history_command(self.history_index)
 
         if table is not None:
             commands = self.db.history_commands[table]
@@ -649,9 +649,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c.close()
 
         # Update project state
-        self._undo_redo_update(command, range_id, table, column)
+        self.__undo_redo_update(command, range_id, table, column)
 
-    def _undo_redo_update(self, command, range_id, table, column):
+    def __undo_redo_update(self, command, range_id, table, column):
         c = self.db.cursor()
 
         if table is None:
@@ -667,38 +667,38 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         if command == 'UPDATE':
             if table == 'object_property':
-                obj = self._get_object_by_id(pk[0], pk[1])
-                self._undo_redo_property_notify(obj, False, column, pk[2], pk[3])
+                obj = self.get_object_by_id(pk[0], pk[1])
+                self.__undo_redo_property_notify(obj, False, column, pk[2], pk[3])
             elif table == 'object_layout_property':
-                child = self._get_object_by_id(pk[0], pk[2])
-                self._undo_redo_property_notify(child, True, column, pk[3], pk[4])
+                child = self.get_object_by_id(pk[0], pk[2])
+                self.__undo_redo_property_notify(child, True, column, pk[3], pk[4])
             elif table == 'object_signal':
                 pass
         elif command == 'INSERT' or command == 'DELETE':
             if table == 'object_property':
-                obj = self._get_object_by_id(pk[0], pk[1])
-                self._undo_redo_property_notify(obj, False, 'value', pk[2], pk[3])
+                obj = self.get_object_by_id(pk[0], pk[1])
+                self.__undo_redo_property_notify(obj, False, 'value', pk[2], pk[3])
             elif table == 'object_layout_property':
-                child = self._get_object_by_id(pk[0], pk[2])
-                self._undo_redo_property_notify(child, True, 'value', pk[3], pk[4])
+                child = self.get_object_by_id(pk[0], pk[2])
+                self.__undo_redo_property_notify(child, True, 'value', pk[3], pk[4])
             elif table =='object' or table == 'ui':
                 c.execute(commands['COUNT'], (self.history_index, ))
                 count = c.fetchone()
 
                 if count[0] == 0:
-                    obj = self._get_object_by_id(pk[0], pk[1] if len(pk) > 1 else None)
+                    obj = self.get_object_by_id(pk[0], pk[1] if len(pk) > 1 else None)
 
                     if table =='object':
-                        self._remove_object(obj)
+                        self.__remove_object(obj)
                     elif table == 'ui':
-                        self._remove_ui(obj)
+                        self.__remove_ui(obj)
                 else:
                     c.execute(commands['DATA'], (self.history_index, ))
                     row = c.fetchone()
                     if table == 'ui':
-                        self._add_ui(True, *row)
+                        self.__add_ui(True, *row)
                     elif table == 'object':
-                        self._add_object(True, *row)
+                        self.__add_object(True, *row)
             elif table == 'object_signal':
                 c.execute(commands['COUNT'], (self.history_index, ))
                 count = c.fetchone()
@@ -706,7 +706,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                 c.execute(commands['DATA'], (self.history_index, ))
                 row = c.fetchone()
 
-                obj = self._get_object_by_id(row[1], row[2])
+                obj = self.get_object_by_id(row[1], row[2])
 
                 if count[0] == 0:
                     for signal in obj.signals:
@@ -718,19 +718,19 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         c.close()
 
-    def _undo_redo(self, undo):
+    def __undo_redo(self, undo):
         c = self.db.cursor()
 
         self.history_enabled = False
         self.db.foreign_keys = False
 
-        command, range_id, table, column = self._get_history_command(self.history_index)
+        command, range_id, table, column = self.__get_history_command(self.history_index)
 
         if command == 'POP':
             if undo:
                 self.history_index -= 1
                 while range_id < self.history_index:
-                    self._undo_redo_do(True)
+                    self.__undo_redo_do(True)
                     self.history_index -= 1
             else:
                 logger.warning("Error on undo/redo stack: we should not try to redo a POP command")
@@ -738,12 +738,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             if not undo:
                 while range_id > self.history_index:
                     self.history_index += 1
-                    self._undo_redo_do(undo)
+                    self.__undo_redo_do(undo)
             else:
                 logger.warning("Error on undo/redo stack: we should not try to undo a PUSH command")
         else:
             # Undo / Redo in DB
-            self._undo_redo_do(undo)
+            self.__undo_redo_do(undo)
 
         self.db.foreign_keys = True
         self.history_enabled = True
@@ -851,7 +851,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         if self.history_index == 0:
             return
 
-        self._undo_redo(True)
+        self.__undo_redo(True)
         self.history_index -= 1
 
     def redo(self):
@@ -859,7 +859,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             return
 
         self.history_index += 1
-        self._undo_redo(False)
+        self.__undo_redo(False)
 
     def get_type_properties(self, name):
         info = self.type_info.get(name, None)
@@ -929,13 +929,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         # "SELECT * FROM (SELECT object_id, row_number() OVER (ORDER BY object_id) AS row_number FROM object WHERE ui_id=1 ORDER BY object_id) WHERE row_number=?;"
 
         try:
-            retval = self._store.get_iter(path)
+            retval = self.__store.get_iter(path)
             return (retval is not None, retval)
         except:
             return (False, None)
 
     def do_iter_next(self, iter_):
-        retval = self._store.iter_next(iter_)
+        retval = self.__store.iter_next(iter_)
 
         if retval is not None:
             iter_.user_data = retval.user_data
@@ -945,7 +945,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         return False
 
     def do_iter_previous(self, iter_):
-        retval = self._store.iter_previous(iter_)
+        retval = self.__store.iter_previous(iter_)
         if retval is not None:
             iter_.user_data = retval.user_data
             iter_.user_data2 = retval.user_data2
@@ -954,45 +954,45 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         return False
 
     def do_iter_has_child(self, iter_):
-        return self._store.iter_has_child(iter_)
+        return self.__store.iter_has_child(iter_)
 
     def do_iter_nth_child(self, iter_, n):
-        retval = self._store.iter_nth_child(iter_, n)
+        retval = self.__store.iter_nth_child(iter_, n)
         return (retval is not None, retval)
 
     def do_iter_children(self, parent):
         if parent is None:
-            retval = self._store.get_iter_first()
+            retval = self.__store.get_iter_first()
             return (retval is not None, retval)
-        elif self._store.iter_has_child(parent):
-            retval = self._store.iter_children(parent)
+        elif self.__store.iter_has_child(parent):
+            retval = self.__store.iter_children(parent)
             return (True, retval)
 
         return (False, None)
 
     def do_iter_n_children(self, iter_):
-        return self._store.iter_n_children(iter_)
+        return self.__store.iter_n_children(iter_)
 
     def do_iter_parent(self, child):
-        retval = self._store.iter_parent(child)
+        retval = self.__store.iter_parent(child)
         return (retval is not None, retval)
 
     def do_get_path(self, iter_):
-        return self._store.get_path(iter_)
+        return self.__store.get_path(iter_)
 
     def do_get_value(self, iter_, column):
-        retval = self._store.get_value(iter_, column)
-        if retval is None and self._store.get_column_type(column) == GObject.TYPE_STRING:
+        retval = self.__store.get_value(iter_, column)
+        if retval is None and self.__store.get_column_type(column) == GObject.TYPE_STRING:
             return ''
 
         return retval
 
     def do_get_n_columns(self):
-        return self._store.get_n_columns()
+        return self.__store.get_n_columns()
 
     def do_get_column_type(self, column):
-        return self._store.get_column_type(column)
+        return self.__store.get_column_type(column)
 
     def do_get_flags(self):
-        return self._store.get_flags()
+        return self.__store.get_flags()
 

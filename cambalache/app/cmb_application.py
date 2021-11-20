@@ -50,7 +50,7 @@ class CmbApplication(Gtk.Application):
 
         if window is None:
             window = CmbWindow(application=self)
-            window.connect('open-project', self._on_open_project)
+            window.connect('open-project', self.__on_open_project)
             if path is not None:
                 window.open_project(path, target_tk=target_tk, uiname=uiname)
             self.add_window(window)
@@ -82,7 +82,7 @@ class CmbApplication(Gtk.Application):
         if self.props.active_window is None:
             self.open(None)
 
-    def _on_open_project(self, window, filename, target_tk, uiname):
+    def __on_open_project(self, window, filename, target_tk, uiname):
         if window.project is None:
             window.open_project(filename, target_tk, uiname)
         else:

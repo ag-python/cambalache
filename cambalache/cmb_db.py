@@ -80,8 +80,8 @@ class CmbDB(GObject.GObject):
         c.close()
 
         # Initialize history (Undo/Redo) tables
-        self._init_history_and_triggers()
-        self._init_data()
+        self.__init_history_and_triggers()
+        self.__init_data()
 
 
     def __del__(self):
@@ -102,7 +102,7 @@ class CmbDB(GObject.GObject):
         self.conn.commit()
         self.conn.execute(f"PRAGMA foreign_keys={fk};")
 
-    def _create_support_table(self, c, table):
+    def __create_support_table(self, c, table):
         _table = table.replace('_', '-')
 
         # Create a history table to store data for INSERT and DELETE commands
@@ -234,26 +234,26 @@ class CmbDB(GObject.GObject):
     END;
             ''')
 
-    def _init_history_and_triggers(self):
+    def __init_history_and_triggers(self):
         c = self.conn.cursor()
 
         # Create history main tables
         c.executescript(HISTORY_SQL)
 
         # Create history tables for each tracked table
-        self._create_support_table(c, 'ui')
-        self._create_support_table(c, 'ui_library')
-        self._create_support_table(c, 'object')
-        self._create_support_table(c, 'object_property')
-        self._create_support_table(c, 'object_layout_property')
-        self._create_support_table(c, 'object_signal')
-        self._create_support_table(c, 'object_data')
-        self._create_support_table(c, 'object_data_arg')
+        self.__create_support_table(c, 'ui')
+        self.__create_support_table(c, 'ui_library')
+        self.__create_support_table(c, 'object')
+        self.__create_support_table(c, 'object_property')
+        self.__create_support_table(c, 'object_layout_property')
+        self.__create_support_table(c, 'object_signal')
+        self.__create_support_table(c, 'object_data')
+        self.__create_support_table(c, 'object_data_arg')
 
         self.conn.commit()
         c.close()
 
-    def _init_data(self):
+    def __init_data(self):
         if self.target_tk not in ['gtk+-3.0', 'gtk-4.0']:
             raise Exception(f'Unknown target tk {self.target_tk}')
 
@@ -302,13 +302,13 @@ class CmbDB(GObject.GObject):
     def set_data(self, key, value):
         self.execute("UPDATE global SET value=? WHERE key=?;", (value, key))
 
-    def _parse_version(self, version):
+    def __parse_version(self, version):
         if version is None:
             return (0, 0, 0)
 
         return tuple([int(x) for x in version.split('.')])
 
-    def _ensure_table_data_columns(self, version, table, data):
+    def __ensure_table_data_columns(self, version, table, data):
         if version is None:
             return data
 
@@ -317,28 +317,28 @@ class CmbDB(GObject.GObject):
 
         return data
 
-    def _migrate_table_data(self, c, version, table, data):
+    def __migrate_table_data(self, c, version, table, data):
         if version is None:
             return
 
         if version < (0, 7, 5):
             cmb_db_migration.migrate_table_data_to_0_7_5(c, table, data)
 
-    def _load_table_from_tuples(self, c, table, tuples, version=None):
+    def __load_table_from_tuples(self, c, table, tuples, version=None):
         data = ast.literal_eval(f'[{tuples}]') if tuples else []
 
         if len(data) == 0:
             return
 
         # Ensure table data has the right ammount of columns
-        data = self._ensure_table_data_columns(version, table, data)
+        data = self.__ensure_table_data_columns(version, table, data)
 
         # Load table data
         cols = ', '.join(['?' for col in data[0]])
         c.executemany(f'INSERT INTO {table} VALUES ({cols})', data)
 
         # Migrate data to current format
-        self._migrate_table_data(c, version, table, data)
+        self.__migrate_table_data(c, version, table, data)
 
     def load(self, filename):
         # TODO: drop all data before loading?
@@ -355,7 +355,7 @@ class CmbDB(GObject.GObject):
             raise Exception(f'Can not load a {target_tk} target in {self.target_tk} project.')
 
 
-        version = self._parse_version(root.get('version', None))
+        version = self.__parse_version(root.get('version', None))
 
         c = self.conn.cursor()
 
@@ -363,7 +363,7 @@ class CmbDB(GObject.GObject):
         self.foreign_keys = False
 
         for child in root.getchildren():
-            self._load_table_from_tuples(c, child.tag, child.text, version)
+            self.__load_table_from_tuples(c, child.tag, child.text, version)
 
         self.foreign_keys = True
         c.close()
@@ -423,7 +423,7 @@ class CmbDB(GObject.GObject):
         self.foreign_keys = False
 
         for child in root.getchildren():
-            self._load_table_from_tuples(c, child.tag, child.text)
+            self.__load_table_from_tuples(c, child.tag, child.text)
 
         self.foreign_keys = True
         c.close()
@@ -551,7 +551,7 @@ class CmbDB(GObject.GObject):
 
             if parent_type:
                 for property_id in layout:
-                    owner_id = self._get_layout_property_owner(parent_type[0], property_id)
+                    owner_id = self.__get_layout_property_owner(parent_type[0], property_id)
                     c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
                               (ui_id, parent_id, object_id, owner_id, property_id, layout[property_id]))
 
@@ -559,7 +559,7 @@ class CmbDB(GObject.GObject):
 
         return object_id
 
-    def _collect_error(self, error, node, name):
+    def __collect_error(self, error, node, name):
         # Ensure error object
         if error not in self.errors:
             self.errors[error] = {}
@@ -573,13 +573,13 @@ class CmbDB(GObject.GObject):
         # Add unknown tag occurence
         errors[name].append(node.sourceline)
 
-    def _unknown_tag(self, node, owner, name):
+    def __unknown_tag(self, node, owner, name):
         if node.tag is etree.Comment:
             return;
 
-        self._collect_error('unknown-tag', node, f'{owner}:{name}' if owner and name else name)
+        self.__collect_error('unknown-tag', node, f'{owner}:{name}' if owner and name else name)
 
-    def _node_get(self, node, *args):
+    def __node_get(self, node, *args):
         keys = node.keys()
         knowns = []
         retval = []
@@ -593,20 +593,20 @@ class CmbDB(GObject.GObject):
                 retval.append(node.get(attr))
                 knowns.append(attr)
             else:
-                self._collect_error('missing-attr', node, attr)
+                self.__collect_error('missing-attr', node, attr)
 
         unknown = list(set(keys) - set(knowns))
 
         for attr in unknown:
-            self._collect_error('unknown-attr', node, attr)
+            self.__collect_error('unknown-attr', node, attr)
 
         return retval
 
-    def _import_property(self, c, info, ui_id, object_id, prop):
-        name, translatable, context, comments = self._node_get(prop, 'name', ['translatable', 'context', 'comments'])
+    def __import_property(self, c, info, ui_id, object_id, prop):
+        name, translatable, context, comments = self.__node_get(prop, 'name', ['translatable', 'context', 'comments'])
 
         property_id = name.replace('_', '-')
-        comment = self._node_get_comment(prop)
+        comment = self.__node_get_comment(prop)
 
         pinfo = None
 
@@ -622,7 +622,7 @@ class CmbDB(GObject.GObject):
 
         # Insert property
         if not pinfo:
-            self._collect_error('unknown-property', prop, f'{info.type_id}:{property_id}')
+            self.__collect_error('unknown-property', prop, f'{info.type_id}:{property_id}')
             return
 
         try:
@@ -631,8 +631,8 @@ class CmbDB(GObject.GObject):
         except Exception as e:
             raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {pinfo.owner_id}:{property_id} property: {e}')
 
-    def _import_signal(self, c, info, ui_id, object_id, signal):
-        name, handler, user_data, swap, after, = self._node_get(signal, 'name', ['handler', 'object', 'swapped', 'after'])
+    def __import_signal(self, c, info, ui_id, object_id, signal):
+        name, handler, user_data, swap, after, = self.__node_get(signal, 'name', ['handler', 'object', 'swapped', 'after'])
 
         tokens = name.split('::')
 
@@ -643,7 +643,7 @@ class CmbDB(GObject.GObject):
             signal_id = tokens[0]
             detail = None
 
-        comment = self._node_get_comment(signal)
+        comment = self.__node_get_comment(signal)
 
         # Find owner type for signal
         if signal_id in info.signals:
@@ -657,7 +657,7 @@ class CmbDB(GObject.GObject):
 
         # Insert signal
         if not owner_id:
-            self._collect_error('unknown-signal', signal, f'{info.type_id}:{signal_id}')
+            self.__collect_error('unknown-signal', signal, f'{info.type_id}:{signal_id}')
             return
 
         try:
@@ -666,24 +666,24 @@ class CmbDB(GObject.GObject):
         except Exception as e:
             raise Exception(f'XML:{signal.sourceline} - Can not import object {object_id} {owner_id}:{signal_id} signal: {e}')
 
-    def _import_child(self, c, info, ui_id, parent_id, child):
-        ctype, internal = self._node_get(child, ['type', 'internal-child'])
+    def __import_child(self, c, info, ui_id, parent_id, child):
+        ctype, internal = self.__node_get(child, ['type', 'internal-child'])
         object_id = None
         packing = None
 
         for node in child.iterchildren():
             if node.tag == 'object':
-                object_id = self._import_object(ui_id, node, parent_id, internal, ctype)
+                object_id = self.__import_object(ui_id, node, parent_id, internal, ctype)
             elif node.tag == 'packing' and self.target_tk == 'gtk+-3.0':
                 # Gtk 3, packing props are sibling to <object>
                 packing = node
             else:
-                self._unknown_tag(node, ctype, node.tag)
+                self.__unknown_tag(node, ctype, node.tag)
 
         if packing is not None and object_id:
-            self._import_layout_properties(c, info, ui_id, parent_id, object_id, packing)
+            self.__import_layout_properties(c, info, ui_id, parent_id, object_id, packing)
 
-    def _get_layout_property_owner(self, type_id, property):
+    def __get_layout_property_owner(self, type_id, property):
         info = self.type_info.get(type_id, None)
 
         if info is None:
@@ -699,7 +699,7 @@ class CmbDB(GObject.GObject):
 
         return owner_id
 
-    def _import_layout_properties(self, c, info, ui_id, parent_id, object_id, layout):
+    def __import_layout_properties(self, c, info, ui_id, parent_id, object_id, layout):
         c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
         parent_type = c.fetchone()
 
@@ -708,13 +708,13 @@ class CmbDB(GObject.GObject):
 
         for prop in layout.iterchildren():
             if prop.tag != 'property':
-                self._unknown_tag(prop, owner_id, prop.tag)
+                self.__unknown_tag(prop, owner_id, prop.tag)
                 continue
 
-            name, translatable, context, comments = self._node_get(prop, 'name', ['translatable', 'context', 'comments'])
+            name, translatable, context, comments = self.__node_get(prop, 'name', ['translatable', 'context', 'comments'])
             property_id = name.replace('_', '-')
-            comment = self._node_get_comment(prop)
-            owner_id = self._get_layout_property_owner(parent_type[0], property_id)
+            comment = self.__node_get_comment(prop)
+            owner_id = self.__get_layout_property_owner(parent_type[0], property_id)
 
             try:
                 c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
@@ -722,13 +722,13 @@ class CmbDB(GObject.GObject):
             except Exception as e:
                 raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {owner_id}:{property_id} layout property: {e}')
 
-    def _import_object_data(self, ui_id, object_id, owner_id, taginfo, ntag, parent_id):
+    def __import_object_data(self, ui_id, object_id, owner_id, taginfo, ntag, parent_id):
         c = self.conn.cursor()
 
         data_id = taginfo.data_id
         text = ntag.text.strip() if ntag.text else None
         value = text if text and len(text) > 0 else None
-        comment = self._node_get_comment(ntag)
+        comment = self.__node_get_comment(ntag)
 
         c.execute("SELECT coalesce((SELECT id FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? ORDER BY id DESC LIMIT 1), 0) + 1;",
                   (ui_id, object_id, owner_id, data_id))
@@ -744,30 +744,30 @@ class CmbDB(GObject.GObject):
 
         for child in ntag.iterchildren():
             if child.tag in taginfo.children:
-                self._import_object_data(ui_id,
-                                         object_id,
-                                         owner_id,
-                                         taginfo.children[child.tag],
-                                         child,
-                                         id)
+                self.__import_object_data(ui_id,
+                                          object_id,
+                                          owner_id,
+                                          taginfo.children[child.tag],
+                                          child,
+                                          id)
             else:
-                self._unknown_tag(child, owner_id, child.tag)
+                self.__unknown_tag(child, owner_id, child.tag)
 
         c.close()
 
-    def _import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False):
+    def __import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False):
         is_template = node.tag == 'template'
 
         if is_template:
-            klass, name = self._node_get(node, 'parent', 'class')
+            klass, name = self.__node_get(node, 'parent', 'class')
         else:
-            klass, name = self._node_get(node, 'class', ['id'])
+            klass, name = self.__node_get(node, 'class', ['id'])
 
-        comment = self._node_get_comment(node)
+        comment = self.__node_get_comment(node)
         info = self.type_info.get(klass, None)
 
         if not info:
-            self._collect_error('unknown-type', node, klass)
+            self.__collect_error('unknown-type', node, klass)
             return
 
         # Insert object
@@ -794,49 +794,49 @@ class CmbDB(GObject.GObject):
 
         for child in node.iterchildren():
             if child.tag == 'property':
-                self._import_property(c, info, ui_id, object_id, child)
+                self.__import_property(c, info, ui_id, object_id, child)
             elif child.tag == 'signal':
-                self._import_signal(c, info, ui_id, object_id, child)
+                self.__import_signal(c, info, ui_id, object_id, child)
             elif child.tag == 'child':
-                self._import_child(c, info, ui_id, object_id, child)
+                self.__import_child(c, info, ui_id, object_id, child)
             elif child.tag == 'layout' and self.target_tk == 'gtk-4.0':
                 # Gtk 4, layout props are children of <object>
-                self._import_layout_properties(c, info, ui_id, parent_id, object_id, child)
+                self.__import_layout_properties(c, info, ui_id, parent_id, object_id, child)
             else:
                 # Custom buildable tags
                 dinfo = find_data_info(info, child.tag)
 
                 if dinfo is not None:
                     taginfo = dinfo.data[child.tag]
-                    self._import_object_data(ui_id, object_id, dinfo.type_id, taginfo, child, None)
+                    self.__import_object_data(ui_id, object_id, dinfo.type_id, taginfo, child, None)
                 else:
-                    self._unknown_tag(child, klass, child.tag)
+                    self.__unknown_tag(child, klass, child.tag)
 
         c.close()
 
         return object_id
 
-    def _node_get_comment(self, node):
+    def __node_get_comment(self, node):
         prev = node.getprevious()
         if prev is not None and prev.tag is etree.Comment:
             return prev.text
         return None
 
-    def _node_get_requirements(self, root):
+    def __node_get_requirements(self, root):
         retval = {}
 
         # Collect requirements and comments
         for req in root.iterfind('requires'):
-            lib, version = self._node_get(req, 'lib', 'version')
+            lib, version = self.__node_get(req, 'lib', 'version')
 
             retval[lib] = {
               'version': version,
-              'comment': self._node_get_comment(req)
+              'comment': self.__node_get_comment(req)
             }
 
         return retval
 
-    def _get_target_from_node(self, root, requirements):
+    def __get_target_from_node(self, root, requirements):
         # Look for explicit gtk version first
         for lib in ['gtk', 'gtk+']:
             if lib in requirements:
@@ -858,10 +858,10 @@ class CmbDB(GObject.GObject):
         tree = etree.parse(filename)
         root = tree.getroot()
 
-        requirements = self._node_get_requirements(root)
+        requirements = self.__node_get_requirements(root)
 
         target_tk = self.target_tk
-        lib, ver, inferred = self._get_target_from_node(root, requirements)
+        lib, ver, inferred = self.__get_target_from_node(root, requirements)
 
         if (target_tk == 'gtk-4.0' and lib != 'gtk') or \
            (target_tk == 'gtk+-3.0' and lib != 'gtk+'):
@@ -878,12 +878,12 @@ class CmbDB(GObject.GObject):
         c = self.conn.cursor()
 
         # Update interface comment
-        comment = self._node_get_comment(root)
+        comment = self.__node_get_comment(root)
         if comment and comment.strip().startswith('Created with Cambalache'):
             comment = None
 
         # Make sure there is no attributes in root tag
-        self._node_get(root)
+        self.__node_get(root)
 
         basename = os.path.basename(filename)
         relpath = os.path.relpath(filename, projectdir)
@@ -892,13 +892,13 @@ class CmbDB(GObject.GObject):
         # Import objects
         for child in root.iterchildren():
             if child.tag == 'object':
-                self._import_object(ui_id, child, None)
+                self.__import_object(ui_id, child, None)
             elif child.tag == 'template':
-                self._import_object(ui_id, child, None)
+                self.__import_object(ui_id, child, None)
             elif child.tag == 'requires':
                 pass
             else:
-                self._unknown_tag(child, None, child.tag)
+                self.__unknown_tag(child, None, child.tag)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
@@ -923,11 +923,11 @@ class CmbDB(GObject.GObject):
 
         return ui_id
 
-    def _node_add_comment(self, node, comment):
+    def __node_add_comment(self, node, comment):
         if comment:
             node.addprevious(etree.Comment(comment))
 
-    def _export_object(self, ui_id, object_id, merengue=False, template_id=None):
+    def __export_object(self, ui_id, object_id, merengue=False, template_id=None):
 
         def node_set(node, attr, val):
             if val is not None:
@@ -997,7 +997,7 @@ class CmbDB(GObject.GObject):
                 node_set(node, 'comments', translation_comments)
 
             obj.append(node)
-            self._node_add_comment(node, comment)
+            self.__node_add_comment(node, comment)
 
         # Signals
         for row in c.execute('SELECT signal_id, handler, detail, (SELECT name FROM object WHERE ui_id=? AND object_id=user_data), swap, after, comment FROM object_signal WHERE ui_id=? AND object_id=?;',
@@ -1011,7 +1011,7 @@ class CmbDB(GObject.GObject):
             if after:
                 node_set(node, 'after', 'yes')
             obj.append(node)
-            self._node_add_comment(node, comment)
+            self.__node_add_comment(node, comment)
 
         # Layout properties class
         layout_class = f'{type_id}LayoutChild'
@@ -1040,11 +1040,11 @@ class CmbDB(GObject.GObject):
 
                 child_position += 1
 
-            child_obj = self._export_object(ui_id, child_id, merengue=merengue)
+            child_obj = self.__export_object(ui_id, child_id, merengue=merengue)
             child = E.child(child_obj)
             node_set(child, 'internal-child', internal)
             node_set(child, 'type', ctype)
-            self._node_add_comment(child_obj, comment)
+            self.__node_add_comment(child_obj, comment)
 
             obj.append(child)
 
@@ -1073,7 +1073,7 @@ class CmbDB(GObject.GObject):
                 value, property_id, comment = prop
                 node = E.property(value, name=property_id)
                 layout.append(node)
-                self._node_add_comment(node, comment)
+                self.__node_add_comment(node, comment)
 
             if len(layout) > 0:
                 if self.target_tk == 'gtk+-3.0':
@@ -1093,7 +1093,7 @@ class CmbDB(GObject.GObject):
                 if value:
                     ntag.text = value
                 node.append(ntag)
-                self._node_add_comment(ntag, comment)
+                self.__node_add_comment(ntag, comment)
 
                 for row in cc.execute('SELECT key, value FROM object_data_arg WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND value IS NOT NULL;',
                                       (ui_id, object_id, owner_id, info.data_id, id)):
@@ -1120,7 +1120,7 @@ class CmbDB(GObject.GObject):
                     if value:
                         ntag.text = value
                     node.append(ntag)
-                    self._node_add_comment(ntag, comment)
+                    self.__node_add_comment(ntag, comment)
 
                     for child in taginfo.children:
                         export_object_data(owner_id, child, taginfo.children[child], ntag, id)
@@ -1144,7 +1144,7 @@ class CmbDB(GObject.GObject):
 
         c.execute('SELECT comment, template_id FROM ui WHERE ui_id=?;', (ui_id,))
         comment, template_id = c.fetchone()
-        self._node_add_comment(node, comment)
+        self.__node_add_comment(node, comment)
 
         # requires
         tk_library_id, tk_version = self.target_tk.split('-')
@@ -1153,7 +1153,7 @@ class CmbDB(GObject.GObject):
         for row in c.execute('SELECT library_id, version, comment FROM ui_library WHERE ui_id=?;', (ui_id,)):
             library_id, version, comment = row
             req = E.requires(lib=library_id, version=version)
-            self._node_add_comment(req, comment)
+            self.__node_add_comment(req, comment)
             node.append(req)
             if library_id == tk_library_id:
                 has_tk_requires = True
@@ -1168,9 +1168,9 @@ class CmbDB(GObject.GObject):
         for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
             object_id, comment = row
-            child = self._export_object(ui_id, object_id, merengue=merengue, template_id=template_id)
+            child = self.__export_object(ui_id, object_id, merengue=merengue, template_id=template_id)
             node.append(child)
-            self._node_add_comment(child, comment)
+            self.__node_add_comment(child, comment)
 
         c.close()
 

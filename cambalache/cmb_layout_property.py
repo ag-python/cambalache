@@ -32,9 +32,9 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
     info = GObject.Property(type=CmbPropertyInfo, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
-        self._init = True
+        self.__on_init = True
         super().__init__(**kwargs)
-        self._init = False
+        self.__on_init = False
 
     @GObject.Property(type=str)
     def value(self):
@@ -66,7 +66,7 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, value))
 
-        if self._init == False:
+        if not self.__on_init:
             self.object._layout_property_changed(self)
 
         c.close()

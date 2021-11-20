@@ -54,10 +54,10 @@ class CmbTypeChooserWidget(Gtk.Box):
 
         super().__init__(**kwargs)
 
-        self.connect('notify::project', self._on_project_notify)
-        self.connect('map', self._on_map)
+        self.connect('notify::project', self.__on_project_notify)
+        self.connect('map', self.__on_map)
 
-    def _model_from_project(self, project):
+    def __model_from_project(self, project):
         if project is None:
             return None
 
@@ -109,17 +109,17 @@ class CmbTypeChooserWidget(Gtk.Box):
 
         return store
 
-    def _on_project_notify(self, object, pspec):
-        model = self._model_from_project(self.project)
+    def __on_project_notify(self, object, pspec):
+        model = self.__model_from_project(self.project)
         self._filter = Gtk.TreeModelFilter(child_model=model) if model else None
         if self._filter:
-            self._filter.set_visible_func(self._visible_func)
+            self._filter.set_visible_func(self.__visible_func)
 
         self.entrycompletion.props.model = model
         self.treeview.props.model = self._filter
 
     @Gtk.Template.Callback('on_searchentry_activate')
-    def _on_searchentry_activate(self, entry):
+    def __on_searchentry_activate(self, entry):
         search_text = entry.props.text
 
         info = self.project.type_info.get(search_text, None)
@@ -127,19 +127,19 @@ class CmbTypeChooserWidget(Gtk.Box):
             self.emit('type-selected', info)
 
     @Gtk.Template.Callback('on_searchentry_search_changed')
-    def _on_searchentry_search_changed(self, entry):
+    def __on_searchentry_search_changed(self, entry):
         self._search_text = entry.props.text.lower()
         self._filter.refilter()
 
     @Gtk.Template.Callback('on_treeview_row_activated')
-    def _on_treeview_row_activated(self, treeview, path, column):
+    def __on_treeview_row_activated(self, treeview, path, column):
         model = treeview.props.model
         info = model[model.get_iter(path)][2]
 
         if info is not None:
             self.emit('type-selected', info)
 
-    def _visible_func(self, model, iter, data):
+    def __visible_func(self, model, iter, data):
         type_id, type_id_lower, info, sensitive = model[iter]
 
         # Always show categories if we are not searching
@@ -148,7 +148,7 @@ class CmbTypeChooserWidget(Gtk.Box):
 
         return type_id_lower.find(self._search_text) >= 0
 
-    def _on_map(self, widget):
+    def __on_map(self, widget):
         toplevel = widget.get_toplevel()
 
         if toplevel:

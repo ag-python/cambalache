@@ -40,21 +40,21 @@ class CmbTranslatableWidget(Gtk.Box):
         self._object = None
         super().__init__(**kwargs)
 
-        self.buffer_text.connect('notify::text', self._on_text_notify)
-        self.check_button_translatable.connect('toggled', self._on_translatable_notify)
-        self.buffer_context.connect('notify::text', self._on_context_notify)
-        self.buffer_comments.connect('notify::text', self._on_comments_notify)
+        self.buffer_text.connect('notify::text', self.__on_text_notify)
+        self.check_button_translatable.connect('toggled', self.__on_translatable_notify)
+        self.buffer_context.connect('notify::text', self.__on_context_notify)
+        self.buffer_comments.connect('notify::text', self.__on_comments_notify)
 
-    def _on_text_notify(self, obj, pspec):
+    def __on_text_notify(self, obj, pspec):
         self.notify('cmb-value')
 
-    def _on_translatable_notify(self, data):
+    def __on_translatable_notify(self, data):
         self.notify('cmb-translatable')
 
-    def _on_context_notify(self, obj, pspec):
+    def __on_context_notify(self, obj, pspec):
         self.notify('cmb-context')
 
-    def _on_comments_notify(self, obj, pspec):
+    def __on_comments_notify(self, obj, pspec):
         self.notify('cmb-comment')
 
     def bind_properties(self, target):

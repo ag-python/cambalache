@@ -95,11 +95,11 @@ class CmbUIEditor(Gtk.Grid):
             self._bindings.append(binding)
 
     @Gtk.Template.Callback('on_remove_button_clicked')
-    def _on_remove_button_clicked(self, button):
+    def __on_remove_button_clicked(self, button):
         self.emit('remove-ui')
 
     @Gtk.Template.Callback('on_export_button_clicked')
-    def _on_export_button_clicked(self, button):
+    def __on_export_button_clicked(self, button):
         self.emit('export-ui')
 
     @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,

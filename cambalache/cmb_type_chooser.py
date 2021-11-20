@@ -63,17 +63,17 @@ class CmbTypeChooser(Gtk.Box):
             self.extra
         ]
 
-        self.connect('notify::project', self._on_project_notify)
-        self.connect('notify::selected-type', self._on_selected_type_notify)
+        self.connect('notify::project', self.__on_project_notify)
+        self.connect('notify::selected-type', self.__on_selected_type_notify)
 
         for chooser in self._choosers:
             chooser.connect('type-selected', lambda o, t: self.emit('type-selected', t))
 
-    def _on_project_notify(self, object, pspec):
+    def __on_project_notify(self, object, pspec):
         project = self.project
         for chooser in self._choosers:
             chooser.project = project
 
-    def _on_selected_type_notify(self, object, pspec):
+    def __on_selected_type_notify(self, object, pspec):
         self.type_label.props.label = self.selected_type.type_id if self.selected_type else ''
 
