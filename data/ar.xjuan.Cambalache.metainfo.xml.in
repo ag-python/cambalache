@@ -94,4 +94,5 @@
   <url type="homepage">https://gitlab.gnome.org/jpu/cambalache</url>
   <url type="bugtracker">https://gitlab.gnome.org/jpu/cambalache/issues</url>
   <url type="donation">https://www.patreon.com/cambalache</url>
+  <url type="contact">https://matrix.to/#/#cambalache:gnome.org</url>
 </component>
