@@ -39,6 +39,8 @@ logger = getLogger(__name__)
 
 class MrgApplication(Gtk.Application):
     def __init__(self):
+        self.stdin = None
+
         super().__init__(application_id='ar.xjuan.Merengue',
                          flags=Gio.ApplicationFlags.NON_UNIQUE)
 
@@ -133,6 +135,9 @@ class MrgApplication(Gtk.Application):
                 controller.set_object_property(property_id,
                                                target_controller.object)
 
+            return
+
+        if controller.object is None:
             return
 
         pspec = controller.object.find_property(property_id)
@@ -236,21 +241,20 @@ class MrgApplication(Gtk.Application):
             return GLib.SOURCE_REMOVE
 
         # We receive a command in each line
-        retval = sys.stdin.readline()
+        retval = self.stdin.readline()
 
         try:
-            # Command is a Json string with a command, args and payload_length fields
+            # Command is a Json string with a command, args and payload fields
             cmd = json.loads(retval)
         except Exception as e:
             logger.warning(f'Error parsing command {e}')
         else:
-            payload_length = cmd.get('payload_length', 0)
-
-            # Read command payload if any
-            payload = sys.stdin.read(payload_length) if payload_length else None
-
             command = cmd.get('command', None)
             args = cmd.get('args', {})
+            has_payload = cmd.get('payload', False)
+
+            # Read payload
+            payload = GLib.strcompress(self.stdin.readline()) if has_payload else None
 
             # Run command
             self.run_command(command, args, payload)
@@ -264,8 +268,8 @@ class MrgApplication(Gtk.Application):
         from merengue import mrg_gtk
         self.registry.load_module(mrg_gtk)
 
-        stdin_channel = GLib.IOChannel.unix_new(sys.stdin.fileno())
-        GLib.io_add_watch(stdin_channel, GLib.PRIORITY_DEFAULT_IDLE,
+        self.stdin = GLib.IOChannel.unix_new(sys.stdin.fileno())
+        GLib.io_add_watch(self.stdin, GLib.PRIORITY_DEFAULT_IDLE,
                           GLib.IOCondition.IN | GLib.IOCondition.HUP,
                           self.on_stdin)
 
