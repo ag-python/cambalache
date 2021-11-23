@@ -158,7 +158,7 @@ class CmbObject(CmbBaseObject):
     def ui(self):
         return self.project.get_object_by_id(self.ui_id)
 
-    def __add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
+    def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         signal = CmbSignal(project=self.project,
                            signal_pk=signal_pk,
                            ui_id=self.ui_id,
@@ -167,7 +167,7 @@ class CmbObject(CmbBaseObject):
                            signal_id=signal_id,
                            handler=handler,
                            detail=detail,
-                           user_data=user_data,
+                           user_data=user_data if user_data is not None else 0,
                            swap=swap,
                            after=after)
 
@@ -187,16 +187,16 @@ class CmbObject(CmbBaseObject):
             logger.warning(f'Error adding signal handler {owner_id}:{signal_id} {handler} to object {self.ui_id}.{{self.object_id}} {e}')
             return None
         else:
-            return self.__add_signal(signal_pk,
-                                     owner_id,
-                                     signal_id,
-                                     handler,
-                                     detail=detail,
-                                     user_data=user_data,
-                                     swap=swap,
-                                     after=after)
+            return self._add_signal(signal_pk,
+                                    owner_id,
+                                    signal_id,
+                                    handler,
+                                    detail=detail,
+                                    user_data=user_data if user_data is not None else 0,
+                                    swap=swap,
+                                    after=after)
 
-    def __remove_signal(self, signal):
+    def _remove_signal(self, signal):
         self.signals.remove(signal)
         self.emit('signal-removed', signal)
         self.project._object_signal_removed(self, signal)
@@ -210,5 +210,5 @@ class CmbObject(CmbBaseObject):
             logger.warning(f'Error removing signal handler {signal.owner_id}:{signal.signal_id} {signal.handler} from object {self.ui_id}.{{self.object_id}} {e}')
             return False
         else:
-            self.__remove_signal(signal)
+            self._remove_signal(signal)
             return True
