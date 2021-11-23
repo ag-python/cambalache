@@ -190,7 +190,7 @@ window.setupDocument = function (document) {
 
         cmd = {
             'command': command,
-            'payload_length': len(payload) if payload is not None else 0
+            'payload': payload is not None
         }
 
         if args is not None:
@@ -200,9 +200,9 @@ window.setupDocument = function (document) {
         self.__merengue.stdin.write(json.dumps(cmd))
         self.__merengue.stdin.write('\n')
 
-        # Send payload if any
         if payload is not None:
-            self.__merengue.stdin.write(payload)
+            self.__merengue.stdin.write(GLib.strescape(payload))
+            self.__merengue.stdin.write('\n')
 
         # Flush
         self.__merengue.stdin.flush()
@@ -213,7 +213,7 @@ window.setupDocument = function (document) {
     def __update_view(self):
         if self.__project is not None and self.__ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self.__get_ui_xml(self.__ui_id, merengue=False)
+                ui = self.__get_ui_xml(self.__ui_id, merengue=True)
                 self.buffer.set_text(ui)
             return
 
