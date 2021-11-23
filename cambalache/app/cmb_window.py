@@ -108,7 +108,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         for action in ['open', 'create_new', 'new',
                        'undo', 'redo', 'intro',
                        'save', 'save_as',
-                       'add_ui', 'delete',
+                       'add_ui',
+                       'copy', 'paste', 'cut', 'delete',
                        'add_placeholder', 'remove_placeholder',
                        'add_placeholder_row', 'remove_placeholder_row',
                        'import', 'export',
@@ -124,6 +125,9 @@ class CmbWindow(Gtk.ApplicationWindow):
             ("win.close",      ["<Primary>w"]),
             ("win.undo",       ["<Primary>z"]),
             ("win.redo",       ["<Primary><shift>z"]),
+            ("win.copy",       ["<Primary>c"]),
+            ("win.paste",      ["<Primary>v"]),
+            ("win.cut",        ["<Primary>x"]),
             ("win.delete",     ["Delete"]),
             ("win.create_new", ["<Primary>n"]),
             ("win.open",       ["<Primary>o"]),
@@ -353,19 +357,35 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.actions['undo'].set_enabled(False)
             self.actions['redo'].set_enabled(False)
 
-    def __update_action_delete(self):
+    def __update_action_clipboard(self):
+        has_selection = False
+
         if self.__is_project_visible():
             sel = self.project.get_selection()
-            self.actions['delete'].set_enabled(len(sel) > 0 if sel is not None else False)
+            if sel:
+                for obj in sel:
+                    if isinstance(obj, CmbObject):
+                        has_selection = True
+                        break
+
+            for action in ['copy', 'cut', 'delete']:
+                self.actions[action].set_enabled(has_selection)
         else:
-            self.actions['delete'].set_enabled(False)
+            for action in ['copy', 'cut', 'delete']:
+                self.actions[action].set_enabled(False)
+
+    def __update_action_clipboard_paste(self):
+        if self.__is_project_visible():
+            self.actions['paste'].set_enabled(self.project.clipboard_count() > 0)
+        else:
+            self.actions['paste'].set_enabled(False)
 
     def __on_project_changed(self, project):
         self.__update_action_undo_redo()
 
     def __on_project_selection_changed(self, project):
         sel = project.get_selection()
-        self.__update_action_delete()
+        self.__update_action_clipboard()
 
         obj = sel[0] if len(sel) > 0 else None
 
@@ -400,8 +420,10 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.actions[action].set_enabled(has_project)
 
         self.__update_action_intro()
-        self.__update_action_delete()
+        self.__update_action_clipboard()
         self.__update_action_undo_redo()
+        self.__update_action_clipboard()
+        self.__update_action_clipboard_paste()
         self.actions['debug'].set_enabled(has_project and self.__opensqlite is not None)
 
     def __file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
@@ -608,6 +630,21 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.project.remove_ui(ui)
 
         dialog.destroy()
+
+    def _on_copy_activate(self, action, data):
+        if self.project:
+            self.project.copy()
+            self.__update_action_clipboard_paste()
+
+    def _on_paste_activate(self, action, data):
+        if self.project:
+            self.project.paste()
+            self.__update_action_clipboard_paste()
+
+    def _on_cut_activate(self, action, data):
+        if self.project:
+            self.project.cut()
+            self.__update_action_clipboard_paste()
 
     def _on_delete_activate(self, action, data):
         if self.project is None:
