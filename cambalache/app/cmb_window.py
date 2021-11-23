@@ -113,7 +113,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'add_placeholder', 'remove_placeholder',
                        'add_placeholder_row', 'remove_placeholder_row',
                        'import', 'export',
-                       'close', 'debug', 'donate', 'about']:
+                       'close', 'debug', 'donate', 'contact', 'about']:
             gaction = Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self.actions[action] = gaction
@@ -748,6 +748,9 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_donate_activate(self, action, data):
         Gtk.show_uri_on_window(self, "https://www.patreon.com/cambalache", Gdk.CURRENT_TIME)
+
+    def _on_contact_activate(self, action, data):
+        Gtk.show_uri_on_window(self, "https://matrix.to/#/#cambalache:gnome.org", Gdk.CURRENT_TIME)
 
     def _on_add_placeholder_activate(self, action, data):
         self.view.add_placeholder()
