@@ -895,6 +895,77 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                           (self.history_index_max + 1, ))
         self.emit('changed')
 
+    def copy(self):
+        # TODO: filter children out
+        selection = [(o.ui_id, o.object_id) for o in self.__selection if isinstance(o, CmbObject)]
+        self.db.clipboard_copy(selection)
+
+    def paste(self):
+        if len(self.__selection) == 0:
+            return
+
+        c = self.db.cursor()
+
+        obj = self.__selection[0]
+        ui_id = obj.ui_id
+        parent_id = obj.object_id if isinstance(obj, CmbObject) else None
+        name = obj.name if obj.name is not None else obj.type_id
+
+        self.history_push(_('Paste clipboard to {name}').format(name=name))
+
+        new_objects = self.db.clipboard_paste(ui_id, parent_id)
+
+        self.history_pop()
+        self.db.commit()
+
+        # Update UI objects
+        for object_id in new_objects:
+            c.execute('SELECT * FROM object WHERE ui_id=? AND object_id=?;',
+                      (ui_id, object_id))
+            self.__add_object(True, *c.fetchone())
+
+        c.close()
+
+    def cut(self):
+        # TODO: filter children out
+        selection = [o for o in self.__selection if isinstance(o, CmbObject)]
+
+        # Copy to clipboard
+        self.copy()
+
+        # Delete from project
+        try:
+            n_objects = len(selection)
+
+            if n_objects == 1:
+                obj = selection[0]
+                name = obj.name if obj.name is not None else obj.type_id
+                self.history_push(_('Cut object {name}').format(name=name))
+            else:
+                self.history_push(_('Cut {n_objects} object').format(n_objects=n_objects))
+
+            for obj in selection:
+                self.db.execute("DELETE FROM object WHERE ui_id=? AND object_id=?;",
+                                (obj.ui_id, obj.object_id))
+
+            self.history_pop()
+            self.db.commit()
+        except:
+            pass
+        else:
+            for obj in selection:
+                self.__remove_object(obj)
+
+    def clipboard_count(self):
+        try:
+            c = self.db.execute('SELECT count(ui_id) FROM clipboard_object WHERE parent_id IS NULL;')
+            retval = c.fetchone()[0]
+            c.close()
+        except:
+            retval = 0
+
+        return retval
+
     # Default handlers
     def do_ui_added(self, ui):
         self.emit('changed')
