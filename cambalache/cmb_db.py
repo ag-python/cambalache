@@ -61,6 +61,20 @@ class CmbDB(GObject.GObject):
     def __init__(self, **kwargs):
         self.type_info = None
 
+        self.ui_tables = [
+            'ui',
+            'ui_library'
+        ]
+
+        self.object_tables = [
+            'object',
+            'object_property',
+            'object_layout_property',
+            'object_signal',
+            'object_data',
+            'object_data_arg'
+        ]
+
         self.history_commands = {}
 
         self.conn = sqlite3.connect(':memory:')
@@ -80,7 +94,7 @@ class CmbDB(GObject.GObject):
         c.close()
 
         # Initialize history (Undo/Redo) tables
-        self.__init_history_and_triggers()
+        self.__init_dynamic_tables()
         self.__init_data()
 
 
@@ -234,21 +248,15 @@ class CmbDB(GObject.GObject):
     END;
             ''')
 
-    def __init_history_and_triggers(self):
+    def __init_dynamic_tables(self):
         c = self.conn.cursor()
 
         # Create history main tables
         c.executescript(HISTORY_SQL)
 
         # Create history tables for each tracked table
-        self.__create_support_table(c, 'ui')
-        self.__create_support_table(c, 'ui_library')
-        self.__create_support_table(c, 'object')
-        self.__create_support_table(c, 'object_property')
-        self.__create_support_table(c, 'object_layout_property')
-        self.__create_support_table(c, 'object_signal')
-        self.__create_support_table(c, 'object_data')
-        self.__create_support_table(c, 'object_data_arg')
+        for table in self.ui_tables + self.object_tables:
+            self.__create_support_table(c,table)
 
         self.conn.commit()
         c.close()
@@ -1182,3 +1190,93 @@ class CmbDB(GObject.GObject):
                               pretty_print=True,
                               xml_declaration=True,
                               encoding='UTF-8').decode('UTF-8')
+
+    def clipboard_copy(self, selection):
+        c = self.conn.cursor()
+
+        # Recreate all clipboard tables
+        for table in self.object_tables:
+            c.execute(f'DROP TABLE IF EXISTS clipboard_{table};')
+            c.execute(f'CREATE TEMP TABLE clipboard_{table} AS SELECT * FROM {table} WHERE 0;')
+
+        # Copy data for every object in selection
+        for ui_id, object_id in selection:
+            c.execute('''
+                 WITH RECURSIVE ancestor(object_id, parent_id) AS (
+                   SELECT object_id, parent_id
+                     FROM object
+                     WHERE ui_id=? AND object_id=?
+                   UNION
+                   SELECT object.object_id, object.parent_id
+                     FROM object JOIN ancestor ON object.parent_id=ancestor.object_id
+                     WHERE ui_id=?
+                 )
+                 SELECT object_id FROM ancestor''',
+                 (ui_id, object_id, ui_id))
+
+            # Object and children ids
+            objects = tuple([ x[0] for x in c.fetchall() ])
+
+            cols = ','.join((['?'] * len(objects)))
+
+            # Copy data from every table
+            for table in self.object_tables:
+                c.execute(f'INSERT INTO clipboard_{table} SELECT * FROM {table} WHERE ui_id=? AND object_id IN ({cols});',
+                          (ui_id, ) + objects)
+
+            c.execute(f'UPDATE clipboard_object SET parent_id=NULL WHERE ui_id=? AND object_id=?',
+                      (ui_id, object_id))
+
+        # Unset signals pk and let autoincrement work
+        c.execute('UPDATE clipboard_object_signal SET signal_pk=NULL;')
+
+        self.conn.commit()
+        c.close()
+
+    def clipboard_paste(self, ui_id, parent_id):
+        retval = []
+
+        c = self.conn.cursor()
+
+        # Get new object id
+        c.execute('SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;',
+                  (ui_id, ))
+        new_id = c.fetchone()[0]
+
+        c.execute('SELECT ui_id, object_id FROM clipboard_object;')
+
+        # Iterate over all objects
+        for row in c.fetchall():
+            o_ui_id, object_id = row
+
+            for table in self.object_tables:
+                # Fix object references
+                if table == 'object':
+                    c.execute('UPDATE clipboard_object SET parent_id=? WHERE ui_id=? AND parent_id=?;',
+                              (new_id, o_ui_id, object_id))
+                elif table == 'object_layout_property':
+                    c.execute('UPDATE clipboard_object_layout_property SET child_id=? WHERE ui_id=? AND child_id=?;',
+                              (new_id, o_ui_id, object_id))
+
+                # Set new object id
+                c.execute(f'UPDATE clipboard_{table} SET ui_id=?, object_id=? WHERE ui_id=? AND object_id=?;',
+                          (ui_id, new_id, o_ui_id, object_id))
+
+            retval.append(new_id)
+            new_id +=1
+
+        # Set paste target
+        c.execute('UPDATE clipboard_object SET parent_id=? WHERE parent_id IS NULL;', (parent_id, ))
+
+        # Paste
+        for table in self.object_tables:
+            c.execute(f'INSERT INTO {table} SELECT * FROM clipboard_{table};')
+
+        # Reset target for next past
+        c.execute('UPDATE clipboard_object SET parent_id=NULL WHERE parent_id=?;',
+                  (parent_id, ))
+
+        self.conn.commit()
+        c.close()
+
+        return retval
