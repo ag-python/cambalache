@@ -93,11 +93,6 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     # Settings
     completed_intro = GObject.Property(type=bool, default=False, flags = GObject.ParamFlags.READWRITE)
-    window_fullscreen = GObject.Property(type=bool, default=True, flags = GObject.ParamFlags.READWRITE)
-    window_width = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
-    window_height = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
-    window_position_x = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
-    window_position_y = GObject.Property(type=int, default=0, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
         self.__project = None
@@ -175,43 +170,23 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         # Create settings object
         self.settings = Gio.Settings(schema_id='ar.xjuan.Cambalache')
+        self.window_settings = Gio.Settings(schema_id='ar.xjuan.Cambalache.state.window')
 
         # Settings list
         settings = [
-            'completed-intro',
-            'window-fullscreen',
-            'window-width',
-            'window-height'
+            'completed-intro'
         ]
 
         # Bind settings
         for prop in settings:
             self.settings.bind(prop, self, prop.replace('-', '_'), Gio.SettingsBindFlags.DEFAULT)
 
-        if self.window_fullscreen:
-            self.maximize()
-        else:
-            self.set_default_size(self.window_width, self.window_height)
-
+        self.__load_window_state()
         self.__update_actions()
 
         settings = Gtk.Settings.get_default()
         settings.connect('notify::gtk-theme-name', lambda o, p: self.__update_dark_mode())
         self.__update_dark_mode()
-
-        self.connect('delete_event', self._on_delete_event)
-
-    def _on_delete_event(self, widget, data):
-        if self.window_fullscreen != self.is_maximized():
-            self.window_fullscreen = self.is_maximized()
-
-        size = self.get_size()
-        if self.window_width != size.width:
-            self.window_width = size.width
-        if self.window_height != size.height:
-            self.window_height = size.height
-
-        return False
 
     @GObject.Property(type=CmbProject)
     def project(self):
@@ -826,5 +801,29 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.tutor.connect('hide-node', self.__on_tutor_hide_node)
         self.tutor.play()
 
+    def __load_window_state(self):
+        state = self.window_settings.get_uint('state')
+
+        if state & Gdk.WindowState.MAXIMIZED:
+            self.maximize()
+        else:
+            size = self.window_settings.get_value('size').unpack()
+            self.set_default_size(*size)
+
+    def __save_window_state(self):
+        state = self.props.window.get_state()
+
+        fullscreen = state & Gdk.WindowState.FULLSCREEN
+        maximized = state & Gdk.WindowState.MAXIMIZED
+
+        self.window_settings.set_uint('state', state)
+
+        size = (0, 0) if fullscreen or maximized else self.get_size()
+
+        self.window_settings.set_value('size', GLib.Variant('(ii)', size))
+
+    def do_delete_event(self, event):
+        self.__save_window_state()
+        return False
 
 Gtk.WidgetClass.set_css_name(CmbWindow, 'CmbWindow')
