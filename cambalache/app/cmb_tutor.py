@@ -86,8 +86,37 @@ class CmbTutor(GObject.GObject):
         return CmbTutorState.NULL
 
     def __add(self, text, widget_name, delay, name=None, position=CmbTutorPosition.BOTTOM):
-        widget = getattr(self.window, widget_name)
-        self.script.append(ScriptNode(widget, text, delay, name, position))
+        retval = {}
+
+        def find_widget(w, data):
+            if data.get('widget', None):
+                return
+
+            name = None
+            n = w.get_name()
+
+            # Get css name first then GtkBuildable name
+            if n and n != GObject.type_name(w):
+                name = n
+            elif isinstance(w, Gtk.Buildable):
+                n = Gtk.Buildable.get_name(w)
+                if n and not n.startswith('___object'):
+                    name = n
+
+            # Return widget
+            if name == widget_name:
+                data['widget'] = w
+                return
+
+            if isinstance(w, Gtk.Container):
+                w.forall(find_widget, data)
+
+        self.window.forall(find_widget, retval)
+
+        widget = retval.get('widget', None)
+
+        if widget:
+            self.script.append(ScriptNode(widget, text, delay, name, position))
 
     def play(self):
         if len(self.script) == 0:
