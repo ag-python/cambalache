@@ -123,11 +123,13 @@ class CmbView(Gtk.Stack):
     webview = Gtk.Template.Child()
     buffer = Gtk.Template.Child()
     menu = Gtk.Template.Child()
+    css_theme_box = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         self.__project = None
         self.__restart_project = None
         self.__ui_id = 0
+        self.__theme = None
 
         super().__init__(**kwargs)
 
@@ -321,13 +323,16 @@ window.setupDocument = function (document) {
             display = self.__port - 8080
             self.__broadwayd.run([f':{display}'])
 
+            # Populate gtk theme submenu
+            self.__populate_css_theme_box()
+
     @GObject.Property(type=str)
     def gtk_theme(self):
-        return self._theme
+        return self.__theme
 
     @gtk_theme.setter
     def _set_theme(self, theme):
-        self._theme = theme
+        self.__theme = theme
         self.__merengue_command('gtk_settings_set',
                                args={
                                    'property': 'gtk-theme-name',
@@ -396,7 +401,7 @@ window.setupDocument = function (document) {
                 self.emit('placeholder-activated', args['ui_id'], args['object_id'], args['position'], args['layout'])
             elif command == 'gtk_settings_get':
                 if args['property'] == 'gtk-theme-name':
-                    self._theme = args['value']
+                    self.__theme = args['value']
                     self.notify('gtk_theme')
 
         except Exception as e:
@@ -467,6 +472,66 @@ window.setupDocument = function (document) {
 
     def remove_placeholder(self, modifier=False):
         self.__add_remove_placeholder('remove_placeholder', modifier)
+
+    def __on_css_theme_button_toggled(self, button, data):
+        if button.props.active:
+            self.gtk_theme = data
+
+    def __populate_css_theme_box(self):
+        gtk_path = 'gtk-3.0'
+
+        if self.__project.target_tk == 'gtk-4.0':
+            gtk_path = 'gtk-4.0'
+
+        for child in self.css_theme_box.get_children():
+            self.css_theme_box.remove(child)
+
+        dirs = []
+
+        dirs += GLib.get_system_data_dirs()
+        dirs.append(GLib.get_user_data_dir())
+
+        # Add /themes to every dir
+        dirs = list(map(lambda d: os.path.join(d, 'themes'), dirs))
+
+        # Append ~/.themes
+        dirs.append(os.path.join(GLib.get_home_dir(), '.themes'))
+
+        # Default themes
+        themes = ['Adwaita', 'HighContrast', 'HighContrastInverse']
+
+        for path in dirs:
+            if not os.path.isdir(path):
+                continue
+
+            for theme in os.listdir(path):
+                tpath = os.path.join(path, theme, gtk_path, 'gtk.css')
+                if os.path.exists(tpath):
+                    themes.append(theme)
+
+        # Dedup and sort
+        themes = list(dict.fromkeys(themes))
+
+        # Add back item
+        button = Gtk.ModelButton(text=_('CSS themes'),
+                                 menu_name='main',
+                                 inverted=True,
+                                 centered=True,
+                                 visible=True)
+        self.css_theme_box.add(button)
+
+        group = None
+        for theme in sorted(themes):
+            button = Gtk.RadioButton(label=theme,
+                                     group=group,
+                                     active=self.gtk_theme == theme,
+                                     visible=True)
+            if group is None:
+                group = button
+
+            button.connect('toggled', self.__on_css_theme_button_toggled, theme)
+            self.css_theme_box.add(button)
+
 
 
 Gtk.WidgetClass.set_css_name(CmbView, 'CmbView')
