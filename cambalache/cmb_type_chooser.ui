@@ -37,7 +37,7 @@
     <property name="spacing">4</property>
     <property name="homogeneous">False</property>
     <child>
-      <object class="GtkMenuButton">
+      <object class="GtkMenuButton" id="type_chooser_all">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="focus-on-click">False</property>
@@ -69,7 +69,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButtonBox">
+      <object class="GtkButtonBox" id="type_chooser_gtk">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="layout-style">expand</property>
