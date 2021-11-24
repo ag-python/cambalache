@@ -72,6 +72,17 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           </packing>
         </child>
         <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
@@ -82,7 +93,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -96,27 +107,13 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">4</property>
           </packing>
         </child>
         <child>
           <object class="GtkSeparator">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">4</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkModelButton">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="action-name">win.show-help-overlay</property>
-            <property name="text" translatable="yes">Keyboard Shortcuts</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -168,6 +165,31 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           </packing>
         </child>
         <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">9</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="action-name">win.show-help-overlay</property>
+            <property name="text" translatable="yes">Keyboard Shortcuts</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">10</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
@@ -178,7 +200,18 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">9</property>
+            <property name="position">11</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">12</property>
           </packing>
         </child>
         <child>
@@ -192,7 +225,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">10</property>
+            <property name="position">13</property>
           </packing>
         </child>
       </object>
@@ -595,35 +628,11 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkBox">
+                      <object class="CmbTypeChooser" id="type_chooser">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="border-width">4</property>
-                        <property name="spacing">6</property>
-                        <child>
-                          <object class="CmbTypeChooser" id="type_chooser">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <signal name="type-selected" handler="on_type_chooser_type_selected" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkComboBoxText" id="theme_combobox">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="pack-type">end</property>
-                            <property name="position">2</property>
-                          </packing>
-                        </child>
+                        <signal name="type-selected" handler="on_type_chooser_type_selected" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

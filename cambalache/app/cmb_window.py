@@ -69,7 +69,6 @@ class CmbWindow(Gtk.ApplicationWindow):
     view = Gtk.Template.Child()
     tree_view = Gtk.Template.Child()
     type_chooser = Gtk.Template.Child()
-    theme_combobox = Gtk.Template.Child()
     editor_stack = Gtk.Template.Child()
     ui_editor = Gtk.Template.Child()
     object_editor = Gtk.Template.Child()
@@ -80,16 +79,8 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     # Tutor widgets
     intro_button = Gtk.Template.Child()
-    open_button = Gtk.Template.Child()
-    recent_button = Gtk.Template.Child()
-    new_button = Gtk.Template.Child()
-    add_button = Gtk.Template.Child()
-    save_button = Gtk.Template.Child()
-    save_as_button = Gtk.Template.Child()
-    menu_button = Gtk.Template.Child()
     main_menu = Gtk.Template.Child()
     export_all = Gtk.Template.Child()
-    donate = Gtk.Template.Child()
 
     # Settings
     completed_intro = GObject.Property(type=bool, default=False, flags = GObject.ParamFlags.READWRITE)
@@ -165,10 +156,6 @@ class CmbWindow(Gtk.ApplicationWindow):
                                      self.__np_name_to_ui,
                                      None)
 
-        GObject.Object.bind_property(self.theme_combobox, 'active-id',
-                                     self.view, 'gtk-theme',
-                                     GObject.BindingFlags.SYNC_CREATE |
-                                     GObject.BindingFlags.BIDIRECTIONAL)
         self.tutor = None
         self.turor_waiting_for_user_action = False
 
@@ -219,12 +206,6 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.__project.connect("notify::filename", self.__on_project_filename_notify)
             self.__project.connect('selection-changed', self.__on_project_selection_changed)
             self.__project.connect('changed', self.__on_project_changed)
-
-            # Populate gtk theme combo
-            if self.__project.target_tk == 'gtk+-3.0':
-                self.__populate_theme_combobox('3.0')
-            elif self.__project.target_tk == 'gtk-4.0':
-                self.__populate_theme_combobox('4.0')
         else:
             self.headerbar.set_subtitle(None)
 
@@ -456,38 +437,6 @@ class CmbWindow(Gtk.ApplicationWindow):
                 sponsors.append(name[2:])
 
         self.about_dialog.add_credit_section(_('Sponsors'), sponsors)
-
-    def __populate_theme_combobox(self, version):
-        self.theme_combobox.remove_all()
-
-        dirs = []
-
-        dirs += GLib.get_system_data_dirs()
-        dirs.append(GLib.get_user_data_dir())
-
-        # Add /themes to every dir
-        dirs = list(map(lambda d: os.path.join(d, 'themes'), dirs))
-
-        # Append ~/.themes
-        dirs.append(os.path.join(GLib.get_home_dir(), '.themes'))
-
-        # Default themes
-        themes = ['Adwaita', 'HighContrast', 'HighContrastInverse']
-
-        for path in dirs:
-            if not os.path.isdir(path):
-                continue
-
-            for theme in os.listdir(path):
-                tpath = os.path.join(path, theme, f'gtk-{version}', 'gtk.css')
-                if os.path.exists(tpath):
-                    themes.append(theme)
-
-        # Dedup and sort
-        themes = list(dict.fromkeys(themes))
-
-        for theme in sorted(themes):
-            self.theme_combobox.append(theme, theme)
 
     def present_message_to_user(self, message, secondary_text=None, details=None):
         dialog = Gtk.MessageDialog(
@@ -779,8 +728,8 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.tutor.play()
             self.disconnect_by_func(self.__on_project_notify)
 
-    def __on_object_added(self, project, obj):
-        if obj.type_id == 'GtkWindow':
+    def __on_object_added(self, project, obj, data):
+        if obj.info.is_a(data):
             project.disconnect_by_func(self.__on_object_added)
             self.turor_waiting_for_user_action = False
             self.tutor.play()
@@ -797,11 +746,23 @@ class CmbWindow(Gtk.ApplicationWindow):
         elif node == 'add-ui':
             self.project.connect('ui-added', self.__on_ui_added)
         elif node == 'add-window':
-            self.project.connect('object-added', self.__on_object_added)
+            self.project.connect('object-added', self.__on_object_added, 'GtkWindow')
+        elif node == 'add-grid':
+            self.project.connect('object-added', self.__on_object_added, 'GtkGrid')
+        elif node == 'add-button':
+            self.project.connect('object-added', self.__on_object_added, 'GtkButton')
         elif node == 'main-menu':
             self.main_menu.props.modal = False
+        elif node == 'show-type-popover':
+            widget.props.popover.modal = False
+            widget.props.popover.popup()
+        elif node == 'show-type-popover-gtk':
+            child = widget.get_children()[0]
+            child.props.popover.props.modal = False
+            child.props.popover.popup()
 
     def __on_tutor_hide_node(self, tutor, node, widget):
+
         if node == 'intro-end':
             self.completed_intro = True
             self.__clear_tutor()
@@ -809,7 +770,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             if self.__project is None:
                 self.turor_waiting_for_user_action = True
                 self.tutor.pause()
-        elif node == 'add-ui' or node == 'add-window':
+        elif node in ['add-ui', 'add-window', 'add-grid', 'add-button']:
             self.turor_waiting_for_user_action = True
             self.tutor.pause()
         elif node == 'main-menu':
@@ -817,6 +778,13 @@ class CmbWindow(Gtk.ApplicationWindow):
         elif node == 'donate':
             self.main_menu.props.modal = True
             self.main_menu.popdown()
+        elif node == 'show-type-popover':
+            widget.props.popover.modal = True
+            widget.props.popover.popdown()
+        elif node == 'show-type-popover-gtk':
+            child = widget.get_children()[0]
+            child.props.popover.props.modal = True
+            child.props.popover.popdown()
 
         self.__update_actions()
 
