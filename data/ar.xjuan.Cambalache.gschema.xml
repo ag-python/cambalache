@@ -9,17 +9,22 @@
       <default>false</default>
     </key>
 
-    <key name='window-fullscreen' type='b'>
-      <default>false</default>
-    </key>
-
-    <key name='window-width' type='i'>
-      <default>0</default>
-    </key>
-
-    <key name='window-height' type='i'>
-      <default>0</default>
-    </key>
+    <child name="state" schema="ar.xjuan.Cambalache.state"/>
 
   </schema>
+
+  <schema id="ar.xjuan.Cambalache.state" path="/ar/xjuan/Cambalache/state/">
+    <child name="window" schema="ar.xjuan.Cambalache.state.window"/>
+  </schema>
+
+  <schema id="ar.xjuan.Cambalache.state.window" path="/ar/xjuan/Cambalache/state/window/">
+    <key name='state' type='u'>
+      <default>0</default>
+    </key>
+
+    <key name='size' type='(ii)'>
+      <default>(0,0)</default>
+    </key>
+  </schema>
+
 </schemalist>
