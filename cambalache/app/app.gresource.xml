@@ -8,5 +8,7 @@
     <file>images/logo-symbolic.svg</file>
     <file>images/gtk3.svg</file>
     <file>images/gtk4.svg</file>
+    <file>images/lp-logo.svg</file>
+    <file>images/patreon-logo.svg</file>
   </gresource>
 </gresources>

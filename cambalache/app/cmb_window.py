@@ -104,7 +104,10 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'add_placeholder', 'remove_placeholder',
                        'add_placeholder_row', 'remove_placeholder_row',
                        'import', 'export',
-                       'close', 'debug', 'donate', 'contact', 'about']:
+                       'close', 'debug',
+                       'show_workspace',
+                       'donate', 'liberapay', 'patreon',
+                       'contact', 'about']:
             gaction = Gio.SimpleAction.new(action, None)
             gaction.connect("activate", getattr(self, f'_on_{action}_activate'))
             self.actions[action] = gaction
@@ -280,10 +283,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         if uri is not None:
             filename, host = GLib.filename_from_uri(uri)
             self.emit('open-project', filename, None, None)
-
-    @Gtk.Template.Callback('on_np_cancel_button_clicked')
-    def __on_np_cancel_button_clicked(self, button):
-        self.__set_page('workspace' if self.project is not None else 'cambalache')
 
     @Gtk.Template.Callback('on_ui_editor_remove_ui')
     def __on_ui_editor_remove_ui(self, editor):
@@ -696,6 +695,12 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.about_dialog.present()
 
     def _on_donate_activate(self, action, data):
+        self.__set_page('donate')
+
+    def _on_liberapay_activate(self, action, data):
+        Gtk.show_uri_on_window(self, "https://liberapay.com/xjuan/donate", Gdk.CURRENT_TIME)
+
+    def _on_patreon_activate(self, action, data):
         Gtk.show_uri_on_window(self, "https://www.patreon.com/cambalache", Gdk.CURRENT_TIME)
 
     def _on_contact_activate(self, action, data):
@@ -712,6 +717,9 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_remove_placeholder_row_activate(self, action, data):
         self.view.remove_placeholder(modifier=True)
+
+    def _on_show_workspace_activate(self, action, data):
+        self.__set_page('workspace' if self.project is not None else 'cambalache')
 
     def __clear_tutor(self):
         try:

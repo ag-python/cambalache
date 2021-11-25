@@ -524,7 +524,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <property name="margin-top">16</property>
-                    <signal name="clicked" handler="on_np_cancel_button_clicked" swapped="no"/>
+                    <property name="action-name">win.show_workspace</property>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -805,6 +805,180 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
             <property name="position">2</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="border-width">16</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="halign">start</property>
+                <property name="action-name">win.show_workspace</property>
+                <property name="relief">none</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="icon-name">go-previous-symbolic</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="valign">start</property>
+                <property name="margin-top">32</property>
+                <property name="margin-bottom">64</property>
+                <property name="spacing">196</property>
+                <property name="homogeneous">True</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">32</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="resource">/ar/xjuan/Cambalache/app/images/lp-logo.svg</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">• Liberapay is a recurrent donations platform
+
+• Run by a non-profit organization
+
+• Source code is public
+
+• No commission fee
+
+• ~5% payment processing fee</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Donate</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="halign">center</property>
+                        <property name="action-name">win.liberapay</property>
+                        <style>
+                          <class name="suggested-action"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">32</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="resource">/ar/xjuan/Cambalache/app/images/patreon-logo.svg</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">• Patreon is a membership platform for creators 
+
+• Run by private company
+
+• No source code available
+
+• ~8% commission fee
+
+• ~8% payment processing fee</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Donate</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="halign">center</property>
+                        <property name="action-name">win.patreon</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="name">donate</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
       </object>
     </child>
     <child type="titlebar">
@@ -1059,7 +1233,12 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
     <property name="program-name">Cambalache</property>
     <property name="copyright">© 2020-2021 Juan Pablo Ugarte</property>
     <property name="comments" translatable="yes">User Interface Maker</property>
+    <property name="website">https://gitlab.gnome.org/jpu/cambalache</property>
+    <property name="website-label" translatable="yes">Source repository and issue tracker</property>
     <property name="authors">Juan Pablo Ugarte</property>
+    <property name="translator-credits" translatable="yes">Vojtěch Perník
+PhilProg
+Philipp Unger</property>
     <property name="artists">Franco Dodorico</property>
     <property name="logo-icon-name">ar.xjuan.Cambalache</property>
     <property name="license-type">lgpl-2-1-only</property>
