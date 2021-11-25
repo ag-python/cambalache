@@ -33,6 +33,7 @@ from gi.repository import GObject, GLib, Gio, Gdk, Gtk, WebKit2
 from . import config
 from .cmb_object import CmbObject
 from .cmb_project import CmbProject
+from .cmb_context_menu import CmbContextMenu
 from cambalache import getLogger
 
 logger = getLogger(__name__)
@@ -122,14 +123,14 @@ class CmbView(Gtk.Stack):
 
     webview = Gtk.Template.Child()
     buffer = Gtk.Template.Child()
-    menu = Gtk.Template.Child()
-    css_theme_box = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         self.__project = None
         self.__restart_project = None
         self.__ui_id = 0
         self.__theme = None
+
+        self.menu = self.__create_context_menu()
 
         super().__init__(**kwargs)
 
@@ -151,6 +152,11 @@ class CmbView(Gtk.Stack):
 
         if self.__gtk4_broadwayd_bin is None:
             logger.warning("gtk4-broadwayd not found, Gtk 4 workspace wont work.")
+
+        GObject.Object.bind_property(self, 'gtk-theme',
+                                     self.menu, 'gtk-theme',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL)
 
     def do_destroy(self):
         if self.__merengue:
@@ -323,8 +329,8 @@ window.setupDocument = function (document) {
             display = self.__port - 8080
             self.__broadwayd.run([f':{display}'])
 
-            # Populate gtk theme submenu
-            self.__populate_css_theme_box()
+            # Update css themes
+            self.menu.target_tk = self.__project.target_tk
 
     @GObject.Property(type=str)
     def gtk_theme(self):
@@ -341,21 +347,32 @@ window.setupDocument = function (document) {
 
     @Gtk.Template.Callback('on_context_menu')
     def __on_context_menu(self, webview, menu, e, hit_test_result):
-        r = Gdk.Rectangle()
-        r.x, r.y, r.width, r.height = (e.x, e.y, 10, 10)
-        self.menu.set_pointing_to(r)
-        self.menu.popup()
+        self.menu.popup_at(e.x, e.y)
         return True
 
-    @Gtk.Template.Callback('on_inspect_button_clicked')
     def __on_inspect_button_clicked(self, button):
         self.props.visible_child_name = 'ui_xml'
         self.__update_view()
 
-    @Gtk.Template.Callback('on_restart_button_clicked')
     def __on_restart_button_clicked(self, button):
         self.__restart_project = self.__project
         self.project = None
+
+    def __create_context_menu(self):
+        retval = CmbContextMenu(relative_to=self)
+
+        restart = Gtk.ModelButton(text=_('Restart workspace'),
+                                  visible=True)
+        restart.connect('clicked', self.__on_restart_button_clicked)
+
+        inspect = Gtk.ModelButton(text=_('Inspect UI definition'),
+                                  visible=True)
+        inspect.connect('clicked', self.__on_inspect_button_clicked)
+
+        retval.main_box.add(restart)
+        retval.main_box.add(inspect)
+
+        return retval
 
     def __on_process_exit(self, process):
         if self.__broadwayd.pid == 0 and self.__merengue.pid == 0:
@@ -472,66 +489,6 @@ window.setupDocument = function (document) {
 
     def remove_placeholder(self, modifier=False):
         self.__add_remove_placeholder('remove_placeholder', modifier)
-
-    def __on_css_theme_button_toggled(self, button, data):
-        if button.props.active:
-            self.gtk_theme = data
-
-    def __populate_css_theme_box(self):
-        gtk_path = 'gtk-3.0'
-
-        if self.__project.target_tk == 'gtk-4.0':
-            gtk_path = 'gtk-4.0'
-
-        for child in self.css_theme_box.get_children():
-            self.css_theme_box.remove(child)
-
-        dirs = []
-
-        dirs += GLib.get_system_data_dirs()
-        dirs.append(GLib.get_user_data_dir())
-
-        # Add /themes to every dir
-        dirs = list(map(lambda d: os.path.join(d, 'themes'), dirs))
-
-        # Append ~/.themes
-        dirs.append(os.path.join(GLib.get_home_dir(), '.themes'))
-
-        # Default themes
-        themes = ['Adwaita', 'HighContrast', 'HighContrastInverse']
-
-        for path in dirs:
-            if not os.path.isdir(path):
-                continue
-
-            for theme in os.listdir(path):
-                tpath = os.path.join(path, theme, gtk_path, 'gtk.css')
-                if os.path.exists(tpath):
-                    themes.append(theme)
-
-        # Dedup and sort
-        themes = list(dict.fromkeys(themes))
-
-        # Add back item
-        button = Gtk.ModelButton(text=_('CSS themes'),
-                                 menu_name='main',
-                                 inverted=True,
-                                 centered=True,
-                                 visible=True)
-        self.css_theme_box.add(button)
-
-        group = None
-        for theme in sorted(themes):
-            button = Gtk.RadioButton(label=theme,
-                                     group=group,
-                                     active=self.gtk_theme == theme,
-                                     visible=True)
-            if group is None:
-                group = button
-
-            button.connect('toggled', self.__on_css_theme_button_toggled, theme)
-            self.css_theme_box.add(button)
-
 
 
 Gtk.WidgetClass.set_css_name(CmbView, 'CmbView')
