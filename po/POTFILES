@@ -1,5 +1,7 @@
 data/ar.xjuan.Cambalache.desktop.in
 data/ar.xjuan.Cambalache.metainfo.xml.in
+cambalache/cmb_context_menu.py
+cambalache/cmb_context_menu.ui
 cambalache/cmb_db.py
 cambalache/cmb_layout_property.py
 cambalache/cmb_list_store.py
