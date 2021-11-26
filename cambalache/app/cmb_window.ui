@@ -1236,7 +1236,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
     <property name="website">https://gitlab.gnome.org/jpu/cambalache</property>
     <property name="website-label" translatable="yes">Source repository and issue tracker</property>
     <property name="authors">Juan Pablo Ugarte</property>
-    <property name="translator-credits" translatable="yes">Vojtěch Perník
+    <property name="translator-credits">Vojtěch Perník
 PhilProg
 Philipp Unger</property>
     <property name="artists">Franco Dodorico</property>
