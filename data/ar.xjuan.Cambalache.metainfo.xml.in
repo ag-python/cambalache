@@ -20,6 +20,38 @@
     </p>
   </description>
   <releases>
+    <release date="2021-12-09" version="0.8.0">
+      <description>
+        <p>UX improvements Release!</p>
+        <ul>
+          <li>New Type chooser bar</li>
+          <li>Workspace placeholder support</li>
+          <li>Translatable properties support (Philipp Unger)</li>
+          <li>Clipboard actions support (Copy, Paste, Cut)</li>
+          <li>Better unsuported features report</li>
+          <li>New Matrix channel #cambalache:gnome.org</li>
+          <li>You can now also support Cambalache on Liberapay (https://liberapay.com/xjuan)</li>
+        </ul>
+      </description>
+      <issues>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/22">Issue #22: Gtk.AboutDialog: license bug</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/10">Issue #10: Export widgets layout data packed in GtkGrid</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/23">Issue #23: Better appdata summary</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/25">Issue #25: Error about target version mismatch</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/29">Issue #29: Error opening project</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/27">Issue #27: Needs a better icon</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/31">Issue #31: Newest ver (git) doesn't display loaded UI</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/34">Issue #34: Translations aren't working in the interactive tour</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/35">Issue #35: Interactive tour isn't working anymore</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/30">Issue #30: Gtk types listed in Cambalache</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/36">Issue #36: Can't build Flatpak after the update of the german translation</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/38">Issue #38: Add translatable metadata to CmbPropertyInfo</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/37">Issue #37: Add support for translatable properties</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/39">Issue #39: Save window state (Philipp Unger)</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/41">Issue #41: Add clipboard support</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/33">Issue #33: No context menu on left pane, the "project view"</issue>
+      </issues>
+    </release>
     <release date="2021-08-24" version="0.7.4">
       <description>
         <p>Bugfix release!</p>
@@ -93,6 +125,7 @@
   <update_contact>juanpablougarte@gmail.com</update_contact>
   <url type="homepage">https://gitlab.gnome.org/jpu/cambalache</url>
   <url type="bugtracker">https://gitlab.gnome.org/jpu/cambalache/issues</url>
+  <url type="donation">https://liberapay.com/xjuan</url>
   <url type="donation">https://www.patreon.com/cambalache</url>
   <url type="contact">https://matrix.to/#/#cambalache:gnome.org</url>
 </component>
