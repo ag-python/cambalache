@@ -28,7 +28,8 @@ import signal
 
 # Set GSchema dir before loading GLib
 os.environ['GSETTINGS_SCHEMA_DIR'] = 'data'
-os.environ['XDG_DATA_DIRS'] = os.environ['XDG_DATA_DIRS'] + ':data'
+os.environ['XDG_DATA_DIRS'] = os.getenv('XDG_DATA_DIRS',
+                                        '/usr/local/share/:/usr/share/') + ':data'
 
 import xml.etree.ElementTree as ET
 from gi.repository import GLib
