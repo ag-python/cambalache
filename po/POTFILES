@@ -20,6 +20,7 @@ cambalache/cmb_ui.py
 cambalache/cmb_view.py
 cambalache/cmb_view.ui
 cambalache/app/cmb_application.py
+cambalache/app/cmb_shortcuts.ui
 cambalache/app/cmb_tutorial.py
 cambalache/app/cmb_window.py
 cambalache/app/cmb_window.ui
