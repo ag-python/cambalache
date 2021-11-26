@@ -62,9 +62,22 @@ and/or a merge request [here](https://gitlab.gnome.org/jpu/cambalache/-/merge_re
 
 ## Financial support
 
-You can financially support Cambalache development on Patreon [here](https://www.patreon.com/cambalache)
+You can financially support Cambalache development on Liberapay or Patreon
 like all these [people](./SUPPORTERS.md) did.
 
+[Liberapay](https://liberapay.com/xjuan)
+ - Liberapay is a recurrent donations platform
+ - Run by a non-profit organization
+ - Source code is public
+ - No commission fee
+ - ~5% payment processing fee
+
+[Patreon](https://www.patreon.com/cambalache)
+ - Patreon is a membership platform for creators
+ - Run by private company
+ - No source code available
+ - ~8% commission fee
+ - ~8% payment processing fee
 
 ## Tools
 
