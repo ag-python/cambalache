@@ -256,6 +256,26 @@
         <property id="text" translatable="True"/>
       </properties>
     </GtkEntryBuffer>
+
+    <GtkShortcutsSection>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkShortcutsSection>
+
+    <GtkShortcutsGroup>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </GtkShortcutsGroup>
+
+    <GtkShortcutsShortcut>
+      <properties>
+        <property id="title" translatable="True"/>
+        <property id="subtitle" translatable="True"/>
+      </properties>
+    </GtkShortcutsShortcut>
+
   </types>
 
   <categories>
