@@ -25,10 +25,11 @@ import os
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gtk
+from gi.repository import GObject, Gdk, Gtk
 
 from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
+from .cmb_context_menu import CmbContextMenu
 
 
 class CmbTreeView(Gtk.TreeView):
@@ -41,6 +42,7 @@ class CmbTreeView(Gtk.TreeView):
         self._selection = self.get_selection()
         self._selection.connect('changed', self.__on_selection_changed)
         self.set_headers_visible (False)
+        self.__right_click = False
 
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn('Object(Type)', renderer)
@@ -49,6 +51,36 @@ class CmbTreeView(Gtk.TreeView):
 
         self.connect('notify::model', self.__on_model_notify)
         self.connect('row-activated', self.__on_row_activated)
+
+        self.menu = CmbContextMenu(relative_to=self)
+
+        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
+                        Gdk.EventMask.BUTTON_RELEASE_MASK)
+        self.connect('button-press-event', self.__on_button_press_event)
+        self.connect('button-release-event', self.__on_button_release_event)
+
+    def __on_button_press_event(self, widget, event):
+        if event.window != self.get_bin_window() or event.button != 3:
+            return False
+
+        self.__right_click = True
+        return True
+
+    def __on_button_release_event(self, widget, event):
+        if event.window != self.get_bin_window() or event.button != 3:
+            return False
+
+        if not self.__right_click:
+            return
+
+        self.__right_click = False
+
+        path, col, xx, yy = self.get_path_at_pos(event.x, event.y)
+        self.get_selection().select_path(path)
+
+        self.menu.popup_at(event.x, event.y)
+
+        return True
 
     def __name_cell_data_func(self, column, cell, model, iter_, data):
         obj = model.get_value(iter_, 0)
