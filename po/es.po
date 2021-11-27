@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-27 15:02-0500\n"
-"PO-Revision-Date: 2021-10-25 16:10-0400\n"
+"PO-Revision-Date: 2021-11-27 15:28-0500\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -59,37 +59,39 @@ msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
 msgid "UX improvements Release!"
-msgstr ""
+msgstr "Lanzamiento de mejorias en UX!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
 msgid "New Type chooser bar"
-msgstr ""
+msgstr "Nueva barra selectora de tipos"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
 msgid "Workspace placeholder support"
-msgstr ""
+msgstr "Soporte de marcadores de posición en espacio de trabajo"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Translatable properties support (Philipp Unger)"
-msgstr ""
+msgstr "Soporte de propiedades traducibles (Philipp Unger)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Clipboard actions support (Copy, Paste, Cut)"
-msgstr ""
+msgstr "Soporte de acciones de portapapeles (Copiar, Pegar, cortar)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
 msgid "Better unsuported features report"
-msgstr ""
+msgstr "Mejor informe de funciones no compatibles"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
 msgid "New Matrix channel #cambalache:gnome.org"
-msgstr ""
+msgstr "Nuevo canal Matrix #cambalache:gnome.org"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:33
 msgid ""
 "You can now also support Cambalache on Liberapay (https://liberapay.com/"
 "xjuan)"
 msgstr ""
+"Ahora también puedes apoyar a Cambalache en Liberapay (https://liberapay.com/"
+"xjuan) "
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:57
 msgid "Bugfix release!"
@@ -187,7 +189,7 @@ msgstr "Juan Pablo Ugarte"
 #. Add back item
 #: cambalache/cmb_context_menu.py:91
 msgid "CSS themes"
-msgstr ""
+msgstr "Temas CSS"
 
 #: cambalache/cmb_context_menu.ui:20
 msgid "Cut"
@@ -215,7 +217,7 @@ msgstr "Leer Documentación"
 
 #: cambalache/cmb_context_menu.ui:123
 msgid "CSS theme"
-msgstr ""
+msgstr "Tema CSS"
 
 #. Translators: This text will be used in the next two string as {convert}
 #: cambalache/cmb_db.py:877
@@ -363,9 +365,9 @@ msgid "Remove UI \"{name}\""
 msgstr "Borrar UI \"{name}\""
 
 #: cambalache/cmb_project.py:543
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Add object {name}"
-msgstr "Borrar object {name}"
+msgstr "Agregar object {name}"
 
 #: cambalache/cmb_project.py:563
 #, python-brace-format
@@ -450,17 +452,17 @@ msgstr "Actualizar señal {signal} de {obj}"
 #: cambalache/cmb_project.py:914
 #, python-brace-format
 msgid "Paste clipboard to {name}"
-msgstr ""
+msgstr "Copiar portapapeles a {name}"
 
 #: cambalache/cmb_project.py:943
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Cut object {name}"
-msgstr "Borrar object {name}"
+msgstr "Cortar objecto {name}"
 
 #: cambalache/cmb_project.py:945
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Cut {n_objects} object"
-msgstr "Crear objecto {obj}"
+msgstr "Cortar {n_objects} objectos"
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -483,26 +485,24 @@ msgid "After"
 msgstr "Después"
 
 #: cambalache/cmb_translatable_popover.py:40
-#, fuzzy
 msgid "<b>Translation</b>"
-msgstr "<dominio de traducción>"
+msgstr "<b>Traduccion</b>"
 
 #: cambalache/cmb_translatable_widget.ui:22
 msgid "Text:"
-msgstr ""
+msgstr "Texto:"
 
 #: cambalache/cmb_translatable_widget.ui:55
 msgid "translatable"
-msgstr ""
+msgstr "traducible"
 
 #: cambalache/cmb_translatable_widget.ui:74
-#, fuzzy
 msgid "Translation context:"
-msgstr "<dominio de traducción>"
+msgstr "Contextp de traducción:"
 
 #: cambalache/cmb_translatable_widget.ui:110
 msgid "Comments for translators:"
-msgstr ""
+msgstr "Comentarios para traductores:"
 
 #: cambalache/cmb_type_chooser.ui:88 cambalache/cmb_type_chooser_widget.py:65
 msgid "Toplevel"
@@ -642,9 +642,8 @@ msgid "Project tree, with multiple UI support"
 msgstr "El árbol del proyecto, con soporte para múltiples UI"
 
 #: cambalache/app/cmb_tutorial.py:48
-#, fuzzy
 msgid "Class selector bar"
-msgstr "Selector de clases"
+msgstr "Barra selectora de clases"
 
 #: cambalache/app/cmb_tutorial.py:49
 msgid "And the object editor"
@@ -652,11 +651,11 @@ msgstr "Y el editor de objectos"
 
 #: cambalache/app/cmb_tutorial.py:52
 msgid "You can search all supported classes here"
-msgstr ""
+msgstr "Podes buscar todas las clases soportadas"
 
 #: cambalache/app/cmb_tutorial.py:54
 msgid "or investigate what is in each group"
-msgstr ""
+msgstr "o investigar que hay en cada grupo"
 
 #: cambalache/app/cmb_tutorial.py:57
 msgid "Now let's add a new UI file"
@@ -674,18 +673,20 @@ msgstr "Excelente!"
 msgid ""
 "BTW, did you know you can double click on any placeholder to create widgets?"
 msgstr ""
+"Por cierto, ¿sabías que puedes hacer doble clic en cualquier marcador de "
+"posición para crear widgets? "
 
 #: cambalache/app/cmb_tutorial.py:64
 msgid "Try adding a grid"
-msgstr ""
+msgstr "Intenta agregar una cuadrícula (grid)"
 
 #: cambalache/app/cmb_tutorial.py:65
 msgid "and a button"
-msgstr ""
+msgstr "y un boton"
 
 #: cambalache/app/cmb_tutorial.py:67
 msgid "Quite easy! Isn't it?"
-msgstr ""
+msgstr "Facil, no?"
 
 #: cambalache/app/cmb_tutorial.py:69
 msgid "Once you finish, you can export all UI files to xml here"
@@ -713,7 +714,7 @@ msgstr "Comenzar introducción interactiva"
 
 #: cambalache/app/cmb_window.py:438
 msgid "Supporters"
-msgstr ""
+msgstr "Seguidores"
 
 #: cambalache/app/cmb_window.py:481
 #, python-brace-format
@@ -799,11 +800,11 @@ msgstr "Intro interaciva"
 
 #: cambalache/app/cmb_window.ui:143
 msgid "Contact us on Matrix!"
-msgstr ""
+msgstr "¡Contáctanos en Matrix! "
 
 #: cambalache/app/cmb_window.ui:145
 msgid "Contact"
-msgstr ""
+msgstr "Contacto"
 
 #: cambalache/app/cmb_window.ui:159 cambalache/app/cmb_window.ui:886
 #: cambalache/app/cmb_window.ui:949
@@ -812,7 +813,7 @@ msgstr "Donar"
 
 #: cambalache/app/cmb_window.ui:184
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Atajos de teclado"
 
 #: cambalache/app/cmb_window.ui:198
 msgid "About"
@@ -898,6 +899,15 @@ msgid ""
 "\n"
 "• ~5% payment processing fee"
 msgstr ""
+"• Liberapay es una plataforma de donaciones recurrentes\n"
+"\n"
+"• Dirigido por una organización sin fines de lucro\n"
+"\n"
+"• El código fuente es público\n"
+"\n"
+"• Sin comisión\n"
+"\n"
+"• ~ 5% de tarifa de procesamiento de pago"
 
 #: cambalache/app/cmb_window.ui:931
 msgid ""
@@ -911,6 +921,15 @@ msgid ""
 "\n"
 "• ~8% payment processing fee"
 msgstr ""
+"• Patreon es una plataforma de membresía para creadores\n"
+"\n"
+"• Dirigido por empresa privada\n"
+"\n"
+"• No hay código fuente disponible\n"
+"\n"
+"• ~ 8% de comisión\n"
+"\n"
+"• ~ 8% de tarifa de procesamiento de pago"
 
 #: cambalache/app/cmb_window.ui:1016
 msgid "_Open"
@@ -946,7 +965,7 @@ msgstr "Creador de Interfaces Gráficas"
 
 #: cambalache/app/cmb_window.ui:1237
 msgid "Source repository and issue tracker"
-msgstr ""
+msgstr "Repositorio y reporte de problemas "
 
 #~ msgid "Sponsors"
 #~ msgstr "Patrocinadores"
