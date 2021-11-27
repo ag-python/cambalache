@@ -27,28 +27,24 @@ import csv
 
 header_text = '''# Cambalache supporters
 
-Many thanks to all the sponsors and advocates of the project
+Many thanks to all the people that suppport the project
 
 '''
 
 def get_supporters(filename):
-    retval = {
-        'supporter': [],
-        'advocate': [],
-        'sponsor': []
-    }
+    retval = []
 
     with open(filename, newline='') as f:
         reader = csv.DictReader(f)
         for row in reader:
             name = row['Name']
             tier = row['Tier'].lower()
-            status = row['Last Charge Status'].lower()
+            lifetime = float(row['Lifetime Amount'])
 
-            if status == 'paid' and tier in retval:
-                retval[tier].append(name)
+            if lifetime > 0:
+                retval.append((name, lifetime))
 
-    return retval
+    return [x[0] for x in sorted(retval, key=lambda v: v[1], reverse=True)]
 
 
 def save_supporters(fd, supporters, prefix):
@@ -65,6 +61,5 @@ if __name__ == "__main__":
 
     with open(sys.argv[2], 'w') as fd:
         fd.write(header_text)
-        save_supporters(fd, supporters['sponsor'], '*')
-        save_supporters(fd, supporters['advocate'], '-')
+        save_supporters(fd, supporters, ' - ')
         fd.close()

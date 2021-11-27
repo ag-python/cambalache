@@ -1,17 +1,13 @@
 # Cambalache supporters
 
-Many thanks to all the sponsors and supporters of the project
+Many thanks to all the people that suppport the project
 
- - Coleman 
- - Willo Vincent
- - Platon workaccount
- - Sonny Piers
- - David
- - Felipe Borges
- - Javier Jardón
- - Aemilia Scott
- - Patrick
- 
-# Former supporters
-
- - Patrick Griffis
+ -  Patrick Griffis
+ -  Willo Vincent
+ -  Javier Jardón
+ -  Sonny Piers
+ -  Platon workaccount
+ -  Felipe Borges
+ -  David
+ -  Aemilia Scott
+ -  Patrick
