@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 18:41-0500\n"
+"POT-Creation-Date: 2021-11-27 15:02-0500\n"
 "PO-Revision-Date: 2021-08-18 22:59+0200\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
@@ -711,8 +711,8 @@ msgid "Start interactive introduction"
 msgstr "Starte interaktive Tour"
 
 #: cambalache/app/cmb_window.py:438
-msgid "Sponsors"
-msgstr "Sponsoren"
+msgid "Supporters"
+msgstr ""
 
 #: cambalache/app/cmb_window.py:481
 #, python-brace-format
@@ -946,6 +946,9 @@ msgstr "Benutzeroberflächen-Ersteller"
 #: cambalache/app/cmb_window.ui:1237
 msgid "Source repository and issue tracker"
 msgstr ""
+
+#~ msgid "Sponsors"
+#~ msgstr "Sponsoren"
 
 #~ msgid "Make sure a UI is selected, type 'GtkWindow' and press enter"
 #~ msgstr ""
