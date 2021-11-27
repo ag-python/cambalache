@@ -151,7 +151,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.version_label.props.label = f"version {config.VERSION}"
         self.about_dialog.props.version = config.VERSION
 
-        self.__populate_about_dialog_sponsors()
+        self.__populate_about_dialog_supporters()
 
         GObject.Object.bind_property(self.np_name_entry, 'text',
                                      self.np_ui_entry, 'placeholder-text',
@@ -425,17 +425,17 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         return dialog
 
-    def __populate_about_dialog_sponsors(self):
+    def __populate_about_dialog_supporters(self):
         gbytes = Gio.resources_lookup_data('/ar/xjuan/Cambalache/app/SUPPORTERS.md',
                                            Gio.ResourceLookupFlags.NONE)
         supporters = gbytes.get_data().decode('UTF-8').splitlines()
         sponsors = []
 
         for name in supporters:
-            if name.startswith('* '):
-                sponsors.append(name[2:])
+            if name.startswith(' - '):
+                sponsors.append(name[3:])
 
-        self.about_dialog.add_credit_section(_('Sponsors'), sponsors)
+        self.about_dialog.add_credit_section(_('Supporters'), sponsors)
 
     def present_message_to_user(self, message, secondary_text=None, details=None):
         dialog = Gtk.MessageDialog(
