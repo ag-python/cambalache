@@ -36,7 +36,6 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 locale.bindtextdomain("cambalache", localedir)
 locale.textdomain("cambalache")
-builtins.__dict__['_'] = locale.gettext
 
 from cambalache.app import CmbApplication
 
