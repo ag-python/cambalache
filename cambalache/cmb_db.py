@@ -1000,7 +1000,7 @@ class CmbDB(GObject.GObject):
             node = E.property(value, name=property_id)
 
             if translatable:
-                node_set(node, 'translatable', 'True')
+                node_set(node, 'translatable', 'yes')
                 node_set(node, 'context', translation_context)
                 node_set(node, 'comments', translation_comments)
 
