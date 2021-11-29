@@ -85,7 +85,7 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Toplevel</property>
+                <property name="label" translatable="yes" comments="Widget group for toplevels/windows">Toplevel</property>
               </object>
             </child>
           </object>
@@ -106,7 +106,7 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Layout</property>
+                <property name="label" translatable="yes" comments="Widget group for container widgets liek GtkBox grid">Layout</property>
               </object>
             </child>
           </object>
@@ -127,7 +127,7 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Control</property>
+                <property name="label" translatable="yes" comments="Widget group for  control wildget like buttons, entries">Control</property>
               </object>
             </child>
           </object>
@@ -148,7 +148,7 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Display</property>
+                <property name="label" translatable="yes" comments="Widget group for display widgets (label, image)">Display</property>
               </object>
             </child>
           </object>
@@ -169,7 +169,7 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Model</property>
+                <property name="label" translatable="yes" comments="Widget group for model objects (ListStore, TextBuffer)">Model</property>
               </object>
             </child>
           </object>
