@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-29 08:09-0500\n"
+"POT-Creation-Date: 2021-11-29 09:14-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -487,23 +487,28 @@ msgstr ""
 msgid "Comments for translators:"
 msgstr ""
 
+#. Widget group for toplevels/windows
 #: cambalache/cmb_type_chooser.ui:88 cambalache/cmb_type_chooser_widget.py:65
 msgid "Toplevel"
 msgstr ""
 
+#. Widget group for container widgets liek GtkBox grid
 #: cambalache/cmb_type_chooser.ui:109 cambalache/cmb_type_chooser_widget.py:66
 #: cambalache/app/cmb_window.ui:746
 msgid "Layout"
 msgstr ""
 
+#. Widget group for  control wildget like buttons, entries
 #: cambalache/cmb_type_chooser.ui:130 cambalache/cmb_type_chooser_widget.py:67
 msgid "Control"
 msgstr ""
 
+#. Widget group for display widgets (label, image)
 #: cambalache/cmb_type_chooser.ui:151 cambalache/cmb_type_chooser_widget.py:68
 msgid "Display"
 msgstr ""
 
+#. Widget group for model objects (ListStore, TextBuffer)
 #: cambalache/cmb_type_chooser.ui:172 cambalache/cmb_type_chooser_widget.py:69
 msgid "Model"
 msgstr ""
