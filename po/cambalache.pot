@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-27 15:02-0500\n"
+"POT-Creation-Date: 2021-11-29 08:09-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -564,6 +564,46 @@ msgstr ""
 msgid "UI Definition"
 msgstr ""
 
+#: cambalache/app/cmb_shortcuts.ui:13
+msgid "Project"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:19
+msgid "Create new project"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1020
+msgid "Open a project"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:33
+msgid "Close the project"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:40
+msgid "Save the project"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:48
+msgid "Workspace"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:54
+msgid "Add  slot/column"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:61
+msgid "Remove slot/column"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:68
+msgid "Add row"
+msgstr ""
+
+#: cambalache/app/cmb_shortcuts.ui:75
+msgid "Remove row"
+msgstr ""
+
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
 msgstr ""
@@ -885,10 +925,6 @@ msgstr ""
 
 #: cambalache/app/cmb_window.ui:1016
 msgid "_Open"
-msgstr ""
-
-#: cambalache/app/cmb_window.ui:1020
-msgid "Open a project"
 msgstr ""
 
 #: cambalache/app/cmb_window.ui:1061

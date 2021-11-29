@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-27 15:02-0500\n"
-"PO-Revision-Date: 2021-11-27 15:28-0500\n"
+"POT-Creation-Date: 2021-11-29 08:09-0500\n"
+"PO-Revision-Date: 2021-11-29 08:26-0500\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -581,6 +581,46 @@ msgstr "Vista del Proyecto"
 msgid "UI Definition"
 msgstr "Definición del UI"
 
+#: cambalache/app/cmb_shortcuts.ui:13
+msgid "Project"
+msgstr "Proyecto"
+
+#: cambalache/app/cmb_shortcuts.ui:19
+msgid "Create new project"
+msgstr "Crear proyecto nuevo"
+
+#: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1020
+msgid "Open a project"
+msgstr "Abrir proyecto"
+
+#: cambalache/app/cmb_shortcuts.ui:33
+msgid "Close the project"
+msgstr "Cerrar proyecto"
+
+#: cambalache/app/cmb_shortcuts.ui:40
+msgid "Save the project"
+msgstr "Guardar proyecto"
+
+#: cambalache/app/cmb_shortcuts.ui:48
+msgid "Workspace"
+msgstr "Área de trabajo"
+
+#: cambalache/app/cmb_shortcuts.ui:54
+msgid "Add  slot/column"
+msgstr "Agregar espacio/columna"
+
+#: cambalache/app/cmb_shortcuts.ui:61
+msgid "Remove slot/column"
+msgstr "Borrar espacio/columna"
+
+#: cambalache/app/cmb_shortcuts.ui:68
+msgid "Add row"
+msgstr "Agregar fila"
+
+#: cambalache/app/cmb_shortcuts.ui:75
+msgid "Remove row"
+msgstr "Borrar file"
+
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
 msgstr "Hola, te voy a mostrar Cambalache"
@@ -934,10 +974,6 @@ msgstr ""
 #: cambalache/app/cmb_window.ui:1016
 msgid "_Open"
 msgstr "_Abrir"
-
-#: cambalache/app/cmb_window.ui:1020
-msgid "Open a project"
-msgstr "Abrir proyecto"
 
 #: cambalache/app/cmb_window.ui:1061
 msgid "Create a new project"
