@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-29 09:14-0500\n"
-"PO-Revision-Date: 2021-11-28 16:13+0100\n"
+"PO-Revision-Date: 2021-11-30 15:14+0100\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
 "Language: de\n"
@@ -585,49 +585,44 @@ msgid "UI Definition"
 msgstr "UI-Definition"
 
 #: cambalache/app/cmb_shortcuts.ui:13
-#, fuzzy
 msgid "Project"
-msgstr "Neues Projekt"
+msgstr "Projekt"
 
 #: cambalache/app/cmb_shortcuts.ui:19
-#, fuzzy
 msgid "Create new project"
 msgstr "Neues Projekt erstellen"
 
 #: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1020
 msgid "Open a project"
-msgstr "Projekt öffnen"
+msgstr "Ein Projekt öffnen"
 
 #: cambalache/app/cmb_shortcuts.ui:33
-#, fuzzy
 msgid "Close the project"
-msgstr "Projekt Schließen"
+msgstr "Das Projekt schließen"
 
 #: cambalache/app/cmb_shortcuts.ui:40
-#, fuzzy
 msgid "Save the project"
-msgstr "Projekt speichern"
+msgstr "Das Projekt speichern"
 
 #: cambalache/app/cmb_shortcuts.ui:48
-#, fuzzy
 msgid "Workspace"
-msgstr "Arbeitsbereich neu starten"
+msgstr "Arbeitsbereich"
 
 #: cambalache/app/cmb_shortcuts.ui:54
 msgid "Add  slot/column"
-msgstr ""
+msgstr "Platzhalter/Spalte hinzufügen"
 
 #: cambalache/app/cmb_shortcuts.ui:61
 msgid "Remove slot/column"
-msgstr ""
+msgstr "Platzhalter/Spalte entfernen"
 
 #: cambalache/app/cmb_shortcuts.ui:68
 msgid "Add row"
-msgstr ""
+msgstr "Zeile hinzufügen"
 
 #: cambalache/app/cmb_shortcuts.ui:75
 msgid "Remove row"
-msgstr ""
+msgstr "Zeile entfernen"
 
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
