@@ -60,6 +60,12 @@ flatpak install --user flathub ar.xjuan.Cambalache
 If you are interested in contributing you can open and issue [here](https://gitlab.gnome.org/jpu/cambalache/-/issues)
 and/or a merge request [here](https://gitlab.gnome.org/jpu/cambalache/-/merge_requests)
 
+## Contact
+
+You can hang with us and ask us questions on Matrix at #cambalache:gnome.org
+
+[Matrix](https://matrix.to/#/#cambalache:gnome.org)
+
 ## Financial support
 
 You can financially support Cambalache development on Liberapay or Patreon
