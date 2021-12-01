@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-29 09:14-0500\n"
-"PO-Revision-Date: 2021-11-29 08:26-0500\n"
+"PO-Revision-Date: 2021-11-30 11:42-0500\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -624,7 +624,7 @@ msgstr "Agregar fila"
 
 #: cambalache/app/cmb_shortcuts.ui:75
 msgid "Remove row"
-msgstr "Borrar file"
+msgstr "Borrar fila"
 
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
@@ -841,7 +841,7 @@ msgstr "Depurar datos"
 
 #: cambalache/app/cmb_window.ui:130
 msgid "Interactive intro"
-msgstr "Intro interaciva"
+msgstr "Intro interactiva"
 
 #: cambalache/app/cmb_window.ui:143
 msgid "Contact us on Matrix!"
