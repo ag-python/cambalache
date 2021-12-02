@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-29 09:14-0500\n"
-"PO-Revision-Date: 2021-11-28 17:08+0100\n"
+"PO-Revision-Date: 2021-12-02 11:47+0100\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -504,28 +504,28 @@ msgstr "Komentář pro překladatele:"
 #. Widget group for toplevels/windows
 #: cambalache/cmb_type_chooser.ui:88 cambalache/cmb_type_chooser_widget.py:65
 msgid "Toplevel"
-msgstr "Nejvyšší úroveň"
+msgstr "Nejvyšší úrovně"
 
 #. Widget group for container widgets liek GtkBox grid
 #: cambalache/cmb_type_chooser.ui:109 cambalache/cmb_type_chooser_widget.py:66
 #: cambalache/app/cmb_window.ui:746
 msgid "Layout"
-msgstr "Rozložení"
+msgstr "Kontejnery"
 
 #. Widget group for  control wildget like buttons, entries
 #: cambalache/cmb_type_chooser.ui:130 cambalache/cmb_type_chooser_widget.py:67
 msgid "Control"
-msgstr ""
+msgstr "Ovládání"
 
 #. Widget group for display widgets (label, image)
 #: cambalache/cmb_type_chooser.ui:151 cambalache/cmb_type_chooser_widget.py:68
 msgid "Display"
-msgstr ""
+msgstr "Zobrazení"
 
 #. Widget group for model objects (ListStore, TextBuffer)
 #: cambalache/cmb_type_chooser.ui:172 cambalache/cmb_type_chooser_widget.py:69
 msgid "Model"
-msgstr "Model"
+msgstr "Modely"
 
 #: cambalache/cmb_type_chooser_widget.py:98
 msgid "Others"
@@ -584,12 +584,10 @@ msgid "UI Definition"
 msgstr "Definice UI"
 
 #: cambalache/app/cmb_shortcuts.ui:13
-#, fuzzy
 msgid "Project"
-msgstr "Nový projekt"
+msgstr "Projekt"
 
 #: cambalache/app/cmb_shortcuts.ui:19
-#, fuzzy
 msgid "Create new project"
 msgstr "Vytvořit nový projekt"
 
@@ -598,35 +596,32 @@ msgid "Open a project"
 msgstr "Otevřít projekt"
 
 #: cambalache/app/cmb_shortcuts.ui:33
-#, fuzzy
 msgid "Close the project"
 msgstr "Zavřít projekt"
 
 #: cambalache/app/cmb_shortcuts.ui:40
-#, fuzzy
 msgid "Save the project"
 msgstr "Uložit projekt"
 
 #: cambalache/app/cmb_shortcuts.ui:48
-#, fuzzy
 msgid "Workspace"
-msgstr "Restartovat prostředí"
+msgstr "Prostředí"
 
 #: cambalache/app/cmb_shortcuts.ui:54
 msgid "Add  slot/column"
-msgstr ""
+msgstr "Přidat zástupnou plochu/sloupec"
 
 #: cambalache/app/cmb_shortcuts.ui:61
 msgid "Remove slot/column"
-msgstr ""
+msgstr "Odebrat zástupnou plochu/sloupec"
 
 #: cambalache/app/cmb_shortcuts.ui:68
 msgid "Add row"
-msgstr ""
+msgstr "Přidat řádek"
 
 #: cambalache/app/cmb_shortcuts.ui:75
 msgid "Remove row"
-msgstr ""
+msgstr "Odebrat řádek"
 
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
