@@ -343,12 +343,16 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self.__is_project_visible():
             sel = self.project.get_selection()
             if sel:
+                # We can delete a UI too
+                self.actions['delete'].set_enabled(True)
+
                 for obj in sel:
                     if isinstance(obj, CmbObject):
                         has_selection = True
                         break
 
-            for action in ['copy', 'cut', 'delete']:
+            # FIXME: Should we enable copy for CmbUI?
+            for action in ['copy', 'cut']:
                 self.actions[action].set_enabled(has_selection)
         else:
             for action in ['copy', 'cut', 'delete']:
