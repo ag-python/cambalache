@@ -83,6 +83,7 @@ class CmbObjectEditor(Gtk.Box):
 
     def __on_template_check_toggled(self, button):
         self.__object.ui.template_id = self.__object.object_id if button.props.active else 0
+        self.__update_template_label()
 
     def __on_expander_expanded(self, expander, pspec, revealer):
         expanded = expander.props.expanded
