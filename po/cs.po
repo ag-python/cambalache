@@ -75,7 +75,7 @@ msgid "Clipboard actions support (Copy, Paste, Cut)"
 msgstr "Podpora akcí schránky (kopírovat, vložit, vyjmout)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
-msgid "Better unsuported features report"
+msgid "Better unsupported features report"
 msgstr "Lepší hlášení nepodporovaný funkcí"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
@@ -749,63 +749,63 @@ msgstr "Hezký den!"
 msgid "<Choose a UI filename to create>"
 msgstr "<Vyberte jméno souboru UI k vytvoření>"
 
-#: cambalache/app/cmb_window.py:388 cambalache/app/cmb_window.ui:1158
+#: cambalache/app/cmb_window.py:392 cambalache/app/cmb_window.ui:1158
 msgid "Start interactive introduction"
 msgstr "Spustit interaktivní prohlídku"
 
-#: cambalache/app/cmb_window.py:438
+#: cambalache/app/cmb_window.py:442
 msgid "Supporters"
 msgstr "Podporovatelé"
 
-#: cambalache/app/cmb_window.py:481
+#: cambalache/app/cmb_window.py:485
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Chyba při načítání {filename}"
 
-#: cambalache/app/cmb_window.py:484
+#: cambalache/app/cmb_window.py:488
 msgid "Choose project to open"
 msgstr "Vyberte projekt k otevření"
 
-#: cambalache/app/cmb_window.py:522
+#: cambalache/app/cmb_window.py:526
 msgid "File name already exists, choose a different name."
 msgstr "Jméno souboru již existuje, vyberte jiné jméno."
 
-#: cambalache/app/cmb_window.py:547
+#: cambalache/app/cmb_window.py:551
 msgid "Choose a new file to save the project"
 msgstr "Vyberte nové jméno souboru k uložení projektu"
 
-#: cambalache/app/cmb_window.py:559
+#: cambalache/app/cmb_window.py:563
 msgid "Choose a file name for the new UI"
 msgstr "Vyberte jméno souboru  pro nové UI"
 
-#: cambalache/app/cmb_window.py:574
+#: cambalache/app/cmb_window.py:578
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
 msgstr "Opravdu chcete odebrat {filename}?"
 
-#: cambalache/app/cmb_window.py:623
+#: cambalache/app/cmb_window.py:627
 msgid "Choose file to import"
 msgstr "Vyberte soubor k importu"
 
 #. Translators: This is used to create a unordered list of unsupported features to show the user
-#: cambalache/app/cmb_window.py:643
+#: cambalache/app/cmb_window.py:647
 #, python-brace-format
 msgid "    • {message}"
 msgstr "    • {message}"
 
 #. Translators: This will be the heading of a list of unsupported features
-#: cambalache/app/cmb_window.py:646
+#: cambalache/app/cmb_window.py:650
 msgid "Cambalache encounter the following issues:"
 msgstr "Cambalache narazil na následující problémy:"
 
 #. Translators: this is the last message after the list of unsupported features
-#: cambalache/app/cmb_window.py:649
+#: cambalache/app/cmb_window.py:653
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 "Váš soubor bude exportován jako '{name}.cmb.ui', aby se předešlo ztrátě dat."
 
-#: cambalache/app/cmb_window.py:654
+#: cambalache/app/cmb_window.py:658
 #, python-brace-format
 msgid ""
 "Cambalache encounter {unsupported_feature}\n"
@@ -814,7 +814,7 @@ msgstr ""
 "Cambalache narazil na {unsupported_feature}\n"
 "Váš soubor bude exportován jako '{name}.cmb.ui', aby se předešlo ztrátě dat."
 
-#: cambalache/app/cmb_window.py:656 cambalache/app/cmb_window.py:662
+#: cambalache/app/cmb_window.py:660 cambalache/app/cmb_window.py:666
 #, python-brace-format
 msgid "Error importing {filename}"
 msgstr "Chyba při importování {filename}"

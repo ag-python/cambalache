@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-29 09:14-0500\n"
-"PO-Revision-Date: 2021-11-30 11:42-0500\n"
+"POT-Creation-Date: 2021-12-09 18:26-0500\n"
+"PO-Revision-Date: 2021-12-09 17:57-0500\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -78,7 +78,7 @@ msgid "Clipboard actions support (Copy, Paste, Cut)"
 msgstr "Soporte de acciones de portapapeles (Copiar, Pegar, cortar)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
-msgid "Better unsuported features report"
+msgid "Better unsupported features report"
 msgstr "Mejor informe de funciones no compatibles"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
@@ -753,63 +753,63 @@ msgstr "Que tenga un buen día!"
 msgid "<Choose a UI filename to create>"
 msgstr "<Elija un nombre de archivo para crear un UI>"
 
-#: cambalache/app/cmb_window.py:388 cambalache/app/cmb_window.ui:1158
+#: cambalache/app/cmb_window.py:392 cambalache/app/cmb_window.ui:1158
 msgid "Start interactive introduction"
 msgstr "Comenzar introducción interactiva"
 
-#: cambalache/app/cmb_window.py:438
+#: cambalache/app/cmb_window.py:442
 msgid "Supporters"
 msgstr "Seguidores"
 
-#: cambalache/app/cmb_window.py:481
+#: cambalache/app/cmb_window.py:485
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Error abriendo {filename}"
 
-#: cambalache/app/cmb_window.py:484
+#: cambalache/app/cmb_window.py:488
 msgid "Choose project to open"
 msgstr "Elija un proyecto para abrir"
 
-#: cambalache/app/cmb_window.py:522
+#: cambalache/app/cmb_window.py:526
 msgid "File name already exists, choose a different name."
 msgstr "El archivo ya existe, elija un nombre diferente."
 
-#: cambalache/app/cmb_window.py:547
+#: cambalache/app/cmb_window.py:551
 msgid "Choose a new file to save the project"
 msgstr "Elija un nuevo archivo para guardar el proyecto"
 
-#: cambalache/app/cmb_window.py:559
+#: cambalache/app/cmb_window.py:563
 msgid "Choose a file name for the new UI"
 msgstr "Elija un nombre de archivo para la UI nueva"
 
-#: cambalache/app/cmb_window.py:574
+#: cambalache/app/cmb_window.py:578
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
 msgstr "¿Realmente desea borrar {filename}?"
 
-#: cambalache/app/cmb_window.py:623
+#: cambalache/app/cmb_window.py:627
 msgid "Choose file to import"
 msgstr "Elija un archivo para importar"
 
 #. Translators: This is used to create a unordered list of unsupported features to show the user
-#: cambalache/app/cmb_window.py:643
+#: cambalache/app/cmb_window.py:647
 #, python-brace-format
 msgid "    • {message}"
 msgstr "    • {message}"
 
 #. Translators: This will be the heading of a list of unsupported features
-#: cambalache/app/cmb_window.py:646
+#: cambalache/app/cmb_window.py:650
 msgid "Cambalache encounter the following issues:"
 msgstr "Cambalache encontró los siguientes problemas:"
 
 #. Translators: this is the last message after the list of unsupported features
-#: cambalache/app/cmb_window.py:649
+#: cambalache/app/cmb_window.py:653
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 "El archivo sera exportado como '{name}.cmb.ui' para evitar perder datos."
 
-#: cambalache/app/cmb_window.py:654
+#: cambalache/app/cmb_window.py:658
 #, python-brace-format
 msgid ""
 "Cambalache encounter {unsupported_feature}\n"
@@ -818,7 +818,7 @@ msgstr ""
 "Cambalache encontró {unsupported_feature}\n"
 "El archivo sera exportado como '{name}.cmb.ui' para evitar perder datos."
 
-#: cambalache/app/cmb_window.py:656 cambalache/app/cmb_window.py:662
+#: cambalache/app/cmb_window.py:660 cambalache/app/cmb_window.py:666
 #, python-brace-format
 msgid "Error importing {filename}"
 msgstr "Error importando {filename}"
