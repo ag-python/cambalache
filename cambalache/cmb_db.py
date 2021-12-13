@@ -876,12 +876,15 @@ class CmbDB(GObject.GObject):
             # Translators: This text will be used in the next two string as {convert}
             convert = _('\nUse gtk4-builder-tool first to convert file.') if target_tk == 'gtk-4.0' else ''
 
+            if lib is None:
+                raise Exception(_('Can not recognize file format'))
+
             if inferred:
                 # Translators: {convert} will be replaced with the gtk4-builder-tool string
                 raise Exception(_('Can not import what looks like a {lib}-{ver} file in a {target_tk} project.{convert}').format(lib=lib, ver=ver, target_tk=target_tk, convert=convert))
             else:
                 # Translators: {convert} will be replaced with the gtk4-builder-tool string
-                raise Exception(_('Can not import a {lib}-{ver} file in a {target_tk} project.{convert}'))
+                raise Exception(_('Can not import a {lib}-{ver} file in a {target_tk} project.{convert}').format(lib=lib, ver=ver, target_tk=target_tk, convert=convert))
 
         c = self.conn.cursor()
 
