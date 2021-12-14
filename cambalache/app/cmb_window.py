@@ -410,12 +410,17 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.__update_action_clipboard_paste()
         self.actions['debug'].set_enabled(has_project and self.__opensqlite is not None)
 
-    def __file_open_dialog_new(self, title, action=Gtk.FileChooserAction.OPEN, filter_obj=None):
+    def __file_open_dialog_new(self,
+                               title,
+                               action=Gtk.FileChooserAction.OPEN,
+                               filter_obj=None,
+                               select_multiple=False):
         dialog = Gtk.FileChooserDialog(
             title=title,
-         parent=self,
+            parent=self,
             action=action,
-            filter=filter_obj
+            filter=filter_obj,
+            select_multiple=select_multiple
         )
         dialog.add_buttons(
             Gtk.STOCK_CANCEL,
@@ -620,51 +625,57 @@ class CmbWindow(Gtk.ApplicationWindow):
             elif type(obj) == CmbObject:
                 self.project.remove_object(obj)
 
+    def __present_import_error(self, filename, msg, detail):
+        details = '\n'.join(detail)
+        logger.warning(f"Error parsing {filename}\n{details}")
+
+        filename = os.path.basename(filename)
+        name, ext = os.path.splitext(filename)
+        unsupported_features_list = None
+        text = None
+
+        if len(msg) > 1:
+            # Translators: This is used to create a unordered list of unsupported features to show the user
+            list = [_("    • {message}").format(message=message) for message in msg]
+
+            # Translators: This will be the heading of a list of unsupported features
+            first_msg = _("Cambalache encounter the following issues:")
+
+            # Translators: this is the last message after the list of unsupported features
+            last_msg = _("Your file will be exported as '{name}.cmb.ui' to avoid data loss.").format(name=name)
+
+            unsupported_features_list = [first_msg] + list + [last_msg]
+        else:
+            unsupported_feature = msg[0]
+            text = _("Cambalache encounter {unsupported_feature}\nYour file will be exported as '{name}.cmb.ui' to avoid data loss.").format(unsupported_feature=unsupported_feature, name=name)
+
+        self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
+                                     secondary_text=text,
+                                     details=unsupported_features_list)
+
     def _on_import_activate(self, action, data):
         if self.project is None:
             return
 
         dialog = self.__file_open_dialog_new(_("Choose file to import"),
-                                            filter_obj=self.import_filter)
+                                             filter_obj=self.import_filter,
+                                             select_multiple=True)
 
         if dialog.run() == Gtk.ResponseType.OK:
-            filename = dialog.get_filename()
+            filenames = dialog.get_filenames()
             dialog.destroy()
-            try:
-                msg, detail = self.project.import_file(filename)
 
-                if msg:
-                    details = '\n'.join(detail)
-                    logger.warning(f"Error parsing {filename}\n{details}")
+            for filename in filenames:
+                try:
+                    msg, detail = self.project.import_file(filename)
 
+                    if msg:
+                        self.__present_import_error(filename, msg, detail)
+
+                except Exception as e:
                     filename = os.path.basename(filename)
-                    name, ext = os.path.splitext(filename)
-                    unsupported_features_list = None
-                    text = None
-
-                    if len(msg) > 1:
-                        # Translators: This is used to create a unordered list of unsupported features to show the user
-                        list = [_("    • {message}").format(message=message) for message in msg]
-
-                        # Translators: This will be the heading of a list of unsupported features
-                        first_msg = _("Cambalache encounter the following issues:")
-
-                        # Translators: this is the last message after the list of unsupported features
-                        last_msg = _("Your file will be exported as '{name}.cmb.ui' to avoid data loss.").format(name=name)
-
-                        unsupported_features_list = [first_msg] + list + [last_msg]
-                    else:
-                        unsupported_feature = msg[0]
-                        text = _("Cambalache encounter {unsupported_feature}\nYour file will be exported as '{name}.cmb.ui' to avoid data loss.").format(unsupported_feature=unsupported_feature, name=name)
-
                     self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
-                                                 secondary_text=text,
-                                                 details=unsupported_features_list)
-
-            except Exception as e:
-                filename = os.path.basename(filename)
-                self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
-                                             secondary_text=str(e))
+                                                 secondary_text=str(e))
         else:
             dialog.destroy()
 
