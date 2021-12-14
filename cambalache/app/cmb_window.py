@@ -491,7 +491,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_open_activate(self, action, data):
         dialog = self.__file_open_dialog_new(_("Choose project to open"),
-                                            filter_obj=self.open_filter)
+                                             filter_obj=self.open_filter)
         if dialog.run() == Gtk.ResponseType.OK:
             self.emit('open-project', dialog.get_filename(), None, None)
 
@@ -554,7 +554,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             return
 
         dialog = self.__file_open_dialog_new(_("Choose a new file to save the project"),
-                                            Gtk.FileChooserAction.SAVE)
+                                             Gtk.FileChooserAction.SAVE)
         if dialog.run() == Gtk.ResponseType.OK:
             self.project.filename = dialog.get_filename()
             self.project.save()
@@ -565,13 +565,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self.project is None:
             return
 
-        dialog = self.__file_open_dialog_new(_("Choose a file name for the new UI"),
-                                            Gtk.FileChooserAction.SAVE)
-        if dialog.run() == Gtk.ResponseType.OK:
-            ui = self.project.add_ui(dialog.get_filename())
-            self.project.set_selection([ui])
-
-        dialog.destroy()
+        ui = self.project.add_ui()
+        self.project.set_selection([ui])
 
     def __remove_ui_with_confirmation(self, ui):
         filename = ui.filename
