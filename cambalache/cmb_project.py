@@ -434,7 +434,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         dirname = os.path.dirname(self.filename)
 
-        for row in c.execute('SELECT ui_id, filename FROM ui;'):
+        for row in c.execute('SELECT ui_id, filename FROM ui WHERE filename IS NOT NULL;'):
             ui_id, filename = row
             self.__export(ui_id, filename, dirname=dirname)
 
@@ -458,10 +458,16 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         return ui
 
-    def add_ui(self, filename, requirements={}):
-        basename = os.path.basename(filename)
-        dirname = os.path.dirname(self.filename)
-        relpath = os.path.relpath(filename, dirname)
+    def add_ui(self, filename=None, requirements={}):
+
+        if filename is None:
+            basename = None
+            relpath = None
+        else:
+            basename = os.path.basename(filename)
+            dirname = os.path.dirname(self.filename)
+            relpath = os.path.relpath(filename, dirname)
+
         try:
             self.history_push(_("Add UI {basename}").format(basename=basename))
             ui_id = self.db.add_ui(basename, relpath, requirements)
