@@ -90,7 +90,11 @@ class CmbTreeView(Gtk.TreeView):
             extra = '(template)' if not obj.parent_id and obj.ui.template_id == obj.object_id else obj.type_id
             cell.set_property('markup', f'{name} <i>{extra}</i>')
         elif type(obj) == CmbUI:
-            cell.set_property('markup', f'<b>{obj.filename}</b>')
+            if obj.filename is None:
+                name = f'<b>Unnamed {obj.ui_id}</b>'
+            else:
+                name = f'<b>{obj.filename}</b>'
+            cell.set_property('markup', name)
 
     def __on_model_notify(self, treeview, pspec):
         if self._project is not None:
