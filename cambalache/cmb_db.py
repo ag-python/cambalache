@@ -278,6 +278,13 @@ class CmbDB(GObject.GObject):
 
     @staticmethod
     def get_target_from_file(filename):
+        def get_target_from_line(line, tag):
+            if not line.endswith('/>'):
+                line = line + f'</{tag}>'
+
+            root = etree.fromstring(line)
+            return root.get('target_tk', None)
+
         retval = None
         try:
             f = open(filename, 'r')
@@ -287,13 +294,10 @@ class CmbDB(GObject.GObject):
                 # FIXME: find a robust way of doing this without parsing the
                 # whole file
                 if line.startswith('<cambalache-project'):
-                    root = etree.fromstring(line + '</cambalache-project>')
-                    retval = root.get('target_tk', None)
+                    retval = get_target_from_line(line, 'cambalache-project')
                     break
                 elif line.startswith('<project'):
-                    # Support old file format root tag
-                    root = etree.fromstring(line + '</project>')
-                    retval = root.get('target_tk', None)
+                    retval = get_target_from_line(line, 'project')
                     break
             f.close()
         except:
