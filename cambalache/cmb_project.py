@@ -29,6 +29,8 @@ import time
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, GLib, GObject, Gtk
 
+from lxml import etree
+
 from .cmb_db import CmbDB
 from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
@@ -95,13 +97,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         super().__init__(**kwargs)
 
         # Target from file take precedence over target_tk property
-        if self.filename:
+        if self.filename and os.path.isfile(self.filename):
             target_tk = CmbDB.get_target_from_file(self.filename)
 
             if target_tk is not None:
                 self.target_tk = target_tk
 
-        if self.target_tk is None:
+        if self.target_tk is None or self.target_tk == '':
             raise Exception('Either target_tk or filename are required')
 
         # Use a TreeStore to hold object tree instead of using SQL for every
@@ -404,10 +406,12 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         logger.info('UI update: {time.monotonic() - import_end}')
 
         # Get parsing errors
-        retval = self.__get_import_errors()
+        msgs, detail_msg = self.__get_import_errors()
         self.db.errors = None
 
-        return retval
+        ui = self.get_object_by_id(ui_id)
+
+        return (ui, msgs, detail_msg)
 
     def __export(self, ui_id, filename, dirname=None):
         if not os.path.isabs(filename):
@@ -609,6 +613,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
                             (ui_id, name))
         row = c.fetchone()
         return self.get_object_by_key(f'{ui_id}.{row[0]}') if row else None
+
+    def get_ui_by_filename(self, filename):
+        dirname = os.path.dirname(self.filename)
+        relpath = os.path.relpath(filename, dirname)
+
+        c = self.db.execute("SELECT ui_id FROM ui WHERE filename=?;",
+                            (relpath, ))
+        row = c.fetchone()
+        return self.get_object_by_key(row[0]) if row else None
 
     def __undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
         # FIXME:use a dict instead of walking the array
@@ -971,6 +984,15 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             retval = 0
 
         return retval
+
+    @staticmethod
+    def get_target_from_ui_file(filename):
+        tree = etree.parse(filename)
+        root = tree.getroot()
+
+        lib, ver, inferred = CmbDB._get_target_from_node(root)
+
+        return f'{lib}-{ver}'
 
     # Default handlers
     def do_ui_added(self, ui):
