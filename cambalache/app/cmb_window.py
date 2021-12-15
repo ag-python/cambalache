@@ -475,6 +475,61 @@ class CmbWindow(Gtk.ApplicationWindow):
         dialog.run()
         dialog.destroy()
 
+    def import_file(self, filename):
+        if self.project is None:
+            dirname = os.path.dirname(filename)
+            basename = os.path.basename(filename)
+            name, ext = os.path.splitext(basename)
+            target_tk = CmbProject.get_target_from_ui_file(filename)
+            self.project = CmbProject(filename=os.path.join(dirname, f'{name}.cmb'),
+                                      target_tk=target_tk)
+            self.__set_page('workspace')
+            self.__update_actions()
+
+        # Check if its already imported
+        ui = self.project.get_ui_by_filename(filename)
+
+        if ui is not None:
+            self.project.set_selection([ui])
+            return
+
+        try:
+            ui, msg, detail = self.project.import_file(filename)
+
+            self.project.set_selection([ui])
+
+            if msg:
+                details = '\n'.join(detail)
+                logger.warning(f"Error parsing {filename}\n{details}")
+
+                filename = os.path.basename(filename)
+                name, ext = os.path.splitext(filename)
+                unsupported_features_list = None
+                text = None
+
+                if len(msg) > 1:
+                    # Translators: This is used to create a unordered list of unsupported features to show the user
+                    list = [_("    • {message}").format(message=message) for message in msg]
+
+                    # Translators: This will be the heading of a list of unsupported features
+                    first_msg = _("Cambalache encounter the following issues:")
+
+                    # Translators: this is the last message after the list of unsupported features
+                    last_msg = _("Your file will be exported as '{name}.cmb.ui' to avoid data loss.").format(name=name)
+
+                    unsupported_features_list = [first_msg] + list + [last_msg]
+                else:
+                    unsupported_feature = msg[0]
+                    text = _("Cambalache encounter {unsupported_feature}\nYour file will be exported as '{name}.cmb.ui' to avoid data loss.").format(unsupported_feature=unsupported_feature, name=name)
+
+                self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
+                                             secondary_text=text,
+                                             details=unsupported_features_list)
+        except Exception as e:
+            filename = os.path.basename(filename)
+            self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
+                                         secondary_text=str(e))
+
     def open_project(self, filename, target_tk=None, uiname=None):
         try:
             self.project = CmbProject(filename=filename, target_tk=target_tk)
@@ -661,16 +716,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             dialog.destroy()
 
             for filename in filenames:
-                try:
-                    msg, detail = self.project.import_file(filename)
-
-                    if msg:
-                        self.__present_import_error(filename, msg, detail)
-
-                except Exception as e:
-                    filename = os.path.basename(filename)
-                    self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
-                                                 secondary_text=str(e))
+                self.import_file(filename)
         else:
             dialog.destroy()
 
