@@ -41,6 +41,12 @@ class CmbApplication(Gtk.Application):
         super().__init__(application_id='ar.xjuan.Cambalache',
                          flags=Gio.ApplicationFlags.HANDLES_OPEN)
 
+    def __add_window(self):
+        window = CmbWindow(application=self)
+        window.connect('open-project', self.__on_open_project)
+        self.add_window(window)
+        return window
+
     def open(self, path, target_tk=None, uiname=None):
         window = None
 
@@ -49,18 +55,31 @@ class CmbApplication(Gtk.Application):
                 window = win
 
         if window is None:
-            window = CmbWindow(application=self)
-            window.connect('open-project', self.__on_open_project)
+            window = self.__add_window()
             if path is not None:
                 window.open_project(path, target_tk=target_tk, uiname=uiname)
-            self.add_window(window)
 
+        window.present()
+
+    def import_file(self, path):
+        window = self.__add_window() if self.props.active_window is None else self.props.active_window
+        window.import_file(path)
         window.present()
 
     def do_open(self, files, nfiles, hint):
         for file in files:
             path = file.get_path()
-            self.open(path)
+
+            content_type, uncertain = Gio.content_type_guess(path, None)
+            if uncertain:
+                with open(path, 'rb') as fd:
+                    data = fd.read(1024)
+                content_type, uncertain = Gio.content_type_guess(path, data)
+
+            if content_type == 'application/x-cambalache-project':
+                self.open(path)
+            elif content_type in ['application/x-gtk-builder', 'application/x-glade']:
+                self.import_file(path)
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
