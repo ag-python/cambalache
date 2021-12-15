@@ -848,11 +848,17 @@ class CmbDB(GObject.GObject):
 
         return retval
 
-    def __get_target_from_node(self, root, requirements):
+    @staticmethod
+    def _get_target_from_node(root):
         # Look for explicit gtk version first
-        for lib in ['gtk', 'gtk+']:
-            if lib in requirements:
-                return (lib, requirements[lib]['version'], False)
+        for req in root.iterfind('requires'):
+            lib = req.get('lib', None)
+            version = req.get('version', '')
+
+            if lib == 'gtk' and version.startswith('4.'):
+                return (lib, '4.0', False)
+            elif lib == 'gtk+' and version.startswith('3.'):
+                return (lib, '3.0', False)
 
         # Infer target by looking for layout/packing tags
         if root.find('.//layout') is not None:
@@ -873,7 +879,7 @@ class CmbDB(GObject.GObject):
         requirements = self.__node_get_requirements(root)
 
         target_tk = self.target_tk
-        lib, ver, inferred = self.__get_target_from_node(root, requirements)
+        lib, ver, inferred = CmbDB._get_target_from_node(root)
 
         if (target_tk == 'gtk-4.0' and lib != 'gtk') or \
            (target_tk == 'gtk+-3.0' and lib != 'gtk+'):
