@@ -23,13 +23,6 @@
 
 /** Common Data Model **/
 
-CREATE TABLE IF NOT EXISTS license (
-  license_id TEXT PRIMARY KEY,
-  name TEXT,
-  license_text TEXT NOT NULL
-) WITHOUT ROWID;
-
-
 /* Library
  *
  * Support for different libraries
@@ -38,11 +31,9 @@ CREATE TABLE IF NOT EXISTS library (
   library_id TEXT PRIMARY KEY,
   version TEXT NOT NULL,
   shared_library TEXT,
-  license_id TEXT REFERENCES license,
+  license_id TEXT,
   license_text TEXT
 ) WITHOUT ROWID;
-
-CREATE INDEX IF NOT EXISTS library_license_id_fk ON library (license_id);
 
 
 /* Library dependecies

@@ -42,13 +42,11 @@ CREATE TABLE ui (
   description TEXT,
   copyright TEXT,
   authors TEXT,
-  license_id TEXT REFERENCES license,
+  license_id TEXT,
   translation_domain TEXT,
   comment TEXT,
   FOREIGN KEY(ui_id, template_id) REFERENCES object(ui_id, object_id) ON DELETE SET NULL
 );
-
-CREATE INDEX ui_license_id_fk ON ui (license_id);
 
 
 /* UI library version target
