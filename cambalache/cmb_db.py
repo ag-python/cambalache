@@ -689,6 +689,9 @@ class CmbDB(GObject.GObject):
             elif node.tag == 'packing' and self.target_tk == 'gtk+-3.0':
                 # Gtk 3, packing props are sibling to <object>
                 packing = node
+            elif node.tag == 'placeholder':
+                # Ignore placeholder tags
+                pass
             else:
                 self.__unknown_tag(node, ctype, node.tag)
 
