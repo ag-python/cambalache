@@ -834,7 +834,7 @@ class CmbDB(GObject.GObject):
     def __node_get_comment(self, node):
         prev = node.getprevious()
         if prev is not None and prev.tag is etree.Comment:
-            return prev.text
+            return prev.text if not prev.text.strip().startswith('interface-') else None
         return None
 
     def __node_get_requirements(self, root):
@@ -913,6 +913,28 @@ class CmbDB(GObject.GObject):
         relpath = os.path.relpath(filename, projectdir)
         ui_id = self.add_ui(basename, relpath, requirements, comment)
 
+        # These values come from Glade
+        license_map = {
+            'other': 'custom',
+            'gplv2': 'gpl_2_0',
+            'gplv3': 'gpl_3_0',
+            'lgplv2': 'lgpl_2_1',
+            'lgplv3': 'lgpl_3_0',
+            'bsd2c': 'bsd',
+            'bsd3c': 'bsd_3',
+            'apache2': 'apache_2_0',
+            'mit': 'mit_x11'
+        }
+
+        # XML key <-> table column
+        interface_key_map = {
+            'interface-license-id': 'license_id',
+            'interface-name': 'name',
+            'interface-description': 'description',
+            'interface-copyright': 'copyright',
+            'interface-authors': 'authors'
+        }
+
         # Import objects
         for child in root.iterchildren():
             if child.tag == 'object':
@@ -921,6 +943,20 @@ class CmbDB(GObject.GObject):
                 self.__import_object(ui_id, child, None)
             elif child.tag == 'requires':
                 pass
+            elif child.tag is etree.Comment:
+                comment = etree.tostring(child).decode('utf-8').strip()
+                comment = comment.removeprefix('<!--').removesuffix('-->').strip()
+
+                # Import interface data from Glade comments
+                if comment.startswith('interface-'):
+                    key, value = comment.split(' ', 1)
+                    if key == 'interface-license-type':
+                        license = license_map.get(value, 'unknown')
+                        c.execute("UPDATE ui SET license_id=? WHERE ui_id=?", (license, ui_id))
+                    else:
+                        column = interface_key_map.get(key, None)
+                        if column is not None:
+                            c.execute(f"UPDATE ui SET {column}=? WHERE ui_id=?", (value, ui_id))
             else:
                 self.__unknown_tag(child, None, child.tag)
 
@@ -1169,6 +1205,15 @@ class CmbDB(GObject.GObject):
         c.execute('SELECT comment, template_id FROM ui WHERE ui_id=?;', (ui_id,))
         comment, template_id = c.fetchone()
         self.__node_add_comment(node, comment)
+
+        # Export UI data as comments
+        for key in ['name', 'description', 'copyright', 'authors', 'license_id']:
+            c.execute(f'SELECT {key} FROM ui WHERE ui_id=?;', (ui_id, ))
+            value = c.fetchone()[0]
+
+            if value is not None:
+                key = key.replace('_', '-')
+                node.append(etree.Comment(f' interface-{key} {value} '))
 
         # requires
         tk_library_id, tk_version = self.target_tk.split('-')
