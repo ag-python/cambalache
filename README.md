@@ -24,6 +24,15 @@ Source code lives on GNOME gitlab [here](https://gitlab.gnome.org/jpu/cambalache
 
 `git clone https://gitlab.gnome.org/jpu/cambalache.git`
 
+## Dependencies
+
+* Python 3 - Cambalache is written in Python
+* [Meson](http://mesonbuild.org) build system
+* [GTK](http://www.gtk.org) 3 and 4 with broadway backend enabled
+* python-gi - Python GTK bindings
+* python3-lxml - Python libxml2 bindings
+* WebkitGTK - Webview for workspace
+
 ## Running from sources
 
 To run it without installing use run-dev.py script, it will automatically compile
@@ -53,6 +62,26 @@ Use the following to install:
 ```
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user flathub ar.xjuan.Cambalache
+```
+
+## Manual installation
+
+This is a regular meson package and can be installed the usual way.
+
+```
+# Create build directory and configure project
+mkdir _build && cd _build
+meson --prefix=~/.local
+
+# Build and install
+ninja
+ninja install
+```
+To run it from .local/ you might need to setup PYTHONPATH env variable depending
+on your distribution defaults
+
+```
+export PYTHONPATH=.local/lib/python3/dist-packages/
 ```
 
 ## Contributing
