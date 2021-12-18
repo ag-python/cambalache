@@ -40,8 +40,8 @@ class MrgGtkGridController(MrgGtkWidgetController):
         else:
             self._packing = ['left-attach', 'top-attach', 'width', 'height']
 
-        self.width = 3
-        self.height = 3
+        self.width = None
+        self.height = None
 
         self.connect("notify::object", self.__on_object_changed)
         self.__on_object_changed(None, None)
@@ -84,6 +84,11 @@ class MrgGtkGridController(MrgGtkWidgetController):
 
     def __on_object_changed(self, obj, pspec):
         width, height = self.__get_size()
+
+        if self.width is None:
+            self.width = width if width else 3
+            self.height = height if width else 3
+
         self.__ensure_placeholders(max(width, self.width), max(height, self.height))
 
     def get_child_position(self, child):

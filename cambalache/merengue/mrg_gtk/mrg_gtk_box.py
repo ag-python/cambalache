@@ -35,7 +35,7 @@ class MrgGtkBoxController(MrgGtkWidgetController):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.size = 3
+        self.size = None
 
         self.connect("notify::object", self.__on_object_changed)
         self.__ensure_placeholders()
@@ -54,8 +54,12 @@ class MrgGtkBoxController(MrgGtkWidgetController):
             return
 
         children = self.get_children()
+        n_children = len(children)
 
-        for i in range(len(children), self.size):
+        if self.size is None:
+            self.size = n_children if n_children else 3
+
+        for i in range(n_children, self.size):
             self.add(MrgPlaceholder(visible=True, controller=self))
 
     def __on_object_changed(self, obj, pspec):
