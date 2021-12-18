@@ -60,7 +60,11 @@
     <child>
       <object class="GtkLabel" id="type_label">
         <property name="visible">True</property>
+        <property name="sensitive">False</property>
         <property name="can-focus">False</property>
+        <attributes>
+          <attribute name="style" value="italic"/>
+        </attributes>
       </object>
       <packing>
         <property name="expand">False</property>
