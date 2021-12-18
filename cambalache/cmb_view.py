@@ -320,6 +320,8 @@ window.setupDocument = function (document) {
             self.__merengue.connect('stdout', self.__on_merengue_stdout)
             self.__merengue.connect('exit', self.__on_process_exit)
 
+            self.__broadwayd_check(self.__project.target_tk)
+
             broadwayd = self.__gtk4_broadwayd_bin if self.__project.target_tk == 'gtk-4.0' else self.__broadwayd_bin
             self.__broadwayd = CmbProcess(file=broadwayd)
             self.__broadwayd.connect('stdout', self.__on_broadwayd_stdout)
@@ -349,6 +351,20 @@ window.setupDocument = function (document) {
     def __on_context_menu(self, webview, menu, e, hit_test_result):
         self.menu.popup_at(e.x, e.y)
         return True
+
+    def __webview_set_msg(self, msg):
+        self.webview.load_html(f'<html><body><h3 style="white-space: pre; text-align: center; margin-top: 45vh; opacity: 50%">{msg}</h3></body></html>')
+
+    def __broadwayd_check(self, target_tk):
+        bin = None
+
+        if target_tk == 'gtk-4.0' and self.__gtk4_broadwayd_bin is None:
+            bin = 'gtk4-broadwayd'
+        if target_tk == 'gtk+-3.0' and self.__broadwayd_bin is None:
+            bin = 'broadwayd'
+
+        if bin is not None:
+            self.__webview_set_msg(_('Workspace not available\n{bin} executable not found').format(bin=bin))
 
     def __on_inspect_button_clicked(self, button):
         self.props.visible_child_name = 'ui_xml'
