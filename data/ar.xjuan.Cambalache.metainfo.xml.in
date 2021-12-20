@@ -20,6 +20,29 @@
     </p>
   </description>
   <releases>
+    <release date="2021-12-20" version="0.8.1">
+      <description>
+        <p>First bugfix release in 0.8 series!</p>
+        <ul>
+          <li>Add support for importing multiples files at once</li>
+          <li>Simplify add new UI file to project</li>
+          <li>Import/export UI meta data like license, author etc</li>
+          <li>Do not create extra placeholders on GtkBox and GtkGrid</li>
+          <li>Show toolkit target on type chooser bar</li>
+          <li>Improve file open handling</li>
+          <li>Automatically import UI file in current or new project on xdg open</li>
+        </ul>
+      </description>
+      <issues>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/48">Issue #48: Confusing error message when importing not .ui file</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/49">Issue #49: Error loading project</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/52">Issue #52: Importing multiple ui files</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/50">Issue #50: Add new UI file to button is confusing</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/45">Issue #45: Exporting and trying to import same project, cause to show error</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/46">Issue #46: A lot of empty spaces when importing glade project</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/53">Issue #53: Add error/warning/info, that for now Gtk4 projects won't work with Ubuntu 21.10</issue>
+      </issues>
+    </release>
     <release date="2021-12-09" version="0.8.0">
       <description>
         <p>UX improvements Release!</p>
@@ -116,8 +139,24 @@
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache3.png</image>
     </screenshot>
     <screenshot>
-      <caption>Workspace gtk dark theme</caption>
+      <caption>Shortcuts window</caption>
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache4.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Workspace gtk dark theme</caption>
+      <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache5.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Display type chooser</caption>
+      <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache6.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Right click popover</caption>
+      <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache7.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>main menu</caption>
+      <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache8.png</image>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1"/>
