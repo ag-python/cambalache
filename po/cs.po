@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-20 17:50-0500\n"
-"PO-Revision-Date: 2021-12-02 11:47+0100\n"
+"PO-Revision-Date: 2021-12-23 14:33+0100\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -55,27 +55,25 @@ msgstr ""
 "podporoval i jiné verze."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
-#, fuzzy
 msgid "First bugfix release in 0.8 series!"
-msgstr "První veřejné vydání!"
+msgstr "První oprava chyb v sérii 0.8!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
-#, fuzzy
 msgid "Add support for importing multiples files at once"
-msgstr "Importování a exportování více UI najednou"
+msgstr "Přidána podpora pro importování více souborů najednou"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
-#, fuzzy
 msgid "Simplify add new UI file to project"
-msgstr "Přidat do projektu nové UI"
+msgstr "Zjednodušeno přidání nového souboru UI do projektu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Import/export UI meta data like license, author etc"
 msgstr ""
+"Import/export metadat uživatelského rozhraní, jako je licence, autor atd."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Do not create extra placeholders on GtkBox and GtkGrid"
-msgstr ""
+msgstr "Nevytváří se další zástupné plochy v GtkBox a GtkGrid"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
 msgid "Show toolkit target on type chooser bar"
@@ -83,11 +81,12 @@ msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
 msgid "Improve file open handling"
-msgstr ""
+msgstr "Zlepšení práce s otevíráním souborů"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:33
 msgid "Automatically import UI file in current or new project on xdg open"
 msgstr ""
+"Automatický import souboru UI do aktuálního nebo nového projektu s xdg open"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:48
 msgid "UX improvements Release!"
@@ -118,11 +117,8 @@ msgid "New Matrix channel #cambalache:gnome.org"
 msgstr "Nový kanál na Metrixu #cambalache:gnome.org"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:56
-#, fuzzy
 msgid "You can now also support Cambalache on Liberapay"
-msgstr ""
-"Nyní můžete také podpořit Cambalache na Liberapay (https://liberapay.com/"
-"xjuan)"
+msgstr "Nyní můžete také podpořit Cambalache na Liberapay"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:80
 msgid "Bugfix release!"
@@ -210,25 +206,23 @@ msgstr "Prostředí Cambalache"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:142
 msgid "Shortcuts window"
-msgstr ""
+msgstr "Okno s klávesovými zkratkami"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:146
 msgid "Workspace gtk dark theme"
 msgstr "Prostředí přepnuté do tmavého režimu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:150
-#, fuzzy
 msgid "Display type chooser"
-msgstr "Nový panel pro výběr typu"
+msgstr "Výběr typu zobrazení"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:154
 msgid "Right click popover"
-msgstr ""
+msgstr "Vyskakovací okno s pravým tlačítkem"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:158
-#, fuzzy
 msgid "main menu"
-msgstr "a hlavní menu"
+msgstr "hlavní menu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:163
 msgid "Juan Pablo Ugarte"
@@ -278,7 +272,7 @@ msgstr ""
 
 #: cambalache/cmb_db.py:893
 msgid "Can not recognize file format"
-msgstr ""
+msgstr "Nelze rozpoznat formát souboru"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
 #: cambalache/cmb_db.py:897
@@ -629,6 +623,8 @@ msgid ""
 "Workspace not available\n"
 "{bin} executable not found"
 msgstr ""
+"Pracovní plocha není k dispozici\n"
+"spustitelný soubor {bin} nebyl nalezen"
 
 #: cambalache/cmb_view.py:380
 msgid "Restart workspace"
