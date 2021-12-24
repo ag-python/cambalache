@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-20 17:50-0500\n"
-"PO-Revision-Date: 2021-11-30 15:14+0100\n"
+"PO-Revision-Date: 2021-12-23 22:27+0100\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
 "Language: de\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:6
@@ -55,39 +55,37 @@ msgstr ""
 "für die Unterstützung anderer Versionen entwickelt."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
-#, fuzzy
 msgid "First bugfix release in 0.8 series!"
-msgstr "Erste öffentliche Veröffentlchung!"
+msgstr "Erste Fehlerbehebungs-Veröffentlichung in der 0.8-Serie!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
-#, fuzzy
 msgid "Add support for importing multiples files at once"
-msgstr "Importiere und exportiere mehrere Benutzeroberflächen gleichzeitig"
+msgstr "Füge Support für das Importieren mehrerer Dateien gleichzeitig hinzu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
-#, fuzzy
 msgid "Simplify add new UI file to project"
-msgstr "Neue Benutzeroberfläche zum Projekt hinzufügen"
+msgstr "Vereinfache das Hinzufügen einer neuen UI-Datei zum Projekt"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Import/export UI meta data like license, author etc"
-msgstr ""
+msgstr "Importiere/Exportiere UI-Metadaten, wie Lizenz, Autor, etc"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Do not create extra placeholders on GtkBox and GtkGrid"
-msgstr ""
+msgstr "Erstelle keine zusätzlichen Platzhalter in GtkBox und GtkGrid"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
 msgid "Show toolkit target on type chooser bar"
-msgstr ""
+msgstr "Zeige Ziel-Tookit in der Typenauswahlleiste an"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
 msgid "Improve file open handling"
-msgstr ""
+msgstr "Verbessere die Handhabung des Öffnens von Dateien"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:33
 msgid "Automatically import UI file in current or new project on xdg open"
 msgstr ""
+"Importiere UI-Datei automatisch in aktuelles oder neues Projekt bei xdg-open"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:48
 msgid "UX improvements Release!"
@@ -119,11 +117,8 @@ msgid "New Matrix channel #cambalache:gnome.org"
 msgstr "Neuer Matrix-Channel #cambalache:gnome.org"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:56
-#, fuzzy
 msgid "You can now also support Cambalache on Liberapay"
-msgstr ""
-"Du kannst Cambalache jetzt auf Liberapay (https://liberapay.com/xjuan) "
-"unterstützen"
+msgstr "Du kannst Cambalache jetzt auch auf Liberypay unterstützen"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:80
 msgid "Bugfix release!"
@@ -212,25 +207,23 @@ msgstr "Cambalache Workspace"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:142
 msgid "Shortcuts window"
-msgstr ""
+msgstr "Tastenkombinations-Fenster"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:146
 msgid "Workspace gtk dark theme"
 msgstr "Workspace Gtk Dark Theme"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:150
-#, fuzzy
 msgid "Display type chooser"
-msgstr "Neue Typauswahlleiste"
+msgstr "Auswahl des Anzeigetyps"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:154
 msgid "Right click popover"
-msgstr ""
+msgstr "Rechtsklickmenü"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:158
-#, fuzzy
 msgid "main menu"
-msgstr "und das Hauptmenü"
+msgstr "Hauptmenü"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:163
 msgid "Juan Pablo Ugarte"
@@ -280,7 +273,7 @@ msgstr ""
 
 #: cambalache/cmb_db.py:893
 msgid "Can not recognize file format"
-msgstr ""
+msgstr "Kann Dateiformat nicht erkennen"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
 #: cambalache/cmb_db.py:897
@@ -630,6 +623,8 @@ msgid ""
 "Workspace not available\n"
 "{bin} executable not found"
 msgstr ""
+"Arbeitsbereich nicht verfügbar\n"
+"{bin} ausführbare Datei nicht gefunden"
 
 #: cambalache/cmb_view.py:380
 msgid "Restart workspace"
@@ -946,7 +941,7 @@ msgstr "Name"
 
 #: cambalache/app/cmb_window.ui:346
 msgid "Toolkit target"
-msgstr "Ziel Toolkit"
+msgstr "Ziel-Toolkit"
 
 #: cambalache/app/cmb_window.ui:358
 msgid "Location"
