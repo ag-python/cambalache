@@ -162,6 +162,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.tutor = None
         self.turor_waiting_for_user_action = False
 
+        self.__clipboard_enabled = True
+
         # Create settings object
         self.settings = Gio.Settings(schema_id='ar.xjuan.Cambalache')
         self.window_settings = Gio.Settings(schema_id='ar.xjuan.Cambalache.state.window')
@@ -289,6 +291,19 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.__remove_ui_with_confirmation(editor.object)
         return True
 
+    @Gtk.Template.Callback('on_window_set_focus')
+    def __on_window_set_focus(self, window, widget):
+        types = [ Gtk.Entry, Gtk.TextView, Gtk.SpinButton ]
+        focused_widget_needs = True
+
+        for type in types:
+            if isinstance(widget, type):
+                focused_widget_needs = False
+                break
+
+        self.__clipboard_enabled = focused_widget_needs
+        self.__update_action_clipboard()
+
     def __update_dark_mode(self):
         # https://en.wikipedia.org/wiki/Relative_luminance
         def linear(c):
@@ -340,7 +355,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     def __update_action_clipboard(self):
         has_selection = False
 
-        if self.__is_project_visible():
+        if self.__clipboard_enabled and self.__is_project_visible():
             sel = self.project.get_selection()
             if sel:
                 # We can delete a UI too
@@ -358,8 +373,10 @@ class CmbWindow(Gtk.ApplicationWindow):
             for action in ['copy', 'cut', 'delete']:
                 self.actions[action].set_enabled(False)
 
+        self.__update_action_clipboard_paste()
+
     def __update_action_clipboard_paste(self):
-        if self.__is_project_visible():
+        if self.__clipboard_enabled and self.__is_project_visible():
             self.actions['paste'].set_enabled(self.project.clipboard_count() > 0)
         else:
             self.actions['paste'].set_enabled(False)
@@ -407,7 +424,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.__update_action_clipboard()
         self.__update_action_undo_redo()
         self.__update_action_clipboard()
-        self.__update_action_clipboard_paste()
         self.actions['debug'].set_enabled(has_project and self.__opensqlite is not None)
 
     def __file_open_dialog_new(self,
@@ -655,17 +671,6 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_delete_activate(self, action, data):
         if self.project is None:
-            return
-
-        focus = self.get_focus()
-
-        # Ensure Delete event is only used when focused widget is the webview or
-        # the project treeview, otherwise yhe user wont be able to use delete in
-        # any entry
-        if focus not in [self.view.webview, self.tree_view]:
-            event = Gtk.get_current_event()
-            if event:
-                focus.event(event)
             return
 
         selection = self.project.get_selection()

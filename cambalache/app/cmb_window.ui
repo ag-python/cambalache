@@ -257,6 +257,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
   </object>
   <template class="CmbWindow" parent="GtkApplicationWindow">
     <property name="can-focus">False</property>
+    <signal name="set-focus" handler="on_window_set_focus" swapped="no"/>
     <child>
       <object class="GtkStack" id="stack">
         <property name="visible">True</property>
