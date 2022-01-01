@@ -29,6 +29,7 @@ if Gtk.MAJOR_VERSION == 3:
 from .mrg_gtk_box import MrgGtkBoxController
 from .mrg_gtk_grid import MrgGtkGridController
 from .mrg_gtk_label import MrgGtkLabelController
+from .mrg_gtk_paned import MrgGtkPanedController
 from .mrg_gtk_widget import MrgGtkWidgetController
 from .mrg_gtk_window import MrgGtkWindowController
 from .mrg_selection import MrgSelection
