@@ -77,6 +77,7 @@ class CmbTypeChooser(Gtk.Box):
             chooser.project = project
 
     def __on_selected_type_notify(self, object, pspec):
-        self.type_label.props.label = self.selected_type.type_id if self.selected_type else self.project.target_tk
+        project_target = self.project.target_tk if self.project else ''
+        self.type_label.props.label = self.selected_type.type_id if self.selected_type else project_target
 
 
