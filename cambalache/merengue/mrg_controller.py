@@ -47,9 +47,6 @@ class MrgController(GObject.Object):
         self.ui_id = int(ui_id)
         self.object_id = int(object_id)
 
-    def remove_object(self):
-        self.object = None
-
     # Object set property wrapper
     def set_object_property(self, name, value):
         if self.object and name not in self.property_ignore_list:

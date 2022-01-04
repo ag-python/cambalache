@@ -165,15 +165,6 @@ class MrgGtkWidgetController(MrgController):
     def remove_placeholder(self, mod):
         pass
 
-    def remove_object(self):
-        if self.object is None:
-            return
-
-        if self.object.props.parent:
-            self.object.props.parent.remove(self.object)
-
-        super().remove_object()
-
     def find_child_property(self, child, property_id):
         if self.object is None:
             return None

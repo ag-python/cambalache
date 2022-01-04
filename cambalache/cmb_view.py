@@ -241,10 +241,7 @@ window.setupDocument = function (document) {
 
     def __on_object_removed(self, project, obj):
         self.__update_view()
-        self.__merengue_command('object_removed', args={
-            'ui_id': obj.ui_id,
-            'object_id': obj.object_id
-        })
+        self.__merengue_update_ui(obj.ui_id)
 
     def __on_object_property_changed(self, project, obj, prop):
         self.__update_view()

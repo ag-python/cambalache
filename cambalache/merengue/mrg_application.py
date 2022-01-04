@@ -100,8 +100,14 @@ class MrgApplication(Gtk.Application):
                 continue
 
             controller = self.controllers.get(object_id, None)
+            pspec = controller.find_property('object') if controller else None
 
-            if controller:
+            # FIXME: object_id could be reused for a different object type
+            # if you undo the creation of a widget and create a different type
+            # As a workaround if the types do not match we create a new controller
+            # This could be fixed if we alway auto increment object_id but then
+            # we would have to clean up unussed controllers
+            if pspec and pspec.value_type == obj.__gtype__:
                 # Reuse controller
                 controller.object = obj
             else:
@@ -114,13 +120,6 @@ class MrgApplication(Gtk.Application):
         for obj in placeholders:
             parent_id = utils.object_get_id(obj.props.parent)
             obj.controller = self.controllers.get(parent_id, None)
-
-    def object_removed(self, ui_id, object_id):
-        controller = self.get_controller(ui_id, object_id)
-
-        if controller:
-            controller.remove_object()
-            del self.controllers[f'{ui_id}.{object_id}']
 
     def object_property_changed(self, ui_id, object_id, property_id, is_object, value):
         controller = self.get_controller(ui_id, object_id)
@@ -218,8 +217,6 @@ class MrgApplication(Gtk.Application):
             self.update_ui(**args, payload=payload)
         elif command == 'selection_changed':
             self.selection_changed(**args)
-        elif command == 'object_removed':
-            self.object_removed(**args)
         elif command == 'object_property_changed':
             self.object_property_changed(**args)
         elif command == 'object_layout_property_changed':
