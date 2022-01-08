@@ -23,13 +23,21 @@
 import gi
 from gi.repository import Gtk
 
+from .mrg_gtk_aspect_frame import MrgGtkAspectFrameController
+
 if Gtk.MAJOR_VERSION == 3:
     from .mrg_gtk_bin import MrgGtkBinController
 
 from .mrg_gtk_box import MrgGtkBoxController
+from .mrg_gtk_expander import MrgGtkExpanderController
+from .mrg_gtk_frame import MrgGtkFrameController
 from .mrg_gtk_grid import MrgGtkGridController
 from .mrg_gtk_label import MrgGtkLabelController
+from .mrg_gtk_overlay import MrgGtkOverlayController
 from .mrg_gtk_paned import MrgGtkPanedController
+from .mrg_gtk_revealer import MrgGtkRevealerController
+from .mrg_gtk_scrolled_window import MrgGtkScrolledWindowController
+from .mrg_gtk_viewport import MrgGtkViewportController
 from .mrg_gtk_widget import MrgGtkWidgetController
 from .mrg_gtk_window import MrgGtkWindowController
 from .mrg_selection import MrgSelection

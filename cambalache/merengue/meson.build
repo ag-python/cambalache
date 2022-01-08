@@ -42,11 +42,18 @@ install_data([
 
 install_data([
   'mrg_gtk/__init__.py',
+  'mrg_gtk/mrg_gtk_aspect_frame.py',
   'mrg_gtk/mrg_gtk_bin.py',
   'mrg_gtk/mrg_gtk_box.py',
+  'mrg_gtk/mrg_gtk_expander.py',
+  'mrg_gtk/mrg_gtk_frame.py',
   'mrg_gtk/mrg_gtk_grid.py',
   'mrg_gtk/mrg_gtk_label.py',
+  'mrg_gtk/mrg_gtk_overlay.py',
   'mrg_gtk/mrg_gtk_paned.py',
+  'mrg_gtk/mrg_gtk_revealer.py',
+  'mrg_gtk/mrg_gtk_scrolled_window.py',
+  'mrg_gtk/mrg_gtk_viewport.py',
   'mrg_gtk/mrg_gtk_widget.py',
   'mrg_gtk/mrg_gtk_window.py',
   'mrg_gtk/mrg_selection.py',
