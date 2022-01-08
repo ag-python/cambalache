@@ -230,10 +230,14 @@ window.setupDocument = function (document) {
 
     def __merengue_update_ui(self, ui_id):
         ui = self.__get_ui_xml(ui_id, merengue=True)
+        toplevels = self.__project.db.get_toplevels(ui_id)
 
         self.__merengue_command('update_ui',
-                               payload=ui,
-                               args={ 'ui_id': ui_id })
+                                payload=ui,
+                                args={
+                                    'ui_id': ui_id,
+                                    'toplevels': toplevels
+                                })
 
     def __on_object_added(self, project, obj):
         self.__update_view()
