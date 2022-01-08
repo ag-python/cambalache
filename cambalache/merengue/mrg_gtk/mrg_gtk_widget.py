@@ -172,7 +172,7 @@ class MrgGtkWidgetController(MrgController):
         if Gtk.MAJOR_VERSION == 4:
             manager = self.object.get_layout_manager()
             layout_child = manager.get_layout_child(child)
-            return layout_child.find_property(property_id)
+            return layout_child.find_property(property_id) if layout_child else None
 
         return self.object.find_child_property(property_id)
 
