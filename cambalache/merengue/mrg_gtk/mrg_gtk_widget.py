@@ -62,9 +62,7 @@ class MrgGtkWidgetController(MrgController):
                 self.window = None
             return
 
-        parent = self.object.get_parent()
-
-        if parent or issubclass(type(self.object), Gtk.Window):
+        if not self.toplevel or issubclass(type(self.object), Gtk.Window):
             return
 
         if self.window is None:

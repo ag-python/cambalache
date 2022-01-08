@@ -73,14 +73,7 @@ class MrgApplication(Gtk.Application):
         for key in self.controllers:
             self.controllers[key].object = None
 
-    def apply_workarounds(self, objects):
-        for obj in objects:
-            # GtkExpander only sets child parent property if expanded
-            # We need parent to know if its a toplevel or not.
-            if issubclass(type(obj), Gtk.Expander):
-                obj.props.expanded = True
-
-    def update_ui(self, ui_id, payload=None):
+    def update_ui(self, ui_id, toplevels=[], payload=None):
         self.clear_all()
 
         if payload == None:
@@ -96,8 +89,6 @@ class MrgApplication(Gtk.Application):
 
         objects = builder.get_objects()
         placeholders = []
-
-        self.apply_workarounds(objects)
 
         # Keep dict of all object controllers by id
         for obj in objects:
@@ -120,13 +111,11 @@ class MrgApplication(Gtk.Application):
             # As a workaround if the types do not match we create a new controller
             # This could be fixed if we alway auto increment object_id but then
             # we would have to clean up unussed controllers
-            if pspec and pspec.value_type == obj.__gtype__:
-                # Reuse controller
-                controller.object = obj
-            else:
-                # Create a new controller
-                controller = self.registry.new_controller_for_object(obj, self)
+            if pspec is None or pspec.value_type != obj.__gtype__:
+                controller = self.registry.new_controller_for_type(obj.__gtype__, self)
 
+            controller.toplevel = object_id in toplevels
+            controller.object = obj
             self.controllers[object_id] = controller
 
         # Set controller for placeholders created by Builder
