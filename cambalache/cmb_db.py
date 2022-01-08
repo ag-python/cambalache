@@ -314,6 +314,13 @@ class CmbDB(GObject.GObject):
     def set_data(self, key, value):
         self.execute("UPDATE global SET value=? WHERE key=?;", (value, key))
 
+    def get_toplevels(self, ui_id):
+        retval = []
+        for row in self.execute("SELECT object_id FROM object WHERE ui_id=? AND parent_id IS NULL;", (ui_id, )):
+            retval.append(row[0])
+
+        return retval
+
     def __parse_version(self, version):
         if version is None:
             return (0, 0, 0)
