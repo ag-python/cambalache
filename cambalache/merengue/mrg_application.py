@@ -73,6 +73,13 @@ class MrgApplication(Gtk.Application):
         for key in self.controllers:
             self.controllers[key].object = None
 
+    def apply_workarounds(self, objects):
+        for obj in objects:
+            # GtkExpander only sets child parent property if expanded
+            # We need parent to know if its a toplevel or not.
+            if issubclass(type(obj), Gtk.Expander):
+                obj.props.expanded = True
+
     def update_ui(self, ui_id, payload=None):
         self.clear_all()
 
@@ -87,10 +94,13 @@ class MrgApplication(Gtk.Application):
         except Exception as e:
             logger.warning(f'Error updating UI {ui_id}: {e}')
 
+        objects = builder.get_objects()
         placeholders = []
 
+        self.apply_workarounds(objects)
+
         # Keep dict of all object controllers by id
-        for obj in builder.get_objects():
+        for obj in objects:
             if isinstance(obj, MrgPlaceholder):
                 placeholders.append(obj)
 
@@ -98,6 +108,9 @@ class MrgApplication(Gtk.Application):
 
             if object_id is None:
                 continue
+
+            if issubclass(type(obj), Gtk.Expander):
+                obj.props.expanded = True
 
             controller = self.controllers.get(object_id, None)
             pspec = controller.find_property('object') if controller else None
