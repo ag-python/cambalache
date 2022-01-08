@@ -34,6 +34,9 @@ class MrgController(GObject.Object):
     object = GObject.Property(type=GObject.GObject,
                               flags=GObject.ParamFlags.READWRITE)
 
+    toplevel = GObject.Property(type=bool, default=False,
+                                flags=GObject.ParamFlags.READWRITE)
+
     selected = GObject.Property(type=bool, default=False,
                                 flags=GObject.ParamFlags.READWRITE)
 
@@ -42,10 +45,16 @@ class MrgController(GObject.Object):
         self.property_ignore_list = set()
 
         super().__init__(**kwargs)
+        self.connect("notify::object", self.__on_object_changed)
 
-        ui_id, object_id = utils.object_get_id(self.object).split('.')
-        self.ui_id = int(ui_id)
-        self.object_id = int(object_id)
+    def __on_object_changed(self, obj, pspec):
+        if self.object:
+            ui_id, object_id = utils.object_get_id(self.object).split('.')
+            self.ui_id = int(ui_id)
+            self.object_id = int(object_id)
+        else:
+            self.ui_id = 0
+            self.object_id = 0
 
     # Object set property wrapper
     def set_object_property(self, name, value):
