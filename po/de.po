@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-20 17:50-0500\n"
+"POT-Creation-Date: 2022-01-11 21:22-0500\n"
 "PO-Revision-Date: 2021-12-23 22:27+0100\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
@@ -55,177 +55,196 @@ msgstr ""
 "für die Unterstützung anderer Versionen entwickelt."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:97
+msgid "Bugfix release!"
+msgstr "Fehlerbehebungs-Veröffentlichung!"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:27
+msgid ""
+"GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, "
+"Frame, Revealer, ScrolledWindow, Viewport and Overlay)"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+msgid "GTK 4: Fix placeholders in GtkPaned"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:29
+msgid "Fix property editor copy/paste shortcuts"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:30
+msgid "Various improvements and minor fixes"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:42
 msgid "First bugfix release in 0.8 series!"
 msgstr "Erste Fehlerbehebungs-Veröffentlichung in der 0.8-Serie!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:27
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:44
 msgid "Add support for importing multiples files at once"
 msgstr "Füge Support für das Importieren mehrerer Dateien gleichzeitig hinzu"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:45
 msgid "Simplify add new UI file to project"
 msgstr "Vereinfache das Hinzufügen einer neuen UI-Datei zum Projekt"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:29
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:46
 msgid "Import/export UI meta data like license, author etc"
 msgstr "Importiere/Exportiere UI-Metadaten, wie Lizenz, Autor, etc"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:30
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:47
 msgid "Do not create extra placeholders on GtkBox and GtkGrid"
 msgstr "Erstelle keine zusätzlichen Platzhalter in GtkBox und GtkGrid"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:31
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:48
 msgid "Show toolkit target on type chooser bar"
 msgstr "Zeige Ziel-Tookit in der Typenauswahlleiste an"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:32
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:49
 msgid "Improve file open handling"
 msgstr "Verbessere die Handhabung des Öffnens von Dateien"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:33
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:50
 msgid "Automatically import UI file in current or new project on xdg open"
 msgstr ""
 "Importiere UI-Datei automatisch in aktuelles oder neues Projekt bei xdg-open"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:48
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:65
 msgid "UX improvements Release!"
 msgstr "UX-Verbesserungs-Veröffentlichung!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:50
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:67
 msgid "New Type chooser bar"
 msgstr "Neue Typauswahlleiste"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:51
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:68
 msgid "Workspace placeholder support"
 msgstr "Unterstützung für Arbeitsplatzplatzhalter"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:52
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:69
 msgid "Translatable properties support (Philipp Unger)"
 msgstr "Unterstützung für übersetzbare Eigenschaften (Philipp Unger)"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:53
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:70
 msgid "Clipboard actions support (Copy, Paste, Cut)"
 msgstr ""
 "Unterstützung von Zwischenablageaktionen (Kopieren, Einfügen, Ausschneiden)"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:54
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:71
 msgid "Better unsupported features report"
 msgstr "Besserer Bericht über nicht unterstützte Funktionen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:55
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:72
 msgid "New Matrix channel #cambalache:gnome.org"
 msgstr "Neuer Matrix-Channel #cambalache:gnome.org"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:56
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:73
 msgid "You can now also support Cambalache on Liberapay"
 msgstr "Du kannst Cambalache jetzt auch auf Liberypay unterstützen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:80
-msgid "Bugfix release!"
-msgstr "Fehlerbehebungs-Veröffentlichung!"
-
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:82
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:99
 msgid "Add sponsors credit section"
 msgstr "Füge Abschnitt \"Sponsorenkredite\" hinzu"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:83
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:100
 msgid "Theme workspace background"
 msgstr "Theme Arbeitsbereich-Hintergrund"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:84
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:101
 msgid "Fix various bugs and regresions"
 msgstr "Behebung verschiedener Fehler und Regressionen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:95
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:112
 msgid "Flathub release!"
 msgstr "Flathub-Veröffentlichung!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:97
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:114
 msgid "Add basic interactive tutorial"
 msgstr "Interaktives Tutorial hinzugefügt"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:98
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:115
 msgid "Add workspace Gtk theme chooser"
 msgstr "Füge Gtk-Designauswahl für Arbeitsbereich hinzu"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:99
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:116
 msgid "Add support for templates"
 msgstr "Füge Unterstützung für Vorlagen hinzu"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:105
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:122
 msgid "New translations release!"
 msgstr "Neue Übersetzungs-Veröffentlichung!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:107
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:124
 msgid "Add Czech translation. Vojtěch Perník"
 msgstr "Füge Tschechische Übersetzung hinzu. Vojtěch Perník"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:108
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:125
 msgid "Add German translation. PhilProg"
 msgstr "Deutsche Übersetzung hinzugefügt. PhilProg"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:109
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:126
 msgid "Add x-cambalache mimetype with icon"
 msgstr "Füge x-xcmbalache-mimetyp mit Symbol hinzu"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:115
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:132
 msgid "First public release!"
 msgstr "Erste öffentliche Veröffentlchung!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:117
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:134
 msgid "Suport for both Gtk 3 and 4 versions"
 msgstr "Unterstützung für Gtk 3- und 4-Versionen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:118
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:135
 msgid "Import and export multiple UI at once"
 msgstr "Importiere und exportiere mehrere Benutzeroberflächen gleichzeitig"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:119
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:136
 msgid "Support plain (no custom tags) GtkBuilder features"
 msgstr ""
 "Unterstützt einfache (keine benutzerdefinierten Tags) GtkBuilder-Funktionen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:120
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:137
 msgid "Undo / Redo stack"
 msgstr "Stapel rückgängig machen / wiederherstellen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:121
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:138
 msgid "LGPL version 2.1"
 msgstr "LGPL Version 2.1"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:130
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:147
 msgid "Cambalache start window"
 msgstr "Cambalache Startfenster"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:134
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:151
 msgid "Cambalache new project page"
 msgstr "Neues Projekt erstellen"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:138
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:155
 msgid "Cambalache workspace"
 msgstr "Cambalache Workspace"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:142
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:159
 msgid "Shortcuts window"
 msgstr "Tastenkombinations-Fenster"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:146
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:163
 msgid "Workspace gtk dark theme"
 msgstr "Workspace Gtk Dark Theme"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:150
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:167
 msgid "Display type chooser"
 msgstr "Auswahl des Anzeigetyps"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:154
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:171
 msgid "Right click popover"
 msgstr "Rechtsklickmenü"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:158
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:175
 msgid "main menu"
 msgstr "Hauptmenü"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:163
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:180
 msgid "Juan Pablo Ugarte"
 msgstr "Juan Pablo Ugarte"
 
@@ -263,7 +282,7 @@ msgid "CSS theme"
 msgstr "CSS-Thema"
 
 #. Translators: This text will be used in the next two string as {convert}
-#: cambalache/cmb_db.py:890
+#: cambalache/cmb_db.py:897
 msgid ""
 "\n"
 "Use gtk4-builder-tool first to convert file."
@@ -271,12 +290,12 @@ msgstr ""
 "\n"
 "Benutze erst gtk4-builder-tool um die Datei zu konvertieren."
 
-#: cambalache/cmb_db.py:893
+#: cambalache/cmb_db.py:900
 msgid "Can not recognize file format"
 msgstr "Kann Dateiformat nicht erkennen"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
-#: cambalache/cmb_db.py:897
+#: cambalache/cmb_db.py:904
 #, python-brace-format
 msgid ""
 "Can not import what looks like a {lib}-{ver} file in a {target_tk} project."
@@ -286,7 +305,7 @@ msgstr ""
 "umgewandelt werden.{convert}"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
-#: cambalache/cmb_db.py:900
+#: cambalache/cmb_db.py:907
 #, python-brace-format
 msgid "Can not import a {lib}-{ver} file in a {target_tk} project.{convert}"
 msgstr ""
@@ -551,6 +570,16 @@ msgstr "Übersetzungskontext:"
 msgid "Comments for translators:"
 msgstr "Kommentar für Übersetzer:"
 
+#: cambalache/cmb_tree_view.py:89
+#, fuzzy
+msgid "(template)"
+msgstr "Vorlage"
+
+#: cambalache/cmb_tree_view.py:92
+#, python-brace-format
+msgid "<b>Unnamed {ui_id}</b>"
+msgstr ""
+
 #. Widget group for toplevels/windows
 #: cambalache/cmb_type_chooser.ui:92 cambalache/cmb_type_chooser_widget.py:65
 msgid "Toplevel"
@@ -558,7 +587,7 @@ msgstr "Toplevel"
 
 #. Widget group for container widgets liek GtkBox grid
 #: cambalache/cmb_type_chooser.ui:113 cambalache/cmb_type_chooser_widget.py:66
-#: cambalache/app/cmb_window.ui:746
+#: cambalache/app/cmb_window.ui:747
 msgid "Layout"
 msgstr "Layout"
 
@@ -617,7 +646,7 @@ msgstr "Vorlage:"
 msgid "Export"
 msgstr "Exportieren"
 
-#: cambalache/cmb_view.py:367
+#: cambalache/cmb_view.py:368
 #, python-brace-format
 msgid ""
 "Workspace not available\n"
@@ -626,11 +655,11 @@ msgstr ""
 "Arbeitsbereich nicht verfügbar\n"
 "{bin} ausführbare Datei nicht gefunden"
 
-#: cambalache/cmb_view.py:380
+#: cambalache/cmb_view.py:381
 msgid "Restart workspace"
 msgstr "Arbeitsbereich neu starten"
 
-#: cambalache/cmb_view.py:384
+#: cambalache/cmb_view.py:385
 msgid "Inspect UI definition"
 msgstr "UI-Definition überprüfen"
 
@@ -650,7 +679,7 @@ msgstr "Projekt"
 msgid "Create new project"
 msgstr "Neues Projekt erstellen"
 
-#: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1020
+#: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1021
 msgid "Open a project"
 msgstr "Ein Projekt öffnen"
 
@@ -807,37 +836,37 @@ msgstr ""
 msgid "Have a nice day!"
 msgstr "Einen schönen Tag!"
 
-#: cambalache/app/cmb_window.py:316
+#: cambalache/app/cmb_window.py:331
 msgid "<Choose a UI filename to create>"
 msgstr "<Wählen Sie einen zu erstellenden UI-Dateinamen>"
 
-#: cambalache/app/cmb_window.py:392 cambalache/app/cmb_window.ui:1158
+#: cambalache/app/cmb_window.py:409 cambalache/app/cmb_window.ui:1159
 msgid "Start interactive introduction"
 msgstr "Starte interaktive Tour"
 
-#: cambalache/app/cmb_window.py:447
+#: cambalache/app/cmb_window.py:463
 msgid "Supporters"
 msgstr "Unterstützer"
 
 #. Translators: This is used to create a unordered list of unsupported features to show the user
-#: cambalache/app/cmb_window.py:512 cambalache/app/cmb_window.py:689
+#: cambalache/app/cmb_window.py:528 cambalache/app/cmb_window.py:694
 #, python-brace-format
 msgid "    • {message}"
 msgstr "    • {message}"
 
 #. Translators: This will be the heading of a list of unsupported features
-#: cambalache/app/cmb_window.py:515 cambalache/app/cmb_window.py:692
+#: cambalache/app/cmb_window.py:531 cambalache/app/cmb_window.py:697
 msgid "Cambalache encounter the following issues:"
 msgstr "Cambalache hat ein Problem festgestellt:"
 
 #. Translators: this is the last message after the list of unsupported features
-#: cambalache/app/cmb_window.py:518 cambalache/app/cmb_window.py:695
+#: cambalache/app/cmb_window.py:534 cambalache/app/cmb_window.py:700
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 "Die Datei wird als '{name}.cmb.ui' exportiert um Datenverlust zu vermeiden."
 
-#: cambalache/app/cmb_window.py:523 cambalache/app/cmb_window.py:700
+#: cambalache/app/cmb_window.py:539 cambalache/app/cmb_window.py:705
 #, python-brace-format
 msgid ""
 "Cambalache encounter {unsupported_feature}\n"
@@ -846,35 +875,35 @@ msgstr ""
 "Cambalache hat folgendes festgestellt: {unsupported_feature}\n"
 "Die Datei wird als '{name}.cmb.ui' exportiert um Datenverlust zu vermeiden."
 
-#: cambalache/app/cmb_window.py:525 cambalache/app/cmb_window.py:530
-#: cambalache/app/cmb_window.py:702
+#: cambalache/app/cmb_window.py:541 cambalache/app/cmb_window.py:546
+#: cambalache/app/cmb_window.py:707
 #, python-brace-format
 msgid "Error importing {filename}"
 msgstr "Fehler beim Importieren von {filename}"
 
-#: cambalache/app/cmb_window.py:545
+#: cambalache/app/cmb_window.py:561
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Fehler beim Laden von {filename}"
 
-#: cambalache/app/cmb_window.py:548
+#: cambalache/app/cmb_window.py:564
 msgid "Choose project to open"
 msgstr "Projekt zum Öffnen auswählen"
 
-#: cambalache/app/cmb_window.py:586
+#: cambalache/app/cmb_window.py:602
 msgid "File name already exists, choose a different name."
 msgstr "Dateiname existiert bereits, wählen Sie einen anderen Namen."
 
-#: cambalache/app/cmb_window.py:611
+#: cambalache/app/cmb_window.py:627
 msgid "Choose a new file to save the project"
 msgstr "Wählen Sie eine neue Datei, um das Projekt zu speichern"
 
-#: cambalache/app/cmb_window.py:633
+#: cambalache/app/cmb_window.py:649
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
 msgstr "Wollen Sie die Datei {filename} wirklich löschen?"
 
-#: cambalache/app/cmb_window.py:710
+#: cambalache/app/cmb_window.py:715
 msgid "Choose file to import"
 msgstr "Datei zum Importieren auswählen"
 
@@ -906,8 +935,8 @@ msgstr "Kontaktiere uns auf Matrix!"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: cambalache/app/cmb_window.ui:159 cambalache/app/cmb_window.ui:886
-#: cambalache/app/cmb_window.ui:949
+#: cambalache/app/cmb_window.ui:159 cambalache/app/cmb_window.ui:887
+#: cambalache/app/cmb_window.ui:950
 msgid "Donate"
 msgstr "Spenden"
 
@@ -923,7 +952,7 @@ msgstr "Über"
 msgid "Quit"
 msgstr "Beenden"
 
-#: cambalache/app/cmb_window.ui:306
+#: cambalache/app/cmb_window.ui:307
 msgid ""
 "<b>\n"
 "\n"
@@ -935,59 +964,59 @@ msgstr ""
 "<span size=\"18000\">Neues Projekt</span>\n"
 "</b>"
 
-#: cambalache/app/cmb_window.ui:334
+#: cambalache/app/cmb_window.ui:335
 msgid "Name"
 msgstr "Name"
 
-#: cambalache/app/cmb_window.ui:346
+#: cambalache/app/cmb_window.ui:347
 msgid "Toolkit target"
 msgstr "Ziel-Toolkit"
 
-#: cambalache/app/cmb_window.ui:358
+#: cambalache/app/cmb_window.ui:359
 msgid "Location"
 msgstr "Speicherort"
 
-#: cambalache/app/cmb_window.ui:370
+#: cambalache/app/cmb_window.ui:371
 msgid "<project basename>"
 msgstr "<Projektbasisname>"
 
-#: cambalache/app/cmb_window.ui:382
+#: cambalache/app/cmb_window.ui:383
 msgid "Create"
 msgstr "Erstellen"
 
-#: cambalache/app/cmb_window.ui:512
+#: cambalache/app/cmb_window.ui:513
 msgid "Choose a location to save the project"
 msgstr "Wählen Sie einen Speicherort zum Speichern des Projekts"
 
-#: cambalache/app/cmb_window.ui:522
+#: cambalache/app/cmb_window.ui:523
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: cambalache/app/cmb_window.ui:539
+#: cambalache/app/cmb_window.ui:540
 msgid "UI Filename"
 msgstr "UI-Dateiname"
 
-#: cambalache/app/cmb_window.ui:576
+#: cambalache/app/cmb_window.ui:577
 msgid "New Project"
 msgstr "Neues Projekt"
 
-#: cambalache/app/cmb_window.ui:718
+#: cambalache/app/cmb_window.ui:719
 msgid "Properties"
 msgstr "Eigenschaften"
 
-#: cambalache/app/cmb_window.ui:762
+#: cambalache/app/cmb_window.ui:763
 msgid "Signals"
 msgstr "Signale"
 
-#: cambalache/app/cmb_window.ui:776
+#: cambalache/app/cmb_window.ui:777
 msgid "Object Editor"
 msgstr "Objekt-Editor"
 
-#: cambalache/app/cmb_window.ui:791
+#: cambalache/app/cmb_window.ui:792
 msgid "UI Editor"
 msgstr "UI-Editor"
 
-#: cambalache/app/cmb_window.ui:868
+#: cambalache/app/cmb_window.ui:869
 msgid ""
 "• Liberapay is a recurrent donations platform\n"
 "\n"
@@ -1009,7 +1038,7 @@ msgstr ""
 "\n"
 "• ~5 % Zahlungsbearbeitungsgebühr"
 
-#: cambalache/app/cmb_window.ui:931
+#: cambalache/app/cmb_window.ui:932
 msgid ""
 "• Patreon is a membership platform for creators \n"
 "\n"
@@ -1031,35 +1060,35 @@ msgstr ""
 "\n"
 "• ~8 % Zahlungsbearbeitungsgebühr"
 
-#: cambalache/app/cmb_window.ui:1016
+#: cambalache/app/cmb_window.ui:1017
 msgid "_Open"
 msgstr "_Öffnen"
 
-#: cambalache/app/cmb_window.ui:1061
+#: cambalache/app/cmb_window.ui:1062
 msgid "Create a new project"
 msgstr "Neues Projekt erstellen"
 
-#: cambalache/app/cmb_window.ui:1082
+#: cambalache/app/cmb_window.ui:1083
 msgid "Save"
 msgstr "Speichern"
 
-#: cambalache/app/cmb_window.ui:1086
+#: cambalache/app/cmb_window.ui:1087
 msgid "Save project"
 msgstr "Projekt speichern"
 
-#: cambalache/app/cmb_window.ui:1101
+#: cambalache/app/cmb_window.ui:1102
 msgid "Save project with a different file name"
 msgstr "Projekt unter anderem Dateinamen speichern"
 
-#: cambalache/app/cmb_window.ui:1138
+#: cambalache/app/cmb_window.ui:1139
 msgid "Add new UI to project"
 msgstr "Neue Benutzeroberfläche zum Projekt hinzufügen"
 
-#: cambalache/app/cmb_window.ui:1235
+#: cambalache/app/cmb_window.ui:1236
 msgid "User Interface Maker"
 msgstr "Benutzeroberflächen-Ersteller"
 
-#: cambalache/app/cmb_window.ui:1237
+#: cambalache/app/cmb_window.ui:1238
 msgid "Source repository and issue tracker"
 msgstr "Quell-Repository und Issue-Tracker"
 
