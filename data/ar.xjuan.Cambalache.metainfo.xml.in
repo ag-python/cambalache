@@ -20,6 +20,23 @@
     </p>
   </description>
   <releases>
+    <release date="2022-01-14" version="0.8.2">
+      <description>
+        <p>Bugfix release!</p>
+        <ul>
+          <li>GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, Frame, Revealer, ScrolledWindow, Viewport and Overlay)</li>
+          <li>GTK 4: Fix placeholders in GtkPaned</li>
+          <li>Fix property editor copy/paste shortcuts</li>
+          <li>Various improvements and minor fixes</li>
+        </ul>
+      </description>
+      <issues>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/72">Issue #72: Superfluous space in tree view for unnamed widgets</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/58">Issue #58: Cut, copy and paste always manipulate tree view (instead of text boxes in Properties tab)</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/73">Issue #73: How to set children in GtkPaned?</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/67">Issue #67: Adding ad deleting a widget doesn't correctly refresh the left view</issue>
+      </issues>
+    </release>
     <release date="2021-12-20" version="0.8.1">
       <description>
         <p>First bugfix release in 0.8 series!</p>
