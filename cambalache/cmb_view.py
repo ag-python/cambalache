@@ -73,9 +73,10 @@ class CmbProcess(GObject.Object):
             try:
                 GLib.spawn_close_pid(self.pid)
                 os.kill(self.pid, 9)
-                self.pid = 0
             except Exception as e:
                 logger.warning(f'Error stoping {self.file} {e}')
+
+            self.pid = 0
 
     def run(self, args, env=[]):
         if self.file is None or self.pid > 0:
@@ -440,6 +441,8 @@ window.setupDocument = function (document) {
 
         except Exception as e:
             logger.warning(f'Merenge output error: {e}')
+            self.__merengue.stop()
+            return GLib.SOURCE_REMOVE
 
         return GLib.SOURCE_CONTINUE
 
