@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-11 21:22-0500\n"
-"PO-Revision-Date: 2021-12-23 22:27+0100\n"
+"PO-Revision-Date: 2022-01-13 17:51+0100\n"
 "Last-Translator: PhilProg <No_E-Mail>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
 "Language: de\n"
@@ -64,18 +64,20 @@ msgid ""
 "GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, "
 "Frame, Revealer, ScrolledWindow, Viewport and Overlay)"
 msgstr ""
+"GTK 4: Behebe Platzhalter in bin wie Containern (AspectFrame, Expander, "
+"Frame, Revealer, ScrolledWindow, Viewport und Overlay)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
 msgid "GTK 4: Fix placeholders in GtkPaned"
-msgstr ""
+msgstr "GTK 4: Behebe Platzhalter in GtkPaned"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Fix property editor copy/paste shortcuts"
-msgstr ""
+msgstr "Behebe die Tastenkürzel Kopieren/Einfügen des Eigenschaftseditors"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Various improvements and minor fixes"
-msgstr ""
+msgstr "Diverse Verbesserungen und kleinere Korrekturen"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:42
 msgid "First bugfix release in 0.8 series!"
@@ -226,7 +228,7 @@ msgstr "Cambalache Workspace"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:159
 msgid "Shortcuts window"
-msgstr "Tastenkombinations-Fenster"
+msgstr "Tastenkürzel-Fenster"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:163
 msgid "Workspace gtk dark theme"
@@ -571,19 +573,18 @@ msgid "Comments for translators:"
 msgstr "Kommentar für Übersetzer:"
 
 #: cambalache/cmb_tree_view.py:89
-#, fuzzy
 msgid "(template)"
-msgstr "Vorlage"
+msgstr "(Vorlage)"
 
 #: cambalache/cmb_tree_view.py:92
 #, python-brace-format
 msgid "<b>Unnamed {ui_id}</b>"
-msgstr ""
+msgstr "<b>Unbenannt {ui_id}</b>"
 
 #. Widget group for toplevels/windows
 #: cambalache/cmb_type_chooser.ui:92 cambalache/cmb_type_chooser_widget.py:65
 msgid "Toplevel"
-msgstr "Toplevel"
+msgstr "Oberste Ebene"
 
 #. Widget group for container widgets liek GtkBox grid
 #: cambalache/cmb_type_chooser.ui:113 cambalache/cmb_type_chooser_widget.py:66
@@ -594,17 +595,17 @@ msgstr "Layout"
 #. Widget group for  control wildget like buttons, entries
 #: cambalache/cmb_type_chooser.ui:134 cambalache/cmb_type_chooser_widget.py:67
 msgid "Control"
-msgstr "Control"
+msgstr "Steuerung"
 
 #. Widget group for display widgets (label, image)
 #: cambalache/cmb_type_chooser.ui:155 cambalache/cmb_type_chooser_widget.py:68
 msgid "Display"
-msgstr "Bildschirm"
+msgstr "Anzeige"
 
 #. Widget group for model objects (ListStore, TextBuffer)
 #: cambalache/cmb_type_chooser.ui:176 cambalache/cmb_type_chooser_widget.py:69
 msgid "Model"
-msgstr "Model"
+msgstr "Modell"
 
 #: cambalache/cmb_type_chooser_widget.py:98
 msgid "Others"
@@ -942,7 +943,7 @@ msgstr "Spenden"
 
 #: cambalache/app/cmb_window.ui:184
 msgid "Keyboard Shortcuts"
-msgstr "Tastenkombinationen"
+msgstr "Tastenkürzel"
 
 #: cambalache/app/cmb_window.ui:198
 msgid "About"
