@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <interface>
+  <!-- interface-name layout.ui -->
   <requires lib="gtk" version="4.0"/>
   <object class="GtkBox">
     <property name="orientation">vertical</property>
