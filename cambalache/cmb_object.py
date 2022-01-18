@@ -50,6 +50,7 @@ class CmbObject(CmbBaseObject):
 
     def __init__(self, **kwargs):
         self.properties = []
+        self.properties_dict = {}
         self.layout = []
         self.signals = []
 
@@ -81,7 +82,11 @@ class CmbObject(CmbBaseObject):
                                property_id=info.property_id,
                                info=info)
 
+            # List of property
             self.properties.append(prop)
+
+            # Dictionary of properties
+            self.properties_dict[property_name] = prop
 
     def __populate_properties(self):
         self.__populate_type_properties(self.type_id)
