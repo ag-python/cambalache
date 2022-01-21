@@ -43,6 +43,7 @@ class CmbTreeView(Gtk.TreeView):
         self._selection.connect('changed', self.__on_selection_changed)
         self.set_headers_visible (False)
         self.__right_click = False
+        self.__inline_objects = {}
 
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn('Object(Type)', renderer)
@@ -82,25 +83,48 @@ class CmbTreeView(Gtk.TreeView):
 
         return True
 
+    def __object_get_inline_prop(self, obj):
+        prop = self.__inline_objects.get(f'{obj.ui_id}.{obj.object_id}', None)
+        return f'<b>{prop}</b> ' if prop else ''
+
     def __name_cell_data_func(self, column, cell, model, iter_, data):
         obj = model.get_value(iter_, 0)
 
         if type(obj) == CmbObject:
+            inline_prop = self.__object_get_inline_prop(obj)
+            name = f'{obj.name} ' if obj.name else ''
             extra = _('(template)') if not obj.parent_id and obj.ui.template_id == obj.object_id else obj.type_id
-            text = f'{obj.name} <i>{extra}</i>' if obj.name else f'<i>{extra}</i>'
+            text = f'{inline_prop}{name}<i>{extra}</i>'
         elif type(obj) == CmbUI:
             text = f'<b>{obj.filename}</b>' if obj.filename else _('<b>Unnamed {ui_id}</b>').format(ui_id=obj.ui_id)
 
         cell.set_property('markup', text)
 
+    def __update_inline_objects(self):
+        self.__inline_objects = {}
+
+        if self._project is None:
+            return
+
+        for row in self._project.db.execute('SELECT ui_id, property_id, inline_object_id FROM object_property WHERE inline_object_id IS NOT NULL;'):
+            ui_id, property_id, inline_object_id = row
+            self.__inline_objects[f'{ui_id}.{inline_object_id}'] = property_id
+
+    def __on_project_changed(self, project):
+        self.__update_inline_objects()
+
     def __on_model_notify(self, treeview, pspec):
         if self._project is not None:
             self._project.disconnect_by_func(self.__on_project_selection_changed)
+            self._project.disconnect_by_func(self.__on_project_changed)
 
         self._project = self.props.model
 
         if self._project:
             self._project.connect('selection-changed', self.__on_project_selection_changed)
+            self._project.connect('changed', self.__on_project_changed)
+
+        self.__update_inline_objects()
 
     def __on_row_activated(self, view, path, column):
         if self.row_expanded(path):
@@ -130,3 +154,4 @@ class CmbTreeView(Gtk.TreeView):
         if _iter is not None:
             obj = project.get_value(_iter, 0)
             project.set_selection([obj])
+
