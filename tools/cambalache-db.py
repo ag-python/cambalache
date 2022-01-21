@@ -180,8 +180,13 @@ class CambalacheDb:
                         translatable = get_bool(prop, 'translatable')
                         save_always = get_bool(prop, 'save-always')
 
-                        c.execute("UPDATE property SET translatable=?, save_always=? WHERE owner_id=? AND property_id=?;",
-                                  (translatable, save_always, owner_id, property_id))
+                        if self.lib.target_tk == 'Gtk-4.0':
+                            is_inline_object = get_bool(prop, 'is-inline-object')
+                        else:
+                            is_inline_object = None
+
+                        c.execute("UPDATE property SET translatable=?, save_always=?, is_inline_object=? WHERE owner_id=? AND property_id=?;",
+                                  (translatable, save_always, is_inline_object, owner_id, property_id))
 
             # Read type custom tags
             for data in klass.iterchildren('data'):
