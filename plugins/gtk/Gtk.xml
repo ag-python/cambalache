@@ -61,6 +61,7 @@
     <GtkWindow>
       <properties>
         <property id="title" translatable="True"/>
+        <property id="child" is-inline-object="True"/>
       </properties>
     </GtkWindow>
 
@@ -139,6 +140,7 @@
     <GtkButton>
       <properties>
         <property id="label" translatable="True"/>
+        <property id="child" is-inline-object="True"/>
       </properties>
     </GtkButton>
 
@@ -169,6 +171,8 @@
     <GtkComboBox>
       <properties>
         <property id="tearoff-title" translatable="True"/>
+        <property id="child" is-inline-object="True"/>
+        <!-- FIXME ><property id="model" is-inline-object="True"/> -->
       </properties>
     </GtkComboBox>
 
@@ -276,6 +280,118 @@
       </properties>
     </GtkShortcutsShortcut>
 
+    <GtkAspectFrame>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkAspectFrame>
+
+    <GtkAssistantPage>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkAssistantPage>
+
+    <GtkDragIcon>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkDragIcon>
+
+    <GtkExpander>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkExpander>
+
+
+    <GtkFlowBoxChild>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkFlowBoxChild>
+
+
+    <GtkFrame>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkFrame>
+
+
+    <GtkListBoxRow>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkListBoxRow>
+
+    <GtkListItem>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkListItem>
+
+    <GtkNotebookPage>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+        <property id="tab" is-inline-object="True"/>
+      </properties>
+    </GtkNotebookPage>
+
+    <GtkOverlay>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkOverlay>
+
+    <GtkPopover>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkPopover>
+
+    <GtkRevealer>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkRevealer>
+
+    <GtkScrolledWindow>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkScrolledWindow>
+
+    <GtkSearchBar>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkSearchBar>
+
+    <GtkStackPage>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkStackPage>
+
+    <GtkTreeExpander>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkTreeExpander>
+
+    <GtkViewport>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkViewport>
+
+    <GtkWindowHandle>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </GtkWindowHandle>
+
   </types>
 
   <categories>
@@ -294,6 +410,7 @@
       <GtkAssistant/>
       <GtkAppChooserDialog/>
       <GtkFileChooserNative/>
+      <GtkDragIcon/>
     </category>
 
     <category name="layout">

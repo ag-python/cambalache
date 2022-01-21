@@ -13,11 +13,11 @@
 	("GBindingFlags","G_BINDING_SYNC_CREATE","sync-create",2,"Synchronize the values of the source and target properties when creating the binding; the direction of the synchronization is always from the source to the target.")
   </type_flags>
   <property>
-	("GBinding","flags","GBindingFlags",None,None,None,None,None,None,"2.26",None,None),
-	("GBinding","source","GObject",1,None,None,None,None,None,"2.26",None,None),
-	("GBinding","source-property","gchararray",None,None,None,None,None,None,"2.26",None,None),
-	("GBinding","target","GObject",1,None,None,None,None,None,"2.26",None,None),
-	("GBinding","target-property","gchararray",None,None,None,None,None,None,"2.26",None,None)
+	("GBinding","flags","GBindingFlags",None,None,None,None,None,None,"2.26",None,None,None),
+	("GBinding","source","GObject",1,None,None,None,None,None,"2.26",None,None,None),
+	("GBinding","source-property","gchararray",None,None,None,None,None,None,"2.26",None,None,None),
+	("GBinding","target","GObject",1,None,None,None,None,None,"2.26",None,None,None),
+	("GBinding","target-property","gchararray",None,None,None,None,None,None,"2.26",None,None,None)
   </property>
   <signal>
 	("GObject","notify",None,None,1)
