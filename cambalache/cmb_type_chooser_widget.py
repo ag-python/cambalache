@@ -43,6 +43,7 @@ class CmbTypeChooserWidget(Gtk.Box):
     uncategorized_only = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
     show_categories = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE, default=False)
     parent_type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+    derived_type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
 
     entrycompletion = Gtk.Template.Child()
     scrolledwindow = Gtk.Template.Child()
@@ -103,6 +104,9 @@ class CmbTypeChooserWidget(Gtk.Box):
             else:
                 append = i.category is None if self.uncategorized_only else \
                          (self.category != '' and i.category == self.category) or  self.category == ''
+
+            if append and self.derived_type_id != '':
+                append = i.is_a(self.derived_type_id)
 
             if append:
                 store.append([i.type_id, i.type_id.lower(), i, True])
