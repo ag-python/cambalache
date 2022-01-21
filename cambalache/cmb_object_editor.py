@@ -259,8 +259,7 @@ class CmbObjectEditor(Gtk.Box):
                 editor = CmbSpinButton(digits=digits,
                                        adjustment=adjustment)
             elif info.is_object:
-                editor = CmbObjectChooser(object=self.__object,
-                                          type_id=type_id)
+                editor = CmbObjectChooser(prop=prop)
             elif tinfo:
                 if tinfo.parent_id == 'enum':
                     editor = CmbEnumComboBox(info=tinfo)

@@ -26,12 +26,14 @@ import gi
 import math
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gtk
+from gi.repository import GLib, GObject, Gdk, Gtk
 
 from .cmb_object import CmbObject
 from .cmb_ui import CmbUI
 from .cmb_type_info import CmbTypeInfo
 from .cmb_translatable_popover import CmbTranslatablePopover
+from .cmb_type_chooser_popover import CmbTypeChooserPopover
+from .cmb_property import CmbProperty
 
 
 class CmbEntry(Gtk.Entry):
@@ -277,18 +279,23 @@ class CmbFlagsEntry(Gtk.Entry):
 class CmbObjectChooser(Gtk.Entry):
     __gtype_name__ = 'CmbObjectChooser'
 
-    object = GObject.Property(type=CmbObject, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
-    type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+    prop = GObject.Property(type=CmbProperty, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
         self._value = None
         super().__init__(**kwargs)
         self.connect('notify::text', self.__on_text_notify)
-        self.props.placeholder_text = f'<{self.type_id}>'
+
+        if self.prop.info.is_inline_object:
+            self.connect("icon-press", self.__on_icon_pressed)
+            self.__update_icons()
 
     def __on_text_notify(self, obj, pspec):
-        obj = self.object.project.get_object_by_name(self.object.ui_id,
-                                                     self.props.text)
+        if self.prop.inline_object_id:
+            return
+
+        obj = self.prop.project.get_object_by_name(self.prop.ui_id,
+                                                   self.props.text)
         if obj:
             self._value = obj.object_id
 
@@ -300,14 +307,64 @@ class CmbObjectChooser(Gtk.Entry):
 
     @cmb_value.setter
     def _set_cmb_value(self, value):
+        prop = self.prop
+
         self._value = int(value) if value else 0
 
         if self._value:
-            obj = self.object.project.get_object_by_id(self.object.ui_id,
-                                                       self._value)
+            obj = prop.project.get_object_by_id(prop.ui_id, self._value)
             self.props.text = obj.name if obj else ''
         else:
             self.props.text = ''
+
+    def __update_icons(self):
+        if not self.prop.info.is_inline_object:
+            return
+
+        if self.prop.inline_object_id:
+            obj = self.prop.project.get_object_by_id(self.prop.ui_id,
+                                                     self.prop.inline_object_id)
+            type = obj.type_id
+            self.props.secondary_icon_name = 'edit-clear-symbolic'
+            self.props.secondary_icon_tooltip_text = _('Clear property')
+            self.props.placeholder_text = f'<inline {type}>'
+            self.props.editable = False
+            self.props.can_focus = False
+        else:
+            self.props.secondary_icon_name = 'list-add-symbolic'
+            self.props.secondary_icon_tooltip_text = _('Add inline object')
+            self.props.placeholder_text = f'<{self.prop.info.type_id}>'
+            self.props.editable = True
+            self.props.can_focus = True
+
+    def __get_name_for_object(self, obj):
+        name = obj.name
+        return obj.type_id.lower() if name is None else name
+
+    def __on_type_selected(self, popover, info):
+        prop = self.prop
+        prop.project.add_object(prop.ui_id,
+                                info.type_id,
+                                parent_id=prop.object_id,
+                                inline_property=prop.property_id)
+        self.__update_icons()
+
+    def __on_icon_pressed(self, widget, icon_pos, event):
+        prop = self.prop
+
+        if self.prop.inline_object_id:
+            obj = prop.project.get_object_by_id(prop.ui_id, prop.inline_object_id)
+
+            print(obj, prop.ui_id, prop.inline_object_id)
+            prop.project.remove_object(obj)
+            self.__update_icons()
+        else:
+            chooser = CmbTypeChooserPopover(relative_to=self,
+                                            parent_type_id=prop.object.type_id,
+                                            derived_type_id=prop.info.type_id)
+            chooser.project = prop.project
+            chooser.connect('type-selected', self.__on_type_selected)
+            chooser.popup()
 
 
 class CmbToplevelChooser(Gtk.ComboBoxText):
