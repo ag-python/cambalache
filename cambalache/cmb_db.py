@@ -334,6 +334,9 @@ class CmbDB(GObject.GObject):
         if version < (0, 7, 5):
             return cmb_db_migration.ensure_columns_for_0_7_5(table, data)
 
+        if version < (0, 9, 0):
+            return cmb_db_migration.ensure_columns_for_0_9_0(table, data)
+
         return data
 
     def __migrate_table_data(self, c, version, table, data):
@@ -551,28 +554,44 @@ class CmbDB(GObject.GObject):
 
         return ui_id
 
-    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, layout=None, position=None):
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, layout=None, position=None, inline_property=None):
         c = self.conn.cursor()
 
         c.execute("SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;", (ui_id, ))
         object_id = c.fetchone()[0]
 
         if position is None:
-            c.execute("SELECT count(object_id) FROM object WHERE ui_id=? AND parent_id=?;",(ui_id, parent_id))
+            c.execute("""
+                SELECT count(object_id)
+                    FROM object
+                    WHERE ui_id=? AND parent_id=?
+                        AND object_id NOT IN (SELECT inline_object_id FROM object_property WHERE inline_object_id IS NOT NULL AND ui_id=? AND object_id=?);
+                """,
+                      (ui_id, parent_id, ui_id, parent_id))
             position = c.fetchone()[0]
 
         c.execute("INSERT INTO object (ui_id, object_id, type_id, name, parent_id, internal, type, comment, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
                   (ui_id, object_id, obj_type, name, parent_id, internal_child, child_type, comment, position))
 
-        if layout:
+        # Get parent type for later
+        if layout or inline_property:
             c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
-            parent_type = c.fetchone()
+            row = c.fetchone()
+            parent_type = row[0] if row else None
+        else:
+            parent_type = None
 
-            if parent_type:
-                for property_id in layout:
-                    owner_id = self.__get_layout_property_owner(parent_type[0], property_id)
-                    c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
-                              (ui_id, parent_id, object_id, owner_id, property_id, layout[property_id]))
+        if layout and parent_type:
+            for property_id in layout:
+                owner_id = self.__get_layout_property_owner(parent_type, property_id)
+                c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
+                          (ui_id, parent_id, object_id, owner_id, property_id, layout[property_id]))
+
+        if parent_id and parent_type and inline_property:
+            info = self.type_info.get(parent_type, None)
+            pinfo = self.__get_property_info(info, inline_property)
+            c.execute("REPLACE INTO object_property(ui_id, object_id, owner_id, property_id, inline_object_id) VALUES(?, ?, ?, ?, ?)",
+                      (ui_id, parent_id, pinfo.owner_id, inline_property, object_id))
 
         c.close()
 
@@ -621,12 +640,7 @@ class CmbDB(GObject.GObject):
 
         return retval
 
-    def __import_property(self, c, info, ui_id, object_id, prop):
-        name, translatable, context, comments = self.__node_get(prop, 'name', ['translatable', 'context', 'comments'])
-
-        property_id = name.replace('_', '-')
-        comment = self.__node_get_comment(prop)
-
+    def __get_property_info(self, info, property_id):
         pinfo = None
 
         # Find owner type for property
@@ -639,14 +653,37 @@ class CmbDB(GObject.GObject):
                     pinfo = type_info.properties[property_id]
                     break
 
+        return pinfo
+
+    def __import_property(self, c, info, ui_id, object_id, prop):
+        name, translatable, context, comments = self.__node_get(prop, 'name', ['translatable', 'context', 'comments'])
+
+        property_id = name.replace('_', '-')
+        comment = self.__node_get_comment(prop)
+
+        pinfo = self.__get_property_info(info, property_id)
+
         # Insert property
         if not pinfo:
             self.__collect_error('unknown-property', prop, f'{info.type_id}:{property_id}')
             return
 
+        # Property value
+        value = prop.text
+
+        # Initialize to null
+        inline_object_id = None
+
+        # GtkBuilder in Gtk4 supports defining an object in a property
+        if self.target_tk == 'gtk-4.0' and pinfo.is_object and pinfo.is_inline_object:
+            obj_node = prop.find('object')
+            if obj_node is not None:
+                inline_object_id = self.__import_object(ui_id, obj_node, object_id)
+                value = None
+
         try:
-            c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                      (ui_id, object_id, pinfo.owner_id, property_id, prop.text, translatable, comment, context, comments))
+            c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments, inline_object_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                      (ui_id, object_id, pinfo.owner_id, property_id, value, translatable, comment, context, comments, inline_object_id))
         except Exception as e:
             raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {pinfo.owner_id}:{property_id} property: {e}')
 
@@ -1029,13 +1066,13 @@ class CmbDB(GObject.GObject):
 
         # Properties + save_always default values
         for row in c.execute(f'''
-                SELECT op.value, op.property_id, op.comment, op.translatable, op.translation_context, op.translation_comments, p.is_object
+                SELECT op.value, op.property_id, op.inline_object_id, op.comment, op.translatable, op.translation_context, op.translation_comments, p.is_object, p.is_inline_object
                   FROM object_property AS op, property AS p
                   WHERE op.ui_id=? AND op.object_id=? AND
                     p.owner_id = op.owner_id AND
                     p.property_id = op.property_id
                 UNION
-                SELECT default_value, property_id, null, null, null, null, is_object
+                SELECT default_value, property_id, null, null, null, null, null, is_object, is_inline_object
                   FROM property
                   WHERE save_always=1 AND owner_id IN ({placeholders}) AND
                     property_id NOT IN
@@ -1045,14 +1082,17 @@ class CmbDB(GObject.GObject):
                 ORDER BY op.property_id
                 ''',
                 (ui_id, object_id) + tuple(hierarchy) + (ui_id, object_id)):
-            val, property_id, comment, translatable, translation_context, translation_comments, is_object = row
+            val, property_id, inline_object_id, comment, translatable, translation_context, translation_comments, is_object, is_inline_object = row
 
             if is_object:
-                if merengue:
-                    value = f'__cmb__{ui_id}.{val}'
+                if inline_object_id and is_inline_object:
+                    value = self.__export_object(ui_id, inline_object_id, merengue=merengue)
                 else:
-                    cc.execute('SELECT name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, val))
-                    value, = cc.fetchone()
+                    if merengue:
+                        value = f'__cmb__{ui_id}.{val}'
+                    else:
+                        cc.execute('SELECT name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, val))
+                        value, = cc.fetchone()
             else:
                 value = val
 
@@ -1093,7 +1133,12 @@ class CmbDB(GObject.GObject):
         child_position = 0
 
         # Children
-        for row in c.execute('SELECT object_id, internal, type, comment, position FROM object WHERE ui_id=? AND parent_id=? ORDER BY position;', (ui_id, object_id)):
+        for row in c.execute('''
+            SELECT object_id, internal, type, comment, position
+                FROM object
+                WHERE ui_id=? AND parent_id=?
+                    AND object_id NOT IN (SELECT inline_object_id FROM object_property WHERE inline_object_id IS NOT NULL AND ui_id=? AND object_id=?)
+                ORDER BY position;''', (ui_id, object_id, ui_id, object_id)):
             child_id, internal, ctype,  comment, position = row
 
             if merengue:

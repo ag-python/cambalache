@@ -56,3 +56,11 @@ def migrate_table_data_to_0_7_5(c, table, data):
             ) AS new
             WHERE object.ui_id=new.ui_id AND object.object_id=new.object_id;
         ''')
+
+
+def ensure_columns_for_0_9_0(table, data):
+    if table == 'object_property':
+        # Append inline_object_id column
+        return [row + (None, ) for row in data]
+
+    return data
