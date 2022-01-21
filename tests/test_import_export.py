@@ -84,3 +84,9 @@ def test_gtk4_signals():
 
 def test_gtk4_template():
     assert_original_and_exported("gtk-4.0", "template.ui")
+
+def test_gtk4_inline_object():
+    assert_original_and_exported("gtk-4.0", "inline_object.ui")
+
+def test_gtk4_stack_page():
+    assert_original_and_exported("gtk-4.0", "stack_page.ui")
