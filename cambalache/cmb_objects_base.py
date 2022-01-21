@@ -42,12 +42,13 @@ class CmbPropertyInfo(CmbBase):
     version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     deprecated_version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     translatable = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
+    is_inline_object = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, owner_id, property_id, type_id, is_object, construct_only, save_always, default_value, minimum, maximum, version, deprecated_version, translatable):
+    def from_row(cls, project, owner_id, property_id, type_id, is_object, construct_only, save_always, default_value, minimum, maximum, version, deprecated_version, translatable, is_inline_object):
         return cls(project=project,
                    owner_id=owner_id,
                    property_id=property_id,
@@ -60,7 +61,8 @@ class CmbPropertyInfo(CmbBase):
                    maximum=maximum,
                    version=version,
                    deprecated_version=deprecated_version,
-                   translatable=translatable)
+                   translatable=translatable,
+                   is_inline_object=is_inline_object)
 
 
 class CmbSignalInfo(CmbBase):
@@ -229,7 +231,7 @@ class CmbBaseProperty(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments):
+    def from_row(cls, project, ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments, inline_object_id):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id,
@@ -284,6 +286,16 @@ class CmbBaseProperty(CmbBase):
     @translation_comments.setter
     def _set_translation_comments(self, value):
         self.db_set('UPDATE object_property SET translation_comments=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
+
+    @GObject.Property(type=int)
+    def inline_object_id(self):
+        return self.db_get('SELECT inline_object_id FROM object_property WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.property_id, ))
+
+    @inline_object_id.setter
+    def _set_inline_object_id(self, value):
+        self.db_set('UPDATE object_property SET inline_object_id=? WHERE (ui_id, object_id, owner_id, property_id) IS (?, ?, ?, ?);',
                     (self.ui_id, self.object_id, self.owner_id, self.property_id, ), value)
 
 

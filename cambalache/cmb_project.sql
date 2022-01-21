@@ -100,8 +100,10 @@ CREATE TABLE object_property (
   comment TEXT,
   translation_context TEXT,
   translation_comments TEXT,
+  inline_object_id INTEGER,
   PRIMARY KEY(ui_id, object_id, owner_id, property_id),
   FOREIGN KEY(ui_id, object_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE,
+  FOREIGN KEY(ui_id, inline_object_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE,
   FOREIGN KEY(owner_id, property_id) REFERENCES property
 ) WITHOUT ROWID;
 
