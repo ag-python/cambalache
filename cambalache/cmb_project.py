@@ -992,7 +992,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         lib, ver, inferred = CmbDB._get_target_from_node(root)
 
-        return f'{lib}-{ver}'
+        return f'{lib}-{ver}' if lib is not None else None
 
     # Default handlers
     def do_ui_added(self, ui):
