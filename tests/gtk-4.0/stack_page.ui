@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <!-- interface-name stack_page.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow">
+    <property name="child">
+      <object class="GtkStack" id="stack">
+        <child>
+          <object class="GtkStackPage">
+            <property name="child">
+              <object class="GtkLabel">
+                <property name="label">It was dark</property>
+              </object>
+            </property>
+            <property name="name">page1</property>
+            <property name="title">In the beginning…</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
+</interface>

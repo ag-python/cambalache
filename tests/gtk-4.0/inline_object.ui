@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <!-- interface-name inline_object.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkWindow">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="label">Hola Mundo</property>
+      </object>
+    </property>
+  </object>
+</interface>
