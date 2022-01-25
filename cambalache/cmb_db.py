@@ -897,6 +897,9 @@ class CmbDB(GObject.GObject):
 
     @staticmethod
     def _get_target_from_node(root):
+        if root.tag != 'interface':
+            return (None, None, None)
+
         # Look for explicit gtk version first
         for req in root.iterfind('requires'):
             lib = req.get('lib', None)
