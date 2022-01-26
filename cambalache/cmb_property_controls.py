@@ -288,6 +288,8 @@ class CmbObjectChooser(Gtk.Entry):
 
         if self.prop.info.is_inline_object:
             self.connect("icon-press", self.__on_icon_pressed)
+            self.prop.object.connect("property-changed",
+                                     lambda o, p: self.__update_icons())
             self.__update_icons()
 
     def __on_text_notify(self, obj, pspec):
@@ -296,8 +298,7 @@ class CmbObjectChooser(Gtk.Entry):
 
         obj = self.prop.project.get_object_by_name(self.prop.ui_id,
                                                    self.props.text)
-        if obj:
-            self._value = obj.object_id
+        self._value = obj.object_id if obj else None
 
         self.notify('cmb-value')
 
@@ -309,7 +310,7 @@ class CmbObjectChooser(Gtk.Entry):
     def _set_cmb_value(self, value):
         prop = self.prop
 
-        self._value = int(value) if value else 0
+        self._value = int(value) if value else None
 
         if self._value:
             obj = prop.project.get_object_by_id(prop.ui_id, self._value)
@@ -354,8 +355,6 @@ class CmbObjectChooser(Gtk.Entry):
 
         if self.prop.inline_object_id:
             obj = prop.project.get_object_by_id(prop.ui_id, prop.inline_object_id)
-
-            print(obj, prop.ui_id, prop.inline_object_id)
             prop.project.remove_object(obj)
             self.__update_icons()
         else:
@@ -409,7 +408,7 @@ class CmbToplevelChooser(Gtk.ComboBoxText):
     @GObject.Property(type=int)
     def cmb_value(self):
         active_id = self.get_active_id()
-        return int(active_id) if active_id is not None else 0
+        return int(active_id) if active_id is not None else None
 
     @cmb_value.setter
     def _set_cmb_value(self, value):
