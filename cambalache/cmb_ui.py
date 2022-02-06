@@ -25,6 +25,9 @@ import gi
 from gi.repository import GObject
 
 from .cmb_objects_base import CmbBaseUI
+from cambalache import getLogger
+
+logger = getLogger(__name__)
 
 
 class CmbUI(CmbBaseUI):
@@ -42,3 +45,23 @@ class CmbUI(CmbBaseUI):
         self.db_set('UPDATE ui SET template_id=? WHERE (ui_id) IS (?);',
                     (self.ui_id, ), value if value != 0 else None)
 
+    def get_library(self, library_id):
+        c = self.project.db.execute("SELECT version FROM ui_library WHERE ui_id=? AND library_id=?;",
+                                    (self.ui_id, library_id))
+        row = c.fetchone()
+        return row[0] if row is not None else None
+
+    def set_library(self, library_id, version, comment=None):
+        c = self.project.db.cursor()
+
+        try:
+            if version is None:
+                c.execute("DELETE FROM ui_library WHERE ui_id=? AND library_id=?;",
+                          (self.ui_id, library_id))
+            else:
+                c.execute("REPLACE INTO ui_library (ui_id, library_id, version, comment) VALUES (?, ?, ?, ?);",
+                          (self.ui_id, library_id, str(version), comment))
+        except Exception as e:
+            logger.warning(f'{self} Error setting library {library_id}={version}: {e}')
+
+        c.close()
