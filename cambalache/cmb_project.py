@@ -36,7 +36,7 @@ from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
-from .cmb_type_info import CmbTypeInfo, CmbTypeData
+from .cmb_type_info import CmbTypeInfo, CmbTypeDataInfo, CmbTypeDataArgInfo
 from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
 from .cmb_list_store import CmbListStore
 from .config import *
@@ -195,24 +195,25 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             'pks': pks
         }
 
-    def __type_get_data(self, type_id, data_id, parent_id, key, value_type_id):
+    def __type_get_data(self, owner_id, data_id, parent_id, key, type_id):
         args = {}
         children = {}
-        retval = CmbTypeData(data_id, value_type_id)
+        parent_id = parent_id if parent_id is not None else 0
+        retval = CmbTypeDataInfo.from_row(self, owner_id, data_id, parent_id, key, type_id)
 
         c = self.db.cursor()
 
         # Collect Arguments
         for row in c.execute('SELECT * FROM type_data_arg WHERE owner_id=? AND data_id=?;',
-                             (type_id, data_id)):
-            type_id, data_id, key, value_type_id = row
-            args[key] = value_type_id
+                             (owner_id, data_id)):
+            _key = row[2]
+            args[_key] = CmbTypeDataArgInfo.from_row(self, *row)
 
         # Recurse children
         for row in c.execute('SELECT * FROM type_data WHERE owner_id=? AND parent_id=?;',
-                             (type_id, data_id)):
-            type_id, data_id, parent_id, key, value_type_id = row
-            children[key] = self.__type_get_data(*row)
+                             (owner_id, data_id)):
+            _key = row[3]
+            children[_key] = self.__type_get_data(*row)
 
         c.close()
 
@@ -221,6 +222,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         return retval
 
+    # TODO: cleanup, try to move things to their respective classes
     def __init_type_info(self, c):
         owner_id = None
 
@@ -285,6 +287,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             info.signals = type_signals.get(type_id, {})
             info.data = type_data.get(type_id, {})
             self.type_info[type_id] = info
+
+        # Set parent back reference
+        for type_id in self.type_info:
+            info = self.type_info[type_id]
+            info.parent = self.type_info.get(info.parent_id, None)
 
     def __init_data(self):
         if self.target_tk is None:

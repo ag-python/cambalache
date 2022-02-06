@@ -25,17 +25,24 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-from .cmb_objects_base import CmbBaseTypeInfo
+from .cmb_objects_base import CmbBaseTypeInfo, CmbBaseTypeDataInfo, CmbBaseTypeDataArgInfo
 
-class CmbTypeData:
-    def __init__(self, data_id, value_type_id):
-        self.data_id = data_id
-        self.value_type_id = value_type_id
+
+class CmbTypeDataArgInfo(CmbBaseTypeDataArgInfo):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class CmbTypeDataInfo(CmbBaseTypeDataInfo):
+    def __init__(self, **kwargs):
         self.args = {}
         self.children = {}
+        super().__init__(**kwargs)
 
 
 class CmbTypeInfo(CmbBaseTypeInfo):
+    parent = GObject.Property(type=GObject.Object, flags = GObject.ParamFlags.READWRITE)
+
     def __init__(self, **kwargs):
         self.hierarchy = []
         self.properties = {}
@@ -59,3 +66,12 @@ class CmbTypeInfo(CmbBaseTypeInfo):
     def is_a(self, type_id):
         return self.type_id == type_id or type_id in self.hierarchy
 
+    def get_data_info(self, name):
+        parent = self
+        while parent:
+            if name in parent.data:
+                return parent.data[name]
+
+            parent = parent.parent
+
+        return None
