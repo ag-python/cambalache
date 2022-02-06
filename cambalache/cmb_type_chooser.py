@@ -36,6 +36,8 @@ class CmbTypeChooser(Gtk.Box):
 
     __gsignals__ = {
         'type-selected': (GObject.SignalFlags.RUN_LAST, None, (CmbTypeInfo, )),
+        'chooser-popup': (GObject.SignalFlags.RUN_LAST, None, (GObject.Object, )),
+        'chooser-popdown': (GObject.SignalFlags.RUN_LAST, None, (GObject.Object, ))
     }
 
     project = GObject.Property(type=CmbProject, flags = GObject.ParamFlags.READWRITE)
@@ -68,6 +70,7 @@ class CmbTypeChooser(Gtk.Box):
 
         for chooser in self._choosers:
             chooser.connect('type-selected', lambda o, t: self.emit('type-selected', t))
+            chooser.connect('notify::visible', self.__on_chooser_visible_notify)
 
     def __on_project_notify(self, object, pspec):
         project = self.project
@@ -80,4 +83,8 @@ class CmbTypeChooser(Gtk.Box):
         project_target = self.project.target_tk if self.project else ''
         self.type_label.props.label = self.selected_type.type_id if self.selected_type else project_target
 
-
+    def __on_chooser_visible_notify(self, obj, pspec):
+        if obj.props.visible:
+            self.emit('chooser-popup', obj)
+        else:
+            self.emit('chooser-popdown', obj)
