@@ -30,6 +30,7 @@ install_data([
     'cmb_layout_property.py',
     'cmb_list_store.py',
     'cmb_object.py',
+    'cmb_object_data.py',
     'cmb_object_editor.py',
     'cmb_objects_base.py',
     'cmb_project.py',

@@ -63,6 +63,7 @@ def getLogger(name):
 
 from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
+#from .cmb_object_data import CmbObjectData
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
 from .cmb_type_info import CmbTypeInfo
