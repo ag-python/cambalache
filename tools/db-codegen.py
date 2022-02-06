@@ -140,7 +140,7 @@ class CambalacheDb:
 #
 # Cambalache Base Object wrappers
 #
-# Copyright (C) 2021  Juan Pablo Ugarte
+# Copyright (C) 2021-2022  Juan Pablo Ugarte
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -169,6 +169,8 @@ from .cmb_base import *
             self.dump_table(fd, 'property', 'CmbPropertyInfo')
             self.dump_table(fd, 'signal', 'CmbSignalInfo')
             self.dump_table(fd, 'type', 'CmbBaseTypeInfo')
+            self.dump_table(fd, 'type_data', 'CmbBaseTypeDataInfo')
+            self.dump_table(fd, 'type_data_arg', 'CmbBaseTypeDataArgInfo')
 
             # Project Objects
             self.dump_table(fd, 'ui', 'CmbBaseUI',
@@ -180,6 +182,8 @@ from .cmb_base import *
             self.dump_table(fd, 'object_signal', 'CmbSignal',
                             mutable=True)
             self.dump_table(fd, 'object', 'CmbBaseObject',
+                            mutable=True)
+            self.dump_table(fd, 'object_data', 'CmbBaseObjectData',
                             mutable=True)
             fd.close();
 

@@ -2,7 +2,7 @@
 #
 # Cambalache Base Object wrappers
 #
-# Copyright (C) 2021  Juan Pablo Ugarte
+# Copyright (C) 2021-2022  Juan Pablo Ugarte
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -113,6 +113,48 @@ class CmbBaseTypeInfo(CmbBase):
                    abstract=abstract,
                    layout=layout,
                    category=category)
+
+
+class CmbBaseTypeDataInfo(CmbBase):
+    __gtype_name__ = 'CmbBaseTypeDataInfo'
+
+    owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    data_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    parent_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    key = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, owner_id, data_id, parent_id, key, type_id):
+        return cls(project=project,
+                   owner_id=owner_id,
+                   data_id=data_id,
+                   parent_id=parent_id,
+                   key=key,
+                   type_id=type_id)
+
+
+class CmbBaseTypeDataArgInfo(CmbBase):
+    __gtype_name__ = 'CmbBaseTypeDataArgInfo'
+
+    owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    data_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    key = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, owner_id, data_id, key, type_id):
+        return cls(project=project,
+                   owner_id=owner_id,
+                   data_id=data_id,
+                   key=key,
+                   type_id=type_id)
 
 
 class CmbBaseUI(CmbBase):
@@ -569,3 +611,55 @@ class CmbBaseObject(CmbBase):
     def _set_position(self, value):
         self.db_set('UPDATE object SET position=? WHERE (ui_id, object_id) IS (?, ?);',
                     (self.ui_id, self.object_id, ), value)
+
+
+class CmbBaseObjectData(CmbBase):
+    __gtype_name__ = 'CmbBaseObjectData'
+
+    ui_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    object_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    owner_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    data_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, ui_id, object_id, owner_id, data_id, id, value, parent_id, comment):
+        return cls(project=project,
+                   ui_id=ui_id,
+                   object_id=object_id,
+                   owner_id=owner_id,
+                   data_id=data_id,
+                   id=id)
+
+    @GObject.Property(type=str)
+    def value(self):
+        return self.db_get('SELECT value FROM object_data WHERE (ui_id, object_id, owner_id, data_id, id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, ))
+
+    @value.setter
+    def _set_value(self, value):
+        self.db_set('UPDATE object_data SET value=? WHERE (ui_id, object_id, owner_id, data_id, id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, ), value)
+
+    @GObject.Property(type=int)
+    def parent_id(self):
+        return self.db_get('SELECT parent_id FROM object_data WHERE (ui_id, object_id, owner_id, data_id, id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, ))
+
+    @parent_id.setter
+    def _set_parent_id(self, value):
+        self.db_set('UPDATE object_data SET parent_id=? WHERE (ui_id, object_id, owner_id, data_id, id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, ), value)
+
+    @GObject.Property(type=str)
+    def comment(self):
+        return self.db_get('SELECT comment FROM object_data WHERE (ui_id, object_id, owner_id, data_id, id) IS (?, ?, ?, ?, ?);',
+                           (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, ))
+
+    @comment.setter
+    def _set_comment(self, value):
+        self.db_set('UPDATE object_data SET comment=? WHERE (ui_id, object_id, owner_id, data_id, id) IS (?, ?, ?, ?, ?);',
+                    (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, ), value)
