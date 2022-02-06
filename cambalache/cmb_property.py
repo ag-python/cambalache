@@ -54,16 +54,8 @@ class CmbProperty(CmbBaseProperty):
             c.execute("DELETE FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
                       (self.ui_id, self.object_id, self.owner_id, self.property_id))
         else:
-            c.execute("SELECT count(ui_id) FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
-                      (self.ui_id, self.object_id, self.owner_id, self.property_id))
-            count = c.fetchone()[0]
-
-            if count > 0:
-               c.execute("UPDATE object_property SET value=? WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
-                          (value, self.ui_id, self.object_id, self.owner_id, self.property_id))
-            else:
-               c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?);",
-                          (self.ui_id, self.object_id, self.owner_id, self.property_id, value))
+            c.execute("REPLACE INTO object_property (ui_id, object_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?);",
+                      (self.ui_id, self.object_id, self.owner_id, self.property_id, value))
 
         if self._init == False:
             self.object._property_changed(self)
