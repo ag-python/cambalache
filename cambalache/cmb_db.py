@@ -781,6 +781,25 @@ class CmbDB(GObject.GObject):
             except Exception as e:
                 raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {owner_id}:{property_id} layout property: {e}')
 
+    def object_add_data(self, ui_id, object_id, owner_id, data_id, value=None, parent_id=None, comment=None):
+        c = self.conn.cursor()
+
+        c.execute("SELECT coalesce((SELECT id FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? ORDER BY id DESC LIMIT 1), 0) + 1;",
+                  (ui_id, object_id, owner_id))
+        id = c.fetchone()[0]
+
+        c.execute("INSERT INTO object_data (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                  (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment))
+        c.close()
+
+        return id
+
+    def object_add_data_arg(self, ui_id, object_id, owner_id, data_id, id, key, val):
+        c = self.conn.cursor()
+        c.execute("INSERT INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                  (ui_id, object_id, owner_id, data_id, id, key, val))
+        c.close()
+
     def __import_object_data(self, ui_id, object_id, owner_id, taginfo, ntag, parent_id):
         c = self.conn.cursor()
 
@@ -789,17 +808,11 @@ class CmbDB(GObject.GObject):
         value = text if text and len(text) > 0 else None
         comment = self.__node_get_comment(ntag)
 
-        c.execute("SELECT coalesce((SELECT id FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? ORDER BY id DESC LIMIT 1), 0) + 1;",
-                  (ui_id, object_id, owner_id, data_id))
-        id = c.fetchone()[0]
-
-        c.execute("INSERT INTO object_data (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-                  (ui_id, object_id, owner_id, data_id, id, value, parent_id, comment))
+        id = self.object_add_data(ui_id, object_id, owner_id, data_id, value, parent_id, comment)
 
         for key in taginfo.args:
             val = ntag.get(key, None)
-            c.execute("INSERT INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                          (ui_id, object_id, owner_id, data_id, id, key, val))
+            self.object_add_data_arg(ui_id, object_id, owner_id, data_id, id, key, val)
 
         for child in ntag.iterchildren():
             if child.tag in taginfo.children:
@@ -863,11 +876,10 @@ class CmbDB(GObject.GObject):
                 self.__import_layout_properties(c, info, ui_id, parent_id, object_id, child)
             else:
                 # Custom buildable tags
-                dinfo = find_data_info(info, child.tag)
+                taginfo = info.get_data_info(child.tag)
 
-                if dinfo is not None:
-                    taginfo = dinfo.data[child.tag]
-                    self.__import_object_data(ui_id, object_id, dinfo.type_id, taginfo, child, None)
+                if taginfo is not None:
+                    self.__import_object_data(ui_id, object_id, taginfo.owner_id, taginfo, child, None)
                 else:
                     self.__unknown_tag(child, klass, child.tag)
 
