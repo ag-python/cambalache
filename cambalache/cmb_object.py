@@ -29,6 +29,7 @@ from gi.repository import GObject, Gtk
 from .cmb_objects_base import CmbBaseObject, CmbSignal
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
+from .cmb_object_data import CmbObjectData
 from .cmb_type_info import CmbTypeInfo
 from .cmb_ui import CmbUI
 from cambalache import getLogger
@@ -53,6 +54,7 @@ class CmbObject(CmbBaseObject):
         self.properties_dict = {}
         self.layout = []
         self.signals = []
+        self.data = []
 
         super().__init__(**kwargs)
 
@@ -216,4 +218,41 @@ class CmbObject(CmbBaseObject):
             return False
         else:
             self._remove_signal(signal)
+            return True
+
+    def add_data(self, data_key, value=None, comment=None):
+        try:
+            value = str(value) if value is not None else None
+            taginfo = self.info.get_data_info(data_key)
+            owner_id = taginfo.owner_id
+            data_id = taginfo.data_id
+            id = self.project.db.object_add_data(self.ui_id, self.object_id, owner_id, data_id, value, None, comment)
+        except Exception as e:
+            logger.warning(f'Error adding data {data_key} {e}')
+            return None
+        else:
+            new_data = CmbObjectData(project=self.project,
+                                     object=self,
+                                     info=taginfo,
+                                     ui_id=self.ui_id,
+                                     object_id=self.object_id,
+                                     owner_id=owner_id,
+                                     data_id=data_id,
+                                     id=id,
+                                     value=value,
+                                     comment=comment)
+            self.data.append(new_data)
+            return new_data
+
+    def remove_data(self, data):
+        try:
+            assert data in self.data
+            self.project.db.execute("DELETE FROM object_data WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=?;",
+                                    (self.ui_id, self.object_id, data.owner_id, data.data_id, data.id))
+            self.project.db.commit()
+        except Exception as e:
+            logger.warning(f'{self} Error removing data {data}: {e}')
+            return False
+        else:
+            self.data.remove(data)
             return True
