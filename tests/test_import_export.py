@@ -90,3 +90,6 @@ def test_gtk4_inline_object():
 
 def test_gtk4_stack_page():
     assert_original_and_exported("gtk-4.0", "stack_page.ui")
+
+def test_gtk4_liststore():
+    assert_original_and_exported("gtk-4.0", "liststore.ui")
