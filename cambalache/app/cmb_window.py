@@ -65,6 +65,10 @@ class CmbWindow(Gtk.ApplicationWindow):
     np_gtk3_radiobutton = Gtk.Template.Child()
     np_gtk4_radiobutton = Gtk.Template.Child()
 
+    # Window message
+    message_revealer = Gtk.Template.Child()
+    message_label = Gtk.Template.Child()
+
     # Workspace
     view = Gtk.Template.Child()
     tree_view = Gtk.Template.Child()
@@ -163,6 +167,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.turor_waiting_for_user_action = False
 
         self.__clipboard_enabled = True
+        self.__message_timeout_id = None
 
         # Create settings object
         self.settings = Gio.Settings(schema_id='ar.xjuan.Cambalache')
@@ -247,6 +252,14 @@ class CmbWindow(Gtk.ApplicationWindow):
             obj = selection[0]
             # Create toplevel object/window
             self.project.add_object(obj.ui_id, info.type_id)
+
+    @Gtk.Template.Callback('on_type_chooser_chooser_popup')
+    def __on_type_chooser_chooser_popup(self, chooser, popup):
+        self._show_message(_('Hold <alt> to create object in place'))
+
+    @Gtk.Template.Callback('on_type_chooser_chooser_popdown')
+    def __on_type_chooser_chooser_popdown(self, chooser, popup):
+        self._show_message(None)
 
     @Gtk.Template.Callback('on_view_placeholder_selected')
     def __on_view_placeholder_selected(self, view, ui_id, object_id, position, layout):
@@ -396,6 +409,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             obj = None
         else:
             self.editor_stack.set_visible_child_name('object')
+            self.__user_message_by_type(obj.info)
 
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
@@ -902,5 +916,36 @@ class CmbWindow(Gtk.ApplicationWindow):
     def do_delete_event(self, event):
         self.__save_window_state()
         return False
+
+    def __user_message_by_type(self, info):
+        msg = None
+
+        # TODO: Move this strings to the database, so it can be defined in 3rd party plugins too
+        if info.is_a('GtkBox'):
+            msg = _('<Ctrl>+Ins/Del to add/remove placeholders')
+        elif info.is_a('GtkGrid'):
+            msg = _('<Ctrl>+Ins/Del to add/remove columns\n<Shift>+<Ctrl>+Ins/Del to add/remove rows')
+
+        self._show_message(msg)
+
+    def __on_message_timeout(self, data):
+        self.__message_timeout_id = None
+        self.message_revealer.props.reveal_child = False
+        return GLib.SOURCE_REMOVE
+
+    def _show_message(self, msg):
+        if self.__message_timeout_id:
+            GLib.source_remove(self.__message_timeout_id)
+            self.__message_timeout_id = None
+
+        if msg:
+            self.message_label.props.label = msg
+            self.message_revealer.props.reveal_child = True
+            self.__message_timeout_id = GLib.timeout_add (len(msg) * 100,
+                                                         self.__on_message_timeout,
+                                                         None)
+        else:
+            self.message_revealer.props.reveal_child = False
+
 
 Gtk.WidgetClass.set_css_name(CmbWindow, 'CmbWindow')

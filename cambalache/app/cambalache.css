@@ -44,6 +44,18 @@ CmbWindow.dark .logo {
   background: -gtk-recolor(url('resource:///ar/xjuan/Cambalache/app/images/logo-symbolic.svg'), success #ffcb85, error #1a1a1a) no-repeat 50% 35% / 40%
 }
 
+CmbWindow label.message {
+  padding: 1ex 1em;
+  border-radius: 1ex 1ex 0 0;
+  color: white;
+  background-color: rgba(0, 0, 0, .6);
+}
+
+CmbWindow.dark label.message {
+  color: black;
+  background-color: rgba(255, 255, 255, .6);
+}
+
 popover.cmb-tutor {
   padding: 1em;
 }
