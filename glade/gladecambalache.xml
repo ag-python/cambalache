@@ -32,6 +32,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
    <glade-widget-class title="CmbTypeChooser" name="CmbTypeChooser" generic-name="typechooser"/>
    <glade-widget-class title="CmbTypeChooserWidget" name="CmbTypeChooserWidget" generic-name="typechooserwidget"/>
    <glade-widget-class title="CmbTypeChooserPopover" name="CmbTypeChooserPopover" generic-name="typechooserpopover"/>
+
+   <glade-widget-class title="CmbEntry" name="CmbEntry" generic-name="cmbentry" parent="GtkEntry"/>
+   <glade-widget-class title="CmbToplevelChooser" name="CmbToplevelChooser" generic-name="CmbToplevelChooser" parent="GtkComboBoxText"/>
+   <glade-widget-class title="CmbTextBuffer" name="CmbTextBuffer" generic-name="cmbtextbuffer" parent="GtkTextBuffer"/>
  </glade-widget-classes>
 
  <glade-widget-group name="cambalache" title="Cambalache">
