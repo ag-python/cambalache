@@ -33,6 +33,8 @@ from .mrg_gtk_expander import MrgGtkExpanderController
 from .mrg_gtk_frame import MrgGtkFrameController
 from .mrg_gtk_grid import MrgGtkGridController
 from .mrg_gtk_label import MrgGtkLabelController
+from .mrg_gtk_list_box import MrgGtkListBoxController
+from .mrg_gtk_list_box_row import MrgGtkListBoxRowController
 from .mrg_gtk_overlay import MrgGtkOverlayController
 from .mrg_gtk_paned import MrgGtkPanedController
 from .mrg_gtk_revealer import MrgGtkRevealerController

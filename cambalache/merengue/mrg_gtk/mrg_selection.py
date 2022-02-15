@@ -93,7 +93,7 @@ class MrgSelection(GObject.GObject):
         else:
             controller = self.app.get_controller_from_object(child)
 
-        if controller.selected:
+        if controller is None or controller.selected:
             return
 
         object_id = utils.object_get_id(controller.object)

@@ -74,6 +74,15 @@ class MrgGtkBoxController(MrgGtkWidgetController):
 
         return super().get_child_layout(child, layout)
 
+    def remove_child(self, child):
+        if self.object is None:
+            return
+
+        if Gtk.MAJOR_VERSION == 4:
+            self.object.remove(child)
+        else:
+            super().remove_child(child)
+
     def add_placeholder(self, mod):
         self.add(MrgPlaceholder(visible=True, controller=self))
         self.size += 1
@@ -85,6 +94,6 @@ class MrgGtkBoxController(MrgGtkWidgetController):
 
         for child in reversed(children):
             if isinstance(child, MrgPlaceholder):
-                self.object.remove(child)
+                self.remove_child(child)
                 self.size -= 1
                 break

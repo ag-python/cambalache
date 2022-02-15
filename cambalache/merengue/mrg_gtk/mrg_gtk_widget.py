@@ -135,6 +135,15 @@ class MrgGtkWidgetController(MrgController):
     def get_child_layout(self, child, layout):
         return layout
 
+    def remove_child(self, child):
+        if self.object is None:
+            return
+
+        if Gtk.MAJOR_VERSION == 3:
+            self.object.remove(child)
+        else:
+            logger.warning('Not implemented')
+
     def placeholder_selected(self, placeholder):
         position = self.get_child_position(placeholder)
         layout = self.get_child_layout(placeholder, {})
