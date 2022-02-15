@@ -104,6 +104,7 @@ class CambalacheDb:
 
         for table in ['type', 'type_iface', 'type_enum', 'type_flags',
                       'type_data', 'type_data_arg',
+                      'type_child_type',
                       'property',
                       'signal']:
 
@@ -160,43 +161,62 @@ class CambalacheDb:
         for child in node:
             self._import_tag(c, child, owner_id, data_id)
 
+    def _import_type(self, c, node, type_id):
+        child_type = node.text.strip()
+        max_children = node.get('max-children', None)
+        linked_property_id = node.get('linked-property-id', None)
+
+        c.execute("INSERT INTO type_child_type (type_id, child_type, max_children, linked_property_id) VALUES (?, ?, ?, ?);",
+                  (type_id, child_type, int(max_children) if max_children else None, linked_property_id))
+
     def populate_types(self, c, types):
         def get_bool(node, prop):
             val = node.get(prop, 'false')
             return 1 if val.lower() in ['true', 'yes', '1', 't', 'y'] else 0
 
+        def check_target(node):
+            target = node.get('target', None)
+
+            return target is not None and target != self.lib.target_tk
+
         for klass in types:
             owner_id = klass.tag
 
             for properties in klass.iterchildren('properties'):
-                target = properties.get('target', None)
+                if check_target(properties):
+                    continue
 
-                if target is None or target == self.lib.target_tk:
-                    for prop in properties:
-                        property_id = prop.get('id', None)
-                        if property_id is None:
-                            continue
+                for prop in properties:
+                    property_id = prop.get('id', None)
+                    if property_id is None:
+                        continue
 
-                        translatable = get_bool(prop, 'translatable')
-                        save_always = get_bool(prop, 'save-always')
+                    translatable = get_bool(prop, 'translatable')
+                    save_always = get_bool(prop, 'save-always')
 
-                        if self.lib.target_tk == 'Gtk-4.0':
-                            is_inline_object = get_bool(prop, 'is-inline-object')
-                        else:
-                            is_inline_object = None
+                    if self.lib.target_tk == 'Gtk-4.0':
+                        is_inline_object = get_bool(prop, 'is-inline-object')
+                    else:
+                        is_inline_object = None
 
-                        c.execute("UPDATE property SET translatable=?, save_always=?, is_inline_object=? WHERE owner_id=? AND property_id=?;",
-                                  (translatable, save_always, is_inline_object, owner_id, property_id))
+                    c.execute("UPDATE property SET translatable=?, save_always=?, is_inline_object=? WHERE owner_id=? AND property_id=?;",
+                              (translatable, save_always, is_inline_object, owner_id, property_id))
 
             # Read type custom tags
             for data in klass.iterchildren('data'):
-                target = data.get('target', None)
-
-                if target is not None and target != self.lib.target_tk:
+                if check_target(data):
                     continue
 
                 for child in data:
                     self._import_tag(c, child, owner_id, None)
+
+            # Read children types
+            for types in klass.iterchildren('children-types'):
+                if check_target(types):
+                    continue
+                for type in types:
+                    self._import_type(c, type, owner_id)
+
 
     def populate_categories(self, c, categories):
         for category in categories:
