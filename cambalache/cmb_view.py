@@ -248,6 +248,11 @@ window.setupDocument = function (document) {
         self.__update_view()
         self.__merengue_update_ui(obj.ui_id)
 
+    def __on_object_changed(self, project, obj, field):
+        if field == 'type':
+            self.__update_view()
+            self.__merengue_update_ui(obj.ui_id)
+
     def __on_object_property_changed(self, project, obj, prop):
         self.__update_view()
         self.__merengue_command('object_property_changed', args={
@@ -300,6 +305,7 @@ window.setupDocument = function (document) {
         if self.__project is not None:
             self.__project.disconnect_by_func(self.__on_object_added)
             self.__project.disconnect_by_func(self.__on_object_removed)
+            self.__project.disconnect_by_func(self.__on_object_changed)
             self.__project.disconnect_by_func(self.__on_object_property_changed)
             self.__project.disconnect_by_func(self.__on_object_layout_property_changed)
             self.__project.disconnect_by_func(self.__on_project_selection_changed)
@@ -314,6 +320,7 @@ window.setupDocument = function (document) {
         if project is not None:
             project.connect('object-added', self.__on_object_added)
             project.connect('object-removed', self.__on_object_removed)
+            project.connect('object-changed', self.__on_object_changed)
             project.connect('object-property-changed', self.__on_object_property_changed)
             project.connect('object-layout-property-changed', self.__on_object_layout_property_changed)
             project.connect('selection-changed', self.__on_project_selection_changed)
