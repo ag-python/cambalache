@@ -157,6 +157,26 @@ class CmbBaseTypeDataArgInfo(CmbBase):
                    type_id=type_id)
 
 
+class CmbTypeChildInfo(CmbBase):
+    __gtype_name__ = 'CmbTypeChildInfo'
+
+    type_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    child_type = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    max_children = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    linked_property_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, type_id, child_type, max_children, linked_property_id):
+        return cls(project=project,
+                   type_id=type_id,
+                   child_type=child_type,
+                   max_children=max_children,
+                   linked_property_id=linked_property_id)
+
+
 class CmbBaseUI(CmbBase):
     __gtype_name__ = 'CmbBaseUI'
 
