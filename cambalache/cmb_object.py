@@ -58,6 +58,8 @@ class CmbObject(CmbBaseObject):
 
         super().__init__(**kwargs)
 
+        self.connect('notify', self.__on_notify)
+
         if self.project is None:
             return
 
@@ -130,6 +132,9 @@ class CmbObject(CmbBaseObject):
         self.emit('signal-added', signal)
         self.project._object_signal_added(self, signal)
 
+    def __on_notify(self, obj, pspec):
+        self.project._object_changed(self, pspec.name)
+
     def __populate_signals(self):
         c = self.project.db.cursor()
 
@@ -164,6 +169,10 @@ class CmbObject(CmbBaseObject):
     @GObject.Property(type=CmbUI)
     def ui(self):
         return self.project.get_object_by_id(self.ui_id)
+
+    @GObject.Property(type=GObject.Object)
+    def parent(self):
+        return self.project.get_object_by_id(self.ui_id, self.parent_id)
 
     def _add_signal(self, signal_pk, owner_id, signal_id, handler, detail=None, user_data=0, swap=False, after=False):
         signal = CmbSignal(project=self.project,
