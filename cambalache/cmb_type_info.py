@@ -25,7 +25,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-from .cmb_objects_base import CmbBaseTypeInfo, CmbBaseTypeDataInfo, CmbBaseTypeDataArgInfo
+from .cmb_objects_base import CmbBaseTypeInfo, CmbBaseTypeDataInfo, CmbBaseTypeDataArgInfo, CmbTypeChildInfo
 
 
 class CmbTypeDataArgInfo(CmbBaseTypeDataArgInfo):
@@ -55,6 +55,22 @@ class CmbTypeInfo(CmbBaseTypeInfo):
         elif self.parent_id == 'flags':
             self.flags = self.__init_enum_flags('flags')
 
+        self.child_types = self.__init_child_type()
+
+    def __init_child_type(self):
+        retval = {}
+
+        for row in self.project.db.execute('SELECT * FROM type_child_type WHERE type_id=?',
+                                           (self.type_id, )):
+            type_id, child_type, max_children, linked_property_id = row
+            retval[child_type] = CmbTypeChildInfo(project=self.project,
+                                                  type_id=type_id,
+                                                  child_type=child_type,
+                                                  max_children=max_children if max_children else 0,
+                                                  linked_property_id=linked_property_id)
+
+        return retval if len(retval.keys()) else None
+
     def __init_enum_flags(self, name):
         retval = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_INT)
 
@@ -75,3 +91,12 @@ class CmbTypeInfo(CmbBaseTypeInfo):
             parent = parent.parent
 
         return None
+
+    def has_child_types(self):
+        parent = self
+        while parent:
+            if parent.child_types:
+                return True
+            parent = parent.parent
+
+        return False
