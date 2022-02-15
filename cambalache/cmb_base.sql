@@ -239,3 +239,15 @@ BEGIN
     END;
 END;
 
+
+/* Type Child types
+ *
+ */
+CREATE TABLE IF NOT EXISTS type_child_type (
+  type_id TEXT REFERENCES type,
+  child_type TEXT,
+  max_children INTEGER,
+  linked_property_id TEXT,
+  PRIMARY KEY(type_id, child_type),
+  FOREIGN KEY(type_id, linked_property_id) REFERENCES property(owner_id, property_id)
+) WITHOUT ROWID;
