@@ -95,6 +95,21 @@ class CmbObjectEditor(Gtk.Box):
 
         revealer.props.reveal_child = expanded
 
+    def __create_child_type_editor(self):
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
+                      spacing=6)
+
+        box.add(Gtk.Label(label=_('Child Type'), width_chars=8))
+
+        combo = CmbChildTypeComboBox(object=self.__object)
+
+        GObject.Object.bind_property(self.__object, 'type',
+                                     combo, 'cmb-value',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL)
+        box.pack_start(combo, True, True, 0)
+        return box
+
     def __update_view(self):
         self.__labels = {}
 
@@ -104,8 +119,14 @@ class CmbObjectEditor(Gtk.Box):
         if self.__object is None:
             return
 
-        # ID
+        parent = self.__object.parent
+
+        if self.layout and parent and parent.info.has_child_types():
+            # Child Type input
+            self.add(self.__create_child_type_editor())
+
         if not self.layout:
+            # ID
             self.add(self.__create_id_editor())
 
         owner_id = None
