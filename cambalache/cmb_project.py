@@ -63,6 +63,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         'object-removed': (GObject.SignalFlags.RUN_FIRST, None,
                            (CmbObject,)),
 
+        'object-changed': (GObject.SignalFlags.RUN_FIRST, None,
+                           (CmbObject, str)),
+
         'object-property-changed': (GObject.SignalFlags.RUN_FIRST, None,
                                     (CmbObject, CmbProperty)),
 
@@ -692,7 +695,11 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         pk = c.fetchone()
 
         if command == 'UPDATE':
-            if table == 'object_property':
+            if table == 'object':
+                obj = self.get_object_by_id(pk[0], pk[1])
+                if obj:
+                    obj.notify(column)
+            elif table == 'object_property':
                 obj = self.get_object_by_id(pk[0], pk[1])
                 self.__undo_redo_property_notify(obj, False, column, pk[2], pk[3])
             elif table == 'object_layout_property':
@@ -891,6 +898,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         info = self.type_info.get(name, None)
         return info.properties if info else None
 
+    def _object_changed(self, obj, field):
+        iter = self.get_iter_from_object(obj)
+        path = self.__store.get_path(iter)
+
+        self.__store.row_changed(path, iter)
+
+        self.emit('object-changed', obj, field)
+
     def _object_property_changed(self, obj, prop):
         self.emit('object-property-changed', obj, prop)
 
@@ -1012,6 +1027,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         self.emit('changed')
 
     def do_object_removed(self, obj):
+        self.emit('changed')
+
+    def do_object_changed(self, obj, field):
         self.emit('changed')
 
     def do_object_property_changed(self, obj, prop):
