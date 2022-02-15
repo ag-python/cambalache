@@ -1404,6 +1404,16 @@
 	("GtkTreeStore",2,"type","type"),
 	("GtkWidget",2,"name","gchararray")
   </type_data_arg>
+  <type_child_type>
+	("GtkExpander","label",1,None),
+	("GtkFrame","label",1,None),
+	("GtkMenuItem","submenu",None,None),
+	("GtkMenuToolButton","menu",1,None),
+	("GtkNotebook","action-end",None,None),
+	("GtkNotebook","action-start",None,None),
+	("GtkNotebook","tab",None,None),
+	("GtkWindow","titlebar",1,None)
+  </type_child_type>
   <property>
 	("GtkAboutDialog","comments","gchararray",None,None,None,None,None,None,None,None,1,None),
 	("GtkAboutDialog","copyright","gchararray",None,None,None,None,None,None,None,None,1,None),

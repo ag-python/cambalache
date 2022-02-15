@@ -1548,6 +1548,19 @@
 	("GtkTreeStore",2,"type","type"),
 	("GtkWidget",2,"name","gchararray")
   </type_data_arg>
+  <type_child_type>
+	("GtkExpander","label",1,None),
+	("GtkFrame","label",1,None),
+	("GtkHeaderBar","end",None,None),
+	("GtkHeaderBar","start",None,None),
+	("GtkHeaderBar","title",1,"title-widget"),
+	("GtkMenuItem","submenu",None,None),
+	("GtkMenuToolButton","menu",1,None),
+	("GtkNotebook","action-end",None,None),
+	("GtkNotebook","action-start",None,None),
+	("GtkNotebook","tab",None,None),
+	("GtkWindow","titlebar",1,None)
+  </type_child_type>
   <property>
 	("GtkATContext","accessible","GtkAccessible",1,None,None,None,None,None,None,None,None,None),
 	("GtkATContext","accessible-role","GtkAccessibleRole",None,1,None,"none",None,None,None,None,None,None),

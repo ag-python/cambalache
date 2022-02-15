@@ -63,13 +63,25 @@
         <property id="title" translatable="True"/>
         <property id="child" is-inline-object="True"/>
       </properties>
+      <children-types>
+        <type max-children="1">titlebar</type>
+      </children-types>
     </GtkWindow>
 
-    <GtkMenuItem>
+    <GtkMenuItem target="Gtk-3.0">
       <properties>
         <property id="label" translatable="True"/>
       </properties>
+      <children-types>
+        <type>submenu</type>
+      </children-types>
     </GtkMenuItem>
+
+    <GtkMenuToolButton target="Gtk-3.0">
+      <children-types>
+        <type max-children="1">menu</type>
+      </children-types>
+    </GtkMenuToolButton>
 
     <GtkToolItemGroup>
       <properties>
@@ -302,6 +314,9 @@
       <properties>
         <property id="child" is-inline-object="True"/>
       </properties>
+      <children-types>
+        <type max-children="1">label</type>
+      </children-types>
     </GtkExpander>
 
 
@@ -316,6 +331,9 @@
       <properties>
         <property id="child" is-inline-object="True"/>
       </properties>
+      <children-types>
+        <type max-children="1">label</type>
+      </children-types>
     </GtkFrame>
 
 
@@ -331,7 +349,15 @@
       </properties>
     </GtkListItem>
 
-    <GtkNotebookPage>
+    <GtkNotebook>
+      <children-types>
+        <type>tab</type>
+        <type>action-start</type>
+        <type>action-end</type>
+      </children-types>
+    </GtkNotebook>
+
+    <GtkNotebookPage target="Gtk-4.0">
       <properties>
         <property id="child" is-inline-object="True"/>
         <property id="tab" is-inline-object="True"/>
@@ -391,6 +417,14 @@
         <property id="child" is-inline-object="True"/>
       </properties>
     </GtkWindowHandle>
+
+    <GtkHeaderBar>
+      <children-types target="Gtk-4.0">
+        <type max-children="1" linked-property-id="title-widget">title</type>
+        <type>start</type>
+        <type>end</type>
+      </children-types>
+    </GtkHeaderBar>
 
   </types>
 
