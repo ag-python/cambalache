@@ -28,6 +28,8 @@ from .mrg_gtk_aspect_frame import MrgGtkAspectFrameController
 if Gtk.MAJOR_VERSION == 3:
     from .mrg_gtk_bin import MrgGtkBinController
     from .mrg_gtk_menu_item import MrgGtkMenuItemController
+elif Gtk.MAJOR_VERSION == 4:
+    from .mrg_gtk_center_box import MrgGtkCenterBoxController
 
 from .mrg_gtk_box import MrgGtkBoxController
 from .mrg_gtk_expander import MrgGtkExpanderController
