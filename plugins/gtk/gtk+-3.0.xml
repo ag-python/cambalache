@@ -1405,6 +1405,9 @@
 	("GtkWidget",2,"name","gchararray")
   </type_data_arg>
   <type_child_type>
+	("GtkCenterBox","center",1,None),
+	("GtkCenterBox","end",1,None),
+	("GtkCenterBox","start",1,None),
 	("GtkExpander","label",1,None),
 	("GtkFrame","label",1,None),
 	("GtkMenuItem","submenu",None,None),
@@ -1412,6 +1415,7 @@
 	("GtkNotebook","action-end",None,None),
 	("GtkNotebook","action-start",None,None),
 	("GtkNotebook","tab",None,None),
+	("GtkTextTagTable","tag",None,None),
 	("GtkWindow","titlebar",1,None)
   </type_child_type>
   <property>

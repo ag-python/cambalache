@@ -426,6 +426,20 @@
       </children-types>
     </GtkHeaderBar>
 
+    <GtkCenterBox>
+      <children-types>
+        <type max-children="1">start</type>
+        <type max-children="1">center</type>
+        <type max-children="1">end</type>
+      </children-types>
+    </GtkCenterBox>
+
+    <GtkTextTagTable>
+      <children-types>
+        <type>tag</type>
+      </children-types>
+    </GtkTextTagTable>
+
   </types>
 
   <categories>
@@ -450,6 +464,7 @@
     <category name="layout">
       <GtkBin/>
       <GtkBox/>
+      <GtkCenterBox/>
       <GtkGrid/>
       <GtkNotebook/>
       <GtkFrame/>
