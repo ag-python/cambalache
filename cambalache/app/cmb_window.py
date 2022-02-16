@@ -262,16 +262,16 @@ class CmbWindow(Gtk.ApplicationWindow):
         self._show_message(None)
 
     @Gtk.Template.Callback('on_view_placeholder_selected')
-    def __on_view_placeholder_selected(self, view, ui_id, object_id, position, layout):
+    def __on_view_placeholder_selected(self, view, ui_id, object_id, layout, position, child_type):
         info = self.type_chooser.selected_type
 
         if info is not None:
-            self.project.add_object(ui_id, info.type_id, None, object_id, layout, position)
+            self.project.add_object(ui_id, info.type_id, None, object_id, layout, position, child_type)
 
         self.type_chooser.selected_type = None
 
     @Gtk.Template.Callback('on_view_placeholder_activated')
-    def __on_view_placeholder_activated(self, view, ui_id, object_id, position, layout):
+    def __on_view_placeholder_activated(self, view, ui_id, object_id, layout, position, child_type):
         r = Gdk.Rectangle()
         r.x, r.y = self.view.get_pointer()
         r.width = r.height = 4
@@ -289,7 +289,8 @@ class CmbWindow(Gtk.ApplicationWindow):
                                                                 None,
                                                                 object_id,
                                                                 layout,
-                                                                position))
+                                                                position,
+                                                                child_type))
         popover.popup()
 
     @Gtk.Template.Callback('on_open_recent_action_item_activated')

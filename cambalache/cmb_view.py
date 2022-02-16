@@ -118,8 +118,8 @@ class CmbView(Gtk.Stack):
     __gtype_name__ = 'CmbView'
 
     __gsignals__ = {
-        'placeholder-selected': (GObject.SignalFlags.RUN_LAST, None, (int, int, int, object)),
-        'placeholder-activated': (GObject.SignalFlags.RUN_LAST, None, (int, int, int, object))
+        'placeholder-selected': (GObject.SignalFlags.RUN_LAST, None, (int, int, object, int, str)),
+        'placeholder-activated': (GObject.SignalFlags.RUN_LAST, None, (int, int, object, int, str))
     }
 
     webview = Gtk.Template.Child()
@@ -438,9 +438,9 @@ window.setupDocument = function (document) {
                 self.__merengue_command('gtk_settings_get',
                                        args={ 'property': 'gtk-theme-name' })
             elif command == 'placeholder_selected':
-                self.emit('placeholder-selected', args['ui_id'], args['object_id'], args['position'], args['layout'])
+                self.emit('placeholder-selected', args['ui_id'], args['object_id'], args['layout'], args['position'], args['child_type'])
             elif command == 'placeholder_activated':
-                self.emit('placeholder-activated', args['ui_id'], args['object_id'], args['position'], args['layout'])
+                self.emit('placeholder-activated', args['ui_id'], args['object_id'], args['layout'], args['position'], args['child_type'])
             elif command == 'gtk_settings_get':
                 if args['property'] == 'gtk-theme-name':
                     self.__theme = args['value']
