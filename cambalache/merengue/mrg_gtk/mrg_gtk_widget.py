@@ -132,6 +132,9 @@ class MrgGtkWidgetController(MrgController):
     def get_child_position(self, child):
         return -1
 
+    def get_child_type(self, child):
+        return None
+
     def get_child_layout(self, child, layout):
         return layout
 
@@ -146,23 +149,27 @@ class MrgGtkWidgetController(MrgController):
 
     def placeholder_selected(self, placeholder):
         position = self.get_child_position(placeholder)
+        child_type = self.get_child_type(placeholder)
         layout = self.get_child_layout(placeholder, {})
         utils.write_command('placeholder_selected',
                             args={
                                 'ui_id': self.ui_id,
                                 'object_id': self.object_id,
                                 'position': position,
+                                'child_type': child_type,
                                 'layout': layout
                             })
 
     def placeholder_activated(self, placeholder):
         position = self.get_child_position(placeholder)
+        child_type = self.get_child_type(placeholder)
         layout = self.get_child_layout(placeholder, {})
         utils.write_command('placeholder_activated',
                             args={
                                 'ui_id': self.ui_id,
                                 'object_id': self.object_id,
                                 'position': position,
+                                'child_type': child_type,
                                 'layout': layout
                             })
 
