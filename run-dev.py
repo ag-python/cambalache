@@ -145,9 +145,13 @@ def create_catalogs_dir():
         GLib.mkdir_with_parents('.catalogs', 0o700)
 
     link_plugin('plugins/gobject/gobject-2.0.xml')
-    link_plugin('plugins/gtk/gtk+-3.0.xml')
+    link_plugin('plugins/gdkpixbuf/gdk-pixbuf-2.0.xml')
+    link_plugin('plugins/pango/pango-1.0.xml')
+    link_plugin('plugins/gdk/gdk-3.0.xml')
+    link_plugin('plugins/gdk/gdk-4.0.xml')
+    link_plugin('plugins/gsk/gsk-4.0.xml')
     link_plugin('plugins/gtk/gtk-4.0.xml')
-
+    link_plugin('plugins/gtk/gtk+-3.0.xml')
 
 def get_version():
     meson = open(os.path.join(basedir, 'meson.build'))
