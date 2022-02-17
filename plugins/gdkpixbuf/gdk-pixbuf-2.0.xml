@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
+<cambalache-catalog name="gdkpixbuf" version="2.0" targets="2.0" depends="gobject-2.0">
+  <type>
+	("GdkColorspace","enum","gdkpixbuf",None,None,None,None,None),
+	("GdkInterpType","enum","gdkpixbuf",None,None,None,None,None),
+	("GdkPixbufAlphaMode","enum","gdkpixbuf",None,None,None,None,None),
+	("GdkPixbufError","enum","gdkpixbuf",None,None,None,None,None),
+	("GdkPixbufRotation","enum","gdkpixbuf",None,None,None,None,None)
+  </type>
+  <type_enum>
+	("GdkColorspace","GDK_COLORSPACE_RGB","rgb",None,"Indicates a red/green/blue additive color space."),
+	("GdkInterpType","GDK_INTERP_BILINEAR","bilinear",2,"Best quality/speed balance; use this mode by default. Bilinear interpolation. For enlargement, it is equivalent to point-sampling the ideal bilinear-interpolated image. For reduction, it is equivalent to laying down small tiles and integrating over the coverage area."),
+	("GdkInterpType","GDK_INTERP_HYPER","hyper",3,"This is the slowest and highest quality reconstruction function. It is derived from the hyperbolic filters in Wolberg's \"Digital Image Warping\", and is formally defined as the hyperbolic-filter sampling the ideal hyperbolic-filter interpolated image (the filter is designed to be idempotent for 1:1 pixel mapping). **Deprecated**: this interpolation filter is deprecated, as in reality it has a lower quality than the @GDK_INTERP_BILINEAR filter (Since: 2.38)"),
+	("GdkInterpType","GDK_INTERP_NEAREST","nearest",None,"Nearest neighbor sampling; this is the fastest and lowest quality mode. Quality is normally unacceptable when scaling down, but may be OK when scaling up."),
+	("GdkInterpType","GDK_INTERP_TILES","tiles",1,"This is an accurate simulation of the PostScript image operator without any interpolation enabled. Each pixel is rendered as a tiny parallelogram of solid color, the edges of which are implemented with antialiasing. It resembles nearest neighbor for enlargement, and bilinear for reduction."),
+	("GdkPixbufAlphaMode","GDK_PIXBUF_ALPHA_BILEVEL","bilevel",None,"A bilevel clipping mask (black and white) will be created and used to draw the image. Pixels below 0.5 opacity will be considered fully transparent, and all others will be considered fully opaque."),
+	("GdkPixbufAlphaMode","GDK_PIXBUF_ALPHA_FULL","full",1,"For now falls back to #GDK_PIXBUF_ALPHA_BILEVEL. In the future it will do full alpha compositing."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_BAD_OPTION","bad-option",2,"A bad option was passed to a pixbuf save module."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_CORRUPT_IMAGE","corrupt-image",None,"An image file was broken somehow."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_FAILED","failed",5,"Generic failure code, something went wrong."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_INCOMPLETE_ANIMATION","incomplete-animation",6,"Only part of the animation was loaded."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY","insufficient-memory",1,"Not enough memory."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_UNKNOWN_TYPE","unknown-type",3,"Unknown image type."),
+	("GdkPixbufError","GDK_PIXBUF_ERROR_UNSUPPORTED_OPERATION","unsupported-operation",4,"Don't know how to perform the given operation on the type of image at hand."),
+	("GdkPixbufRotation","GDK_PIXBUF_ROTATE_CLOCKWISE","clockwise",270,"Rotate by 270 degrees."),
+	("GdkPixbufRotation","GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE","counterclockwise",90,"Rotate by 90 degrees."),
+	("GdkPixbufRotation","GDK_PIXBUF_ROTATE_NONE","none",None,"No rotation."),
+	("GdkPixbufRotation","GDK_PIXBUF_ROTATE_UPSIDEDOWN","upsidedown",180,"Rotate by 180 degrees.")
+  </type_enum>
+</cambalache-catalog>
