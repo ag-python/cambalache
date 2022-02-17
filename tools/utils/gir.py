@@ -45,7 +45,8 @@ class GirData:
     def __init__(self, gir_file,
                  types=None,
                  skip_types=[],
-                 target_gtk4=False):
+                 target_gtk4=False,
+                 exclude_objects=False):
 
         self._instances = {}
 
@@ -88,6 +89,8 @@ class GirData:
         self.shared_library = namespace.get('shared-library')
         self.target_tk = 'Gtk-4.0' if target_gtk4 else 'Gtk+-3.0'
 
+        self.ignored_types = set()
+
         # Load Module described by gir
         try:
             print(f"Loading {self.name} {self.version}")
@@ -106,6 +109,12 @@ class GirData:
 
         # Dictionary of all flags
         self.flags = self._get_flags(namespace, types)
+
+        if exclude_objects:
+            self.ifaces = []
+            self.types = []
+            self.sorted_types = []
+            return
 
         # Dictionary of all interfaces
         self.ifaces = self._get_ifaces(namespace, types)
@@ -323,6 +332,7 @@ class GirData:
 
                 # FIXME: Ignore types defined in other NS for now
                 if type_name.find('.') >= 0:
+                    self.ignored_types.add(type_name)
                     continue
 
                 if type_name != 'GObject':

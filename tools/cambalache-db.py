@@ -269,6 +269,10 @@ if __name__ == "__main__":
                         help='Types to get extra metadata',
                         default=None)
 
+    parser.add_argument('--exclude-objects',
+                        help='Exclude objects in output',
+                        action='store_true')
+
     parser.add_argument('--skip-types', metavar='T', type=str, nargs='+',
                         help='Types to avoid instantiating to get extra metadata',
                         default=[])
@@ -279,10 +283,13 @@ if __name__ == "__main__":
     db.populate_from_gir(args.gir,
                          target_gtk4=args.target_gtk4,
                          types=args.types,
-                         skip_types=args.skip_types)
+                         skip_types=args.skip_types,
+                         exclude_objects=args.exclude_objects)
 
     # Load custom type data from json file
     if args.extra_data:
         db.populate_extra_data_from_xml(args.extra_data)
+
+    print('Ignored types: ', db.lib.ignored_types)
 
     db.dump(args.output)
