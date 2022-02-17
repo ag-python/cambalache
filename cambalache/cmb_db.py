@@ -49,6 +49,10 @@ PROJECT_SQL = _get_text_resource('cmb_project.sql')
 HISTORY_SQL = _get_text_resource('cmb_history.sql')
 
 GOBJECT_XML = os.path.join(catalogsdir, 'gobject-2.0.xml')
+GDKPIXBUF_XML = os.path.join(catalogsdir, 'gdk-pixbuf-2.0.xml')
+GDK3_XML = os.path.join(catalogsdir, 'gdk-3.0.xml')
+GDK4_XML = os.path.join(catalogsdir, 'gdk-4.0.xml')
+GSK4_XML = os.path.join(catalogsdir, 'gsk-4.0.xml')
 GTK3_XML = os.path.join(catalogsdir, 'gtk+-3.0.xml')
 GTK4_XML = os.path.join(catalogsdir, 'gtk-4.0.xml')
 
@@ -268,10 +272,16 @@ class CmbDB(GObject.GObject):
         # Add GObject data
         self.load_catalog(GOBJECT_XML)
 
+        # Add GdkPixbuf data
+        self.load_catalog(GDKPIXBUF_XML)
+
         # Add gtk data
         if self.target_tk == 'gtk+-3.0':
+            self.load_catalog(GDK3_XML)
             self.load_catalog(GTK3_XML)
         elif self.target_tk == 'gtk-4.0':
+            self.load_catalog(GDK4_XML)
+            self.load_catalog(GSK4_XML)
             self.load_catalog(GTK4_XML)
 
         # TODO: Load all libraries that depend on self.target_tk
