@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
-<cambalache-catalog name="gdk" version="4.0" targets="4.0" depends="gdkpixbuf-2.0">
+<cambalache-catalog name="gdk" namespace="Gdk" prefix="Gdk" version="4.0" targets="4.0" depends="gdkpixbuf-2.0">
   <type>
 	("GdkAnchorHints","flags","gdk",None,None,None,None,None),
 	("GdkAxisFlags","flags","gdk",None,None,None,None,None),

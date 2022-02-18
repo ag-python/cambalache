@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
-<cambalache-catalog name="gobject" version="2.0" targets="2.0,2.26">
+<cambalache-catalog name="gobject" namespace="GObject" prefix="G" version="2.0" targets="2.0,2.26">
   <type>
 	("GBinding","GObject","gobject","2.26",None,None,None,None),
 	("GBindingFlags","flags","gobject",None,None,None,None,None),

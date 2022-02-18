@@ -10,13 +10,16 @@ CAMBALACHE_DB=flatpak run \
 	org.gnome.Sdk//40 \
 	../tools/cambalache-db.py
 
-CATALOG_FILES = \
+BASE_CATALOG_FILES = \
 	gobject/gobject-2.0.xml \
 	gdkpixbuf/gdk-pixbuf-2.0.xml \
 	pango/pango-1.0.xml \
 	gdk/gdk-3.0.xml \
 	gdk/gdk-4.0.xml \
-	gsk/gsk-4.0.xml \
+	gsk/gsk-4.0.xml
+
+CATALOG_FILES = \
+	${BASE_CATALOG_FILES} \
 	gtk/gtk-4.0.xml \
 	gtk/gtk+-3.0.xml
 
@@ -66,18 +69,20 @@ gsk/gsk-4.0.xml:
 		--exclude-objects \
 		--output $@
 
-gtk/gtk+-3.0.xml: gtk/Gtk.xml
+gtk/gtk+-3.0.xml: gtk/Gtk.xml ${BASE_CATALOG_FILES}
 	${CAMBALACHE_DB} \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/Gtk-3.0.gir \
+		--external-catalogs ${BASE_CATALOG_FILES} \
 		--extra-data gtk/Gtk.xml \
 		--output $@
 
-gtk/gtk-4.0.xml: gtk/Gtk.xml
+gtk/gtk-4.0.xml: gtk/Gtk.xml ${BASE_CATALOG_FILES}
 	${CAMBALACHE_DB} \
 		--target-gtk4 \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/Gtk-4.0.gir \
+		--external-catalogs ${BASE_CATALOG_FILES} \
 		--extra-data gtk/Gtk.xml \
 		--skip-types GtkActivateAction GtkMnemonicAction GtkNamedAction GtkNeverTrigger GtkNothingAction GtkSignalAction GtkPrintJob \
 		--output $@ && true

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
-<cambalache-catalog name="gsk" version="4.0" targets="4.0" depends="gobject-2.0">
+<cambalache-catalog name="gsk" namespace="Gsk" prefix="Gsk" version="4.0" targets="4.0" depends="gobject-2.0">
   <type>
 	("GskBlendMode","enum","gsk",None,None,None,None,None),
 	("GskCorner","enum","gsk",None,None,None,None,None),

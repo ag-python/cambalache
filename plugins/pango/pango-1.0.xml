@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
-<cambalache-catalog name="pango" version="1.0" targets="1.0" depends="gobject-2.0">
+<cambalache-catalog name="pango" namespace="Pango" prefix="Pango" version="1.0" targets="1.0" depends="gobject-2.0">
   <type>
 	("PangoAlignment","enum","pango",None,None,None,None,None),
 	("PangoAttrType","enum","pango",None,None,None,None,None),
