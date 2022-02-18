@@ -157,6 +157,11 @@ class CmbObjectEditor(Gtk.Box):
                 self.add(revealer)
                 i = 0
 
+            editor = self.__create_editor_for_property(prop)
+
+            if editor is None:
+                continue
+
             label = Gtk.Label(label=prop.property_id,
                               xalign=0)
 
@@ -166,7 +171,6 @@ class CmbObjectEditor(Gtk.Box):
             # Update labe status
             self.__update_property_label(prop)
 
-            editor = self.__create_editor_for_property(prop)
             grid.attach(label, 0, i, 1, 1)
             grid.attach(editor, 1, i, 1, 1)
             i += 1
@@ -238,58 +242,59 @@ class CmbObjectEditor(Gtk.Box):
     def __create_editor_for_property(self, prop):
         editor = None
 
-        if prop.info is not None:
-            info = prop.info
-            type_id = info.type_id
-            tinfo = self.__object.project.type_info.get(type_id, None)
+        if prop.info is None:
+            return None
 
-            if type_id == 'gboolean':
-                editor = CmbSwitch()
-            if type_id == 'gunichar':
-                editor = CmbEntry(hexpand=True,
-                                  max_length=1,
-                                  placeholder_text=f'<{type_id}>')
-            elif type_id == 'gchar' or type_id == 'guchar' or \
-                 type_id == 'gint' or type_id == 'guint' or \
-                 type_id == 'glong' or type_id == 'gulong' or \
-                 type_id == 'gint64' or type_id == 'guint64'or \
-                 type_id == 'gfloat' or type_id == 'gdouble':
+        info = prop.info
+        type_id = info.type_id
+        tinfo = self.__object.project.type_info.get(type_id, None)
 
-                digits = 0
-                step_increment = 1
-                minimum, maximum = self.__get_min_max_for_type(type_id)
+        if type_id == 'gboolean':
+            editor = CmbSwitch()
+        if type_id == 'gunichar':
+            editor = CmbEntry(hexpand=True,
+                              max_length=1,
+                              placeholder_text=f'<{type_id}>')
+        elif type_id == 'gchar' or type_id == 'guchar' or \
+             type_id == 'gint' or type_id == 'guint' or \
+             type_id == 'glong' or type_id == 'gulong' or \
+             type_id == 'gint64' or type_id == 'guint64'or \
+             type_id == 'gfloat' or type_id == 'gdouble':
 
-                # FIXME: is there a better way to handle inf -inf values other
-                # than casting to str?
-                if info.minimum is not None:
-                    value = float(info.minimum)
-                    minimum = value if value != -math.inf else -GLib.MAXDOUBLE
-                if info.maximum is not None:
-                    value = float(info.maximum)
-                    maximum = value if value != math.inf else GLib.MAXDOUBLE
+            digits = 0
+            step_increment = 1
+            minimum, maximum = self.__get_min_max_for_type(type_id)
 
-                if type_id == 'gfloat' or type_id == 'gdouble':
-                    digits = 4
-                    step_increment = 0.1
+            # FIXME: is there a better way to handle inf -inf values other
+            # than casting to str?
+            if info.minimum is not None:
+                value = float(info.minimum)
+                minimum = value if value != -math.inf else -GLib.MAXDOUBLE
+            if info.maximum is not None:
+                value = float(info.maximum)
+                maximum = value if value != math.inf else GLib.MAXDOUBLE
 
-                adjustment = Gtk.Adjustment(lower=minimum,
-                                            upper=maximum,
-                                            step_increment=step_increment,
-                                            page_increment=10)
+            if type_id == 'gfloat' or type_id == 'gdouble':
+                digits = 4
+                step_increment = 0.1
 
-                editor = CmbSpinButton(digits=digits,
-                                       adjustment=adjustment)
-            elif info.is_object:
-                editor = CmbObjectChooser(prop=prop)
-            elif tinfo:
-                if tinfo.parent_id == 'enum':
-                    editor = CmbEnumComboBox(info=tinfo)
-                elif tinfo.parent_id == 'flags':
-                    editor = CmbFlagsEntry(info=tinfo)
+            adjustment = Gtk.Adjustment(lower=minimum,
+                                        upper=maximum,
+                                        step_increment=step_increment,
+                                        page_increment=10)
+
+            editor = CmbSpinButton(digits=digits,
+                                   adjustment=adjustment)
+        elif info.is_object:
+            editor = CmbObjectChooser(prop=prop)
+        elif tinfo:
+            if tinfo.parent_id == 'enum':
+                editor = CmbEnumComboBox(info=tinfo)
+            elif tinfo.parent_id == 'flags':
+                editor = CmbFlagsEntry(info=tinfo)
 
         if editor is None:
-            editor = CmbEntry(hexpand=True,
-                            placeholder_text=f'<{type_id}>')
+            editor = CmbEntry(hexpand=True, placeholder_text=f'<{type_id}>')
             if info.translatable == True:
                 editor.make_translatable(target = prop)
 
