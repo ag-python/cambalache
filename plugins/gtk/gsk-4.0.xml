@@ -8,6 +8,7 @@
 	("GskRenderNodeType","enum","gsk",None,None,None,None,None),
 	("GskScalingFilter","enum","gsk",None,None,None,None,None),
 	("GskSerializationError","enum","gsk",None,None,None,None,None),
+	("GskTransform","boxed","gsk",None,None,None,None,None),
 	("GskTransformCategory","enum","gsk",None,None,None,None,None)
   </type>
   <type_enum>

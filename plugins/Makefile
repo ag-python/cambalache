@@ -11,12 +11,13 @@ CAMBALACHE_DB=flatpak run \
 	../tools/cambalache-db.py
 
 BASE_CATALOG_FILES = \
-	gobject/gobject-2.0.xml \
+	glib/gobject-2.0.xml \
+	glib/gio-2.0.xml \
 	gdkpixbuf/gdk-pixbuf-2.0.xml \
 	pango/pango-1.0.xml \
-	gdk/gdk-3.0.xml \
-	gdk/gdk-4.0.xml \
-	gsk/gsk-4.0.xml
+	gtk/gdk-3.0.xml \
+	gtk/gdk-4.0.xml \
+	gtk/gsk-4.0.xml
 
 CATALOG_FILES = \
 	${BASE_CATALOG_FILES} \
@@ -25,17 +26,26 @@ CATALOG_FILES = \
 
 all: ${CATALOG_FILES}
 
-gobject/gobject-2.0.xml:
+glib/gobject-2.0.xml:
 	${CAMBALACHE_DB} \
 		--gir /usr/share/gir-1.0/GObject-2.0.gir \
 		--types GObject GBinding GBindingFlags \
+		--boxed-types GStrv GBytes\
 		--skip-types GBinding \
+		--output $@
+
+glib/gio-2.0.xml:
+	${CAMBALACHE_DB} \
+		--gir /usr/share/gir-1.0/Gio-2.0.gir \
+		--types GFile \
+		--exclude-objects \
 		--output $@
 
 gdkpixbuf/gdk-pixbuf-2.0.xml:
 	${CAMBALACHE_DB} \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/GdkPixbuf-2.0.gir \
+		--types GdkPixbuf \
 		--exclude-objects \
 		--output $@
 
@@ -46,26 +56,29 @@ pango/pango-1.0.xml:
 		--exclude-objects \
 		--output $@
 
-gdk/gdk-3.0.xml:
+gtk/gdk-3.0.xml:
 	${CAMBALACHE_DB} \
 		--dependencies gdkpixbuf-2.0 \
 		--gir /usr/share/gir-1.0/Gdk-3.0.gir \
+		--boxed-types GdkColor GdkRGBA \
 		--exclude-objects \
 		--output $@
 
-gdk/gdk-4.0.xml:
+gtk/gdk-4.0.xml:
 	${CAMBALACHE_DB} \
 		--target-gtk4 \
 		--dependencies gdkpixbuf-2.0 \
 		--gir /usr/share/gir-1.0/Gdk-4.0.gir \
+		--boxed-types GdkRGBA GdkContentFormats\
 		--exclude-objects \
 		--output $@
 
-gsk/gsk-4.0.xml:
+gtk/gsk-4.0.xml:
 	${CAMBALACHE_DB} \
 		--target-gtk4 \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/Gsk-4.0.gir \
+		--boxed-types GskTransform \
 		--exclude-objects \
 		--output $@
 

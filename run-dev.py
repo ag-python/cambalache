@@ -144,12 +144,13 @@ def create_catalogs_dir():
     if not os.path.exists('.catalogs'):
         GLib.mkdir_with_parents('.catalogs', 0o700)
 
-    link_plugin('plugins/gobject/gobject-2.0.xml')
+    link_plugin('plugins/glib/gobject-2.0.xml')
+    link_plugin('plugins/glib/gio-2.0.xml')
     link_plugin('plugins/gdkpixbuf/gdk-pixbuf-2.0.xml')
     link_plugin('plugins/pango/pango-1.0.xml')
-    link_plugin('plugins/gdk/gdk-3.0.xml')
-    link_plugin('plugins/gdk/gdk-4.0.xml')
-    link_plugin('plugins/gsk/gsk-4.0.xml')
+    link_plugin('plugins/gtk/gdk-3.0.xml')
+    link_plugin('plugins/gtk/gdk-4.0.xml')
+    link_plugin('plugins/gtk/gsk-4.0.xml')
     link_plugin('plugins/gtk/gtk-4.0.xml')
     link_plugin('plugins/gtk/gtk+-3.0.xml')
 

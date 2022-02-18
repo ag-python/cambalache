@@ -49,7 +49,9 @@ PROJECT_SQL = _get_text_resource('cmb_project.sql')
 HISTORY_SQL = _get_text_resource('cmb_history.sql')
 
 GOBJECT_XML = os.path.join(catalogsdir, 'gobject-2.0.xml')
+GIO_XML = os.path.join(catalogsdir, 'gio-2.0.xml')
 GDKPIXBUF_XML = os.path.join(catalogsdir, 'gdk-pixbuf-2.0.xml')
+PANGO_XML = os.path.join(catalogsdir, 'pango-1.0.xml')
 GDK3_XML = os.path.join(catalogsdir, 'gdk-3.0.xml')
 GDK4_XML = os.path.join(catalogsdir, 'gdk-4.0.xml')
 GSK4_XML = os.path.join(catalogsdir, 'gsk-4.0.xml')
@@ -269,11 +271,13 @@ class CmbDB(GObject.GObject):
         if self.target_tk not in ['gtk+-3.0', 'gtk-4.0']:
             raise Exception(f'Unknown target tk {self.target_tk}')
 
-        # Add GObject data
+        # Add GObject and Gio data
         self.load_catalog(GOBJECT_XML)
+        self.load_catalog(GIO_XML)
 
-        # Add GdkPixbuf data
+        # Add GdkPixbuf and Pango data
         self.load_catalog(GDKPIXBUF_XML)
+        self.load_catalog(PANGO_XML)
 
         # Add gtk data
         if self.target_tk == 'gtk+-3.0':
