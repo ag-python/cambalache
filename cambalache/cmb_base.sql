@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS library (
   library_id TEXT PRIMARY KEY,
   version TEXT NOT NULL,
   namespace TEXT NOT NULL UNIQUE,
-  prefix TEXT NOT NULL UNIQUE,
+  prefix TEXT NOT NULL,
   shared_library TEXT,
   license_id TEXT,
   license_text TEXT
@@ -79,7 +79,7 @@ CREATE INDEX IF NOT EXISTS type_library_id_fk ON type (library_id);
 
 /* Add fundamental types */
 INSERT INTO type (type_id) VALUES
- ('object'), ('interface'), ('enum'), ('flags'), ('gtype'),
+ ('object'), ('interface'), ('enum'), ('flags'), ('gtype'), ('boxed'), ('variant'),
  ('gchar'), ('guchar'), ('gunichar'), ('gchararray'),
  ('gboolean'),
  ('gint'), ('guint'), ('glong'), ('gulong'), ('gint64'), ('guint64'),
@@ -212,7 +212,7 @@ END;
 
 CREATE TRIGGER on_property_after_insert AFTER INSERT ON property
 WHEN
-  (SELECT parent_id FROM type WHERE type_id = new.type_id) NOT IN ('enum', 'flags')
+  (SELECT parent_id FROM type WHERE type_id = new.type_id) NOT IN ('enum', 'flags', 'boxed')
 BEGIN
   UPDATE property SET is_object = TRUE WHERE owner_id = new.owner_id and property_id = new.property_id;
 END;
