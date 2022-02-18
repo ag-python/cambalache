@@ -291,6 +291,8 @@ class CmbObjectChooser(Gtk.Entry):
             self.prop.object.connect("property-changed",
                                      lambda o, p: self.__update_icons())
             self.__update_icons()
+        else:
+            self.props.placeholder_text = f'<{self.prop.info.type_id}>'
 
     def __on_text_notify(self, obj, pspec):
         if self.prop.inline_object_id:
