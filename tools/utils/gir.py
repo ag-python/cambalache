@@ -46,7 +46,8 @@ class GirData:
                  types=None,
                  skip_types=[],
                  target_gtk4=False,
-                 exclude_objects=False):
+                 exclude_objects=False,
+                 external_types=None):
 
         self._instances = {}
 
@@ -89,6 +90,7 @@ class GirData:
         self.shared_library = namespace.get('shared-library')
         self.target_tk = 'Gtk-4.0' if target_gtk4 else 'Gtk+-3.0'
 
+        self.external_types = external_types if external_types else {}
         self.ignored_types = set()
 
         # Load Module described by gir
@@ -330,12 +332,15 @@ class GirData:
             if type_name == 'object' or type_name == 'enum' or type_name == 'flags':
                 type_name = type.get('name', 'GObject')
 
-                # FIXME: Ignore types defined in other NS for now
                 if type_name.find('.') >= 0:
-                    self.ignored_types.add(type_name)
-                    continue
+                    nstype_name = self.external_types.get(type_name, None)
 
-                if type_name != 'GObject':
+                    if nstype_name is None:
+                        self.ignored_types.add(type_name)
+                        continue
+
+                    type_name = nstype_name
+                elif type_name != 'GObject':
                     type_name = self.prefix + type_name
 
             retval[name] = {
@@ -380,10 +385,8 @@ class GirData:
             parent = self.prefix + parent
         elif parent is None:
             parent = 'object'
-        elif parent.startswith('Gtk.'):
-            parent = parent.replace('Gtk.', 'Gtk')
         else:
-            parent = 'GObject'
+            parent = self.external_types.get(parent, 'GObject')
 
         # Get version and deprecated-version from constructor if possible
         constructor = element.find('constructor', nsmap)
@@ -581,8 +584,8 @@ class GirData:
                              (name, iface))
 
         # Import library
-        conn.execute(f"INSERT INTO library (library_id, version, shared_library) VALUES (?, ?, ?);",
-                     (self.lib, self.version, self.shared_library));
+        conn.execute(f"INSERT INTO library (library_id, version, namespace, prefix, shared_library) VALUES (?, ?, ?, ?, ?);",
+                     (self.lib, self.version, self.name, self.prefix, self.shared_library));
 
         # Import ifaces
         for name in self.ifaces:

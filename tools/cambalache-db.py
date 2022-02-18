@@ -22,6 +22,7 @@
 
 import os
 import sys
+import ast
 import sqlite3
 import argparse
 
@@ -31,7 +32,7 @@ from utils import gir
 
 
 class CambalacheDb:
-    def __init__(self, dependencies=None):
+    def __init__(self, dependencies=None, external_catalogs=None):
         self.lib = None
         self.dependencies = dependencies if dependencies else []
 
@@ -44,6 +45,15 @@ class CambalacheDb:
         with open('../cambalache/cmb_base.sql', 'r') as sql:
             self.conn.executescript(sql.read())
             self.conn.commit()
+
+        self.lib_namespace = {}
+        if external_catalogs:
+            for catalog in external_catalogs:
+                self.load_catalog_types(catalog)
+
+            self.external_types = self.get_external_types()
+        else:
+            self.external_types = {}
 
     def dump(self, filename):
         # Copy/Paste from CmbDB
@@ -89,6 +99,8 @@ class CambalacheDb:
         libid = self.lib.lib
         catalog = E('cambalache-catalog',
                     name=libid,
+                    namespace=self.lib.name,
+                    prefix=self.lib.prefix,
                     version=self.lib.version)
 
         targets = []
@@ -133,8 +145,55 @@ class CambalacheDb:
 
         c.close()
 
+    def __load_table_from_tuples(self, c, table, tuples):
+        data = ast.literal_eval(f'[{tuples}]') if tuples else []
+
+        if len(data) == 0:
+            return
+
+        # Load table data
+        cols = ', '.join(['?' for col in data[0]])
+        c.executemany(f'INSERT INTO {table} VALUES ({cols})', data)
+
+    def load_catalog_types(self, filename):
+        tree = etree.parse(filename)
+        root = tree.getroot()
+
+        name = root.get('name', None)
+        namespace = root.get('namespace', None)
+        prefix = root.get('prefix', None)
+
+        self.lib_namespace[name] = (namespace, prefix)
+
+        c = self.conn.cursor()
+
+        c.execute("CREATE TABLE IF NOT EXISTS external_type AS SELECT * FROM type WHERE 0;")
+
+        for node in root.iterfind('type'):
+            self.__load_table_from_tuples(c, 'external_type', node.text)
+
+        c.close()
+        self.conn.commit()
+
+    def get_external_types(self):
+        retval = {}
+        c = self.conn.cursor()
+
+        for row in c.execute("SELECT type_id, library_id FROM external_type;"):
+            type_id, library_id = row
+            namespace, prefix = self.lib_namespace.get(library_id, None)
+
+            if namespace is not None:
+                if type_id.startswith(prefix):
+                    nstype = type_id[len(prefix):]
+                    retval[f'{namespace}.{nstype}'] = type_id
+
+        c.close()
+
+        return retval
+
     def populate_from_gir(self, girfile, **kwargs):
-        self.lib = gir.GirData(girfile, **kwargs)
+        self.lib = gir.GirData(girfile, external_types=self.external_types, **kwargs)
         self.lib.populate_db(self.conn)
         self.conn.commit()
 
@@ -277,9 +336,15 @@ if __name__ == "__main__":
                         help='Types to avoid instantiating to get extra metadata',
                         default=[])
 
+    parser.add_argument('--external-catalogs', metavar='T', type=str, nargs='+',
+                        help='List of catalogs to get properties types',
+                        default=[])
+
     args = parser.parse_args()
 
-    db = CambalacheDb(dependencies=args.dependencies)
+    db = CambalacheDb(dependencies=args.dependencies,
+                      external_catalogs=args.external_catalogs)
+
     db.populate_from_gir(args.gir,
                          target_gtk4=args.target_gtk4,
                          types=args.types,
