@@ -30,6 +30,8 @@
 CREATE TABLE IF NOT EXISTS library (
   library_id TEXT PRIMARY KEY,
   version TEXT NOT NULL,
+  namespace TEXT NOT NULL UNIQUE,
+  prefix TEXT NOT NULL UNIQUE,
   shared_library TEXT,
   license_id TEXT,
   license_text TEXT

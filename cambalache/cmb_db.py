@@ -406,14 +406,16 @@ class CmbDB(GObject.GObject):
 
         name = root.get('name', None)
         version = root.get('version', None)
+        namespace = root.get('namespace', None)
+        prefix = root.get('prefix', None)
         targets = root.get('targets', '')
         depends = root.get('depends', '')
 
         c = self.conn.cursor()
 
         # Insert library
-        c.execute("INSERT INTO library(library_id, version) VALUES (?, ?);",
-                  (name, version))
+        c.execute("INSERT INTO library(library_id, version, namespace, prefix) VALUES (?, ?, ?, ?);",
+                  (name, version, namespace, prefix))
 
         # Insert target versions
         for target in targets.split(','):
