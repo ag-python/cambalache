@@ -44,6 +44,9 @@ class GirData:
 
     def __init__(self, gir_file,
                  types=None,
+                 flag_types=None,
+                 enum_types=None,
+                 boxed_types=[],
                  skip_types=[],
                  target_gtk4=False,
                  exclude_objects=False,
@@ -69,7 +72,9 @@ class GirData:
             'GParamString':  'gchararray',
             'GParamObject':  'object',
             'GParamUnichar':  'gunichar',
-            'GParamGType':  'gtype'
+            'GParamGType':  'gtype',
+            'GParamBoxed': 'boxed',
+            'GParamVariant': 'variant'
         }
 
         tree = etree.parse(gir_file)
@@ -91,7 +96,14 @@ class GirData:
         self.target_tk = 'Gtk-4.0' if target_gtk4 else 'Gtk+-3.0'
 
         self.external_types = external_types if external_types else {}
+
+        self.external_nstypes = {}
+        for t in self.external_types:
+            self.external_nstypes[self.external_types[t]] = t
+
+        self.ignored_pspecs = set()
         self.ignored_types = set()
+        self.ignored_boxed_types = set()
 
         # Load Module described by gir
         try:
@@ -107,25 +119,23 @@ class GirData:
         from gi.repository import CmbUtils
 
         # Dictionary of all enumerations
-        self.enumerations = self._get_enumerations(namespace, types)
+        self.enumerations = self._get_enumerations(namespace, enum_types)
 
         # Dictionary of all flags
-        self.flags = self._get_flags(namespace, types)
+        self.flags = self._get_flags(namespace, flag_types)
 
-        if exclude_objects:
-            self.ifaces = []
-            self.types = []
-            self.sorted_types = []
-            return
-
-        # Dictionary of all interfaces
-        self.ifaces = self._get_ifaces(namespace, types)
-
-        # Dictionary of all classes/types
-        self.types = self._get_types(namespace, types, skip_types)
+        # Include Boxed types
+        self.types = self._get_boxed_types(boxed_types)
 
         if self.name == 'Gtk' and self.version == '3.0':
             self.lib = 'gtk+'
+
+        # Dictionary of all interfaces
+        self.ifaces = self._get_ifaces(namespace, types, exclude_objects)
+
+        # Dictionary of all classes/types
+        obj_types = self._get_types(namespace, types, skip_types, exclude_objects)
+        self.types.update(obj_types)
 
         if target_gtk4:
             self._gtk4_init()
@@ -327,6 +337,8 @@ class GirData:
 
             type_name = self.pspec_map.get(pspec_type_name, None)
             if type_name is None:
+                self.ignored_pspecs.add(pspec_type_name)
+                self.ignored_types.add(type_name)
                 continue
 
             if type_name == 'object' or type_name == 'enum' or type_name == 'flags':
@@ -342,6 +354,12 @@ class GirData:
                     type_name = nstype_name
                 elif type_name != 'GObject':
                     type_name = self.prefix + type_name
+            elif type_name == 'boxed':
+                type_name = GObject.type_name(pspec.value_type)
+
+                if type_name not in self.external_nstypes:
+                    self.ignored_boxed_types.add(type_name)
+                    continue
 
             retval[name] = {
                 'type': type_name,
@@ -414,13 +432,34 @@ class GirData:
             'interfaces': self._type_get_interfaces(element)
         }
 
-    def _get_types (self, namespace, types=None, skip_types=[]):
+    def _get_boxed_types (self, boxed_types=[]):
+        retval = {}
+
+        for name in boxed_types:
+            retval[name] = {
+                'parent': 'boxed',
+                'is_container': 0,
+                'layout': None,
+                'abstract': 0,
+                'version': None,
+                'deprecated_version': None,
+                'properties': [],
+                'signals': {},
+                'interfaces': []
+            }
+
+        return retval
+
+    def _get_types (self, namespace, types=None, skip_types=[], exclude_objects=False):
         retval = {}
 
         for child in namespace.iterfind('class', nsmap):
             name = child.get(ns('glib','type-name'))
 
-            if name and (types is None or name in types):
+            if name is None or (exclude_objects and types is None):
+                continue
+
+            if types is None or name in types:
                 data = self._get_type_data(child, name, not name in skip_types)
                 if name and data is not None:
                     retval[name] = data
@@ -472,12 +511,16 @@ class GirData:
 
         return retval
 
-    def _get_ifaces (self, namespace, types=None):
+    def _get_ifaces (self, namespace, types=None, exclude_objects=False):
         retval = {}
 
         for child in namespace.iterfind('interface', nsmap):
             name = child.get(ns('glib','type-name'))
-            if name and (types is None or name in types):
+
+            if name is None or (exclude_objects and types is None):
+                continue
+
+            if types is None or name in types:
                 if name.startswith(self.prefix):
                     iface = getattr(self.mod, name[len(self.prefix):], None)
                 else:

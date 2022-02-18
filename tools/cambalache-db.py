@@ -32,7 +32,7 @@ from utils import gir
 
 
 class CambalacheDb:
-    def __init__(self, dependencies=None, external_catalogs=None):
+    def __init__(self, dependencies=None, external_catalogs=[]):
         self.lib = None
         self.dependencies = dependencies if dependencies else []
 
@@ -47,13 +47,10 @@ class CambalacheDb:
             self.conn.commit()
 
         self.lib_namespace = {}
-        if external_catalogs:
-            for catalog in external_catalogs:
-                self.load_catalog_types(catalog)
+        self.external_types = {}
 
-            self.external_types = self.get_external_types()
-        else:
-            self.external_types = {}
+        for catalog in external_catalogs:
+            self.load_catalog_types(catalog)
 
     def dump(self, filename):
         # Copy/Paste from CmbDB
@@ -145,16 +142,6 @@ class CambalacheDb:
 
         c.close()
 
-    def __load_table_from_tuples(self, c, table, tuples):
-        data = ast.literal_eval(f'[{tuples}]') if tuples else []
-
-        if len(data) == 0:
-            return
-
-        # Load table data
-        cols = ', '.join(['?' for col in data[0]])
-        c.executemany(f'INSERT INTO {table} VALUES ({cols})', data)
-
     def load_catalog_types(self, filename):
         tree = etree.parse(filename)
         root = tree.getroot()
@@ -165,32 +152,21 @@ class CambalacheDb:
 
         self.lib_namespace[name] = (namespace, prefix)
 
-        c = self.conn.cursor()
-
-        c.execute("CREATE TABLE IF NOT EXISTS external_type AS SELECT * FROM type WHERE 0;")
-
         for node in root.iterfind('type'):
-            self.__load_table_from_tuples(c, 'external_type', node.text)
+            data = ast.literal_eval(f'[{node.text}]') if node.text else []
 
-        c.close()
-        self.conn.commit()
+            if len(data) == 0:
+                continue
 
-    def get_external_types(self):
-        retval = {}
-        c = self.conn.cursor()
+            for row in data:
+                type_id = row[0]
+                library_id = row[2]
 
-        for row in c.execute("SELECT type_id, library_id FROM external_type;"):
-            type_id, library_id = row
-            namespace, prefix = self.lib_namespace.get(library_id, None)
+                namespace, prefix = self.lib_namespace.get(library_id, None)
 
-            if namespace is not None:
-                if type_id.startswith(prefix):
+                if namespace is not None and type_id.startswith(prefix):
                     nstype = type_id[len(prefix):]
-                    retval[f'{namespace}.{nstype}'] = type_id
-
-        c.close()
-
-        return retval
+                    self.external_types[f'{namespace}.{nstype}'] = type_id
 
     def populate_from_gir(self, girfile, **kwargs):
         self.lib = gir.GirData(girfile, external_types=self.external_types, **kwargs)
@@ -328,6 +304,18 @@ if __name__ == "__main__":
                         help='Types to get extra metadata',
                         default=None)
 
+    parser.add_argument('--flag-types', metavar='T', type=str, nargs='+',
+                        help='Flag types to get extra metadata',
+                        default=None)
+
+    parser.add_argument('--enum-types', metavar='T', type=str, nargs='+',
+                        help='Enum types to get extra metadata',
+                        default=None)
+
+    parser.add_argument('--boxed-types', metavar='T', type=str, nargs='+',
+                        help='Boxed Types to include',
+                        default=[])
+
     parser.add_argument('--exclude-objects',
                         help='Exclude objects in output',
                         action='store_true')
@@ -348,6 +336,9 @@ if __name__ == "__main__":
     db.populate_from_gir(args.gir,
                          target_gtk4=args.target_gtk4,
                          types=args.types,
+                         flag_types=args.flag_types,
+                         enum_types=args.enum_types,
+                         boxed_types=args.boxed_types,
                          skip_types=args.skip_types,
                          exclude_objects=args.exclude_objects)
 
@@ -355,6 +346,13 @@ if __name__ == "__main__":
     if args.extra_data:
         db.populate_extra_data_from_xml(args.extra_data)
 
-    print('Ignored types: ', db.lib.ignored_types)
+    if len(db.lib.ignored_pspecs):
+        print('Ignored pspecs: ', db.lib.ignored_pspecs)
+
+    if len(db.lib.ignored_types):
+        print('Ignored types: ', db.lib.ignored_types)
+
+    if len(db.lib.ignored_boxed_types):
+        print('Ignored boxed types: ', db.lib.ignored_boxed_types)
 
     db.dump(args.output)
