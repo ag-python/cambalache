@@ -64,9 +64,9 @@ cmb_utils_get_iface_properties(const gchar *name)
 
 /**
  * cmb_utils_implements_buildable_add_child:
- * @name: Object class name to check
+ * @buildable: Object to check
  *
- * Return wheter buildable implements add_child() or not
+ * Return whether buildable implements add_child() or not
  *
  */
 gboolean
@@ -87,4 +87,66 @@ cmb_utils_implements_buildable_add_child(GObject *buildable)
     }
 
   return FALSE;
+}
+
+/**
+ * cmb_utils_pspec_enum_get_default_nick:
+ * @gtype:
+ * @default_value:
+ *
+ *
+ */
+const gchar *
+cmb_utils_pspec_enum_get_default_nick(GType gtype, gint default_value)
+{
+  GEnumClass *enum_class = g_type_class_ref (gtype);;
+  GEnumValue *enum_value= g_enum_get_value (enum_class, default_value);
+  const gchar *retval = NULL;
+
+  if (enum_value)
+    retval = enum_value->value_nick;
+
+  g_type_class_unref (enum_class);
+
+  return retval;
+}
+
+/**
+ * cmb_utils_pspec_flags_get_default_nick:
+ * @gtype:
+ * @default_value:
+ *
+ *
+ */
+gchar *
+cmb_utils_pspec_flags_get_default_nick(GType gtype, guint default_value)
+{
+  GFlagsClass *flags_class = g_type_class_ref (gtype);
+  GFlagsValue *flags_value = NULL;
+  GString *str = g_string_new("");
+
+  do {
+    flags_value = g_flags_get_first_value (flags_class, default_value);
+
+    if (flags_value) {
+      if (flags_value->value == 0) break;
+
+      if (str->len)
+        g_string_append (str, " | ");
+
+      g_string_append (str, flags_value->value_nick);
+
+      /* Remove first value bit */
+      default_value &= ~flags_value->value;
+    }
+
+  } while (flags_value);
+
+  g_type_class_unref (flags_class);
+
+  if (str->len)
+    return g_string_free(str, FALSE);
+
+  g_string_free(str, TRUE);
+  return NULL;
 }

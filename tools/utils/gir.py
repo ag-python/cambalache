@@ -203,31 +203,6 @@ class GirData:
 
         return None
 
-    def _get_enum_nick_by_value(self, gtype, value):
-        name = GObject.type_name(gtype)
-        enum = self.enumerations.get(name, None)
-
-        if enum is not None:
-            members = enum['members']
-            for member in members:
-                if value == int(members[member]['value']):
-                    return members[member]['nick']
-        return None
-
-    def _get_flags_nick_by_value(self, gtype, value):
-        name = GObject.type_name(gtype)
-        enum = self.flags.get(name, None)
-        retval = None
-
-        if enum is not None:
-            members = enum['members']
-            for member in members:
-                if value & int(members[member]['value']):
-                    nick = members[member]['nick']
-                    retval = member if retval is None else f'{retval} | {nick}'
-
-        return retval
-
     def _get_default_value_from_pspec(self, pspec):
         if pspec is None:
             return None
@@ -235,9 +210,9 @@ class GirData:
         if pspec.value_type == GObject.TYPE_BOOLEAN:
             return 'True' if pspec.default_value != 0 else 'False'
         elif GObject.type_is_a(pspec.value_type, GObject.TYPE_ENUM):
-            return self._get_enum_nick_by_value(pspec.value_type, pspec.default_value)
+            return CmbUtils.pspec_enum_get_default_nick(pspec.value_type, pspec.default_value)
         elif GObject.type_is_a(pspec.value_type, GObject.TYPE_FLAGS):
-            return self._get_flags_nick_by_value(pspec.value_type, pspec.default_value)
+            return CmbUtils.pspec_flags_get_default_nick(pspec.value_type, pspec.default_value)
 
         return pspec.default_value
 
@@ -325,9 +300,9 @@ class GirData:
 
         for child in element.iterfind('property', nsmap):
             name = child.get('name')
-            type = child.find('type', nsmap)
+            type_node = child.find('type', nsmap)
 
-            if type is None or child.get('writable') != '1':
+            if type_node is None or child.get('writable') != '1':
                 continue
 
             # Property pspec
@@ -342,7 +317,7 @@ class GirData:
                 continue
 
             if type_name == 'object' or type_name == 'enum' or type_name == 'flags':
-                type_name = type.get('name', 'GObject')
+                type_name = type_node.get('name', 'GObject')
 
                 if type_name.find('.') >= 0:
                     nstype_name = self.external_types.get(type_name, None)
