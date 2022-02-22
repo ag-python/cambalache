@@ -404,6 +404,9 @@ window.setupDocument = function (document) {
             self.project = self.__restart_project
             self.__restart_project = None
             self.__ui_id = 0
+        else:
+            self.__restart_project = self.__project
+            self.project = None
 
     def __command_selection_changed(self, selection):
         objects = []
