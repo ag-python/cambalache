@@ -25,8 +25,9 @@ import os
 import gi
 import sys
 import json
+import importlib
 
-from gi.repository import GLib, Gio, Gdk, Gtk
+from gi.repository import GLib, GObject, Gio, Gdk, Gtk
 
 from .mrg_controller_registry import MrgControllerRegistry
 from .mrg_placeholder import MrgPlaceholder
@@ -207,6 +208,19 @@ class MrgApplication(Gtk.Application):
         if controller:
             controller.remove_placeholder(modifier)
 
+    def load_namespace(self, namespace, version, object_types):
+        if version:
+            gi.require_version(namespace, version)
+
+        mod = importlib.import_module(f'gi.repository.{namespace}')
+
+        if mod is None:
+            return
+
+        for type in object_types:
+            if hasattr(mod, type):
+                GObject.type_ensure(getattr(mod, type).__gtype__)
+
     def run_command(self, command, args, payload):
         logger.debug(f'{command} {args}')
 
@@ -228,6 +242,8 @@ class MrgApplication(Gtk.Application):
             self.add_placeholder(**args)
         elif command == 'remove_placeholder':
             self.remove_placeholder(**args)
+        elif command == 'load_namespace':
+            self.load_namespace(**args)
         else:
             logger.warning(f'Unknown command {command}')
 
