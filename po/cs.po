@@ -1,22 +1,22 @@
 # Czech translations for cambalache package.
 # Copyright (C) 2021 THE cambalache'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the cambalache package.
-# Vojtěch Perník <translations@pervoj.cz>, 2021.
+# Vojtěch Perník <translations@pervoj.cz>, 2021-2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-11 21:22-0500\n"
-"PO-Revision-Date: 2021-12-23 14:33+0100\n"
+"PO-Revision-Date: 2022-02-22 11:48+0100\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.0\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"X-Generator: Gtranslator 41.0\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:6
@@ -64,18 +64,20 @@ msgid ""
 "GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, "
 "Frame, Revealer, ScrolledWindow, Viewport and Overlay)"
 msgstr ""
+"GTK 4: Oprava zástupných ploch v binu jako u konteinerů (AspectFrame, "
+"Expander, Frame, Revealer, ScrolledWindow, Viewport a Overlay)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
 msgid "GTK 4: Fix placeholders in GtkPaned"
-msgstr ""
+msgstr "GTK 4: Oprava zástupných ploch v GtkPaned"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Fix property editor copy/paste shortcuts"
-msgstr ""
+msgstr "Oprava zkratek kopírovat/vložit v editoru vlastností"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Various improvements and minor fixes"
-msgstr ""
+msgstr "Různá vylepšení a drobné opravy"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:42
 msgid "First bugfix release in 0.8 series!"
@@ -100,7 +102,7 @@ msgstr "Nevytváří se další zástupné plochy v GtkBox a GtkGrid"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:48
 msgid "Show toolkit target on type chooser bar"
-msgstr ""
+msgstr "Zobrazení cílové verze toolkitu na panelu pro výběr typu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:49
 msgid "Improve file open handling"
@@ -571,14 +573,13 @@ msgid "Comments for translators:"
 msgstr "Komentář pro překladatele:"
 
 #: cambalache/cmb_tree_view.py:89
-#, fuzzy
 msgid "(template)"
-msgstr "Šablona"
+msgstr "(šablona)"
 
 #: cambalache/cmb_tree_view.py:92
 #, python-brace-format
 msgid "<b>Unnamed {ui_id}</b>"
-msgstr ""
+msgstr "<b>Nepojmenovaný {ui_id}</b>"
 
 #. Widget group for toplevels/windows
 #: cambalache/cmb_type_chooser.ui:92 cambalache/cmb_type_chooser_widget.py:65
@@ -967,7 +968,7 @@ msgstr "Jméno"
 
 #: cambalache/app/cmb_window.ui:347
 msgid "Toolkit target"
-msgstr "Cíl toolkitu"
+msgstr "Cílová verze"
 
 #: cambalache/app/cmb_window.ui:359
 msgid "Location"
