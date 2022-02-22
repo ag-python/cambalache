@@ -27,6 +27,32 @@ from gi.repository import GObject
 from .cmb_base import *
 
 
+class CmbBaseLibraryInfo(CmbBase):
+    __gtype_name__ = 'CmbBaseLibraryInfo'
+
+    library_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    namespace = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    prefix = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    shared_library = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    license_id = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    license_text = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, library_id, version, namespace, prefix, shared_library, license_id, license_text):
+        return cls(project=project,
+                   library_id=library_id,
+                   version=version,
+                   namespace=namespace,
+                   prefix=prefix,
+                   shared_library=shared_library,
+                   license_id=license_id,
+                   license_text=license_text)
+
+
 class CmbPropertyInfo(CmbBase):
     __gtype_name__ = 'CmbPropertyInfo'
 

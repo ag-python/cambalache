@@ -166,6 +166,7 @@ from .cmb_base import *
 """)
 
             # Base Objects
+            self.dump_table(fd, 'library', 'CmbBaseLibraryInfo')
             self.dump_table(fd, 'property', 'CmbPropertyInfo')
             self.dump_table(fd, 'signal', 'CmbSignalInfo')
             self.dump_table(fd, 'type', 'CmbBaseTypeInfo')

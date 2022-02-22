@@ -28,6 +28,7 @@ install_data([
     'cmb_db.py',
     'cmb_db_migration.py',
     'cmb_layout_property.py',
+    'cmb_library_info.py',
     'cmb_list_store.py',
     'cmb_object.py',
     'cmb_object_data.py',
