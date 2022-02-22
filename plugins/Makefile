@@ -14,15 +14,26 @@ BASE_CATALOG_FILES = \
 	glib/gobject-2.0.xml \
 	glib/gio-2.0.xml \
 	gdkpixbuf/gdk-pixbuf-2.0.xml \
-	pango/pango-1.0.xml \
-	gtk/gdk-3.0.xml \
+	pango/pango-1.0.xml
+
+GTK3_DEPS = \
+	${BASE_CATALOG_FILES} \
+	gtk/gdk-3.0.xml
+
+GTK4_DEPS = \
+	${BASE_CATALOG_FILES} \
 	gtk/gdk-4.0.xml \
 	gtk/gsk-4.0.xml
 
 CATALOG_FILES = \
 	${BASE_CATALOG_FILES} \
+	${GTK3_DEPS} \
+	${GTK4_DEPS} \
 	gtk/gtk-4.0.xml \
-	gtk/gtk+-3.0.xml
+	gtk/gtk+-3.0.xml \
+	gnome/libhandy-1.xml \
+	$(NULL)
+
 
 all: ${CATALOG_FILES}
 
@@ -82,23 +93,40 @@ gtk/gsk-4.0.xml:
 		--exclude-objects \
 		--output $@
 
-gtk/gtk+-3.0.xml: gtk/Gtk.xml ${BASE_CATALOG_FILES}
+gtk/gtk+-3.0.xml: gtk/Gtk.xml ${GTK3_DEPS}
 	${CAMBALACHE_DB} \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/Gtk-3.0.gir \
-		--external-catalogs ${BASE_CATALOG_FILES} \
+		--external-catalogs ${GTK3_DEPS} \
 		--extra-data gtk/Gtk.xml \
 		--output $@
 
-gtk/gtk-4.0.xml: gtk/Gtk.xml ${BASE_CATALOG_FILES}
+gtk/gtk-4.0.xml: gtk/Gtk.xml ${GTK4_DEPS}
 	${CAMBALACHE_DB} \
 		--target-gtk4 \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/Gtk-4.0.gir \
-		--external-catalogs ${BASE_CATALOG_FILES} \
+		--external-catalogs ${GTK4_DEPS} \
 		--extra-data gtk/Gtk.xml \
 		--skip-types GtkActivateAction GtkMnemonicAction GtkNamedAction GtkNeverTrigger GtkNothingAction GtkSignalAction GtkPrintJob \
 		--output $@ && true
+
+
+gnome/libhandy-1.xml: gtk/gtk+-3.0.xml
+	${CAMBALACHE_DB} \
+		--dependencies gtk+-3.0 \
+		--gir /usr/share/gir-1.0/Handy-1.gir \
+		--external-catalogs ${GTK3_DEPS} gtk/gtk+-3.0.xml \
+		--skip-types HdySwipeTracker HdyValueObject \
+		--output $@
+
+# gnome/Adw-1.xml: gtk/gtk-4.0.xml
+# 	${CAMBALACHE_DB} \
+# 		--dependencies gtk-4.0 \
+# 		--gir /usr/share/gir-1.0/Adw-1.gir \
+# 		--external-catalogs ${GTK4_DEPS} gtk/gtk-4.0.xml \
+# 		--output $@
+
 
 .PHONY: all clean
 
