@@ -85,7 +85,7 @@ class CmbTypeChooserWidget(Gtk.Box):
         for key in project.type_info:
             i = project.type_info[key]
 
-            if not i.abstract and i.parent_id not in [None, 'interface', 'enum', 'flags'] and i.layout in [None, 'container']:
+            if not i.abstract and i.parent_id not in [None, 'interface', 'enum', 'flags', 'boxed'] and i.layout in [None, 'container']:
                 infos.append(i)
 
         infos = sorted(infos, key=lambda i: (order.get(i.category, 99), i.type_id))
