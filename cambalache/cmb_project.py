@@ -36,6 +36,7 @@ from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
+from .cmb_library_info import CmbLibraryInfo
 from .cmb_type_info import CmbTypeInfo
 from .cmb_objects_base import CmbSignal
 from .cmb_list_store import CmbListStore
@@ -90,6 +91,9 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
     def __init__(self, **kwargs):
         # Type Information
         self.type_info = {}
+
+        # Library Info
+        self.library_info = {}
 
         # Selection
         self.__selection = []
@@ -211,6 +215,14 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             info = self.type_info[type_id]
             info.parent = self.type_info.get(info.parent_id, None)
 
+    def __init_library_info(self, c):
+        for row in c.execute('''SELECT * FROM library
+                                  WHERE
+                                    library_id NOT IN ('gobject', 'pango', 'gdkpixbuf', 'gio', 'gdk', 'gtk', 'gtk+')
+                                  ORDER BY library_id;'''):
+            library_id = row[0]
+            self.library_info[library_id] = CmbLibraryInfo.from_row(self, *row)
+
     def __init_data(self):
         if self.target_tk is None:
             return
@@ -218,6 +230,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
         c = self.db.cursor()
 
         self.__init_type_info(c)
+        self.__init_library_info(c)
 
         c.close()
 
