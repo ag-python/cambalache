@@ -410,7 +410,8 @@ class CmbWindow(Gtk.ApplicationWindow):
             obj = None
         else:
             self.editor_stack.set_visible_child_name('object')
-            self.__user_message_by_type(obj.info)
+            if obj:
+                self.__user_message_by_type(obj.info)
 
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
