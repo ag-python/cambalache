@@ -421,6 +421,19 @@ window.setupDocument = function (document) {
 
         self.__project.set_selection(objects)
 
+    def __load_namespaces(self):
+        if self.project == None:
+            return
+
+        for id in self.project.library_info:
+            info = self.project.library_info[id]
+            self.__merengue_command('load_namespace',
+                                    args={
+                                        'namespace': info.namespace,
+                                        'version': info.version,
+                                        'object_types': info.object_types,
+                                    })
+
     def __on_merengue_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
             self.__merengue.stop()
@@ -443,7 +456,9 @@ window.setupDocument = function (document) {
                 self.__on_project_selection_changed(self.__project)
 
                 self.__merengue_command('gtk_settings_get',
-                                       args={ 'property': 'gtk-theme-name' })
+                                        args={ 'property': 'gtk-theme-name' })
+
+                self.__load_namespaces()
             elif command == 'placeholder_selected':
                 self.emit('placeholder-selected', args['ui_id'], args['object_id'], args['layout'], args['position'], args['child_type'])
             elif command == 'placeholder_activated':
