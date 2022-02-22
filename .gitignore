@@ -1,6 +1,7 @@
 *.pyc
 .flatpak-builder
 .catalogs
+.lc_messages
 .vscode
 build
 repo

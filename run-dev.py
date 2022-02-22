@@ -25,6 +25,7 @@ import os
 import sys
 import stat
 import signal
+import locale
 
 # Set GSchema dir before loading GLib
 os.environ['GSETTINGS_SCHEMA_DIR'] = 'data'
@@ -40,6 +41,7 @@ sys.path.insert(1, basedir)
 glib_compile_resources = GLib.find_program_in_path ('glib-compile-resources')
 glib_compile_schemas = GLib.find_program_in_path ('glib-compile-schemas')
 update_mime_database = GLib.find_program_in_path ('update-mime-database')
+msgfmt = GLib.find_program_in_path ('msgfmt')
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -167,12 +169,45 @@ def get_version():
 
     return 'git'
 
+
+def check_init_locale():
+    localedir = os.path.join(basedir, 'po', '.lc_messages')
+
+    if not os.path.exists(localedir):
+        GLib.mkdir_with_parents(localedir, 0o700)
+
+    linguas = open(os.path.join(basedir, 'po', 'LINGUAS'))
+
+    for lang in linguas:
+        lang = lang.strip()
+        po_file = os.path.join(basedir, 'po', f'{lang}.po')
+        mo_dir = os.path.join(basedir, 'po', '.lc_messages', lang, 'LC_MESSAGES')
+        mo_file = os.path.join(mo_dir, 'cambalache.mo')
+
+        if not os.path.exists(mo_dir):
+            GLib.mkdir_with_parents(mo_dir, 0o700)
+
+        if not os.path.exists(mo_file) or os.path.getmtime (mo_file) < os.path.getmtime (po_file):
+            print('msgfmt', po_file, mo_file)
+            GLib.spawn_sync('.',
+                            [msgfmt, po_file, '-o', mo_file],
+                            None,
+                            GLib.SpawnFlags.DEFAULT,
+                            None,
+                            None)
+
+    locale.bindtextdomain("cambalache", localedir)
+    locale.textdomain("cambalache")
+
+
 if __name__ == '__main__':
     if glib_compile_resources is None:
         print('Could not find glib-compile-resources in PATH')
         exit()
 
     version = get_version()
+
+    check_init_locale()
 
     # Create config files pointing to source directories
     dev_config('cambalache/config.py',
