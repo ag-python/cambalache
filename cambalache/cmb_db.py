@@ -50,7 +50,7 @@ HISTORY_SQL = _get_text_resource('cmb_history.sql')
 
 GOBJECT_XML = os.path.join(catalogsdir, 'gobject-2.0.xml')
 GIO_XML = os.path.join(catalogsdir, 'gio-2.0.xml')
-GDKPIXBUF_XML = os.path.join(catalogsdir, 'gdk-pixbuf-2.0.xml')
+GDKPIXBUF_XML = os.path.join(catalogsdir, 'gdkpixbuf-2.0.xml')
 PANGO_XML = os.path.join(catalogsdir, 'pango-1.0.xml')
 GDK3_XML = os.path.join(catalogsdir, 'gdk-3.0.xml')
 GDK4_XML = os.path.join(catalogsdir, 'gdk-4.0.xml')
@@ -58,6 +58,7 @@ GSK4_XML = os.path.join(catalogsdir, 'gsk-4.0.xml')
 GTK3_XML = os.path.join(catalogsdir, 'gtk+-3.0.xml')
 GTK4_XML = os.path.join(catalogsdir, 'gtk-4.0.xml')
 
+LIBHANDY_XML = os.path.join(catalogsdir, 'libhandy-1.xml')
 
 class CmbDB(GObject.GObject):
     __gtype_name__ = 'CmbDB'
@@ -84,6 +85,9 @@ class CmbDB(GObject.GObject):
         self.history_commands = {}
 
         self.conn = sqlite3.connect(':memory:')
+
+        self.conn.create_function('VERSION_CMP', 2, sqlite_version_cmp)
+        self.conn.create_aggregate('MAX_VERSION', 1, MaxVersion)
 
         super().__init__(**kwargs)
 
@@ -283,6 +287,8 @@ class CmbDB(GObject.GObject):
         if self.target_tk == 'gtk+-3.0':
             self.load_catalog(GDK3_XML)
             self.load_catalog(GTK3_XML)
+            # FIXME: this should be optional
+            self.load_catalog(LIBHANDY_XML)
         elif self.target_tk == 'gtk-4.0':
             self.load_catalog(GDK4_XML)
             self.load_catalog(GSK4_XML)
@@ -339,7 +345,7 @@ class CmbDB(GObject.GObject):
         if version is None:
             return (0, 0, 0)
 
-        return tuple([int(x) for x in version.split('.')])
+        return parse_version(version)
 
     def __ensure_table_data_columns(self, version, table, data):
         if version is None:
@@ -1206,8 +1212,6 @@ class CmbDB(GObject.GObject):
 
             # Packing / Layout
             layout = E('packing' if self.target_tk == 'gtk+-3.0' else 'layout')
-
-            # TODO: support object packing properties
             for prop in cc.execute(f'''
                     SELECT value, property_id, comment
                       FROM object_layout_property
@@ -1313,21 +1317,21 @@ class CmbDB(GObject.GObject):
                 key = key.replace('_', '-')
                 node.append(etree.Comment(f' interface-{key} {value} '))
 
-        # requires
-        tk_library_id, tk_version = self.target_tk.split('-')
-        has_tk_requires = False
-
+        # Requires selected by the user
         for row in c.execute('SELECT library_id, version, comment FROM ui_library WHERE ui_id=?;', (ui_id,)):
             library_id, version, comment = row
             req = E.requires(lib=library_id, version=version)
             self.__node_add_comment(req, comment)
             node.append(req)
-            if library_id == tk_library_id:
-                has_tk_requires = True
 
-        # Ensure we output a requires lib
-        if not has_tk_requires:
-            library_id, version = self.target_tk.split('-')
+        # Ensure we output a requires lib for every used module
+        # If the user did not specify a requirement version we use the latest
+        for row in c.execute('''SELECT l.library_id, MAX_VERSION(v.version)
+            FROM library AS l, library_version AS v
+            WHERE l.library_id=v.library_id AND l.library_id IN
+                (SELECT DISTINCT t.library_id FROM object AS o, type AS t WHERE o.ui_id=? AND o.type_id = t.type_id)
+            GROUP BY l.library_id;''', (ui_id,)):
+            library_id, version = row
             req = E.requires(lib=library_id, version=version)
             node.append(req)
 
@@ -1443,3 +1447,43 @@ class CmbDB(GObject.GObject):
         c.close()
 
         return retval
+
+# Function used in SQLite
+
+def parse_version(version):
+    return tuple([int(x) for x in version.split('.')])
+
+def version_cmp(a, b):
+    an = len(a)
+    bn = len(a)
+
+    for i in range(0, max(an, bn)):
+        val_a = a[i] if i < an else 0
+        val_b = b[i] if i < bn else 0
+        retval = val_a - val_b
+
+        if retval != 0:
+            return retval
+
+    return 0
+
+# Compares two version strings
+def sqlite_version_cmp(a, b):
+    return version_cmp(parse_version(a), parse_version(b))
+
+
+# Aggregate class to get the MAX version
+class MaxVersion:
+    def __init__(self):
+        self.max_ver = None
+        self.max_ver_str = None
+
+    def step(self, value):
+        ver = parse_version(value)
+
+        if self.max_ver is None or version_cmp(self.max_ver, ver) < 0:
+            self.max_ver = ver
+            self.max_ver_str = value
+
+    def finalize(self):
+        return self.max_ver_str
