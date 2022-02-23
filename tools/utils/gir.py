@@ -43,6 +43,7 @@ def ns(namespace, name):
 class GirData:
 
     def __init__(self, gir_file,
+                 libname=None,
                  types=None,
                  flag_types=None,
                  enum_types=None,
@@ -90,7 +91,7 @@ class GirData:
         # Get module/name space data
         self.name = namespace.get('name')
         self.prefix = namespace.get(ns('c', 'identifier-prefixes'))
-        self.lib = self.name.lower()
+        self.lib = libname
         self.version = namespace.get('version')
         self.shared_library = namespace.get('shared-library')
         self.target_tk = 'Gtk-4.0' if target_gtk4 else 'Gtk+-3.0'
@@ -126,9 +127,6 @@ class GirData:
 
         # Include Boxed types
         self.types = self._get_boxed_types(boxed_types)
-
-        if self.name == 'Gtk' and self.version == '3.0':
-            self.lib = 'gtk+'
 
         # Dictionary of all interfaces
         self.ifaces = self._get_ifaces(namespace, types, exclude_objects)

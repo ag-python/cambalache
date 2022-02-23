@@ -353,7 +353,10 @@ if __name__ == "__main__":
     db = CambalacheDb(dependencies=args.dependencies,
                       external_catalogs=args.external_catalogs)
 
+    tokens = os.path.basename(args.output).split('-')
+
     db.populate_from_gir(args.gir,
+                         libname=tokens[0],
                          target_gtk4=args.target_gtk4,
                          types=args.types,
                          flag_types=args.flag_types,
