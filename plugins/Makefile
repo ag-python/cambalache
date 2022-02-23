@@ -13,7 +13,7 @@ CAMBALACHE_DB=flatpak run \
 BASE_CATALOG_FILES = \
 	glib/gobject-2.0.xml \
 	glib/gio-2.0.xml \
-	gdkpixbuf/gdk-pixbuf-2.0.xml \
+	gdkpixbuf/gdkpixbuf-2.0.xml \
 	pango/pango-1.0.xml
 
 GTK3_DEPS = \
@@ -52,7 +52,7 @@ glib/gio-2.0.xml:
 		--exclude-objects \
 		--output $@
 
-gdkpixbuf/gdk-pixbuf-2.0.xml:
+gdkpixbuf/gdkpixbuf-2.0.xml:
 	${CAMBALACHE_DB} \
 		--dependencies gobject-2.0 \
 		--gir /usr/share/gir-1.0/GdkPixbuf-2.0.gir \

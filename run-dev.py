@@ -152,7 +152,7 @@ def create_catalogs_dir():
 
     link_plugin('plugins/glib/gobject-2.0.xml')
     link_plugin('plugins/glib/gio-2.0.xml')
-    link_plugin('plugins/gdkpixbuf/gdk-pixbuf-2.0.xml')
+    link_plugin('plugins/gdkpixbuf/gdkpixbuf-2.0.xml')
     link_plugin('plugins/pango/pango-1.0.xml')
     link_plugin('plugins/gtk/gdk-3.0.xml')
     link_plugin('plugins/gtk/gdk-4.0.xml')
