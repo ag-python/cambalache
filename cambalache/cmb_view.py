@@ -290,11 +290,10 @@ window.setupDocument = function (document) {
                     objects.append(obj.object_id)
 
             self.__merengue_command('selection_changed', args={ 'ui_id': ui_id, 'selection': objects })
-
-        elif self.__ui_id > 0:
+        else:
             self.__ui_id = 0
             self.__update_view()
-            self.__merengue_command('selection_changed', args={ 'ui_id': 0, 'selection': [] })
+            self.__merengue_update_ui(0)
 
     @GObject.Property(type=GObject.GObject)
     def project(self):
