@@ -66,15 +66,18 @@ class MrgApplication(Gtk.Application):
         object_id = utils.object_get_id(obj)
         return self.controllers.get(object_id, None)
 
-    def clear_all(self):
+    def clear_all(self, clear_selection=False):
         self.preselected_widget = None
 
         # Unset controllers objects
         for key in self.controllers:
-            self.controllers[key].object = None
+            controller = self.controllers[key]
+            controller.object = None
+            if clear_selection:
+                controller.selected = False
 
     def update_ui(self, ui_id, toplevels=[], payload=None):
-        self.clear_all()
+        self.clear_all(clear_selection=ui_id == 0)
 
         if payload == None:
             return
