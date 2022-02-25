@@ -1286,7 +1286,12 @@ class CmbDB(GObject.GObject):
         node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
 
         c.execute('SELECT comment, template_id FROM ui WHERE ui_id=?;', (ui_id,))
-        comment, template_id = c.fetchone()
+        row = c.fetchone()
+
+        if row is None:
+            return None
+
+        comment, template_id = row
         self.__node_add_comment(node, comment)
 
         # Export UI data as comments
@@ -1330,6 +1335,10 @@ class CmbDB(GObject.GObject):
 
     def tostring(self, ui_id, merengue=False):
         ui = self.export_ui(ui_id, merengue=merengue)
+
+        if ui is None:
+            return None
+
         return etree.tostring(ui,
                               pretty_print=True,
                               xml_declaration=True,
