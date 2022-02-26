@@ -37,7 +37,7 @@ CREATE TABLE ui (
   ui_id INTEGER PRIMARY KEY AUTOINCREMENT,
   template_id INTEGER,
 
-  name TEXT UNIQUE,
+  name TEXT,
   filename TEXT UNIQUE,
   description TEXT,
   copyright TEXT,
