@@ -105,6 +105,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'save', 'save_as',
                        'add_ui',
                        'copy', 'paste', 'cut', 'delete',
+                       'add_object', 'add_object_toplevel',
                        'add_placeholder', 'remove_placeholder',
                        'add_placeholder_row', 'remove_placeholder_row',
                        'import', 'export',
@@ -248,6 +249,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         if info.is_a('GtkWidget') and not info.is_a('GtkWindow'):
             # Select type and let user choose which placeholder to use
             self.type_chooser.props.selected_type = info
+            self.__update_action_add_object()
         elif len(selection) > 0:
             obj = selection[0]
             # Create toplevel object/window
@@ -416,6 +418,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
         self.signal_editor.object = obj
+        self.__update_action_add_object()
 
     def __update_action_intro(self):
         enabled = False
@@ -425,6 +428,15 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.intro_button.props.tooltip_text = _('Start interactive introduction')
 
         self.intro_button.set_visible(enabled)
+
+    def __update_action_add_object(self):
+        has_project = self.__is_project_visible()
+        has_selection = True if self.project and len(self.project.get_selection()) > 0 else False
+        has_info = self.type_chooser.props.selected_type is not None
+        enabled = has_project and has_selection and has_info
+
+        for action in ['add_object', 'add_object_toplevel']:
+            self.actions[action].set_enabled(enabled)
 
     def __update_actions(self):
         has_project = self.__is_project_visible()
@@ -439,7 +451,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.__update_action_intro()
         self.__update_action_clipboard()
         self.__update_action_undo_redo()
-        self.__update_action_clipboard()
+        self.__update_action_add_object()
         self.actions['debug'].set_enabled(has_project and self.__opensqlite is not None)
 
     def __file_open_dialog_new(self,
@@ -695,6 +707,29 @@ class CmbWindow(Gtk.ApplicationWindow):
                 self.__remove_ui_with_confirmation(obj)
             elif type(obj) == CmbObject:
                 self.project.remove_object(obj)
+
+    def _on_add_object_activate(self, action, data):
+        info = self.type_chooser.props.selected_type
+        if self.project is None or info is None:
+            return
+
+        selection = self.project.get_selection()
+        if len(selection) > 0:
+            obj = selection[0]
+            parent_id = obj.object_id if isinstance(obj, CmbObject) else None
+            self.project.add_object(obj.ui_id, info.type_id, None, parent_id)
+            return
+
+    def _on_add_object_toplevel_activate(self, action, data):
+        info = self.type_chooser.props.selected_type
+        if self.project is None or info is None:
+            return
+
+        selection = self.project.get_selection()
+        if len(selection) > 0:
+            obj = selection[0]
+            self.project.add_object(obj.ui_id, info.type_id)
+            return
 
     def __present_import_error(self, filename, msg, detail):
         details = '\n'.join(detail)
