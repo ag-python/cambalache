@@ -42,6 +42,7 @@ from .mrg_gtk_overlay import MrgGtkOverlayController
 from .mrg_gtk_paned import MrgGtkPanedController
 from .mrg_gtk_revealer import MrgGtkRevealerController
 from .mrg_gtk_scrolled_window import MrgGtkScrolledWindowController
+from .mrg_gtk_stack import MrgGtkStackController
 from .mrg_gtk_viewport import MrgGtkViewportController
 from .mrg_gtk_widget import MrgGtkWidgetController
 from .mrg_gtk_window import MrgGtkWindowController
