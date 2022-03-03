@@ -536,8 +536,8 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             return False
 
         if parent_info.is_a('GtkWidget'):
-            # Only GtkWidget can be a child
-            if not obj_info.is_a('GtkWidget'):
+            # In Gtk 3 only GtkWidget can be a child on Gtk 4 on the other hand there are types that can have GObjects as children
+            if self.target_tk == 'gtk+-3.0' and not obj_info.is_a('GtkWidget'):
                 return False
 
             # GtkWindow can not be a child
