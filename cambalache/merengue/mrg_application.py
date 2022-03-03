@@ -171,6 +171,22 @@ class MrgApplication(Gtk.Application):
             except:
                 pass
 
+    def _show_widget(self, controller):
+        child = controller.object
+
+        parent = child.props.parent
+        while parent:
+            parent_id = utils.object_get_id(parent)
+            controller = self.controllers.get(parent_id, None)
+
+            if controller:
+                controller.show_child(child)
+                child = parent
+                parent = controller.object.props.parent
+            else:
+                break
+
+
     def selection_changed(self, ui_id, selection):
         # Clear objects
         for object_id in self.controllers:
@@ -188,10 +204,7 @@ class MrgApplication(Gtk.Application):
 
             if obj and issubclass(type(obj), Gtk.Widget):
                 controller.selected = True
-
-                if length == 1 and issubclass(type(obj), Gtk.Window):
-                    # TODO: fix broadway for this to work
-                    obj.present()
+                self._show_widget(controller)
 
     def gtk_settings_set(self, property, value):
         self.settings.set_property(property, value)

@@ -201,3 +201,5 @@ class MrgGtkWidgetController(MrgController):
         else:
             self.object.child_set_property(child, property_id, val)
 
+    def show_child(self, child):
+        pass
