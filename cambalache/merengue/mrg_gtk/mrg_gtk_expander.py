@@ -33,3 +33,5 @@ class MrgGtkExpanderController(MrgGtkBinController):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def show_child(self, child):
+        self.object.set_expanded(True)
