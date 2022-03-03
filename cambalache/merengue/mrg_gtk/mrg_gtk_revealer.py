@@ -32,4 +32,11 @@ class MrgGtkRevealerController(MrgGtkBinController):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.connect("notify::object", self.__on_object_changed)
 
+    def __on_object_changed(self, obj, pspec):
+        if self.object:
+            self.object.set_reveal_child(True)
+
+    def show_child(self, child):
+        self.object.set_reveal_child(True)
