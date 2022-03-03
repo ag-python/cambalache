@@ -35,7 +35,7 @@ class MrgGtkBinController(MrgGtkWidgetController):
         super().__init__(**kwargs)
 
         self.connect("notify::object", self.__on_object_changed)
-        self.__on_object_changed(self.object, None)
+        self.__update_placeholder()
 
     def add(self, child):
         if self.object is None:
