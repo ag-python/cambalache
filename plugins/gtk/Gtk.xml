@@ -368,6 +368,9 @@
       <properties>
         <property id="child" is-inline-object="True"/>
       </properties>
+      <children-types>
+        <type>overlay</type>
+      </children-types>
     </GtkOverlay>
 
     <GtkPopover>

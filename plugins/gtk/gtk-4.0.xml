@@ -1562,6 +1562,7 @@
 	("GtkNotebook","action-end",None,None),
 	("GtkNotebook","action-start",None,None),
 	("GtkNotebook","tab",None,None),
+	("GtkOverlay","overlay",None,None),
 	("GtkTextTagTable","tag",None,None),
 	("GtkWindow","titlebar",1,None)
   </type_child_type>
