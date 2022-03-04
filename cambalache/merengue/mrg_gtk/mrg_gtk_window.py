@@ -28,6 +28,9 @@ from .mrg_selection import MrgSelection
 
 
 class MrgGtkWindowController(MrgGtkBinController):
+    object = GObject.Property(type=Gtk.Window,
+                              flags=GObject.ParamFlags.READWRITE)
+
     def __init__(self, **kwargs):
         self._object = None
         self._position = None
@@ -38,66 +41,63 @@ class MrgGtkWindowController(MrgGtkBinController):
 
         super().__init__(**kwargs)
 
+        self.connect("notify::object", self.__on_object_changed)
+
         self.selection = MrgSelection(app=self.app, window=self.object)
 
         self.property_ignore_list.add('modal')
 
-    @GObject.property(type=Gtk.Window)
-    def object(self):
-        return self._object
-
-    @object.setter
-    def _set_object(self, obj):
+    def __on_object_changed(self, obj, pspec):
         # keep track of size, position, and window state (maximized)
         self._save_state()
 
         if self._object:
             self._object.destroy()
 
-        self._object = obj
+        self._object = self.object
 
         # Handle widget selection
         if self.selection:
-            self.selection.window = obj
+            self.selection.window = self.object
 
-        if obj:
+        if self.object:
             self._update_name()
 
             # Make sure the user can not close the window
             if Gtk.MAJOR_VERSION == 4:
-                obj.connect('close-request', lambda o: True)
+                self.object.connect('close-request', lambda o: True)
             else:
-                obj.connect('delete-event', lambda o, e: True)
+                self.object.connect('delete-event', lambda o, e: True)
 
             # Restore size
             if self._size and not self._is_maximized:
                 self.object.set_default_size(*self._size)
 
             # Disable modal at runtime
-            obj.props.modal = False
+            self.object.props.modal = False
 
             # Always show toplevels windows
             if Gtk.MAJOR_VERSION == 4:
-                obj.show()
+                self.object.show()
             else:
-                obj.show_all()
+                self.object.show_all()
 
             # Add gtk version CSS class
             gtkversion = 'gtk4' if Gtk.MAJOR_VERSION == 4 else 'gtk3'
-            obj.get_style_context().add_class(gtkversion)
+            self.object.get_style_context().add_class(gtkversion)
 
             self._restore_state()
 
     def _update_name(self):
-        if self._object is None:
+        if self.object is None:
             return
 
         # TODO: finx a way to get object name instead of ID
-        type_name = GObject.type_name(self._object.__gtype__)
-        self._object.props.title = type_name
+        type_name = GObject.type_name(self.object.__gtype__)
+        self.object.props.title = type_name
 
     def _save_state(self):
-        if self._object is None:
+        if self.object is None:
             return
 
         self._is_maximized = self.object.is_maximized()
