@@ -962,6 +962,8 @@ class CmbWindow(Gtk.ApplicationWindow):
             msg = _('<Ctrl>+Ins/Del to add/remove placeholders')
         elif info.is_a('GtkGrid'):
             msg = _('<Ctrl>+Ins/Del to add/remove columns\n<Shift>+<Ctrl>+Ins/Del to add/remove rows')
+        elif info.is_a('GtkAssistant') or info.is_a('GtkStack'):
+            msg = _('<Ctrl>+Ins/Del to add/remove pages')
 
         self._show_message(msg)
 
