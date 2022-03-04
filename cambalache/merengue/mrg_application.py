@@ -173,7 +173,6 @@ class MrgApplication(Gtk.Application):
 
     def _show_widget(self, controller):
         child = controller.object
-
         parent = child.props.parent
         while parent:
             parent_id = utils.object_get_id(parent)
@@ -182,10 +181,8 @@ class MrgApplication(Gtk.Application):
             if controller:
                 controller.show_child(child)
                 child = parent
-                parent = controller.object.props.parent
-            else:
-                break
 
+            parent = parent.props.parent
 
     def selection_changed(self, ui_id, selection):
         # Clear objects
