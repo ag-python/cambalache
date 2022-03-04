@@ -222,7 +222,7 @@ window.setupDocument = function (document) {
     def __update_view(self):
         if self.__project is not None and self.__ui_id > 0:
             if self.props.visible_child_name == 'ui_xml':
-                ui = self.__get_ui_xml(self.__ui_id, merengue=True)
+                ui = self.__get_ui_xml(self.__ui_id)
                 self.buffer.set_text(ui)
             return
 
