@@ -99,21 +99,24 @@ class MrgGtkWidgetController(MrgController):
             state = Gtk.StateFlags.NORMAL if self.selected else Gtk.StateFlags.BACKDROP
             toplevel.set_state_flags(state, True)
 
-    def get_children(self):
-        if self.object is None:
+    def __get_children(self, obj):
+        if obj is None:
             return []
 
         if Gtk.MAJOR_VERSION == 4:
             retval = []
 
-            child = self.object.get_first_child()
+            child = obj.get_first_child()
             while child is not None:
                 retval.append(child)
                 child = child.get_next_sibling()
 
             return retval
         else:
-            return self.object.get_children() if isinstance(self.object, Gtk.Container) else []
+            return obj.get_children() if isinstance(obj, Gtk.Container) else []
+
+    def get_children(self):
+        return self.__get_children(self.object)
 
     def child_get(self, child, properties):
         if self.object is None:
@@ -203,3 +206,18 @@ class MrgGtkWidgetController(MrgController):
 
     def show_child(self, child):
         pass
+
+    def find_child(self, *args):
+        retval = self.object
+
+        for name in args:
+            for child in self.__get_children(retval):
+                if utils.object_get_builder_id(child) == name:
+                    retval = child
+                    break
+
+            if utils.object_get_builder_id(retval) != name:
+                return None
+
+        return retval
+        
