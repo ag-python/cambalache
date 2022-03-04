@@ -24,6 +24,7 @@ import gi
 from gi.repository import Gtk
 
 from .mrg_gtk_aspect_frame import MrgGtkAspectFrameController
+from .mrg_gtk_assistant import MrgGtkAssistantController
 
 if Gtk.MAJOR_VERSION == 3:
     from .mrg_gtk_bin import MrgGtkBinController

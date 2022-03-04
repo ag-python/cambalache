@@ -43,6 +43,7 @@ install_data([
 install_data([
   'mrg_gtk/__init__.py',
   'mrg_gtk/mrg_gtk_aspect_frame.py',
+  'mrg_gtk/mrg_gtk_assistant.py',
   'mrg_gtk/mrg_gtk_bin.py',
   'mrg_gtk/mrg_gtk_box.py',
   'mrg_gtk/mrg_gtk_center_box.py',
