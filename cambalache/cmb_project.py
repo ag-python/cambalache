@@ -893,6 +893,7 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
 
         self.__undo_redo(True)
         self.history_index -= 1
+        self.emit('changed')
 
     def redo(self):
         if self.history_index >= self.history_index_max:
