@@ -91,6 +91,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def __init__(self, **kwargs):
         self.__project = None
+        self.__last_saved_index = None
 
         super().__init__(**kwargs)
 
@@ -121,6 +122,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         # Add global accelerators
         action_map = [
             ("win.save",       ["<Primary>s"]),
+            ("win.export",     ["<Primary>e"]),
             ("win.close",      ["<Primary>w"]),
             ("win.undo",       ["<Primary>z"]),
             ("win.redo",       ["<Primary><shift>z"]),
@@ -399,6 +401,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def __on_project_changed(self, project):
         self.__update_action_undo_redo()
+        self.__update_action_save()
 
     def __on_project_selection_changed(self, project):
         sel = project.get_selection()
@@ -438,16 +441,20 @@ class CmbWindow(Gtk.ApplicationWindow):
         for action in ['add_object', 'add_object_toplevel']:
             self.actions[action].set_enabled(enabled)
 
+    def __update_action_save(self):
+        has_project = self.__is_project_visible()
+        self.actions['save'].set_enabled(has_project and self.project.history_index != self.__last_saved_index)
+
     def __update_actions(self):
         has_project = self.__is_project_visible()
 
-        for action in ['undo', 'redo',
-                       'save', 'save_as',
+        for action in ['save_as',
                        'add_ui', 'delete',
                        'import', 'export',
                        'close', 'debug']:
             self.actions[action].set_enabled(has_project)
 
+        self.__update_action_save()
         self.__update_action_intro()
         self.__update_action_clipboard()
         self.__update_action_undo_redo()
@@ -646,7 +653,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_save_activate(self, action, data):
         if self.project is not None:
-            self.project.save()
+            self.__save_project()
 
     def _on_save_as_activate(self, action, data):
         if self.project is None:
@@ -656,7 +663,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                                              Gtk.FileChooserAction.SAVE)
         if dialog.run() == Gtk.ResponseType.OK:
             self.project.filename = dialog.get_filename()
-            self.project.save()
+            self.__save_project()
 
         dialog.destroy()
 
@@ -776,8 +783,15 @@ class CmbWindow(Gtk.ApplicationWindow):
         else:
             dialog.destroy()
 
+    def __save_project(self):
+        if self.project is not None:
+            self.__last_saved_index = self.project.history_index
+            self.project.save()
+            self.__update_action_save()
+
     def _on_export_activate(self, action, data):
         if self.project is not None:
+            self.__save_project()
             self.project.export()
 
     def _on_close_activate(self, action, data):
