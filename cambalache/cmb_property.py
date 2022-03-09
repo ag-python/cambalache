@@ -50,7 +50,7 @@ class CmbProperty(CmbBaseProperty):
     def _set_value(self, value):
         c = self.project.db.cursor()
 
-        if value is None or value == self.info.default_value:
+        if value is None or value == self.info.default_value or (self.info.is_object and value == 0):
             c.execute("DELETE FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
                       (self.ui_id, self.object_id, self.owner_id, self.property_id))
         else:
