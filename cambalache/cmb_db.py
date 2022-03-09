@@ -360,6 +360,9 @@ class CmbDB(GObject.GObject):
         if version < (0, 7, 5):
             cmb_db_migration.migrate_table_data_to_0_7_5(c, table, data)
 
+        if version < (0, 9, 0):
+            cmb_db_migration.migrate_table_data_to_0_9_0(c, table, data)
+
     def __load_table_from_tuples(self, c, table, tuples, version=None):
         data = ast.literal_eval(f'[{tuples}]') if tuples else []
 
@@ -1116,6 +1119,10 @@ class CmbDB(GObject.GObject):
             val, property_id, inline_object_id, comment, translatable, translation_context, translation_comments, is_object, is_inline_object = row
 
             if is_object:
+                # Ignore object properties with 0/null ID
+                if int(val) == 0:
+                    continue
+
                 if inline_object_id and is_inline_object:
                     value = self.__export_object(ui_id, inline_object_id, merengue=merengue)
                 else:
@@ -1123,7 +1130,10 @@ class CmbDB(GObject.GObject):
                         value = f'__cmb__{ui_id}.{val}'
                     else:
                         cc.execute('SELECT name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, val))
-                        value, = cc.fetchone()
+                        row = cc.fetchone()
+                        if row is None:
+                            continue
+                        value = row[0]
             else:
                 value = val
 

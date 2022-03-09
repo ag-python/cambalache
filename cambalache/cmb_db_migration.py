@@ -64,3 +64,17 @@ def ensure_columns_for_0_9_0(table, data):
         return [row + (None, ) for row in data]
 
     return data
+
+def migrate_table_data_to_0_9_0(c, table, data):
+    if table == 'object_property':
+        # Remove all object properties with a 0 as value
+        c.execute('''
+            DELETE FROM object_property AS op
+                WHERE value = 0 AND
+                    (SELECT property_id
+                        FROM property
+                        WHERE owner_id=op.owner_id
+                            AND property_id=op.property_id
+                            AND is_object)
+                    IS NOT NULL;
+        ''')
