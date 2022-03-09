@@ -1,7 +1,7 @@
 #
 # CmbProject - Cambalache Project
 #
-# Copyright (C) 2020-2021  Juan Pablo Ugarte
+# Copyright (C) 2020-2022  Juan Pablo Ugarte
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -36,8 +36,8 @@ from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
-from .cmb_type_info import CmbTypeInfo, CmbTypeDataInfo, CmbTypeDataArgInfo
-from .cmb_objects_base import CmbPropertyInfo, CmbSignal, CmbSignalInfo
+from .cmb_type_info import CmbTypeInfo
+from .cmb_objects_base import CmbSignal
 from .cmb_list_store import CmbListStore
 from .config import *
 from cambalache import getLogger
@@ -198,98 +198,13 @@ class CmbProject(GObject.GObject, Gtk.TreeModel):
             'pks': pks
         }
 
-    def __type_get_data(self, owner_id, data_id, parent_id, key, type_id):
-        args = {}
-        children = {}
-        parent_id = parent_id if parent_id is not None else 0
-        retval = CmbTypeDataInfo.from_row(self, owner_id, data_id, parent_id, key, type_id)
-
-        c = self.db.cursor()
-
-        # Collect Arguments
-        for row in c.execute('SELECT * FROM type_data_arg WHERE owner_id=? AND data_id=?;',
-                             (owner_id, data_id)):
-            _key = row[2]
-            args[_key] = CmbTypeDataArgInfo.from_row(self, *row)
-
-        # Recurse children
-        for row in c.execute('SELECT * FROM type_data WHERE owner_id=? AND parent_id=?;',
-                             (owner_id, data_id)):
-            _key = row[3]
-            children[_key] = self.__type_get_data(*row)
-
-        c.close()
-
-        retval.args = args
-        retval.children = children
-
-        return retval
-
-    # TODO: cleanup, try to move things to their respective classes
     def __init_type_info(self, c):
-        owner_id = None
-
-        # Dictionary with all the types hierarchy
-        type_hierarchy = {}
-        type_id = None
-        hierarchy = None
-        for row in c.execute('SELECT type_id, parent_id FROM type_tree WHERE parent_id != "object";'):
-            if type_id != row[0]:
-                type_id = row[0]
-                hierarchy = []
-                type_hierarchy[type_id] = hierarchy
-            hierarchy.append(row[1])
-
-        # Dictionary with all the type properties
-        type_properties = {}
-        owner_id = None
-        props = None
-        for row in c.execute("SELECT * FROM property ORDER BY owner_id, property_id;"):
-            if owner_id != row[0]:
-                owner_id = row[0]
-                props = {}
-                type_properties[owner_id] = props
-
-            property_id = row[1]
-            props[property_id] = CmbPropertyInfo.from_row(self, *row)
-
-        # Dictionary with all the type signals
-        type_signals = {}
-        owner_id = None
-        signals = None
-        for row in c.execute('SELECT * FROM signal ORDER BY owner_id, signal_id;'):
-            if owner_id != row[0]:
-                owner_id = row[0]
-                signals = {}
-                type_signals[owner_id] = signals
-
-            signal_id = row[1]
-            signals[signal_id] = CmbSignalInfo.from_row(self, *row)
-
-        # Dictionary with all the type extra data
-        type_data = {}
-        owner_id = None
-        data = None
-        for row in c.execute('SELECT * FROM type_data WHERE parent_id IS NULL ORDER BY owner_id, data_id;'):
-            if owner_id != row[0]:
-                owner_id = row[0]
-                data = {}
-                type_data[owner_id] = data
-
-            key = row[3]
-            data[key] = self.__type_get_data(*row)
-
         for row in c.execute('''SELECT * FROM type
                                   WHERE
                                     parent_id IS NOT NULL
                                   ORDER BY type_id;'''):
             type_id = row[0]
-            info = CmbTypeInfo.from_row(self, *row)
-            info.hierarchy = type_hierarchy.get(type_id, [])
-            info.properties = type_properties.get(type_id, {})
-            info.signals = type_signals.get(type_id, {})
-            info.data = type_data.get(type_id, {})
-            self.type_info[type_id] = info
+            self.type_info[type_id] = CmbTypeInfo.from_row(self, *row)
 
         # Set parent back reference
         for type_id in self.type_info:
