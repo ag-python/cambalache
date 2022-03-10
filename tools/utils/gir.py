@@ -259,7 +259,7 @@ class GirData:
 
             if len(properties) > 0:
                 layout_types[f'{name}LayoutChild'] = {
-                    'parent': 'object',
+                    'parent': 'GObject',
                     'layout': 'child',
                     'properties': properties,
                     'abstract': 1,
