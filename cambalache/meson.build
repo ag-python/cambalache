@@ -47,6 +47,7 @@ install_data([
     'cmb_ui.py',
     'cmb_ui_editor.py',
     'cmb_view.py',
+    'icon_naming_spec.py',
     '__init__.py'
     ],
     install_dir: moduledir)

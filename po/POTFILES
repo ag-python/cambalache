@@ -9,6 +9,7 @@ cambalache/cmb_object_editor.py
 cambalache/cmb_object.py
 cambalache/cmb_project.py
 cambalache/cmb_property.py
+cambalache/cmb_property_controls.py
 cambalache/cmb_signal_editor.py
 cambalache/cmb_signal_editor.ui
 cambalache/cmb_translatable_popover.py
@@ -21,6 +22,7 @@ cambalache/cmb_ui_editor.ui
 cambalache/cmb_ui.py
 cambalache/cmb_view.py
 cambalache/cmb_view.ui
+cambalache/icon_naming_spec.py
 cambalache/app/cmb_application.py
 cambalache/app/cmb_shortcuts.ui
 cambalache/app/cmb_tutorial.py
