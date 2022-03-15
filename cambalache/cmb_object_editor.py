@@ -292,6 +292,8 @@ class CmbObjectEditor(Gtk.Box):
                 editor = CmbEnumComboBox(info=tinfo)
             elif tinfo.parent_id == 'flags':
                 editor = CmbFlagsEntry(info=tinfo)
+        elif type_id == 'gchararray' and info.property_id == 'icon-name':
+            editor = CmbIconNameEntry(hexpand=True, placeholder_text=f'<Named Icon>')
 
         if editor is None:
             editor = CmbEntry(hexpand=True, placeholder_text=f'<{type_id}>')

@@ -29,3 +29,7 @@ CmbView {
 CmbObjectEditor label.modified {
   font-style: italic;
 }
+
+popover.cmb-icon-chooser iconview:not(:selected) {
+  background-color: unset;
+}
