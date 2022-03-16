@@ -212,7 +212,7 @@ END;
 
 CREATE TRIGGER on_property_after_insert AFTER INSERT ON property
 WHEN
-  (SELECT parent_id FROM type WHERE type_id = new.type_id) NOT IN ('enum', 'flags', 'boxed')
+  (SELECT parent_id FROM type WHERE type_id = new.type_id) NOT IN (SELECT type_id FROM type WHERE type_id <> 'object' AND parent_id IS NULL)
 BEGIN
   UPDATE property SET is_object = TRUE WHERE owner_id = new.owner_id and property_id = new.property_id;
 END;
