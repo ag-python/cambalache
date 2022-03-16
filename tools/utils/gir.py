@@ -137,6 +137,8 @@ class GirData:
         obj_types = self._get_types(namespace, types, skip_types, exclude_objects)
         self.types.update(obj_types)
 
+        self._cmb_types_init()
+
         if target_gtk4:
             self._gtk4_init()
         else:
@@ -216,6 +218,24 @@ class GirData:
 
         return pspec.default_value
 
+    def _cmb_types_init(self):
+        if self.lib not in ['gtk+', 'gtk']:
+            return
+
+        extra_types = {}
+
+        # Extra types for Gtk 3 and 4
+        extra_types['CmbIconName'] = {
+            'parent': 'gchararray'
+        }
+
+        if self.lib == 'gtk+':
+            extra_types['CmbStockId'] = {
+                'parent': 'gchararray'
+            }
+
+        self.types.update(extra_types)
+
     def _gtk3_init(self):
         def get_properties (name, props):
             retval = {}
@@ -262,11 +282,7 @@ class GirData:
                     'parent': 'GObject',
                     'layout': 'child',
                     'properties': properties,
-                    'abstract': 1,
-                    'version': None,
-                    'deprecated_version': None,
-                    'signals': {},
-                    'interfaces': []
+                    'abstract': 1
                 }
 
         self.types.update(layout_types)
@@ -414,13 +430,7 @@ class GirData:
             retval[name] = {
                 'parent': 'boxed',
                 'is_container': 0,
-                'layout': None,
                 'abstract': 0,
-                'version': None,
-                'deprecated_version': None,
-                'properties': [],
-                'signals': {},
-                'interfaces': []
             }
 
         return retval
@@ -534,11 +544,11 @@ class GirData:
             return version if major >= mod_major else None
 
         def db_insert_enum_flags(conn, name, data):
-            parent = data['parent']
+            parent = data.get('parent', None)
             conn.execute(f"INSERT INTO type (library_id, type_id, parent_id) VALUES (?, ?, ?);",
                          (self.lib, name, parent))
 
-            members = data['members']
+            members = data.get('members', [])
             for member in members:
                 m = members[member]
                 conn.execute(f"INSERT INTO type_{parent} (type_id, name, value, nick, doc) VALUES (?, ?, ?, ?, ?);",
@@ -546,27 +556,26 @@ class GirData:
 
 
         def db_insert_iface(conn, name, data):
-            parent = data['parent']
+            parent = data.get('parent', None)
             conn.execute(f"INSERT INTO type (library_id, type_id, parent_id) VALUES (?, ?, ?);",
                          (self.lib, name, parent))
 
 
         def db_insert_type(conn, name, data):
-            parent = data['parent']
+            parent = data.get('parent', None)
 
             if parent and parent.find('.') >= 0:
                 parent = 'object'
 
             conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?);",
                          (self.lib, name, parent,
-                          clean_ver(data['version']),
-                          clean_ver(data['deprecated_version']),
-                          data['abstract'],
-                          data['layout']))
-
+                          clean_ver(data.get('version', None)),
+                          clean_ver(data.get('deprecated_version', None)),
+                          data.get('abstract', None),
+                          data.get('layout', None)))
 
         def db_insert_type_data(conn, name, data):
-            properties = data['properties']
+            properties = data.get('properties', [])
             for prop in properties:
                 p = properties[prop]
                 prop_type = p['type']
@@ -588,7 +597,7 @@ class GirData:
                               clean_ver(p['version']),
                               clean_ver(p['deprecated_version'])))
 
-            signals = data['signals']
+            signals = data.get('signals', {})
             for signal in signals:
                 s = signals[signal]
                 conn.execute(f"INSERT INTO signal (owner_id, signal_id, version, deprecated_version, detailed) VALUES (?, ?, ?, ?, ?);",

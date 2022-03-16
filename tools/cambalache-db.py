@@ -228,6 +228,7 @@ class CambalacheDb:
 
                     translatable = get_bool(prop, 'translatable')
                     save_always = get_bool(prop, 'save-always')
+                    type_id = prop.get('type', None)
 
                     if self.lib.target_tk == 'Gtk-4.0':
                         is_inline_object = get_bool(prop, 'is-inline-object')
@@ -236,6 +237,11 @@ class CambalacheDb:
 
                     c.execute("UPDATE property SET translatable=?, save_always=?, is_inline_object=? WHERE owner_id=? AND property_id=?;",
                               (translatable, save_always, is_inline_object, owner_id, property_id))
+
+                    # Force a different type (For Icon names stock ids etc)
+                    if type_id:
+                        c.execute("UPDATE property SET type_id=? WHERE owner_id=? AND property_id=?;",
+                                  (type_id, owner_id, property_id))
 
             # Read type custom tags
             for data in klass.iterchildren('data'):
@@ -278,6 +284,20 @@ class CambalacheDb:
 
         c.close()
         self.conn.commit()
+
+    def get_ignored_named_icons(self):
+        retval = []
+        n = 0
+        c = self.conn.cursor()
+
+        for row in c.execute("SELECT owner_id, property_id FROM property WHERE type_id='gchararray' AND property_id LIKE '%icon-name%';"):
+            owner_id, property_id = row
+            retval.append((owner_id, property_id))
+            n += 1
+
+        c.close()
+
+        return retval if n else None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate Cambalache library data')
@@ -354,5 +374,10 @@ if __name__ == "__main__":
 
     if len(db.lib.ignored_boxed_types):
         print('Ignored boxed types: ', db.lib.ignored_boxed_types)
+
+    ignored_named_icons = db.get_ignored_named_icons()
+    if ignored_named_icons:
+        print('Possible icon name properties (You need to specify type="CmbIconName"): ',
+              ignored_named_icons)
 
     db.dump(args.output)
