@@ -38,6 +38,10 @@ from gi.repository import GLib
 basedir = os.path.dirname(__file__)
 sys.path.insert(1, basedir)
 
+privatedir = os.path.join(basedir, '.lib')
+os.environ['GI_TYPELIB_PATH'] = privatedir
+os.environ['LD_LIBRARY_PATH'] = privatedir
+
 glib_compile_resources = GLib.find_program_in_path ('glib-compile-resources')
 glib_compile_schemas = GLib.find_program_in_path ('glib-compile-schemas')
 update_mime_database = GLib.find_program_in_path ('update-mime-database')
@@ -200,6 +204,32 @@ def check_init_locale():
     locale.textdomain("cambalache")
 
 
+def compile_private():
+    srcdir = os.path.join(basedir, 'cambalache', 'private')
+
+    for prog in ['cc', 'pkg-config', 'g-ir-compiler', 'g-ir-scanner']:
+        if GLib.find_program_in_path (prog) is None:
+            print(f'{prog} is needed to compile Cambalache private library')
+            return
+
+    if not os.path.exists(privatedir):
+        GLib.mkdir_with_parents(privatedir, 0o700)
+
+    for v, pkg in [('3', 'gtk+-3.0'), ('4', 'gtk4')]:
+        srcfile = f'{srcdir}/cmb_private.c'
+        typelib = f'{privatedir}/CambalachePrivate-{v}.0.typelib'
+
+        if os.path.exists(typelib) and os.path.getmtime (srcfile) < os.path.getmtime (typelib):
+            continue
+
+        os.system(f'cc -c -fpic -Wall `pkg-config {pkg} --cflags` -I{srcdir} {srcfile} -o {privatedir}/cmb_private.o')
+        os.system(f'cc -shared -o {privatedir}/libcambalacheprivate-{v}.so {privatedir}/cmb_private.o `pkg-config {pkg} --libs`')
+        os.system(f'g-ir-scanner -i Gtk-{v}.0 -n CambalachePrivate --nsversion={v}.0 \
+                   --identifier-prefix=cmb_private -L {privatedir} -l cambalacheprivate-{v} --symbol-prefix=cmb_private \
+                   {srcdir}/*.c {srcdir}/*.h --warn-all -o {privatedir}/CambalachePrivate-{v}.0.gir')
+        os.system(f'g-ir-compiler {privatedir}/CambalachePrivate-{v}.0.gir --output={typelib}')
+
+
 if __name__ == '__main__':
     if glib_compile_resources is None:
         print('Could not find glib-compile-resources in PATH')
@@ -233,6 +263,8 @@ if __name__ == '__main__':
     update_mime('data/ar.xjuan.Cambalache.mime.xml')
 
     create_catalogs_dir()
+
+    compile_private()
 
     # Run Application
     from cambalache.app import CmbApplication

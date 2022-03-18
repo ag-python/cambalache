@@ -52,5 +52,6 @@ install_data([
     ],
     install_dir: moduledir)
 
+subdir('private')
 subdir('merengue')
 subdir('app')
