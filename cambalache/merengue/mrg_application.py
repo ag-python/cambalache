@@ -144,15 +144,7 @@ class MrgApplication(Gtk.Application):
         if controller.object is None:
             return
 
-        pspec = controller.object.find_property(property_id)
-
-        if pspec:
-            try:
-                status, val = self.builder.value_from_string_type(pspec.value_type, value)
-                if status:
-                    controller.set_object_property(property_id, val)
-            except:
-                pass
+        controller.set_object_property(property_id, value)
 
     def object_layout_property_changed(self, ui_id, object_id, child_id, property_id, value):
         controller = self.get_controller(ui_id, object_id)
@@ -161,15 +153,7 @@ class MrgApplication(Gtk.Application):
         if controller is None or child is None:
             return
 
-        pspec = controller.find_child_property(child.object, property_id)
-
-        if pspec:
-            try:
-                status, val = self.builder.value_from_string_type(pspec.value_type, value)
-                if status:
-                    controller.set_object_child_property(child.object, property_id, val)
-            except:
-                pass
+        controller.set_object_child_property(child.object, property_id, value)
 
     def _show_widget(self, controller):
         child = controller.object

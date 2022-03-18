@@ -42,6 +42,7 @@ if __name__ == "__main__":
     version = sys.argv[1]
     gi.require_version('Gdk', version)
     gi.require_version('Gtk', version)
+    gi.require_version('CambalachePrivate', version)
 
     from merengue import MrgApplication
     app = MrgApplication()

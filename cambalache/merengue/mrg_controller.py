@@ -22,7 +22,7 @@
 #
 
 import gi
-from gi.repository import GObject
+from gi.repository import GObject, CambalachePrivate
 from . import utils
 
 
@@ -59,6 +59,6 @@ class MrgController(GObject.Object):
     # Object set property wrapper
     def set_object_property(self, name, value):
         if self.object and name not in self.property_ignore_list:
-            self.object.set_property(name, value)
+            CambalachePrivate.object_set_property_from_string(self.object, name, value)
 
 

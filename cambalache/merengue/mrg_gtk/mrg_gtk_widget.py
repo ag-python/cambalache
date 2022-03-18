@@ -21,7 +21,7 @@
 #
 
 import gi
-from gi.repository import GObject, Gdk, Gtk
+from gi.repository import GObject, Gdk, Gtk, CambalachePrivate
 
 from .mrg_selection import MrgSelection
 
@@ -200,9 +200,9 @@ class MrgGtkWidgetController(MrgController):
         if Gtk.MAJOR_VERSION == 4:
             manager = self.object.get_layout_manager()
             layout_child = manager.get_layout_child(child)
-            layout_child.set_property(property_id, val)
+            CambalachePrivate.object_set_property_from_string(layout_child, property_id, val)
         else:
-            self.object.child_set_property(child, property_id, val)
+            CambalachePrivate.container_child_set_property_from_string(self.object, child, property_id, val)
 
     def show_child(self, child):
         pass
