@@ -58,6 +58,8 @@ class CmbTypeInfo(CmbBaseTypeInfo):
 
         self.child_types = self.__init_child_type()
 
+        self.instantiable = self.is_a('GObject') and not self.abstract
+
     def __init_hierarchy(self):
         retval = []
 
