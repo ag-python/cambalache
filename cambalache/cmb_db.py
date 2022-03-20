@@ -1120,7 +1120,7 @@ class CmbDB(GObject.GObject):
 
             if is_object:
                 # Ignore object properties with 0/null ID
-                if int(val) == 0:
+                if val is not None and int(val) == 0:
                     continue
 
                 if inline_object_id and is_inline_object:
