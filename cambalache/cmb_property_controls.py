@@ -545,6 +545,9 @@ class CmbIconNameEntry(CmbEntry):
             info = theme.lookup_icon(icon, 32, Gtk.IconLookupFlags.FORCE_SIZE)
             symbolic = info.is_symbolic()
 
+            if not os.path.exists(info.get_filename()):
+                continue
+
             standard_symbolic = symbolic and icon.removesuffix('-symbolic') in standard_icon_names
 
             iter = self.__model.append([icon,
