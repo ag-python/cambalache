@@ -155,6 +155,10 @@ class CmbWindow(Gtk.ApplicationWindow):
         if self.__opensqlite is None:
             self.__opensqlite = GLib.find_program_in_path('xdg-open')
 
+        # No xdg-open?
+        if self.__opensqlite is None:
+            logger.warning('You need sqlitebrowser or xdg-open for debuging project data!')
+
         self.version_label.props.label = f"version {config.VERSION}"
         self.about_dialog.props.version = config.VERSION
 
