@@ -492,10 +492,9 @@ class CmbIconNameEntry(CmbEntry):
 
         super().__init__(**kwargs)
 
-        GObject.Object.bind_property(self, 'primary-icon-name',
-                                     self, 'cmb-value',
-                                     GObject.BindingFlags.SYNC_CREATE |
-                                     GObject.BindingFlags.BIDIRECTIONAL)
+        GObject.Object.bind_property(self, 'cmb-value',
+                                     self, 'primary-icon-name',
+                                     GObject.BindingFlags.SYNC_CREATE)
 
         self.props.secondary_icon_name = 'document-edit-symbolic'
         self.connect("icon-press", self.__on_icon_pressed)
