@@ -255,6 +255,11 @@ window.setupDocument = function (document) {
 
     def __on_object_property_changed(self, project, obj, prop):
         self.__update_view()
+
+        if prop.info.construct_only:
+            self.__merengue_update_ui(obj.ui_id)
+            return
+
         self.__merengue_command('object_property_changed', args={
             'ui_id': obj.ui_id,
             'object_id': obj.object_id,
