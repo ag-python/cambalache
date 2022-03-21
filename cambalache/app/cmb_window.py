@@ -148,17 +148,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         builder.add_from_resource('/ar/xjuan/Cambalache/app/cmb_shortcuts.ui')
         self.set_help_overlay(builder.get_object("shortcuts"))
 
-        self.__opensqlite = GLib.find_program_in_path('sqlitebrowser')
-        self.__opensqlite_pid = None
-
-        # Fallback to xdg-open
-        if self.__opensqlite is None:
-            self.__opensqlite = GLib.find_program_in_path('xdg-open')
-
-        # No xdg-open?
-        if self.__opensqlite is None:
-            logger.warning('You need sqlitebrowser or xdg-open for debuging project data!')
-
         self.version_label.props.label = f"version {config.VERSION}"
         self.about_dialog.props.version = config.VERSION
 
@@ -463,7 +452,6 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.__update_action_clipboard()
         self.__update_action_undo_redo()
         self.__update_action_add_object()
-        self.actions['debug'].set_enabled(has_project and self.__opensqlite is not None)
 
     def __file_open_dialog_new(self,
                                title,
@@ -802,24 +790,10 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.project = None
         self.__set_page('cambalache')
 
-    def __on_opensqlite_exit(self, pid, status, data):
-        self.__opensqlite_pid = None
-
     def _on_debug_activate(self, action, data):
-        if self.__opensqlite is None:
-            return
-
         filename = self.project.filename + '.db'
         self.project.db_backup(filename)
-
-        if self.__opensqlite_pid is not None:
-            return
-
-        pid, stdin, stdout, stderr = GLib.spawn_async([self.__opensqlite, filename],
-                                                      flags=GLib.SpawnFlags.DO_NOT_REAP_CHILD )
-        self.__opensqlite_pid = pid
-        GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid,
-                             self.__on_opensqlite_exit, None)
+        Gtk.show_uri_on_window(self, f'file://{filename}', Gdk.CURRENT_TIME)
 
     def _on_about_activate(self, action, data):
         self.about_dialog.present()
