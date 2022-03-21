@@ -30,12 +30,12 @@
 	("GdkPixbufRotation","GDK_PIXBUF_ROTATE_UPSIDEDOWN","upsidedown",180,"Rotate by 180 degrees.")
   </type_enum>
   <property>
-	("GdkPixbuf","bits-per-sample","gint",None,None,None,"8","1","16",None,None,None,None),
-	("GdkPixbuf","colorspace","GdkColorspace",None,None,None,"rgb",None,None,None,None,None,None),
-	("GdkPixbuf","has-alpha","gboolean",None,None,None,"False",None,None,None,None,None,None),
-	("GdkPixbuf","height","gint",None,None,None,"1","1","2147483647",None,None,None,None),
-	("GdkPixbuf","n-channels","gint",None,None,None,"3","0","2147483647",None,None,None,None),
-	("GdkPixbuf","rowstride","gint",None,None,None,"1","1","2147483647",None,None,None,None),
-	("GdkPixbuf","width","gint",None,None,None,"1","1","2147483647",None,None,None,None)
+	("GdkPixbuf","bits-per-sample","gint",None,1,None,"8","1","16",None,None,None,None),
+	("GdkPixbuf","colorspace","GdkColorspace",None,1,None,"rgb",None,None,None,None,None,None),
+	("GdkPixbuf","has-alpha","gboolean",None,1,None,"False",None,None,None,None,None,None),
+	("GdkPixbuf","height","gint",None,1,None,"1","1","2147483647",None,None,None,None),
+	("GdkPixbuf","n-channels","gint",None,1,None,"3","0","2147483647",None,None,None,None),
+	("GdkPixbuf","rowstride","gint",None,1,None,"1","1","2147483647",None,None,None,None),
+	("GdkPixbuf","width","gint",None,1,None,"1","1","2147483647",None,None,None,None)
   </property>
 </cambalache-catalog>
