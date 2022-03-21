@@ -255,7 +255,7 @@ class GirData:
                     'type': type_name,
                     'version': None,
                     'deprecated_version': None,
-                    'construct': 1 if pspec.flags & GObject.ParamFlags.CONSTRUCT else None,
+                    'construct': 1 if pspec.flags & GObject.ParamFlags.CONSTRUCT_ONLY else None,
                     'default_value': self._get_default_value_from_pspec(pspec),
                     'minimum': pspec.minimum if hasattr(pspec, 'minimum') else None,
                     'maximum': pspec.maximum if hasattr(pspec, 'maximum') else None
@@ -356,7 +356,7 @@ class GirData:
                 'type': type_name,
                 'version': child.get('version'),
                 'deprecated_version': child.get('deprecated-version'),
-                'construct': child.get('construct'),
+                'construct': child.get('construct-only'),
                 'default_value': self._get_default_value_from_pspec(pspec),
                 'minimum': pspec.minimum if hasattr(pspec, 'minimum') else None,
                 'maximum': pspec.maximum if hasattr(pspec, 'maximum') else None
