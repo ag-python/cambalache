@@ -33,11 +33,14 @@ class MrgControllerRegistry(GObject.GObject):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        # Loaded modules
+        self.modules = {}
+
         # Registered controllers
         self.registry = {}
 
     # Object set property wrapper
-    def load_module(self, module):
+    def load_module(self, namespace, module):
         def get_object_type(klass):
             props = klass.list_properties()
 
@@ -46,6 +49,8 @@ class MrgControllerRegistry(GObject.GObject):
                     return pspec.value_type
 
             return None
+
+        self.modules[namespace] = module
 
         for component in module.__dict__.items():
             name, klass = component

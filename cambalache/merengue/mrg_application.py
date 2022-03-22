@@ -51,7 +51,7 @@ class MrgApplication(Gtk.Application):
         # List of available controler classes for objects
         self.registry = MrgControllerRegistry()
 
-        # List of controllers
+        # Dict of controllers
         self.controllers = {}
 
         # The widget that got the last button press this is used to select
@@ -217,6 +217,15 @@ class MrgApplication(Gtk.Application):
         if mod is None:
             return
 
+        # Load merengue plugin if any
+        try:
+            plugin = importlib.import_module(f'merengue.mrg_{namespace.lower()}')
+            self.registry.load_module(namespace, plugin)
+        except Exception as e:
+            logger.warning(e)
+        except ImportError:
+            pass
+
         for type in object_types:
             if hasattr(mod, type):
                 GObject.type_ensure(getattr(mod, type).__gtype__)
@@ -276,9 +285,8 @@ class MrgApplication(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
 
-        # TODO: support multiples plugins
         from merengue import mrg_gtk
-        self.registry.load_module(mrg_gtk)
+        self.registry.load_module('Gtk', mrg_gtk)
 
         self.stdin = GLib.IOChannel.unix_new(sys.stdin.fileno())
         GLib.io_add_watch(self.stdin, GLib.PRIORITY_DEFAULT_IDLE,
