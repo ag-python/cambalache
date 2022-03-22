@@ -1,6 +1,6 @@
-# GtkBin Controller
+# Container Controller
 #
-# Copyright (C) 2021  Juan Pablo Ugarte
+# Copyright (C) 2022  Juan Pablo Ugarte
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,32 +21,25 @@
 #
 
 import gi
-from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from gi.repository import GObject
 from merengue import MrgPlaceholder
+from merengue.mrg_gtk import MrgGtkWidgetController
 
 
-class MrgGtkBinController(MrgGtkWidgetController):
-    object = GObject.Property(type=Gtk.Bin if Gtk.MAJOR_VERSION == 3 else Gtk.Widget,
-                              flags=GObject.ParamFlags.READWRITE)
-
+class MrgContainerController(MrgGtkWidgetController):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
         self.connect("notify::object", self.__on_object_changed)
-        self.__update_placeholder()
+        self.__ensure_placeholders()
 
-    def add(self, child):
-        if self.object is None:
-            return
+    def __get_placeholder(self):
+        for child in self.get_children():
+            if isinstance(child, MrgPlaceholder):
+                return child
+        return None
 
-        if Gtk.MAJOR_VERSION == 3:
-            self.object.add(child)
-        else:
-            self.object.set_child(child)
-
-    def __update_placeholder(self):
+    def __ensure_placeholders(self):
         if self.object is None:
             return
 
@@ -54,5 +47,27 @@ class MrgGtkBinController(MrgGtkWidgetController):
             self.add(MrgPlaceholder(visible=True, controller=self))
 
     def __on_object_changed(self, obj, pspec):
-        self.__update_placeholder()
+        self.__ensure_placeholders()
 
+    def add(self, child):
+        if self.object:
+            self.object.add(child)
+
+    def remove_child(self, child):
+        if self.object:
+            super().remove(child)
+
+    def add_placeholder(self, mod):
+        placeholder = self.__get_placeholder()
+
+        if placeholder is None:
+            placeholder = MrgPlaceholder(visible=True, controller=self)
+            self.add(placeholder)
+
+        self.show_child(placeholder)
+
+    def remove_placeholder(self, mod):
+        placeholder = self.__get_placeholder()
+        if placeholder:
+            self.remove_child(placeholder)
+            self.size -= 1

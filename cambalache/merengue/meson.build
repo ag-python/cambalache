@@ -67,3 +67,13 @@ install_data([
   install_dir: join_paths(moduledir, 'mrg_gtk')
 )
 
+
+install_data([
+  'mrg_handy/__init__.py',
+  'mrg_handy/mrg_container.py',
+  'mrg_handy/mrg_hdy_deck.py',
+  'mrg_handy/mrg_hdy_leaflet.py',
+  'mrg_handy/mrg_hdy_search_bar.py',
+  ],
+  install_dir: join_paths(moduledir, 'mrg_handy')
+)
