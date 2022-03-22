@@ -453,12 +453,12 @@ window.setupDocument = function (document) {
             if command == 'selection_changed':
                 self.__command_selection_changed(**args)
             elif command == 'started':
-                self.__on_project_selection_changed(self.__project)
-
                 self.__merengue_command('gtk_settings_get',
                                         args={ 'property': 'gtk-theme-name' })
 
                 self.__load_namespaces()
+
+                self.__on_project_selection_changed(self.__project)
             elif command == 'placeholder_selected':
                 self.emit('placeholder-selected', args['ui_id'], args['object_id'], args['layout'], args['position'], args['child_type'])
             elif command == 'placeholder_activated':
