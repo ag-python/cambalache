@@ -221,10 +221,10 @@ class MrgApplication(Gtk.Application):
         try:
             plugin = importlib.import_module(f'merengue.mrg_{namespace.lower()}')
             self.registry.load_module(namespace, plugin)
-        except Exception as e:
-            logger.warning(e)
         except ImportError:
             pass
+        except Exception as e:
+            logger.warning(e)
 
         for type in object_types:
             if hasattr(mod, type):
