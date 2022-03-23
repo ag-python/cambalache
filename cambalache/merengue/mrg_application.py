@@ -134,15 +134,10 @@ class MrgApplication(Gtk.Application):
             return
 
         if is_object:
-            target_controller = self.get_controller(ui_id, value)
+            target = self.get_controller(ui_id, value)
+            controller.set_object_property(property_id,
+                                           target.object if target else None)
 
-            if target_controller:
-                controller.set_object_property(property_id,
-                                               target_controller.object)
-
-            return
-
-        if controller.object is None:
             return
 
         controller.set_object_property(property_id, value)
