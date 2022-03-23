@@ -59,6 +59,8 @@ class MrgController(GObject.Object):
     # Object set property wrapper
     def set_object_property(self, name, value):
         if self.object and name not in self.property_ignore_list:
-            CambalachePrivate.object_set_property_from_string(self.object, name, value)
-
+            if type(value) == str:
+                CambalachePrivate.object_set_property_from_string(self.object, name, value)
+            else:
+                self.object.set_property(name, value)
 
