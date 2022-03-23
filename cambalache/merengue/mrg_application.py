@@ -114,8 +114,8 @@ class MrgApplication(Gtk.Application):
             if pspec is None or pspec.value_type != obj.__gtype__:
                 controller = self.registry.new_controller_for_type(obj.__gtype__, self)
 
-            controller.toplevel = object_id in toplevels
             controller.object = obj
+            controller.toplevel = controller.object_id in toplevels
             self.controllers[object_id] = controller
 
         # Set controller for placeholders created by Builder
