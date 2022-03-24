@@ -1328,9 +1328,10 @@ class CmbDB(GObject.GObject):
         # If the user did not specify a requirement version we use the latest
         for row in c.execute('''SELECT l.library_id, MAX_VERSION(v.version)
             FROM library AS l, library_version AS v
-            WHERE l.library_id=v.library_id AND l.library_id IN
-                (SELECT DISTINCT t.library_id FROM object AS o, type AS t WHERE o.ui_id=? AND o.type_id = t.type_id)
-            GROUP BY l.library_id;''', (ui_id,)):
+            WHERE l.library_id=v.library_id AND
+                l.library_id NOT IN (SELECT library_id FROM ui_library WHERE ui_id=?) AND
+                l.library_id IN (SELECT DISTINCT t.library_id FROM object AS o, type AS t WHERE o.ui_id=? AND o.type_id = t.type_id)
+            GROUP BY l.library_id;''', (ui_id, ui_id)):
             library_id, version = row
             req = E.requires(lib=library_id, version=version)
             node.append(req)
