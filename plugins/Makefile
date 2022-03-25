@@ -7,7 +7,7 @@ CAMBALACHE_DB=flatpak run \
 	--device=all \
 	--filesystem=host \
 	--command=python3 \
-	org.gnome.Sdk//40 \
+	org.gnome.Sdk//42 \
 	../tools/cambalache-db.py
 
 BASE_CATALOG_FILES = \
@@ -32,6 +32,7 @@ CATALOG_FILES = \
 	gtk/gtk-4.0.xml \
 	gtk/gtk+-3.0.xml \
 	gnome/libhandy-1.xml \
+	gnome/libadwaita-1.xml \
 	$(NULL)
 
 
@@ -120,12 +121,14 @@ gnome/libhandy-1.xml: gtk/gtk+-3.0.xml
 		--skip-types HdySwipeTracker HdyValueObject \
 		--output $@
 
-# gnome/Adw-1.xml: gtk/gtk-4.0.xml
-# 	${CAMBALACHE_DB} \
-# 		--dependencies gtk-4.0 \
-# 		--gir /usr/share/gir-1.0/Adw-1.gir \
-# 		--external-catalogs ${GTK4_DEPS} gtk/gtk-4.0.xml \
-# 		--output $@
+gnome/libadwaita-1.xml: gtk/gtk-4.0.xml
+	${CAMBALACHE_DB} \
+		--target-gtk4 \
+		--dependencies gtk-4.0 \
+		--gir /usr/share/gir-1.0/Adw-1.gir \
+		--external-catalogs ${GTK4_DEPS} gtk/gtk-4.0.xml \
+		--skip-types AdwAnimation AdwSwipeTracker\
+		--output $@
 
 
 .PHONY: all clean

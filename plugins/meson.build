@@ -8,7 +8,8 @@ install_data([
     'gtk/gsk-4.0.xml',
     'gtk/gtk-4.0.xml',
     'gtk/gtk+-3.0.xml',
-    'gnome/libhandy-1.xml'
+    'gnome/libhandy-1.xml',
+    'gnome/libadwaita-1.xml'
     ],
     install_dir: catalogsdir)
 
