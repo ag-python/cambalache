@@ -48,9 +48,6 @@ class MrgGtkWindow(MrgGtkBin):
         self.property_ignore_list.add('modal')
 
     def __on_object_changed(self, obj, pspec):
-        # keep track of size, position, and window state (maximized)
-        self._save_state()
-
         if self._object:
             self._object.destroy()
 
@@ -72,6 +69,8 @@ class MrgGtkWindow(MrgGtkBin):
             # Restore size
             if self._size and not self._is_maximized:
                 self.object.set_default_size(*self._size)
+            else:
+                self.object.set_default_size(320, 240)
 
             # Disable modal at runtime
             self.object.props.modal = False
@@ -88,11 +87,14 @@ class MrgGtkWindow(MrgGtkBin):
 
             self._restore_state()
 
+        # keep track of size, position, and window state (maximized)
+        self._save_state()
+
     def _update_name(self):
         if self.object is None:
             return
 
-        # TODO: finx a way to get object name instead of ID
+        # TODO: find a way to get object name instead of ID
         type_name = GObject.type_name(self.object.__gtype__)
         self.object.props.title = type_name
 
@@ -106,6 +108,7 @@ class MrgGtkWindow(MrgGtkBin):
             return
 
         if Gtk.MAJOR_VERSION == 4:
+            # FIXME: this does not work, find a way to get the size of the window try map event
             self._size = [self.object.get_width(), self.object.get_height()]
         else:
             self._position = self.object.get_position()
