@@ -1,4 +1,4 @@
-# GtkWindow Selection Controller
+# GtkWindow Selection 
 #
 # Copyright (C) 2021  Juan Pablo Ugarte
 #

@@ -23,10 +23,10 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 
 
-class MrgGtkExpanderController(MrgGtkBinController):
+class MrgGtkExpander(MrgGtkBin):
     object = GObject.Property(type=Gtk.Expander,
                               flags=GObject.ParamFlags.READWRITE)
 

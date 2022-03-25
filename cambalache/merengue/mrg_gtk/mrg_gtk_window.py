@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 from .mrg_selection import MrgSelection
 
 
-class MrgGtkWindowController(MrgGtkBinController):
+class MrgGtkWindow(MrgGtkBin):
     object = GObject.Property(type=Gtk.Window,
                               flags=GObject.ParamFlags.READWRITE)
 

@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_box import MrgGtkBoxController
+from .mrg_gtk_box import MrgGtkBox
 from merengue import MrgPlaceholder, utils
 
 
-class MrgGtkListBoxController(MrgGtkBoxController):
+class MrgGtkListBox(MrgGtkBox):
     object = GObject.Property(type=Gtk.ListBox,
                               flags=GObject.ParamFlags.READWRITE)
 

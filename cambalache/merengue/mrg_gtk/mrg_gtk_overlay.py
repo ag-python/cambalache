@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 from merengue import MrgPlaceholder
 
 
-class MrgGtkOverlayController(MrgGtkBinController):
+class MrgGtkOverlay(MrgGtkBin):
     object = GObject.Property(type=Gtk.Overlay,
                               flags=GObject.ParamFlags.READWRITE)
 

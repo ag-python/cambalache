@@ -23,10 +23,10 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 
 
-class MrgGtkListBoxRowController(MrgGtkBinController):
+class MrgGtkListBoxRow(MrgGtkBin):
     object = GObject.Property(type=Gtk.ListBoxRow,
                               flags=GObject.ParamFlags.READWRITE)
 

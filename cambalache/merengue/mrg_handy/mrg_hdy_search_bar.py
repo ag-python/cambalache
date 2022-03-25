@@ -25,10 +25,10 @@ import gi
 from gi.repository import GObject, Gtk, Handy
 
 from merengue import utils
-from merengue.mrg_gtk import MrgGtkBinController
+from merengue.mrg_gtk import MrgGtkBin
 
 
-class MrgHdySearchBarController(MrgGtkBinController):
+class MrgHdySearchBar(MrgGtkBin):
     object = GObject.Property(type=Handy.SearchBar,
                               flags=GObject.ParamFlags.READWRITE)
 

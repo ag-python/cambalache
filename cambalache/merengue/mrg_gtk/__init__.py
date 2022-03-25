@@ -23,28 +23,28 @@
 import gi
 from gi.repository import Gtk
 
-from .mrg_gtk_aspect_frame import MrgGtkAspectFrameController
-from .mrg_gtk_assistant import MrgGtkAssistantController
+from .mrg_gtk_aspect_frame import MrgGtkAspectFrame
+from .mrg_gtk_assistant import MrgGtkAssistant
 
 if Gtk.MAJOR_VERSION == 3:
-    from .mrg_gtk_bin import MrgGtkBinController
-    from .mrg_gtk_menu_item import MrgGtkMenuItemController
+    from .mrg_gtk_bin import MrgGtkBin
+    from .mrg_gtk_menu_item import MrgGtkMenuItem
 elif Gtk.MAJOR_VERSION == 4:
-    from .mrg_gtk_center_box import MrgGtkCenterBoxController
+    from .mrg_gtk_center_box import MrgGtkCenterBox
 
-from .mrg_gtk_box import MrgGtkBoxController
-from .mrg_gtk_expander import MrgGtkExpanderController
-from .mrg_gtk_frame import MrgGtkFrameController
-from .mrg_gtk_grid import MrgGtkGridController
-from .mrg_gtk_label import MrgGtkLabelController
-from .mrg_gtk_list_box import MrgGtkListBoxController
-from .mrg_gtk_list_box_row import MrgGtkListBoxRowController
-from .mrg_gtk_overlay import MrgGtkOverlayController
-from .mrg_gtk_paned import MrgGtkPanedController
-from .mrg_gtk_revealer import MrgGtkRevealerController
-from .mrg_gtk_scrolled_window import MrgGtkScrolledWindowController
-from .mrg_gtk_stack import MrgGtkStackController
-from .mrg_gtk_viewport import MrgGtkViewportController
-from .mrg_gtk_widget import MrgGtkWidgetController
-from .mrg_gtk_window import MrgGtkWindowController
+from .mrg_gtk_box import MrgGtkBox
+from .mrg_gtk_expander import MrgGtkExpander
+from .mrg_gtk_frame import MrgGtkFrame
+from .mrg_gtk_grid import MrgGtkGrid
+from .mrg_gtk_label import MrgGtkLabel
+from .mrg_gtk_list_box import MrgGtkListBox
+from .mrg_gtk_list_box_row import MrgGtkListBoxRow
+from .mrg_gtk_overlay import MrgGtkOverlay
+from .mrg_gtk_paned import MrgGtkPaned
+from .mrg_gtk_revealer import MrgGtkRevealer
+from .mrg_gtk_scrolled_window import MrgGtkScrolledWindow
+from .mrg_gtk_stack import MrgGtkStack
+from .mrg_gtk_viewport import MrgGtkViewport
+from .mrg_gtk_widget import MrgGtkWidget
+from .mrg_gtk_window import MrgGtkWindow
 from .mrg_selection import MrgSelection

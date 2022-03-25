@@ -30,7 +30,7 @@ from merengue import MrgController, getLogger, utils
 logger = getLogger(__name__)
 
 
-class MrgGtkWidgetController(MrgController):
+class MrgGtkWidget(MrgController):
     object = GObject.Property(type=Gtk.Widget,
                               flags=GObject.ParamFlags.READWRITE)
 

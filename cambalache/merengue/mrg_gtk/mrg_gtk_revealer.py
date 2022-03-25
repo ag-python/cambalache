@@ -23,10 +23,10 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 
 
-class MrgGtkRevealerController(MrgGtkBinController):
+class MrgGtkRevealer(MrgGtkBin):
     object = GObject.Property(type=Gtk.Revealer,
                               flags=GObject.ParamFlags.READWRITE)
 

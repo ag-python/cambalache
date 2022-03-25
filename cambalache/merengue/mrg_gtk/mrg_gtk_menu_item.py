@@ -23,10 +23,10 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_widget import MrgGtkWidget
 
 
-class MrgGtkMenuItemController(MrgGtkWidgetController):
+class MrgGtkMenuItem(MrgGtkWidget):
     object = GObject.Property(type=Gtk.MenuItem, flags=GObject.ParamFlags.READWRITE)
 
     # Disable GtkBin Controller (We do not want placeholders)

@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_widget import MrgGtkWidget
 from merengue import MrgPlaceholder
 
 
-class MrgGtkStackController(MrgGtkWidgetController):
+class MrgGtkStack(MrgGtkWidget):
     object = GObject.Property(type=Gtk.Stack,
                               flags=GObject.ParamFlags.READWRITE)
 

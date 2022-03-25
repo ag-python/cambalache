@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 from merengue import MrgPlaceholder
 
 
-class MrgGtkFrameController(MrgGtkBinController):
+class MrgGtkFrame(MrgGtkBin):
     object = GObject.Property(type=Gtk.Frame,
                               flags=GObject.ParamFlags.READWRITE)
 

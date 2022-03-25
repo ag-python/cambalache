@@ -1,4 +1,4 @@
-# GtkAssistant Controller
+# GtkAssistant
 #
 # Copyright (C) 2022  Juan Pablo Ugarte
 #
@@ -23,13 +23,13 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_window import MrgGtkWindowController
+from .mrg_gtk_window import MrgGtkWindow
 from merengue import MrgPlaceholder, getLogger, utils
 
 logger = getLogger(__name__)
 
 
-class MrgGtkAssistantController(MrgGtkWindowController):
+class MrgGtkAssistant(MrgGtkWindow):
     object = GObject.Property(type=Gtk.Assistant,
                               flags=GObject.ParamFlags.READWRITE)
 

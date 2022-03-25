@@ -27,6 +27,6 @@ from gi.repository import Handy
 
 Handy.init()
 
-from .mrg_hdy_deck import MrgHdyDeckController
-from .mrg_hdy_leaflet import MrgHdyLeafletController
-from .mrg_hdy_search_bar import MrgHdySearchBarController
+from .mrg_hdy_deck import MrgHdyDeck
+from .mrg_hdy_leaflet import MrgHdyLeaflet
+from .mrg_hdy_search_bar import MrgHdySearchBar

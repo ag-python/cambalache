@@ -23,13 +23,13 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_widget import MrgGtkWidget
 from merengue import MrgPlaceholder, getLogger, utils
 
 logger = getLogger(__name__)
 
 
-class MrgGtkBoxController(MrgGtkWidgetController):
+class MrgGtkBox(MrgGtkWidget):
     object = GObject.Property(type=Gtk.Box, flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):

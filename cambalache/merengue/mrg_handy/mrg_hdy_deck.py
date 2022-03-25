@@ -24,10 +24,10 @@ import gi
 
 from gi.repository import GObject, Handy
 
-from .mrg_container import MrgContainerController
+from .mrg_container import MrgContainer
 
 
-class MrgHdyDeckController(MrgContainerController):
+class MrgHdyDeck(MrgContainer):
     object = GObject.Property(type=Handy.Deck,
                               flags=GObject.ParamFlags.READWRITE)
 

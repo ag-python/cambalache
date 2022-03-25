@@ -1,4 +1,4 @@
-# GtkBin Controller
+# GtkBin 
 #
 # Copyright (C) 2021  Juan Pablo Ugarte
 #
@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_widget import MrgGtkWidget
 from merengue import MrgPlaceholder
 
 
-class MrgGtkBinController(MrgGtkWidgetController):
+class MrgGtkBin(MrgGtkWidget):
     object = GObject.Property(type=Gtk.Bin if Gtk.MAJOR_VERSION == 3 else Gtk.Widget,
                               flags=GObject.ParamFlags.READWRITE)
 

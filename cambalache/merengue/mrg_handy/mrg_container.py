@@ -24,10 +24,10 @@ import gi
 
 from gi.repository import GObject
 from merengue import MrgPlaceholder
-from merengue.mrg_gtk import MrgGtkWidgetController
+from merengue.mrg_gtk import MrgGtkWidget
 
 
-class MrgContainerController(MrgGtkWidgetController):
+class MrgContainer(MrgGtkWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.connect("notify::object", self.__on_object_changed)

@@ -1,4 +1,4 @@
-# GtkAspectFrame Controller
+# GtkAspectFrame 
 #
 # Copyright (C) 2022  Juan Pablo Ugarte
 #
@@ -23,11 +23,11 @@
 import gi
 from gi.repository import GObject, Gdk, Gtk
 
-from .mrg_gtk_bin import MrgGtkBinController
+from .mrg_gtk_bin import MrgGtkBin
 from merengue import MrgPlaceholder
 
 
-class MrgGtkAspectFrameController(MrgGtkBinController):
+class MrgGtkAspectFrame(MrgGtkBin):
     object = GObject.Property(type=Gtk.AspectFrame,
                               flags=GObject.ParamFlags.READWRITE)
 

@@ -23,13 +23,13 @@
 import gi
 from gi.repository import GObject, Gtk
 
-from .mrg_gtk_widget import MrgGtkWidgetController
+from .mrg_gtk_widget import MrgGtkWidget
 from merengue import MrgPlaceholder, getLogger, utils
 
 logger = getLogger(__name__)
 
 
-class MrgGtkCenterBoxController(MrgGtkWidgetController):
+class MrgGtkCenterBox(MrgGtkWidget):
     object = GObject.Property(type=Gtk.CenterBox, flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):

@@ -24,10 +24,10 @@ import gi
 
 from gi.repository import GObject, Handy
 
-from .mrg_container import MrgContainerController
+from .mrg_container import MrgContainer
 
 
-class MrgHdyLeafletController(MrgContainerController):
+class MrgHdyLeaflet(MrgContainer):
     object = GObject.Property(type=Handy.Leaflet,
                               flags=GObject.ParamFlags.READWRITE)
 
