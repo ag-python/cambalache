@@ -59,6 +59,8 @@ GTK3_XML = os.path.join(catalogsdir, 'gtk+-3.0.xml')
 GTK4_XML = os.path.join(catalogsdir, 'gtk-4.0.xml')
 
 LIBHANDY_XML = os.path.join(catalogsdir, 'libhandy-1.xml')
+LIBADWAITA_XML = os.path.join(catalogsdir, 'libadwaita-1.xml')
+
 
 class CmbDB(GObject.GObject):
     __gtype_name__ = 'CmbDB'
@@ -293,6 +295,8 @@ class CmbDB(GObject.GObject):
             self.load_catalog(GDK4_XML)
             self.load_catalog(GSK4_XML)
             self.load_catalog(GTK4_XML)
+            # FIXME: this should be optional
+            self.load_catalog(LIBADWAITA_XML)
 
         # TODO: Load all libraries that depend on self.target_tk
 

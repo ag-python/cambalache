@@ -160,6 +160,7 @@ def create_catalogs_dir():
     link_plugin('plugins/gtk/gtk-4.0.xml')
     link_plugin('plugins/gtk/gtk+-3.0.xml')
     link_plugin('plugins/gnome/libhandy-1.xml')
+    link_plugin('plugins/gnome/libadwaita-1.xml')
 
 def get_version():
     meson = open(os.path.join(basedir, 'meson.build'))
