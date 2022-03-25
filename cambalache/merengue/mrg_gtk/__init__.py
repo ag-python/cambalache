@@ -25,9 +25,9 @@ from gi.repository import Gtk
 
 from .mrg_gtk_aspect_frame import MrgGtkAspectFrame
 from .mrg_gtk_assistant import MrgGtkAssistant
+from .mrg_gtk_bin import MrgGtkBin
 
 if Gtk.MAJOR_VERSION == 3:
-    from .mrg_gtk_bin import MrgGtkBin
     from .mrg_gtk_menu_item import MrgGtkMenuItem
 elif Gtk.MAJOR_VERSION == 4:
     from .mrg_gtk_center_box import MrgGtkCenterBox
