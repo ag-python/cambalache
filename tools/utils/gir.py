@@ -111,6 +111,10 @@ class GirData:
             print(f"Loading {self.name} {self.version}")
             gi.require_version(self.name, self.version)
             self.mod = importlib.import_module(f'gi.repository.{self.name}')
+
+            if hasattr(self.mod, 'init'):
+                getattr(self.mod, 'init')()
+
         except ValueError as e:
             print(f"Oops! Could not load {self.name} {self.version} module: {e}")
 
