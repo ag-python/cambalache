@@ -150,17 +150,17 @@ def create_catalogs_dir():
     if not os.path.exists('.catalogs'):
         GLib.mkdir_with_parents('.catalogs', 0o700)
 
-    link_plugin('plugins/glib/gobject-2.0.xml')
-    link_plugin('plugins/glib/gio-2.0.xml')
-    link_plugin('plugins/gdkpixbuf/gdkpixbuf-2.0.xml')
-    link_plugin('plugins/pango/pango-1.0.xml')
-    link_plugin('plugins/gtk/gdk-3.0.xml')
-    link_plugin('plugins/gtk/gdk-4.0.xml')
-    link_plugin('plugins/gtk/gsk-4.0.xml')
-    link_plugin('plugins/gtk/gtk-4.0.xml')
-    link_plugin('plugins/gtk/gtk+-3.0.xml')
-    link_plugin('plugins/gnome/libhandy-1.xml')
-    link_plugin('plugins/gnome/libadwaita-1.xml')
+    link_plugin('catalogs/glib/gobject-2.0.xml')
+    link_plugin('catalogs/glib/gio-2.0.xml')
+    link_plugin('catalogs/gdkpixbuf/gdkpixbuf-2.0.xml')
+    link_plugin('catalogs/pango/pango-1.0.xml')
+    link_plugin('catalogs/gtk/gdk-3.0.xml')
+    link_plugin('catalogs/gtk/gdk-4.0.xml')
+    link_plugin('catalogs/gtk/gsk-4.0.xml')
+    link_plugin('catalogs/gtk/gtk-4.0.xml')
+    link_plugin('catalogs/gtk/gtk+-3.0.xml')
+    link_plugin('catalogs/gnome/libhandy-1.xml')
+    link_plugin('catalogs/gnome/libadwaita-1.xml')
 
 def get_version():
     meson = open(os.path.join(basedir, 'meson.build'))

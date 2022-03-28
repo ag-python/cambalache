@@ -63,14 +63,14 @@ assert(all_required, 'One or more required modules where not found')
 
 # Broadway is needed to display the workspace in CmbView
 find_program('broadwayd', required: true)
-#find_program('gtk4-broadwayd', required: true)
+find_program('gtk4-broadwayd', required: true)
 
 gtk3_dep = dependency('gtk+-3.0', version: '>= 3.24.0')
 gtk4_dep = dependency('gtk4', version: '>= 4.4.0')
 
 subdir('data')
 subdir('cambalache')
-subdir('plugins')
+subdir('catalogs')
 subdir('po')
 
 meson.add_install_script('postinstall.py')
