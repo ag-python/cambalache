@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/ar/xjuan/Cambalache">
-    <file>cmb_base.sql</file>
-    <file>cmb_project.sql</file>
-    <file>cmb_history.sql</file>
+    <file>db/cmb_base.sql</file>
+    <file>db/cmb_project.sql</file>
+    <file>db/cmb_history.sql</file>
     <file>cmb_view.ui</file>
     <file>cmb_context_menu.ui</file>
     <file>cmb_type_chooser.ui</file>

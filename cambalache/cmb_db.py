@@ -44,9 +44,9 @@ def _get_text_resource(name):
                                        Gio.ResourceLookupFlags.NONE)
     return gbytes.get_data().decode('UTF-8')
 
-BASE_SQL = _get_text_resource('cmb_base.sql')
-PROJECT_SQL = _get_text_resource('cmb_project.sql')
-HISTORY_SQL = _get_text_resource('cmb_history.sql')
+BASE_SQL = _get_text_resource('db/cmb_base.sql')
+PROJECT_SQL = _get_text_resource('db/cmb_project.sql')
+HISTORY_SQL = _get_text_resource('db/cmb_history.sql')
 
 GOBJECT_XML = os.path.join(catalogsdir, 'gobject-2.0.xml')
 GIO_XML = os.path.join(catalogsdir, 'gio-2.0.xml')
