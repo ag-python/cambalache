@@ -67,18 +67,17 @@ class MrgApplication(Gtk.Application):
         object_id = utils.object_get_id(obj)
         return self.controllers.get(object_id, None)
 
-    def clear_all(self, clear_selection=False):
+    def clear_all(self):
         self.preselected_widget = None
 
         # Unset controllers objects
         for key in self.controllers:
             controller = self.controllers[key]
             controller.object = None
-            if clear_selection:
-                controller.selected = False
+            controller.selected = False
 
-    def update_ui(self, ui_id, toplevels=[], payload=None):
-        self.clear_all(clear_selection=ui_id == 0)
+    def update_ui(self, ui_id, toplevels=[], selection=[], payload=None):
+        self.clear_all()
 
         if payload == None:
             return
@@ -127,6 +126,8 @@ class MrgApplication(Gtk.Application):
             parent_id = utils.object_get_id(obj.props.parent)
             obj.controller = self.controllers.get(parent_id, None)
 
+        self.set_selection(ui_id, selection)
+
     def object_property_changed(self, ui_id, object_id, property_id, is_object, value):
         controller = self.get_controller(ui_id, object_id)
 
@@ -164,11 +165,7 @@ class MrgApplication(Gtk.Application):
 
             parent = parent.props.parent
 
-    def selection_changed(self, ui_id, selection):
-        # Clear objects
-        for object_id in self.controllers:
-            self.controllers[object_id].selected = False
-
+    def set_selection(self, ui_id, selection):
         length = len(selection)
 
         # Add class to selected objects
@@ -182,6 +179,13 @@ class MrgApplication(Gtk.Application):
             if obj and issubclass(type(obj), Gtk.Widget):
                 controller.selected = True
                 self._show_widget(controller)
+
+    def selection_changed(self, ui_id, selection):
+        # Clear objects
+        for object_id in self.controllers:
+            self.controllers[object_id].selected = False
+
+        self.set_selection(ui_id, selection)
 
     def gtk_settings_set(self, property, value):
         self.settings.set_property(property, value)
