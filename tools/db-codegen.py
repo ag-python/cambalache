@@ -33,10 +33,10 @@ class CambalacheDb:
         dirname = os.path.dirname(__file__) or '.'
 
         # Create DB tables
-        with open(os.path.join(dirname, '../cambalache/cmb_base.sql'), 'r') as sql:
+        with open(os.path.join(dirname, '../cambalache/db/cmb_base.sql'), 'r') as sql:
             self.conn.executescript(sql.read())
 
-        with open(os.path.join(dirname, '../cambalache/cmb_project.sql'), 'r') as sql:
+        with open(os.path.join(dirname, '../cambalache/db/cmb_project.sql'), 'r') as sql:
             self.conn.executescript(sql.read())
 
         self.conn.commit()
@@ -56,6 +56,8 @@ class CambalacheDb:
                 col_type = 'str'
             elif col_type == 'BOOLEAN':
                 col_type = 'bool'
+            elif col_type == 'REAL':
+                col_type = 'float'
             else:
                 print('Error unknown type', col_type)
 
