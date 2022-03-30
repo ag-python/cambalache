@@ -40,6 +40,7 @@ class CmbTreeView(Gtk.TreeView):
 
         self._project = None
         self._selection = self.get_selection()
+        self.__in_selection_change = False
         self._selection.connect('changed', self.__on_selection_changed)
         self.set_headers_visible (False)
         self.__right_click = False
@@ -60,6 +61,8 @@ class CmbTreeView(Gtk.TreeView):
         self.connect('button-press-event', self.__on_button_press_event)
         self.connect('button-release-event', self.__on_button_release_event)
 
+        self.set_reorderable(True)
+
     def __on_button_press_event(self, widget, event):
         if event.window != self.get_bin_window() or event.button != 3:
             return False
@@ -72,11 +75,16 @@ class CmbTreeView(Gtk.TreeView):
             return False
 
         if not self.__right_click:
-            return
+            return False
 
         self.__right_click = False
 
-        path, col, xx, yy = self.get_path_at_pos(event.x, event.y)
+        retval = self.get_path_at_pos(event.x, event.y)
+
+        if retval is None:
+            return False
+
+        path, col, xx, yy = retval
         self.get_selection().select_path(path)
 
         self.menu.popup_at(event.x, event.y)
@@ -140,6 +148,8 @@ class CmbTreeView(Gtk.TreeView):
         if selection == current:
             return
 
+        self.__in_selection_change = True
+
         if len(selection) > 0:
             _iter = project.get_iter_from_object(selection[0])
             path = project.get_path(_iter)
@@ -148,7 +158,12 @@ class CmbTreeView(Gtk.TreeView):
         else:
             self._selection.unselect_all()
 
+        self.__in_selection_change = False
+
     def __on_selection_changed(self, selection):
+        if self.__in_selection_change:
+            return
+
         project, _iter = selection.get_selected()
 
         if _iter is not None:
