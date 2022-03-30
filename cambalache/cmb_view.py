@@ -232,12 +232,15 @@ window.setupDocument = function (document) {
     def __merengue_update_ui(self, ui_id):
         ui = self.__get_ui_xml(ui_id, merengue=True)
         toplevels = self.__project.db.get_toplevels(ui_id)
+        selection = self.__project.get_selection()
+        objects = self.__get_selection_objects(selection, ui_id)
 
         self.__merengue_command('update_ui',
                                 payload=ui,
                                 args={
                                     'ui_id': ui_id,
-                                    'toplevels': toplevels
+                                    'toplevels': toplevels,
+                                    'selection': objects
                                 })
 
     def __on_object_added(self, project, obj):
@@ -249,7 +252,7 @@ window.setupDocument = function (document) {
         self.__merengue_update_ui(obj.ui_id)
 
     def __on_object_changed(self, project, obj, field):
-        if field == 'type':
+        if field in ['type', 'position']:
             self.__update_view()
             self.__merengue_update_ui(obj.ui_id)
 
@@ -278,6 +281,15 @@ window.setupDocument = function (document) {
             'value': prop.value
         })
 
+    def __get_selection_objects(self, selection, ui_id):
+        objects = []
+
+        for obj in selection:
+            if type(obj) == CmbObject and obj.ui_id == ui_id:
+                objects.append(obj.object_id)
+
+        return objects
+
     def __on_project_selection_changed(self, project):
         selection = project.get_selection()
 
@@ -289,11 +301,7 @@ window.setupDocument = function (document) {
                 self.__update_view()
                 self.__merengue_update_ui(ui_id)
 
-            objects = []
-            for obj in selection:
-                if type(obj) == CmbObject and obj.ui_id == ui_id:
-                    objects.append(obj.object_id)
-
+            objects = self.__get_selection_objects(selection, ui_id)
             self.__merengue_command('selection_changed', args={ 'ui_id': ui_id, 'selection': objects })
         else:
             self.__ui_id = 0
