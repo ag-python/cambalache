@@ -1,7 +1,7 @@
 #
 # CambalacheDB - Data Model for Cambalache
 #
-# Copyright (C) 2021  Juan Pablo Ugarte
+# Copyright (C) 2021-2022  Juan Pablo Ugarte
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ import sys
 import ast
 import sqlite3
 import argparse
+import json
 
 from lxml import etree
 from lxml.builder import E
@@ -42,7 +43,7 @@ class CambalacheDb:
         dirname = os.path.dirname(__file__) or '.'
 
         # Create DB tables
-        with open('../cambalache/cmb_base.sql', 'r') as sql:
+        with open('../cambalache/db/cmb_base.sql', 'r') as sql:
             self.conn.executescript(sql.read())
             self.conn.commit()
 
@@ -228,6 +229,7 @@ class CambalacheDb:
 
                     translatable = get_bool(prop, 'translatable')
                     save_always = get_bool(prop, 'save-always')
+                    is_position = get_bool(prop, 'is-position')
                     type_id = prop.get('type', None)
 
                     if self.lib.target_tk == 'Gtk-4.0':
@@ -235,8 +237,8 @@ class CambalacheDb:
                     else:
                         is_inline_object = None
 
-                    c.execute("UPDATE property SET translatable=?, save_always=?, is_inline_object=? WHERE owner_id=? AND property_id=?;",
-                              (translatable, save_always, is_inline_object, owner_id, property_id))
+                    c.execute("UPDATE property SET translatable=?, save_always=?, is_inline_object=?, is_position=? WHERE owner_id=? AND property_id=?;",
+                              (translatable, save_always, is_inline_object, is_position, owner_id, property_id))
 
                     # Force a different type (For Icon names stock ids etc)
                     if type_id:
@@ -286,18 +288,50 @@ class CambalacheDb:
         self.conn.commit()
 
     def get_ignored_named_icons(self):
-        retval = []
+        retval = {}
         n = 0
         c = self.conn.cursor()
 
         for row in c.execute("SELECT owner_id, property_id FROM property WHERE type_id='gchararray' AND property_id LIKE '%icon-name%';"):
             owner_id, property_id = row
-            retval.append((owner_id, property_id))
+
+            ids = retval.get(owner_id, None)
+            if ids is None:
+                ids = []
+                retval[owner_id] = ids
+
+            ids.append(property_id)
             n += 1
 
         c.close()
 
         return retval if n else None
+
+    def get_position_layout_properties(self):
+        retval = {}
+        n = 0
+        c = self.conn.cursor()
+
+        for row in c.execute('''SELECT p.owner_id, p.property_id FROM property AS p, type AS t
+                                WHERE p.owner_id=t.type_id AND
+                                      t.layout='child' AND
+                                      p.type_id='gint' AND
+                                      p.is_position IN (NULL, 0) AND
+                                      p.property_id LIKE '%position%';'''):
+            owner_id, property_id = row
+
+            ids = retval.get(owner_id, None)
+            if ids is None:
+                ids = []
+                retval[owner_id] = ids
+
+            ids.append(property_id)
+            n += 1
+
+        c.close()
+
+        return retval if n else None
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate Cambalache library data')
@@ -381,6 +415,11 @@ if __name__ == "__main__":
     ignored_named_icons = db.get_ignored_named_icons()
     if ignored_named_icons:
         print('Possible icon name properties (You need to specify type="CmbIconName"): ',
-              ignored_named_icons)
+              json.dumps(ignored_named_icons, indent=2, sort_keys=True))
+
+    position_properties = db.get_position_layout_properties()
+    if position_properties:
+        print('Possible position properties (You need to specify is-position="True"): ',
+              json.dumps(position_properties, indent=2, sort_keys=True))
 
     db.dump(args.output)
