@@ -113,7 +113,9 @@ class GirData:
             self.mod = importlib.import_module(f'gi.repository.{self.name}')
 
             if hasattr(self.mod, 'init'):
-                getattr(self.mod, 'init')()
+                init_function = getattr(self.mod, 'init')
+                if len(init_function.get_arguments()) == 0:
+                    init_function()
 
         except ValueError as e:
             print(f"Oops! Could not load {self.name} {self.version} module: {e}")
