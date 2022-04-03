@@ -18,6 +18,54 @@
       </properties>
     </GtkWidget>
 
+    <GtkBoxLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkBoxLayoutChild>
+
+    <GtkHeaderBarLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkHeaderBarLayoutChild>
+
+    <GtkNotebookLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkNotebookLayoutChild>
+
+    <GtkActionBarLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkActionBarLayoutChild>
+
+    <GtkPopoverMenuBarLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkPopoverMenuBarLayoutChild>
+
+    <GtkStackLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkStackLayoutChild>
+
+    <GtkToolItemGroupLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkToolItemGroupLayoutChild>
+
+    <GtkPopoverMenuLayoutChild>
+      <properties>
+        <property id="position" target="Gtk-3.0" is-position="True"/>
+      </properties>
+    </GtkPopoverMenuLayoutChild>
+
     <GtkGridLayoutChild>
       <properties target="Gtk-3.0">
         <property id="left-attach" save-always="True"/>
