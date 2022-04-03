@@ -69,12 +69,13 @@ class CmbPropertyInfo(CmbBase):
     deprecated_version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     translatable = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
     is_inline_object = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
+    is_position = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, owner_id, property_id, type_id, is_object, construct_only, save_always, default_value, minimum, maximum, version, deprecated_version, translatable, is_inline_object):
+    def from_row(cls, project, owner_id, property_id, type_id, is_object, construct_only, save_always, default_value, minimum, maximum, version, deprecated_version, translatable, is_inline_object, is_position):
         return cls(project=project,
                    owner_id=owner_id,
                    property_id=property_id,
@@ -88,7 +89,8 @@ class CmbPropertyInfo(CmbBase):
                    version=version,
                    deprecated_version=deprecated_version,
                    translatable=translatable,
-                   is_inline_object=is_inline_object)
+                   is_inline_object=is_inline_object,
+                   is_position=is_position)
 
 
 class CmbSignalInfo(CmbBase):

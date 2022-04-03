@@ -194,7 +194,8 @@ CREATE TABLE IF NOT EXISTS property (
   version TEXT,
   deprecated_version TEXT,
   translatable BOOLEAN CHECK (type_id IN (NULL, 'gchararray')),
-  is_inline_object BOOLEAN,
+  is_inline_object BOOLEAN DEFAULT 0,
+  is_position BOOLEAN DEFAULT 0,
   PRIMARY KEY(owner_id, property_id)
 ) WITHOUT ROWID;
 
