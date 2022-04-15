@@ -53,8 +53,10 @@ class CmbObject(CmbBaseObject):
         self.properties = []
         self.properties_dict = {}
         self.layout = []
+        self.layout_dict = {}
         self.signals = []
         self.data = []
+        self.position_layout_property = None
 
         super().__init__(**kwargs)
 
@@ -116,7 +118,14 @@ class CmbObject(CmbBaseObject):
                                      property_id=info.property_id,
                                      info=info)
 
+            # Keep a reference to the position layout property
+            if info.is_position:
+                self.position_layout_property = prop
+
             self.layout.append(prop)
+
+            # Dictionary of properties
+            self.layout_dict[property_name] = prop
 
     def _property_changed(self, prop):
         self.emit('property-changed', prop)
@@ -265,3 +274,46 @@ class CmbObject(CmbBaseObject):
         else:
             self.data.remove(data)
             return True
+
+    def reorder_child(self, child, position):
+        if child is None:
+            logger.warning(f'child has to be a CmbObject')
+            return
+
+        if self.ui_id != child.ui_id or self.object_id != child.parent_id:
+            logger.warning(f'{child} is not children of {self}')
+            return
+
+        name = child.name if child.name is not None else child.type_id
+        self.project.history_push(_('Reorder object {name} from position {old} to {new}').format(name=name, old=child.position, new=position))
+
+        children = []
+
+        # Get children in order
+        c = self.project.db.cursor()
+        for row in c.execute('''
+            SELECT object_id, position
+                FROM object
+                WHERE ui_id=? AND parent_id=? AND internal IS NULL AND object_id!=?
+                    AND object_id NOT IN (SELECT inline_object_id FROM object_property WHERE inline_object_id IS NOT NULL AND ui_id=? AND object_id=?)
+                ORDER BY position;''', (self.ui_id, self.object_id, child.object_id, self.ui_id, self.object_id)):
+            child_id, child_position = row
+
+            obj = self.project.get_object_by_id(self.ui_id, child_id)
+            if obj:
+                children.append(obj)
+
+        # Insert child in new position
+        children.insert(position, child)
+
+        # Update all positions
+        for pos, obj in enumerate(children):
+            # Sync layout property
+            if obj.position_layout_property:
+                obj.position_layout_property.value = pos
+            else:
+                # Or object position
+                obj.position = pos
+
+        c.close()
+        self.project.history_pop()
