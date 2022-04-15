@@ -1070,9 +1070,6 @@ class CmbProject(GObject.GObject,
 
         return None
 
-    def __object_id_update_from_path(self, object, path):
-        self.__object_id[f'{object.ui_id}.{object.object_id}'] = self.__store.get_iter(path)
-
     def do_row_draggable(self, path):
         return self.__store.row_draggable(path)
 
@@ -1096,24 +1093,26 @@ class CmbProject(GObject.GObject,
 
         prev_path = path.copy()
         prev = self.__get_object_from_path(prev_path) if prev_path.prev() else None
-        position = prev.position + 1 if prev else 0
+        if prev:
+            position = prev.position
+            if position is None:
+                position = 0
+            position += 1
+        else:
+            position = 0
 
-        name = dest.name if dest.name is not None else dest.type_id
-        self.history_push(_('Reorder object {name} from position {old} to {new}').format(name=name, old=dest.position, new=position))
-
-        next = dest
+        # update __object_id dictionary
+        iter = self.__store.get_iter(path)
         update_dest = True
-        while next:
-            if next != dest or update_dest:
-                next.position = position
-                self.__object_id_update_from_path(next, path)
-                position += 1
-                update_dest = next == dest
+        while iter:
+            obj = self.__store[iter][0]
+            if obj != dest or update_dest:
+                self.__object_id[f'{obj.ui_id}.{obj.object_id}'] = iter
+                update_dest = obj == dest
+            iter = self.__store.iter_next(iter)
 
-            path.next()
-            next = self.__get_object_from_path(path)
-
-        self.history_pop()
+        # Reorder child and the rest of children
+        dest.parent.reorder_child(dest, position)
 
         return retval
 
