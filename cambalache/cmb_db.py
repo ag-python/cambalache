@@ -803,6 +803,16 @@ class CmbDB(GObject.GObject):
             property_id = name.replace('_', '-')
             comment = self.__node_get_comment(prop)
             owner_id = self.__get_layout_property_owner(parent_type[0], property_id)
+            owner_info = self.type_info.get(owner_id, None)
+
+            if owner_info:
+                pinfo = owner_info.properties.get(property_id, None)
+
+                # Update object position if this layout property is_position
+                if pinfo and pinfo.is_position:
+                    c.execute("UPDATE object SET position=? WHERE ui_id=? AND object_id=?;",
+                              (prop.text, ui_id, object_id))
+                    continue
 
             try:
                 c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
@@ -1130,6 +1140,7 @@ class CmbDB(GObject.GObject):
 
             if is_object:
                 # Ignore object properties with 0/null ID
+                print(property_id)
                 if val is not None and int(val) == 0:
                     continue
 
