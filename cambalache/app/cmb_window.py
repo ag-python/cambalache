@@ -570,6 +570,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                                              details=unsupported_features_list)
         except Exception as e:
             filename = os.path.basename(filename)
+            logger.warning(f'Error loading {filename} {traceback.format_exc()}')
             self.present_message_to_user(_("Error importing {filename}").format(filename=filename),
                                          secondary_text=str(e))
 
