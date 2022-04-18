@@ -46,10 +46,7 @@ from cambalache import getLogger
 logger = getLogger(__name__)
 
 
-class CmbProject(GObject.GObject,
-                 Gtk.TreeModel,
-                 Gtk.TreeDragSource,
-                 Gtk.TreeDragDest):
+class CmbProject(Gtk.TreeStore):
     __gtype_name__ = 'CmbProject'
 
     __gsignals__ = {
@@ -91,7 +88,7 @@ class CmbProject(GObject.GObject,
     undo_msg = GObject.Property(type=str)
     redo_msg = GObject.Property(type=str)
 
-    def __init__(self, **kwargs):
+    def __init__(self, target_tk=None, filename=None, **kwargs):
         # Type Information
         self.type_info = {}
 
@@ -106,6 +103,9 @@ class CmbProject(GObject.GObject,
 
         super().__init__(**kwargs)
 
+        self.target_tk = target_tk
+        self.filename = filename
+
         # Target from file take precedence over target_tk property
         if self.filename and os.path.isfile(self.filename):
             target_tk = CmbDB.get_target_from_file(self.filename)
@@ -118,15 +118,7 @@ class CmbProject(GObject.GObject,
 
         # Use a TreeStore to hold object tree instead of using SQL for every
         # TreeStore call
-        self.__store = Gtk.TreeStore(GObject.GObject)
-
-        # Foward signals to CmbProject, this way the user can not add data to
-        # the TreeModel using Gtk API
-        self.__store.connect('row-changed', lambda o, p, i: self.row_changed(p, i))
-        self.__store.connect('row-inserted', lambda o, p, i: self.row_inserted(p, i))
-        self.__store.connect('row-has-child-toggled', lambda o, p, i: self.row_has_child_toggled(p, i))
-        self.__store.connect('row-deleted', lambda o, p: self.row_deleted(p))
-        self.__store.connect('rows-reordered', lambda o, p, i, n: self.rows_reordered(p, i, n))
+        self.set_column_types([GObject.GObject])
 
         # DataModel is only used internally
         self.db = CmbDB(target_tk=self.target_tk)
@@ -262,7 +254,7 @@ class CmbProject(GObject.GObject,
             self.__add_ui(False, *row)
 
             # Update UI objects
-            for obj in cc.execute('SELECT * FROM object WHERE ui_id=?;', (ui_id, )):
+            for obj in cc.execute('SELECT * FROM object WHERE ui_id=? ORDER BY parent_id, position;', (ui_id, )):
                 self.__add_object(False, *obj)
 
         c.close()
@@ -396,7 +388,7 @@ class CmbProject(GObject.GObject,
     def __add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
         ui = CmbUI(project=self, ui_id=ui_id)
 
-        self.__object_id[ui_id] = self.__store.append(None, [ui])
+        self.__object_id[ui_id] = self.append(None, [ui])
 
         if emit:
             self.emit('ui-added', ui)
@@ -428,7 +420,7 @@ class CmbProject(GObject.GObject,
 
         if iter_ is not None:
             self.__selection_remove(ui)
-            self.__store.remove(iter_)
+            self.remove(iter_)
             self.emit('ui-removed', ui)
 
     def remove_ui(self, ui):
@@ -452,7 +444,7 @@ class CmbProject(GObject.GObject,
         else:
             parent = self.__object_id.get(ui_id, None)
 
-        self.__object_id[f'{ui_id}.{object_id}'] = self.__store.append(parent, [obj])
+        self.__object_id[f'{ui_id}.{object_id}'] = self.insert(parent, position if position else 0, [obj])
 
         if emit:
             self.emit('object-added', obj)
@@ -512,7 +504,7 @@ class CmbProject(GObject.GObject,
         iter_ = self.__object_id.pop(f'{obj.ui_id}.{obj.object_id}', None)
         if iter_ is not None:
             self.__selection_remove(obj)
-            self.__store.remove(iter_)
+            self.remove(iter_)
             self.emit('object-removed', obj)
 
     def remove_object(self, obj):
@@ -550,7 +542,7 @@ class CmbProject(GObject.GObject,
 
     def get_object_by_key(self, key):
         _iter = self.__object_id.get(key, None)
-        return self.__store.get_value(_iter, 0) if _iter else None
+        return self.get_value(_iter, 0) if _iter else None
 
     def get_object_by_id(self, ui_id, object_id = None):
         key = f'{ui_id}.{object_id}' if object_id is not None else ui_id
@@ -839,9 +831,9 @@ class CmbProject(GObject.GObject,
 
     def _object_changed(self, obj, field):
         iter = self.get_iter_from_object(obj)
-        path = self.__store.get_path(iter)
+        path = self.get_path(iter)
 
-        self.__store.row_changed(path, iter)
+        self.row_changed(path, iter)
 
         self.emit('object-changed', obj, field)
 
@@ -955,6 +947,14 @@ class CmbProject(GObject.GObject,
 
         return f'{lib}-{ver}' if lib is not None else None
 
+    def __get_object_from_path(self, path):
+        try:
+            iter = self.get_iter(path)
+        except:
+            return None
+
+        return self[iter][0] if iter else None
+
     # Default handlers
     def do_ui_added(self, ui):
         self.emit('changed')
@@ -983,138 +983,38 @@ class CmbProject(GObject.GObject,
     def do_object_signal_removed(self, obj, signal):
         self.emit('changed')
 
-    # GtkTreeModel iface
-
-    def do_get_iter(self, path):
-        # NOTE: We could implement TreeModel iface directly with sqlite using
-        # row_number() function and the object_id as the iter but it would be
-        # too intensive just to save some memory
-        # "SELECT * FROM (SELECT object_id, row_number() OVER (ORDER BY object_id) AS row_number FROM object WHERE ui_id=1 ORDER BY object_id) WHERE row_number=?;"
-
-        try:
-            retval = self.__store.get_iter(path)
-            return (retval is not None, retval)
-        except:
-            return (False, None)
-
-    def do_iter_next(self, iter_):
-        retval = self.__store.iter_next(iter_)
-
-        if retval is not None:
-            iter_.user_data = retval.user_data
-            iter_.user_data2 = retval.user_data2
-            iter_.user_data3 = retval.user_data3
-            return True
-        return False
-
-    def do_iter_previous(self, iter_):
-        retval = self.__store.iter_previous(iter_)
-        if retval is not None:
-            iter_.user_data = retval.user_data
-            iter_.user_data2 = retval.user_data2
-            iter_.user_data3 = retval.user_data3
-            return True
-        return False
-
-    def do_iter_has_child(self, iter_):
-        return self.__store.iter_has_child(iter_)
-
-    def do_iter_nth_child(self, iter_, n):
-        retval = self.__store.iter_nth_child(iter_, n)
-        return (retval is not None, retval)
-
-    def do_iter_children(self, parent):
-        if parent is None:
-            retval = self.__store.get_iter_first()
-            return (retval is not None, retval)
-        elif self.__store.iter_has_child(parent):
-            retval = self.__store.iter_children(parent)
-            return (True, retval)
-
-        return (False, None)
-
-    def do_iter_n_children(self, iter_):
-        return self.__store.iter_n_children(iter_)
-
-    def do_iter_parent(self, child):
-        retval = self.__store.iter_parent(child)
-        return (retval is not None, retval)
-
-    def do_get_path(self, iter_):
-        return self.__store.get_path(iter_)
-
-    def do_get_value(self, iter_, column):
-        retval = self.__store.get_value(iter_, column)
-        if retval is None and self.__store.get_column_type(column) == GObject.TYPE_STRING:
-            return ''
-
-        return retval
-
-    def do_get_n_columns(self):
-        return self.__store.get_n_columns()
-
-    def do_get_column_type(self, column):
-        return self.__store.get_column_type(column)
-
-    def do_get_flags(self):
-        return self.__store.get_flags()
-
-    # GtkTreeDragSource Iface
-    def __get_object_from_path(self, path):
-        try:
-            iter = self.__store.get_iter(path)
-            if iter:
-                return self.__store[iter][0]
-        except:
-            pass
-
-        return None
-
-    def do_row_draggable(self, path):
-        return self.__store.row_draggable(path)
-
-    def do_drag_data_get(self, path, selection_data):
-        return self.__store.drag_data_get(path, selection_data)
-
-    def do_drag_data_delete(self, path):
-        selection = self.get_selection()
-
-        retval = self.__store.drag_data_delete(path)
-
-        if len(selection):
-            self.set_selection(selection)
-
     # GtkTreeDragDest Iface
     def do_drag_data_received(self, path, selection_data):
-        retval = self.__store.drag_data_received(path, selection_data)
-        dest = self.__get_object_from_path(path)
-        if dest is None:
-            return retval
+        valid, _model, drag_path = Gtk.tree_get_row_drag_data(selection_data)
 
-        prev_path = path.copy()
-        prev = self.__get_object_from_path(prev_path) if prev_path.prev() else None
-        if prev:
-            position = prev.position
-            if position is None:
-                position = 0
-            position += 1
-        else:
-            position = 0
+        if not valid:
+            return False
+
+        drag_iter = self.get_iter(drag_path)
+        drag_obj = self[drag_iter][0]
+
+        # remove old row
+        self.remove(drag_iter)
+
+        # insert in new place
+        iter = self.get_iter(path)
+        iter = self.insert_before(None, iter, [drag_obj])
+        position_path = self.get_path(iter)
 
         # update __object_id dictionary
-        iter = self.__store.get_iter(path)
-        update_dest = True
         while iter:
-            obj = self.__store[iter][0]
-            if obj != dest or update_dest:
+            obj = self[iter][0]
+            if obj:
                 self.__object_id[f'{obj.ui_id}.{obj.object_id}'] = iter
-                update_dest = obj == dest
-            iter = self.__store.iter_next(iter)
+            iter = self.iter_next(iter)
 
         # Reorder child and the rest of children
-        dest.parent.reorder_child(dest, position)
+        indices = position_path.get_indices()
+        drag_obj.parent.reorder_child(drag_obj, indices[-1])
 
-        return retval
+        self.set_selection([drag_obj])
+
+        return True
 
     def do_row_drop_possible(self, path, selection_data):
         valid, _model, drag_path = Gtk.tree_get_row_drag_data(selection_data)
