@@ -101,6 +101,8 @@ class CmbProject(Gtk.TreeStore):
         # Create TreeModel store
         self.__object_id = {}
 
+        self.__reordering_children = False
+
         super().__init__(**kwargs)
 
         self.target_tk = target_tk
@@ -433,7 +435,7 @@ class CmbProject(Gtk.TreeStore):
         except:
             pass
 
-    def __add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=None):
+    def __add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=0):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,
@@ -444,7 +446,7 @@ class CmbProject(Gtk.TreeStore):
         else:
             parent = self.__object_id.get(ui_id, None)
 
-        self.__object_id[f'{ui_id}.{object_id}'] = self.insert(parent, position if position else 0, [obj])
+        self.__object_id[f'{ui_id}.{object_id}'] = self.insert(parent, position, [obj])
 
         if emit:
             self.emit('object-added', obj)
@@ -471,7 +473,7 @@ class CmbProject(Gtk.TreeStore):
         else:
             return True
 
-    def add_object(self, ui_id, obj_type, name=None, parent_id=None, layout=None, position=None, child_type=None, inline_property=None):
+    def add_object(self, ui_id, obj_type, name=None, parent_id=None, layout=None, position=0, child_type=None, inline_property=None):
         if parent_id:
             parent = self.get_object_by_id(ui_id, parent_id)
             if parent is None:
@@ -498,7 +500,7 @@ class CmbProject(Gtk.TreeStore):
             logger.warning(f'Error adding object {obj_name}: {e}')
             return None
         else:
-            return self.__add_object(True, ui_id, object_id, obj_type, name, parent_id)
+            return self.__add_object(True, ui_id, object_id, obj_type, name, parent_id, position=position)
 
     def __remove_object(self, obj):
         iter_ = self.__object_id.pop(f'{obj.ui_id}.{obj.object_id}', None)
@@ -682,6 +684,7 @@ class CmbProject(Gtk.TreeStore):
         c.close()
 
     def __undo_redo(self, undo):
+        selection = self.get_selection()
         c = self.db.cursor()
 
         self.history_enabled = False
@@ -711,6 +714,8 @@ class CmbProject(Gtk.TreeStore):
         self.db.foreign_keys = True
         self.history_enabled = True
         c.close()
+
+        self.set_selection(selection)
 
     def get_undo_redo_msg(self):
         c = self.db.cursor()
@@ -831,9 +836,26 @@ class CmbProject(Gtk.TreeStore):
 
     def _object_changed(self, obj, field):
         iter = self.get_iter_from_object(obj)
-        path = self.get_path(iter)
 
-        self.row_changed(path, iter)
+        if field == 'position':
+            if self.__reordering_children:
+                return
+
+            parent = self.iter_parent(iter)
+
+            try:
+                position = self.iter_nth_child(parent, obj.position)
+                self.move_before(iter, position)
+            except:
+                pos = self.iter_n_children()
+                position = self.iter_nth_child(parent, pos)
+                self.move_after(iter, position)
+
+            # Update all children iters
+            self.__update_children_iters(parent)
+        else:
+            path = self.get_path(iter)
+            self.row_changed(path, iter)
 
         self.emit('object-changed', obj, field)
 
@@ -983,6 +1005,27 @@ class CmbProject(Gtk.TreeStore):
     def do_object_signal_removed(self, obj, signal):
         self.emit('changed')
 
+    def __update_children_iters(self, parent):
+        if self.__reordering_children:
+            return
+
+        iter = self.iter_children(parent) if parent else self.iter_first()
+
+        # update __object_id dictionary
+        while iter:
+            obj = self[iter][0]
+            if obj:
+                if isinstance(obj, CmbObject):
+                    self.__object_id[f'{obj.ui_id}.{obj.object_id}'] = iter
+                else:
+                    self.__object_id[f'{obj.ui_id}'] = iter
+
+            # Recurse children
+            if self.iter_has_child(iter):
+                self.__update_children_iters(iter)
+
+            iter = self.iter_next(iter)
+
     # GtkTreeDragDest Iface
     def do_drag_data_received(self, path, selection_data):
         valid, _model, drag_path = Gtk.tree_get_row_drag_data(selection_data)
@@ -993,28 +1036,30 @@ class CmbProject(Gtk.TreeStore):
         drag_iter = self.get_iter(drag_path)
         drag_obj = self[drag_iter][0]
 
-        # remove old row
-        self.remove(drag_iter)
+        # Move to new place
+        try:
+            iter = self.get_iter(path)
+            self.move_before(drag_iter, iter)
+        except ValueError:
+            path.prev()
+            iter = self.get_iter(path)
+            self.move_after(drag_iter, iter)
 
-        # insert in new place
-        iter = self.get_iter(path)
-        iter = self.insert_before(None, iter, [drag_obj])
-        position_path = self.get_path(iter)
+        position_path = self.get_path(drag_iter)
 
         # update __object_id dictionary
-        while iter:
-            obj = self[iter][0]
-            if obj:
-                self.__object_id[f'{obj.ui_id}.{obj.object_id}'] = iter
-            iter = self.iter_next(iter)
+        self.__update_children_iters(self.iter_parent(iter))
 
         # Reorder child and the rest of children
         indices = position_path.get_indices()
+
+        self.__reordering_children = True
         drag_obj.parent.reorder_child(drag_obj, indices[-1])
+        self.__reordering_children = False
 
         self.set_selection([drag_obj])
 
-        return True
+        return False
 
     def do_row_drop_possible(self, path, selection_data):
         valid, _model, drag_path = Gtk.tree_get_row_drag_data(selection_data)
