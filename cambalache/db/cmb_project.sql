@@ -76,7 +76,7 @@ CREATE TABLE object (
   internal TEXT,
   type TEXT,
   comment TEXT,
-  position INTEGER,
+  position INTEGER NOT NULL ON CONFLICT REPLACE DEFAULT 0,
   PRIMARY KEY(ui_id, object_id),
   FOREIGN KEY(ui_id, parent_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE
 ) WITHOUT ROWID;
