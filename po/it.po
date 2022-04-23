@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-11 21:22-0500\n"
-"PO-Revision-Date: 2022-04-23 22:51+0200\n"
+"PO-Revision-Date: 2022-04-23 23:20+0200\n"
 "Last-Translator: Lorenzo Capalbo <capalbo.lorenzo@tutanota.com>\n"
 "Language-Team: Italian <gnome-it-list@gnome.org>\n"
 "Language: it\n"
@@ -210,7 +210,7 @@ msgstr ""
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:137
 msgid "Undo / Redo stack"
-msgstr "Pila disfare / rifare"
+msgstr "Pila annulla / ripeti"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:138
 msgid "LGPL version 2.1"
@@ -681,19 +681,19 @@ msgstr "Progetto"
 
 #: cambalache/app/cmb_shortcuts.ui:19
 msgid "Create new project"
-msgstr "Crea un nuovo progetto"
+msgstr "Crea nuovo progetto"
 
 #: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1021
 msgid "Open a project"
-msgstr "Apri un "
+msgstr "Apri progetto"
 
 #: cambalache/app/cmb_shortcuts.ui:33
 msgid "Close the project"
-msgstr "Chiudi il progetto"
+msgstr "Chiudi progetto"
 
 #: cambalache/app/cmb_shortcuts.ui:40
 msgid "Save the project"
-msgstr "Salva il progetto"
+msgstr "Salva progetto"
 
 #: cambalache/app/cmb_shortcuts.ui:48
 msgid "Workspace"
@@ -717,7 +717,7 @@ msgstr "Rimuovi riga"
 
 #: cambalache/app/cmb_tutorial.py:27
 msgid "Hi, I will show you around Cambalache"
-msgstr "Ciao, ti farò fare un giro di Cambalache"
+msgstr "Ciao, ti mostrerò cosa Cambalache è in grado di offrire"
 
 #: cambalache/app/cmb_tutorial.py:30
 msgid "You can open a project"
@@ -725,7 +725,7 @@ msgstr "Puoi aprire un progetto"
 
 #: cambalache/app/cmb_tutorial.py:31
 msgid "find recently used"
-msgstr "trovare quelli aperti di recente"
+msgstr "navigare tra quelli aperti di recente"
 
 #: cambalache/app/cmb_tutorial.py:32
 msgid "or create a new one"
@@ -733,11 +733,11 @@ msgstr "oppure crearne uno nuovo"
 
 #: cambalache/app/cmb_tutorial.py:34
 msgid "Common actions like Undo"
-msgstr "Azioni comuni come Disfare"
+msgstr "Azioni comuni come Annulla"
 
 #: cambalache/app/cmb_tutorial.py:35
 msgid "Redo"
-msgstr "Rifare"
+msgstr "Ripeti"
 
 #: cambalache/app/cmb_tutorial.py:36
 msgid "Add new UI file"
@@ -768,20 +768,20 @@ msgid ""
 "This is the project workspace, where you can see and select the widgets to "
 "edit"
 msgstr ""
-"Questa è l'area di lavoro del progetto, dove puoi vedere e selezionare i "
-"componenti da modificare"
+"Questa è l'area di lavoro del progetto, dove puoi visualizzare e selezionare "
+"i componenti da modificare"
 
 #: cambalache/app/cmb_tutorial.py:46
 msgid "Project tree, with multiple UI support"
-msgstr "Albero di progetto, con supporto per multiple UI"
+msgstr "l'albero di progetto, con supporto per multiple UI"
 
 #: cambalache/app/cmb_tutorial.py:48
 msgid "Class selector bar"
-msgstr "Barra selettrice di classe"
+msgstr "la barra selettrice di classe"
 
 #: cambalache/app/cmb_tutorial.py:49
 msgid "And the object editor"
-msgstr "E l'editor oggetti"
+msgstr "e l'editor oggetti"
 
 #: cambalache/app/cmb_tutorial.py:52
 msgid "You can search all supported classes here"
@@ -820,11 +820,11 @@ msgstr "e un bottone"
 
 #: cambalache/app/cmb_tutorial.py:67
 msgid "Quite easy! Isn't it?"
-msgstr "Abbastanza semplice! O no?"
+msgstr "Abbastanza semplice, no?"
 
 #: cambalache/app/cmb_tutorial.py:69
 msgid "Once you finish, you can export all UI files to xml here"
-msgstr "Appena finito, puoi esportare tutti i file UI in xml da qui"
+msgstr "Appena finito, potrai esportare tutti i file UI in xml da qui"
 
 #: cambalache/app/cmb_tutorial.py:72
 msgid ""
@@ -832,7 +832,7 @@ msgid ""
 "If you find Cambalache usefull please consider donating"
 msgstr ""
 "Questo è tutto per ora.\n"
-"Se trovi Cambalache utile, perfavore considera donare"
+"Se trovi Cambalache utile, per favore considera una donazione"
 
 #: cambalache/app/cmb_tutorial.py:74
 msgid "Have a nice day!"
