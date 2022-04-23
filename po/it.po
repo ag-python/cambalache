@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-11 21:22-0500\n"
-"PO-Revision-Date: 2022-04-23 22:38+0200\n"
+"PO-Revision-Date: 2022-04-23 22:51+0200\n"
 "Last-Translator: Lorenzo Capalbo <capalbo.lorenzo@tutanota.com>\n"
 "Language-Team: Italian <gnome-it-list@gnome.org>\n"
 "Language: it\n"
@@ -44,7 +44,7 @@ msgid ""
 "for Gtk and the GNOME desktop environment."
 msgstr ""
 "Cambalache è un nuovo strumento RAD che consente la creazione di interfacce "
-"per GTK e l'ambiente desktop GNOME."
+"utente per GTK e l'ambiente desktop GNOME."
 
 #. To translators: AppData description second paragraph
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:17
@@ -66,7 +66,7 @@ msgid ""
 "GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, "
 "Frame, Revealer, ScrolledWindow, Viewport and Overlay)"
 msgstr ""
-"GTK 4: Corretti marcatori in contenitori tibo bin (AspectFrame, Expander, "
+"GTK 4: Corretti marcatori in contenitori di tipo bin (AspectFrame, Expander, "
 "Frame, Revealer, ScrolledWindow, Viewport and Overlay)\\"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
@@ -200,7 +200,7 @@ msgstr "Supporto per le versioni GTK 3 e 4"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:135
 msgid "Import and export multiple UI at once"
-msgstr "Importa ed esporta multiple UI alla volta"
+msgstr "Importa ed esporta molteplici UI alla volta"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:136
 msgid "Support plain (no custom tags) GtkBuilder features"
@@ -234,7 +234,7 @@ msgstr "Finestra delle scorciatoie"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:163
 msgid "Workspace gtk dark theme"
-msgstr "Tema scuro di GTK in Area di lavoro"
+msgstr "Tema scuro di GTK dell'area di lavoro"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:167
 msgid "Display type chooser"
