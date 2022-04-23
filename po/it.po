@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-11 21:22-0500\n"
-"PO-Revision-Date: 2022-04-23 23:20+0200\n"
+"PO-Revision-Date: 2022-04-23 23:29+0200\n"
 "Last-Translator: Lorenzo Capalbo <capalbo.lorenzo@tutanota.com>\n"
 "Language-Team: Italian <gnome-it-list@gnome.org>\n"
 "Language: it\n"
@@ -587,7 +587,7 @@ msgstr "<b>Senza nome {ui_id}</b>"
 #. Widget group for toplevels/windows
 #: cambalache/cmb_type_chooser.ui:92 cambalache/cmb_type_chooser_widget.py:65
 msgid "Toplevel"
-msgstr "Livello superiore"
+msgstr "Finestra"
 
 #. Widget group for container widgets liek GtkBox grid
 #: cambalache/cmb_type_chooser.ui:113 cambalache/cmb_type_chooser_widget.py:66
