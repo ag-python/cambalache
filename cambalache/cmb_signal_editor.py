@@ -140,8 +140,16 @@ class CmbSignalEditor(Gtk.Box):
 
         if signal is not None:
             if len(new_text) > 0:
-                signal.user_data = int(new_text)
-                self.treestore[iter_][Col.USER_DATA.value] = str(signal.user_data)
+                data_obj = self._object.project.get_object_by_name(signal.ui_id, new_text)
+
+                if data_obj:
+                    signal.user_data = data_obj.object_id
+                    name = data_obj.name
+                else:
+                    signal.user_data = 0
+                    name = ''
+
+                self.treestore[iter_][Col.USER_DATA.value] = name
             else:
                 signal.user_data = 0
                 self.treestore[iter_][Col.USER_DATA.value] = ''
@@ -265,3 +273,10 @@ class CmbSignalEditor(Gtk.Box):
         else:
             cell.props.sensitive = True
 
+        if signal and column == Col.USER_DATA.value:
+            user_data = signal.user_data
+            if user_data:
+                data_obj = self._object.project.get_object_by_id(signal.ui_id, user_data)
+                cell.props.text = data_obj.name if data_obj else ''
+            else:
+                cell.props.text = ''
