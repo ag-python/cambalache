@@ -404,8 +404,11 @@ class CmbProject(Gtk.TreeStore):
             relpath = None
         else:
             basename = os.path.basename(filename)
-            dirname = os.path.dirname(self.filename)
-            relpath = os.path.relpath(filename, dirname)
+            if self.filename:
+                dirname = os.path.dirname(self.filename)
+                relpath = os.path.relpath(filename, dirname)
+            else:
+                relpath = None
 
         try:
             self.history_push(_("Add UI {basename}").format(basename=basename))
