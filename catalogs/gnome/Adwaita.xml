@@ -7,13 +7,13 @@
 <meta>
   <types>
 
-    <GtkHeaderBar>
+    <AdwHeaderBar>
       <children-types>
         <type max-children="1" linked-property-id="title-widget">title</type>
         <type>start</type>
         <type>end</type>
       </children-types>
-    </GtkHeaderBar>
+    </AdwHeaderBar>
 
     <AdwActionRow>
       <properties>

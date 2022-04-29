@@ -132,9 +132,9 @@
 	("AdwViewSwitcherPolicy","ADW_VIEW_SWITCHER_POLICY_WIDE","wide",1,"Force the wide mode")
   </type_enum>
   <type_child_type>
-	("GtkHeaderBar","end",None,None),
-	("GtkHeaderBar","start",None,None),
-	("GtkHeaderBar","title",1,"title-widget")
+	("AdwHeaderBar","end",None,None),
+	("AdwHeaderBar","start",None,None),
+	("AdwHeaderBar","title",1,"title-widget")
   </type_child_type>
   <property>
 	("AdwActionRow","activatable-widget","GtkWidget",None,None,None,None,None,None,"1.0",None,None,None,None),
