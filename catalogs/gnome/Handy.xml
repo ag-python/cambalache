@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+ Handy Extra meta data
+
+ Copyright (C) 2022  Juan Pablo Ugarte
+-->
+<meta>
+  <types>
+
+    <AdwActionRow>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwActionRow>
+
+    <AdwAvatar>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwAvatar>
+
+    <AdwExpanderRow>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwExpanderRow>
+
+    <AdwPreferencesPage>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwPreferencesPage>
+
+    <AdwStatusPage>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwStatusPage>
+
+  </types>
+</meta>
+  
