@@ -118,6 +118,7 @@ gnome/libhandy-1.xml: gtk/gtk+-3.0.xml
 		--dependencies gtk+-3.0 \
 		--gir /usr/share/gir-1.0/Handy-1.gir \
 		--external-catalogs ${GTK3_DEPS} gtk/gtk+-3.0.xml \
+		--extra-data gnome/Handy.xml \
 		--skip-types HdySwipeTracker HdyValueObject \
 		--output $@
 
@@ -127,6 +128,7 @@ gnome/libadwaita-1.xml: gtk/gtk-4.0.xml
 		--dependencies gtk-4.0 \
 		--gir /usr/share/gir-1.0/Adw-1.gir \
 		--external-catalogs ${GTK4_DEPS} gtk/gtk-4.0.xml \
+		--extra-data gnome/Adwaita.xml \
 		--skip-types AdwAnimation AdwSwipeTracker\
 		--output $@
 

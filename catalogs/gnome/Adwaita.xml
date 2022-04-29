@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+ Adwaita Extra meta data
+
+ Copyright (C) 2022  Juan Pablo Ugarte
+-->
+<meta>
+  <types>
+
+    <GtkHeaderBar>
+      <children-types>
+        <type max-children="1" linked-property-id="title-widget">title</type>
+        <type>start</type>
+        <type>end</type>
+      </children-types>
+    </GtkHeaderBar>
+
+    <AdwActionRow>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwActionRow>
+
+    <AdwAvatar>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwAvatar>
+
+    <AdwButtonContent>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwButtonContent>
+
+    <AdwExpanderRow>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwExpanderRow>
+
+    <AdwPreferencesPage>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwPreferencesPage>
+
+    <AdwSplitButton>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwSplitButton>
+
+    <AdwStatusPage>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwStatusPage>
+
+    <AdwViewStackPage>
+      <properties>
+        <property id="icon-name" type="CmbIconName"/>
+      </properties>
+    </AdwViewStackPage>
+
+  </types>
+</meta>
+  
