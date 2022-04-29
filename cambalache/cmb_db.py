@@ -1140,7 +1140,6 @@ class CmbDB(GObject.GObject):
 
             if is_object:
                 # Ignore object properties with 0/null ID
-                print(property_id)
                 if val is not None and int(val) == 0:
                     continue
 
