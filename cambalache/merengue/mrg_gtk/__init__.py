@@ -41,6 +41,7 @@ from .mrg_gtk_list_box import MrgGtkListBox
 from .mrg_gtk_list_box_row import MrgGtkListBoxRow
 from .mrg_gtk_overlay import MrgGtkOverlay
 from .mrg_gtk_paned import MrgGtkPaned
+from .mrg_gtk_popover import MrgGtkPopover
 from .mrg_gtk_revealer import MrgGtkRevealer
 from .mrg_gtk_scrolled_window import MrgGtkScrolledWindow
 from .mrg_gtk_stack import MrgGtkStack
