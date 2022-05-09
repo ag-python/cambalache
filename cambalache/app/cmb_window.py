@@ -241,7 +241,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                 return
 
         # Windows and non widgets do not need a parent
-        if info.is_a('GtkWidget') and not info.is_a('GtkWindow'):
+        if info.is_a('GtkWidget') and not info.is_a('GtkWindow') and info.category != 'toplevel':
             # Select type and let user choose which placeholder to use
             self.type_chooser.props.selected_type = info
             self.__update_action_add_object()
