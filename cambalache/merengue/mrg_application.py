@@ -45,9 +45,6 @@ class MrgApplication(Gtk.Application):
         super().__init__(application_id='ar.xjuan.Merengue',
                          flags=Gio.ApplicationFlags.NON_UNIQUE)
 
-        # Needed to parse values from strings
-        self.builder = Gtk.Builder()
-
         # List of available controler classes for objects
         self.registry = MrgControllerRegistry()
 
@@ -117,8 +114,10 @@ class MrgApplication(Gtk.Application):
             if pspec is None or pspec.value_type != obj.__gtype__:
                 controller = self.registry.new_controller_for_type(obj.__gtype__, self)
 
+            _uiid, obj_id = object_id.split('.')
+            controller.toplevel = int(obj_id) in toplevels
             controller.object = obj
-            controller.toplevel = controller.object_id in toplevels
+
             self.controllers[object_id] = controller
 
         # Set controller for placeholders created by Builder
