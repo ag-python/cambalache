@@ -1,4 +1,4 @@
-# GtkWindow Selection 
+# MrgSelection Selection handling
 #
 # Copyright (C) 2021  Juan Pablo Ugarte
 #
@@ -42,21 +42,21 @@ class MrgSelection(GObject.GObject):
                            flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
-        self._window = None
+        self._container = None
         self.gesture = None
 
         super().__init__(**kwargs)
 
-    @GObject.property(type=Gtk.Window)
-    def window(self):
-        return self._window
+    @GObject.property(type=Gtk.Widget)
+    def container(self):
+        return self._container
 
-    @window.setter
-    def _set_window(self, obj):
-        self._window = obj
+    @container.setter
+    def _set_container(self, obj):
+        self._container = obj
 
-        if self.window:
-            self.gesture = utils.gesture_click_new(self.window, propagation_phase=Gtk.PropagationPhase.CAPTURE)
+        if self._container:
+            self.gesture = utils.gesture_click_new(self._container, propagation_phase=Gtk.PropagationPhase.CAPTURE)
             self.gesture.connect('pressed', self.__on_gesture_button_pressed)
             self.gesture.connect('released', self.__on_gesture_button_released)
         else:
@@ -65,7 +65,7 @@ class MrgSelection(GObject.GObject):
     def __on_gesture_button_pressed(self, gesture, n_press, x, y):
         global preselected_widget
 
-        child = self.get_child_at_position(self.window, x, y)
+        child = self.get_child_at_position(self._container, x, y)
 
         if not self.is_widget_from_ui(child):
             return
@@ -78,7 +78,7 @@ class MrgSelection(GObject.GObject):
     def __on_gesture_button_released(self, gesture, n_press, x, y):
         global preselected_widget
 
-        child = self.get_child_at_position(self.window, x, y)
+        child = self.get_child_at_position(self._container, x, y)
         if child != preselected_widget:
             return
 

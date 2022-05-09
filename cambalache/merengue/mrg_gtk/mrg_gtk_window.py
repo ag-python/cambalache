@@ -43,7 +43,7 @@ class MrgGtkWindow(MrgGtkBin):
 
         self.connect("notify::object", self.__on_object_changed)
 
-        self.selection = MrgSelection(app=self.app, window=self.object)
+        self.selection = MrgSelection(app=self.app, container=self.object)
 
         self.property_ignore_list.add('modal')
 
@@ -55,7 +55,7 @@ class MrgGtkWindow(MrgGtkBin):
 
         # Handle widget selection
         if self.selection:
-            self.selection.window = self.object
+            self.selection.container = self.object
 
         if self.object:
             self._update_name()
