@@ -44,10 +44,14 @@ class MrgController(GObject.Object):
         # Properties in this will will be ignored by set_object_property()
         self.property_ignore_list = set()
 
+        self.ui_id = 0
+        self.object_id = 0
+
         super().__init__(**kwargs)
         self.connect("notify::object", self.__on_object_changed)
+        self.on_object_changed()
 
-    def __on_object_changed(self, obj, pspec):
+    def on_object_changed(self):
         if self.object:
             ui_id, object_id = utils.object_get_id(self.object).split('.')
             self.ui_id = int(ui_id)
@@ -56,6 +60,9 @@ class MrgController(GObject.Object):
             self.ui_id = 0
             self.object_id = 0
 
+    def __on_object_changed(self, obj, pspec):
+        self.on_object_changed()
+
     # Object set property wrapper
     def set_object_property(self, name, value):
         if self.object and name not in self.property_ignore_list:
@@ -63,4 +70,5 @@ class MrgController(GObject.Object):
                 CambalachePrivate.object_set_property_from_string(self.object, name, value)
             else:
                 self.object.set_property(name, value)
+
 
