@@ -36,6 +36,7 @@ class MrgGtkWidget(MrgController):
 
     def __init__(self, **kwargs):
         self.window = None
+        self.selection = None
 
         super().__init__(**kwargs)
 
@@ -45,16 +46,15 @@ class MrgGtkWidget(MrgController):
         self.child_property_ignore_list = set()
 
         self.connect("notify::selected", self.__on_selected_changed)
-        self.connect("notify::object", self.__on_object_changed)
 
         # Make sure show_all() always works
         if Gtk.MAJOR_VERSION == 3:
             self.property_ignore_list.add('no-show-all')
 
-        self.__on_object_changed(self.object, None)
+    def on_object_changed(self):
+        super().on_object_changed()
 
-    def __on_object_changed(self, obj, pspec):
-        self.__on_selected_changed(obj, pspec)
+        self.on_selected_changed()
 
         if self.object is None:
             if self.window:
@@ -68,7 +68,7 @@ class MrgGtkWidget(MrgController):
         if self.window is None:
             type_name = GObject.type_name(self.object.__gtype__)
             self.window = Gtk.Window(deletable=False, title=type_name)
-            self.selection = MrgSelection(app=self.app, window=self.window)
+            self.selection = MrgSelection(app=self.app, container=self.window)
 
         if Gtk.MAJOR_VERSION == 4:
             self.window.set_child(self.object)
@@ -80,7 +80,7 @@ class MrgGtkWidget(MrgController):
             self.window.add(self.object)
             self.window.show_all()
 
-    def __on_selected_changed(self, obj, pspec):
+    def on_selected_changed(self):
         if self.object is None:
             return
 
@@ -98,6 +98,9 @@ class MrgGtkWidget(MrgController):
         if toplevel:
             state = Gtk.StateFlags.NORMAL if self.selected else Gtk.StateFlags.BACKDROP
             toplevel.set_state_flags(state, True)
+
+    def __on_selected_changed(self, obj, pspec):
+        self.on_selected_changed()
 
     def __get_children(self, obj):
         if obj is None:
