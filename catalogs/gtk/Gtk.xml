@@ -555,6 +555,8 @@
       <GtkAppChooserDialog/>
       <GtkFileChooserNative/>
       <GtkDragIcon/>
+      <GtkPopover/>
+      <GtkPopoverMenu/>
     </category>
 
     <category name="layout">
@@ -585,8 +587,6 @@
       <GtkSearchBar/>
       <GtkHeaderBar/>
       <GtkStack/>
-      <GtkPopover/>
-      <GtkPopoverMenu/>
       <GtkActionBar/>
     </category>
 
