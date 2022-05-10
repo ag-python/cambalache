@@ -56,6 +56,7 @@ install_data([
   'mrg_gtk/mrg_gtk_menu_item.py',
   'mrg_gtk/mrg_gtk_overlay.py',
   'mrg_gtk/mrg_gtk_paned.py',
+  'mrg_gtk/mrg_gtk_popover.py',
   'mrg_gtk/mrg_gtk_revealer.py',
   'mrg_gtk/mrg_gtk_scrolled_window.py',
   'mrg_gtk/mrg_gtk_stack.py',
