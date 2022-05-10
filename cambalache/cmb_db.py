@@ -771,21 +771,22 @@ class CmbDB(GObject.GObject):
         if packing is not None and object_id:
             self.__import_layout_properties(c, info, ui_id, parent_id, object_id, packing)
 
-    def __get_layout_property_owner(self, type_id, property):
+    def __get_layout_property_owner(self, type_id, property_id):
         info = self.type_info.get(type_id, None)
 
         if info is None:
             return None
 
-        if self.target_tk == 'gtk+-3.0':
-            # For Gtk 3 we fake a LayoutChild class for each GtkContainer
-            # FIXME: look in parent classes too
-            owner_id = f'{type_id}LayoutChild'
-        else:
-            # FIXME: Need to get layout-manager-type from class
-            owner_id = f'{type_id}LayoutChild'
+        # Walk type hierarchy until we find the Layout child property
+        while info:
+            owner = self.type_info.get(f'{info.type_id}LayoutChild', None)
 
-        return owner_id
+            if owner and owner.properties.get(property_id, None) is not None:
+                return owner.type_id
+
+            info = info.parent
+
+        return None
 
     def __import_layout_properties(self, c, info, ui_id, parent_id, object_id, layout):
         c.execute("SELECT type_id FROM object WHERE ui_id=? AND object_id=?;", (ui_id, parent_id))
