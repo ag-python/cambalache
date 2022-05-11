@@ -68,6 +68,9 @@ class MrgGtkPopover(MrgGtkWidget):
         self.selection = None
 
         if self.object is None:
+            if self.window:
+                self.window.destroy()
+                self.window = None
             return
 
         if self.window is None:
