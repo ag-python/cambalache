@@ -39,6 +39,7 @@ from .mrg_gtk_grid import MrgGtkGrid
 from .mrg_gtk_label import MrgGtkLabel
 from .mrg_gtk_list_box import MrgGtkListBox
 from .mrg_gtk_list_box_row import MrgGtkListBoxRow
+from .mrg_gtk_notebook import MrgGtkNotebook
 from .mrg_gtk_overlay import MrgGtkOverlay
 from .mrg_gtk_paned import MrgGtkPaned
 from .mrg_gtk_popover import MrgGtkPopover
