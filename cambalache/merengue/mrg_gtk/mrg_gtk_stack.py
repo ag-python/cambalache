@@ -36,7 +36,6 @@ class MrgGtkStack(MrgGtkWidget):
         self.connect("notify::object", self.__on_object_changed)
         self.__ensure_placeholders()
 
-
     def __get_placeholder(self):
         for child in self.get_children():
             if isinstance(child, MrgPlaceholder):
@@ -87,4 +86,3 @@ class MrgGtkStack(MrgGtkWidget):
         placeholder = self.__get_placeholder()
         if placeholder:
             self.remove_child(placeholder)
-            self.size -= 1
