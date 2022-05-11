@@ -48,20 +48,26 @@ class MrgGtkPopover(MrgGtkWidget):
         if self.object is None:
             return
 
+        self.__button.set_popover(self.object)
+
         if Gtk.MAJOR_VERSION == 3:
             self.object.set_modal(False)
-            self.object.set_relative_to(self.__button)
         else:
             self.object.set_autohide(False)
-            self.object.set_parent(self.__button)
+
+    def popup(self):
+        if self.__button is None:
+            return
+
+        if Gtk.MAJOR_VERSION == 3:
+            self.__button.set_active(True)
+        else:
+            self.__button.popup()
 
     def on_object_changed(self):
         # Clear old popover
         if self.__object:
-            if Gtk.MAJOR_VERSION == 3:
-                self.__object.set_relative_to(None)
-            else:
-                self.__object.unparent()
+            self.__button.set_popover(None)
 
         # Keep a reference to object
         self.__object = self.object
@@ -74,13 +80,10 @@ class MrgGtkPopover(MrgGtkWidget):
             return
 
         if self.window is None:
-            self.__button = Gtk.Button(label='popdown',
-                                       visible=True,
-                                       halign=Gtk.Align.CENTER,
-                                       valign=Gtk.Align.CENTER,
-                                       receives_default=False)
-
-            self.__button.connect('clicked', self.__on_button_clicked)
+            self.__button = Gtk.MenuButton(visible=True,
+                                           halign=Gtk.Align.CENTER,
+                                           valign=Gtk.Align.CENTER,
+                                           receives_default=False)
 
             self.window = Gtk.Window(title='Popover Preview Window',
                                      deletable=False,
@@ -90,8 +93,12 @@ class MrgGtkPopover(MrgGtkWidget):
             self.window.set_default_size(640, 480)
 
             if Gtk.MAJOR_VERSION == 4:
+                self.__button.set_icon_name('open-menu-symbolic')
                 self.window.set_child(self.__button)
             else:
+                image = Gtk.Image(visible=True,
+                                  icon_name='open-menu-symbolic')
+                self.__button.add(image)
                 self.window.add(self.__button)
 
         self.selection = MrgSelection(app=self.app, container=self.object)
@@ -106,16 +113,11 @@ class MrgGtkPopover(MrgGtkWidget):
             self.object.show_all()
             self.window.show_all()
 
-    def __on_button_clicked(self, button):
-        if self.object:
-            self.__ensure_popup()
+    def on_selected_changed(self):
+        super().on_selected_changed()
 
-            if self.object.is_visible():
-                self.__button.props.label = 'popup'
-                self.object.popdown()
-            else:
-                self.__button.props.label = 'popdown'
-                self.object.popup()
+        if self.object:
+            self.object.popup()
 
     def show_child(self, child):
         if self.object:
