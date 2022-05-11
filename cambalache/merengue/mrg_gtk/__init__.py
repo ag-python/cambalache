@@ -29,6 +29,7 @@ from .mrg_gtk_bin import MrgGtkBin
 
 if Gtk.MAJOR_VERSION == 3:
     from .mrg_gtk_menu_item import MrgGtkMenuItem
+    from .mrg_gtk_menu import MrgGtkMenu
 elif Gtk.MAJOR_VERSION == 4:
     from .mrg_gtk_center_box import MrgGtkCenterBox
 
