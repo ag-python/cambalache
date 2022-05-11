@@ -7,35 +7,35 @@
 <meta>
   <types>
 
-    <AdwActionRow>
+    <HdyActionRow>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
       </properties>
-    </AdwActionRow>
+    </HdyActionRow>
 
-    <AdwAvatar>
+    <HdyAvatar>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
       </properties>
-    </AdwAvatar>
+    </HdyAvatar>
 
-    <AdwExpanderRow>
+    <HdyExpanderRow>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
       </properties>
-    </AdwExpanderRow>
+    </HdyExpanderRow>
 
-    <AdwPreferencesPage>
+    <HdyPreferencesPage>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
       </properties>
-    </AdwPreferencesPage>
+    </HdyPreferencesPage>
 
-    <AdwStatusPage>
+    <HdyStatusPage>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
       </properties>
-    </AdwStatusPage>
+    </HdyStatusPage>
 
   </types>
 </meta>
