@@ -557,6 +557,8 @@
       <GtkDragIcon/>
       <GtkPopover/>
       <GtkPopoverMenu/>
+      <GtkMenu/>
+      <GtkRecentChooserMenu/>
     </category>
 
     <category name="layout">
@@ -627,8 +629,6 @@
       <GtkProgressBar/>
       <GtkLevelBar/>
       <GtkSpinner/>
-      <GtkMenu/>
-      <GtkRecentChooserMenu/>
       <GtkCalendar/>
       <GtkSeparator/>
       <GtkDrawingArea/>
