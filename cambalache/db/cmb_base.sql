@@ -71,7 +71,8 @@ CREATE TABLE IF NOT EXISTS type (
   deprecated_version TEXT,
   abstract BOOLEAN,
   layout TEXT CHECK (layout IN ('container', 'manager', 'child')),
-  category TEXT CHECK (category IN ('toplevel', 'layout', 'control', 'display', 'model'))
+  category TEXT CHECK (category IN ('toplevel', 'layout', 'control', 'display', 'model')),
+  workspace_type TEXT
 ) WITHOUT ROWID;
 
 CREATE INDEX IF NOT EXISTS type_parent_id_fk ON type (parent_id);

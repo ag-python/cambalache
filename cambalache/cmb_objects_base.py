@@ -126,12 +126,13 @@ class CmbBaseTypeInfo(CmbBase):
     abstract = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
     layout = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     category = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+    workspace_type = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, type_id, parent_id, library_id, version, deprecated_version, abstract, layout, category):
+    def from_row(cls, project, type_id, parent_id, library_id, version, deprecated_version, abstract, layout, category, workspace_type):
         return cls(project=project,
                    type_id=type_id,
                    parent_id=parent_id,
@@ -140,7 +141,8 @@ class CmbBaseTypeInfo(CmbBase):
                    deprecated_version=deprecated_version,
                    abstract=abstract,
                    layout=layout,
-                   category=category)
+                   category=category,
+                   workspace_type=workspace_type)
 
 
 class CmbBaseTypeDataInfo(CmbBase):

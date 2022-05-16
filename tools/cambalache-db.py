@@ -218,6 +218,11 @@ class CambalacheDb:
         for klass in types:
             owner_id = klass.tag
 
+            workspace_type = klass.get('workspace-type', None)
+
+            c.execute("UPDATE type SET workspace_type=? WHERE type_id=?;",
+                      (workspace_type, owner_id))
+
             for properties in klass.iterchildren('properties'):
                 if check_target(properties):
                     continue
