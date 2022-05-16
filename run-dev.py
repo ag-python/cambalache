@@ -227,7 +227,7 @@ def compile_private():
         os.system(f'cc -c -fpic -Wall `pkg-config {pkg} --cflags` -I{srcdir} {srcfile} -o {privatedir}/cmb_private.o')
         os.system(f'cc -shared -o {privatedir}/libcambalacheprivate-{v}.so {privatedir}/cmb_private.o `pkg-config {pkg} --libs`')
         os.system(f'g-ir-scanner -i Gtk-{v}.0 -n CambalachePrivate --nsversion={v}.0 \
-                   --identifier-prefix=cmb_private -L {privatedir} -l cambalacheprivate-{v} --symbol-prefix=cmb_private \
+                   --identifier-prefix=cmb_private -L {privatedir} -l cambalacheprivate-{v} --symbol-prefix=cmb_private --identifier-prefix=CmbPrivate \
                    {srcdir}/*.c {srcdir}/*.h --warn-all -o {privatedir}/CambalachePrivate-{v}.0.gir')
         os.system(f'g-ir-compiler {privatedir}/CambalachePrivate-{v}.0.gir --output={typelib}')
 
