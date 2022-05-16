@@ -1098,20 +1098,22 @@ class CmbDB(GObject.GObject):
         c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
         type_id, name = c.fetchone()
 
+        info = self.type_info.get(type_id, None)
+
         if not merengue and template_id == object_id:
             obj = E.template()
             node_set(obj, 'class', name)
             node_set(obj, 'parent', type_id)
         else:
             obj = E.object()
-            node_set(obj, 'class', type_id)
 
             if merengue:
+                workspace_type = info.workspace_type
+                node_set(obj, 'class', workspace_type if workspace_type else type_id)
                 node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
             else:
+                node_set(obj, 'class', type_id)
                 node_set(obj, 'id', name)
-
-        info = self.type_info.get(type_id, None)
 
         # Create class hierarchy list
         hierarchy = [type_id] + info.hierarchy if info else [type_id]
