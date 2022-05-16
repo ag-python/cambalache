@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+ GObject Extra meta data
+
+ Copyright (C) 2022  Juan Pablo Ugarte
+-->
+<meta>
+  <types>
+    <GBinding workspace-type="MrgGBindingProxy"/>
+  </types>
+</meta>

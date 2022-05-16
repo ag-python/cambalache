@@ -43,6 +43,7 @@ glib/gobject-2.0.xml:
 		--gir /usr/share/gir-1.0/GObject-2.0.gir \
 		--types GObject GBinding GBindingFlags \
 		--boxed-types GStrv GBytes\
+		--extra-data glib/GObject.xml \
 		--skip-types GBinding \
 		--output $@
 

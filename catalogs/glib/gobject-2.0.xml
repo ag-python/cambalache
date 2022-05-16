@@ -2,11 +2,11 @@
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
 <cambalache-catalog name="gobject" namespace="GObject" prefix="G" version="2.0" targets="2.0,2.26">
   <type>
-	("GBinding","GObject","gobject","2.26",None,None,None,None),
-	("GBindingFlags","flags","gobject",None,None,None,None,None),
-	("GBytes","boxed","gobject",None,None,None,None,None),
-	("GObject","object","gobject",None,None,None,None,None),
-	("GStrv","boxed","gobject",None,None,None,None,None)
+	("GBinding","GObject","gobject","2.26",None,None,None,None,"MrgGBindingProxy"),
+	("GBindingFlags","flags","gobject",None,None,None,None,None,None),
+	("GBytes","boxed","gobject",None,None,None,None,None,None),
+	("GObject","object","gobject",None,None,None,None,None,None),
+	("GStrv","boxed","gobject",None,None,None,None,None,None)
   </type>
   <type_flags>
 	("GBindingFlags","G_BINDING_BIDIRECTIONAL","bidirectional",1,"Bidirectional binding; if either the property of the source or the property of the target changes, the other is updated."),
