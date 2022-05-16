@@ -25,6 +25,7 @@ import os
 import gi
 import json
 import socket
+import time
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
@@ -144,6 +145,7 @@ class CmbView(Gtk.Stack):
         self.__merengue = None
         self.__broadwayd = None
         self.__port = None
+        self.__merengue_last_exit = None
 
         context = self.get_style_context()
         context.connect('changed', lambda ctx: self.__update_webview_bg())
@@ -412,6 +414,15 @@ window.setupDocument = function (document) {
         return retval
 
     def __on_process_exit(self, process):
+        if process == self.__merengue:
+            if self.__merengue_last_exit is None:
+                self.__merengue_last_exit = time.monotonic()
+            else:
+                if (time.monotonic() - self.__merengue_last_exit) < 1:
+                    self.__webview_set_msg(_('Workspace process error\nStopping auto restart'))
+                    self.__merengue_last_exit = None
+                    return
+
         if self.__broadwayd.pid == 0 and self.__merengue.pid == 0:
             self.project = self.__restart_project
             self.__restart_project = None
