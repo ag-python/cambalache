@@ -261,7 +261,7 @@ window.setupDocument = function (document) {
     def __on_object_property_changed(self, project, obj, prop):
         self.__update_view()
 
-        if prop.info.construct_only:
+        if obj.info.workspace_type is None and prop.info.construct_only:
             self.__merengue_update_ui(obj.ui_id)
             return
 
