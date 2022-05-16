@@ -1,6 +1,6 @@
 # Merengue Gtk plugin
 #
-# Copyright (C) 2021  Juan Pablo Ugarte
+# Copyright (C) 2021-2022  Juan Pablo Ugarte
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 #
 
 import gi
-from gi.repository import Gtk
+from gi.repository import GObject, Gtk
 
 from .mrg_gtk_aspect_frame import MrgGtkAspectFrame
 from .mrg_gtk_assistant import MrgGtkAssistant
@@ -51,3 +51,8 @@ from .mrg_gtk_viewport import MrgGtkViewport
 from .mrg_gtk_widget import MrgGtkWidget
 from .mrg_gtk_window import MrgGtkWindow
 from .mrg_selection import MrgSelection
+
+# Proxy objects
+# Some objects can not be instantiated in the runtime if not properly configured
+from .mrg_g_binding import MrgGBindingProxy
+GObject.type_ensure(MrgGBindingProxy.__gtype__)

@@ -42,6 +42,7 @@ install_data([
 
 install_data([
   'mrg_gtk/__init__.py',
+  'mrg_gtk/mrg_g_binding.py',
   'mrg_gtk/mrg_gtk_aspect_frame.py',
   'mrg_gtk/mrg_gtk_assistant.py',
   'mrg_gtk/mrg_gtk_bin.py',
