@@ -47,6 +47,7 @@ class CmbTypeInfo(CmbBaseTypeInfo):
         super().__init__(**kwargs)
 
         self.hierarchy = self.__init_hierarchy()
+        self.interfaces = self.__init_interfaces()
         self.properties = self.__init_properties_signals(CmbPropertyInfo, 'property')
         self.signals = self.__init_properties_signals(CmbSignalInfo, 'signal')
         self.data = self.__init_data()
@@ -91,6 +92,17 @@ class CmbTypeInfo(CmbBaseTypeInfo):
 
         c.close()
 
+        return retval
+
+    def __init_interfaces(self):
+        retval = []
+
+        c = self.project.db.cursor()
+        for row in c.execute(f'SELECT iface_id FROM type_iface WHERE type_id=? ORDER BY iface_id;',
+                             (self.type_id, )):
+            retval.append(row[0])
+
+        c.close()
         return retval
 
     def __init_properties_signals(self, Klass, table):
