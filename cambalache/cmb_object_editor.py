@@ -28,6 +28,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, GObject, Gtk
 
 from .cmb_object import CmbObject
+from .cmb_object_data_editor import CmbObjectDataEditor
 from .cmb_property_controls import *
 
 
@@ -167,6 +168,24 @@ class CmbObjectEditor(Gtk.Box):
                 grid.attach(label, 0, i, 1, 1)
                 grid.attach(editor, 1, i, 1, 1)
                 i += 1
+
+            # Custom Data Editors
+            for key in info.data:
+                data = info.data[key]
+
+                label = Gtk.Label(label=key.title(), xalign=0)
+
+                # FIXME/TODO:
+                # CmbObjectDataEditor should take data (CmbTypeDataInfo)
+                # and keep a reference to each children and arguments object in
+                # the tree store
+                editor = CmbObjectDataEditor(data.children[list(data.children.keys())[0]])
+
+                grid.attach(label, 0, i, 1, 1)
+
+                # Editor goes into its own row and takes both columns
+                grid.attach(editor, 0, i+1, 2, 1)
+                i += 2
 
             # Continue if class had no editors to add
             if i == 0:
