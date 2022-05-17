@@ -129,51 +129,58 @@ class CmbObjectEditor(Gtk.Box):
             # ID
             self.add(self.__create_id_editor())
 
-        owner_id = None
-        grid = None
-        i = 0
+        info = self.__object.info
+        for owner_id in [info.type_id] + info.hierarchy:
+            info = self.__object.project.type_info.get(owner_id, None)
 
-        # Properties
-        properties = self.__object.layout if self.layout else self.__object.properties
-        for prop in properties:
-            if owner_id != prop.owner_id:
-                owner_id = prop.owner_id
+            # Editor count
+            i = 0
 
-                expander = Gtk.Expander(label=f'<b>{owner_id}</b>',
-                                        use_markup=True,
-                                        expanded=True)
-                revealer = Gtk.Revealer(reveal_child=True)
+            # Grid for all properties and custom data editors
+            grid = Gtk.Grid(hexpand=True,
+                            margin_start=16,
+                            row_spacing=4,
+                            column_spacing=4)
 
-                expander.connect('notify::expanded', self.__on_expander_expanded, revealer)
+            # Properties
+            properties = self.__object.layout_dict if self.layout else self.__object.properties_dict
+            for property_id in info.properties:
+                prop = properties.get(property_id, None)
 
-                grid = Gtk.Grid(hexpand=True,
-                                margin_start=16,
-                                row_spacing=4,
-                                column_spacing=4)
+                if prop is None:
+                    continue
 
-                revealer.add(grid)
+                editor = self.__create_editor_for_property(prop)
 
-                self.add(expander)
-                self.add(revealer)
-                i = 0
+                if editor is None:
+                    continue
 
-            editor = self.__create_editor_for_property(prop)
+                label = Gtk.Label(label=prop.property_id,
+                                  xalign=0)
 
-            if editor is None:
+                # Keep a dict of labels
+                self.__labels[prop.property_id] = label
+
+                # Update labe status
+                self.__update_property_label(prop)
+
+                grid.attach(label, 0, i, 1, 1)
+                grid.attach(editor, 1, i, 1, 1)
+                i += 1
+
+            # Continue if class had no editors to add
+            if i == 0:
                 continue
 
-            label = Gtk.Label(label=prop.property_id,
-                              xalign=0)
-
-            # Keep a dict of labels
-            self.__labels[prop.property_id] = label
-
-            # Update labe status
-            self.__update_property_label(prop)
-
-            grid.attach(label, 0, i, 1, 1)
-            grid.attach(editor, 1, i, 1, 1)
-            i += 1
+            # Create expander/revealer to pack editor grid
+            expander = Gtk.Expander(label=f'<b>{owner_id}</b>',
+                                    use_markup=True,
+                                    expanded=True)
+            revealer = Gtk.Revealer(reveal_child=True)
+            expander.connect('notify::expanded', self.__on_expander_expanded, revealer)
+            revealer.add(grid)
+            self.add(expander)
+            self.add(revealer)
 
         self.show_all()
 
