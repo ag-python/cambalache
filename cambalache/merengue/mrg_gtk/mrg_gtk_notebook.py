@@ -70,7 +70,7 @@ class MrgGtkNotebook(MrgGtkWidget):
             if isinstance(child, Gtk.NotebookPage):
                 page = child
             else:
-                self.object.get_page(child)
+                page = self.object.get_page(child)
 
             position = page.props.position
         else:
