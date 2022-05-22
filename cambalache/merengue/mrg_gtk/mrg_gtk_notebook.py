@@ -68,15 +68,14 @@ class MrgGtkNotebook(MrgGtkWidget):
     def show_child(self, child):
         if Gtk.MAJOR_VERSION == 4:
             if isinstance(child, Gtk.NotebookPage):
-                page = child
+                position = child.props.position
             else:
-                page = self.object.get_page(child)
-
-            position = page.props.position
+                position = self.object.page_num(child)
         else:
-            position = self.object.child_get_property(child, 'position')
+            position = self.object.page_num(child)
 
-        self.object.set_current_page(position)
+        if position >= 0:
+            self.object.set_current_page(position)
 
     def add(self, child):
         if self.object is None:
