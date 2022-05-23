@@ -86,6 +86,8 @@ class CmbDB(GObject.GObject):
 
         self.history_commands = {}
 
+        self.clipboard = []
+
         self.conn = sqlite3.connect(':memory:')
 
         self.conn.create_function('VERSION_CMP', 2, sqlite_version_cmp)
@@ -1377,15 +1379,20 @@ class CmbDB(GObject.GObject):
                               encoding='UTF-8').decode('UTF-8')
 
     def clipboard_copy(self, selection):
-        c = self.conn.cursor()
-
-        # Recreate all clipboard tables
-        for table in self.object_tables:
-            c.execute(f'DROP TABLE IF EXISTS clipboard_{table};')
-            c.execute(f'CREATE TEMP TABLE clipboard_{table} AS SELECT * FROM {table} WHERE 0;')
+        self.clipboard = []
 
         # Copy data for every object in selection
         for ui_id, object_id in selection:
+            node = self.__export_object(ui_id, object_id)
+            self.clipboard.append(node)
+
+    def clipboard_paste(self, ui_id, parent_id):
+        c = self.conn.cursor()
+        retval = {}
+
+        for node in self.clipboard:
+            object_id = self.__import_object(ui_id, node, parent_id)
+
             c.execute('''
                  WITH RECURSIVE ancestor(object_id, parent_id) AS (
                    SELECT object_id, parent_id
@@ -1400,71 +1407,10 @@ class CmbDB(GObject.GObject):
                  (ui_id, object_id, ui_id))
 
             # Object and children ids
-            objects = tuple([ x[0] for x in c.fetchall() ])
-
-            cols = ','.join((['?'] * len(objects)))
-
-            # Copy data from every table
-            for table in self.object_tables:
-                c.execute(f'INSERT INTO clipboard_{table} SELECT * FROM {table} WHERE ui_id=? AND object_id IN ({cols});',
-                          (ui_id, ) + objects)
-
-            c.execute(f'UPDATE clipboard_object SET parent_id=NULL WHERE ui_id=? AND object_id=?',
-                      (ui_id, object_id))
-
-        # Unset signals pk and let autoincrement work
-        c.execute('UPDATE clipboard_object_signal SET signal_pk=NULL;')
-
-        self.conn.commit()
-        c.close()
-
-    def clipboard_paste(self, ui_id, parent_id):
-        retval = []
-
-        c = self.conn.cursor()
-
-        # Get new object id
-        c.execute('SELECT coalesce((SELECT object_id FROM object WHERE ui_id=? ORDER BY object_id DESC LIMIT 1), 0) + 1;',
-                  (ui_id, ))
-        new_id = c.fetchone()[0]
-
-        c.execute('SELECT ui_id, object_id FROM clipboard_object;')
-
-        # Iterate over all objects
-        for row in c.fetchall():
-            o_ui_id, object_id = row
-
-            for table in self.object_tables:
-                # Fix object references
-                if table == 'object':
-                    c.execute('UPDATE clipboard_object SET parent_id=? WHERE ui_id=? AND parent_id=?;',
-                              (new_id, o_ui_id, object_id))
-                elif table == 'object_layout_property':
-                    c.execute('UPDATE clipboard_object_layout_property SET child_id=? WHERE ui_id=? AND child_id=?;',
-                              (new_id, o_ui_id, object_id))
-
-                # Set new object id
-                c.execute(f'UPDATE clipboard_{table} SET ui_id=?, object_id=? WHERE ui_id=? AND object_id=?;',
-                          (ui_id, new_id, o_ui_id, object_id))
-
-            retval.append(new_id)
-            new_id +=1
-
-        # Set paste target
-        c.execute('UPDATE clipboard_object SET parent_id=? WHERE parent_id IS NULL;', (parent_id, ))
-
-        # Paste
-        for table in self.object_tables:
-            c.execute(f'INSERT INTO {table} SELECT * FROM clipboard_{table};')
-
-        # Reset target for next past
-        c.execute('UPDATE clipboard_object SET parent_id=NULL WHERE parent_id=?;',
-                  (parent_id, ))
-
-        self.conn.commit()
-        c.close()
+            retval[object_id] = tuple([ x[0] for x in c.fetchall() ])
 
         return retval
+
 
 # Function used in SQLite
 

@@ -917,9 +917,13 @@ class CmbProject(Gtk.TreeStore):
 
         # Update UI objects
         for object_id in new_objects:
-            c.execute('SELECT * FROM object WHERE ui_id=? AND object_id=?;',
-                      (ui_id, object_id))
-            self.__add_object(True, *c.fetchone())
+            for child_id in new_objects[object_id]:
+                c.execute('SELECT * FROM object WHERE ui_id=? AND object_id=?;',
+                          (ui_id, child_id))
+                self.__add_object(False, *c.fetchone())
+
+            obj = self.get_object_by_id(ui_id, object_id)
+            self.emit('object-added', obj)
 
         c.close()
 
@@ -954,14 +958,7 @@ class CmbProject(Gtk.TreeStore):
                 self.__remove_object(obj)
 
     def clipboard_count(self):
-        try:
-            c = self.db.execute('SELECT count(ui_id) FROM clipboard_object WHERE parent_id IS NULL;')
-            retval = c.fetchone()[0]
-            c.close()
-        except:
-            retval = 0
-
-        return retval
+        return len(self.db.clipboard)
 
     @staticmethod
     def get_target_from_ui_file(filename):
