@@ -87,6 +87,7 @@ class CmbDB(GObject.GObject):
         self.history_commands = {}
 
         self.clipboard = []
+        self.clipboard_ids = []
 
         self.conn = sqlite3.connect(':memory:')
 
@@ -686,7 +687,7 @@ class CmbDB(GObject.GObject):
 
         return pinfo
 
-    def __import_property(self, c, info, ui_id, object_id, prop):
+    def __import_property(self, c, info, ui_id, object_id, prop, object_id_map=None):
         name, translatable, context, comments = self.__node_get(prop, 'name', ['translatable', 'context', 'comments'])
 
         property_id = name.replace('_', '-')
@@ -712,13 +713,17 @@ class CmbDB(GObject.GObject):
                 inline_object_id = self.__import_object(ui_id, obj_node, object_id)
                 value = None
 
+        # Need to remap object ids on paste
+        if object_id_map and pinfo.is_object:
+            value = object_id_map.get(value, value)
+
         try:
             c.execute("INSERT INTO object_property (ui_id, object_id, owner_id, property_id, value, translatable, comment, translation_context, translation_comments, inline_object_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                       (ui_id, object_id, pinfo.owner_id, property_id, value, translatable, comment, context, comments, inline_object_id))
         except Exception as e:
             raise Exception(f'XML:{prop.sourceline} - Can not import object {object_id} {pinfo.owner_id}:{property_id} property: {e}')
 
-    def __import_signal(self, c, info, ui_id, object_id, signal):
+    def __import_signal(self, c, info, ui_id, object_id, signal, object_id_map=None):
         name, handler, user_data, swap, after, = self.__node_get(signal, 'name', ['handler', 'object', 'swapped', 'after'])
 
         tokens = name.split('::')
@@ -742,6 +747,10 @@ class CmbDB(GObject.GObject):
                     owner_id = parent
                     break
 
+        # Need to remap object ids on paste
+        if object_id_map and user_data:
+            user_data = object_id_map.get(user_data, user_data)
+
         # Insert signal
         if not owner_id:
             self.__collect_error('unknown-signal', signal, f'{info.type_id}:{signal_id}')
@@ -753,14 +762,14 @@ class CmbDB(GObject.GObject):
         except Exception as e:
             raise Exception(f'XML:{signal.sourceline} - Can not import object {object_id} {owner_id}:{signal_id} signal: {e}')
 
-    def __import_child(self, c, info, ui_id, parent_id, child):
+    def __import_child(self, c, info, ui_id, parent_id, child, object_id_map=None):
         ctype, internal = self.__node_get(child, ['type', 'internal-child'])
         object_id = None
         packing = None
 
         for node in child.iterchildren():
             if node.tag == 'object':
-                object_id = self.__import_object(ui_id, node, parent_id, internal, ctype)
+                object_id = self.__import_object(ui_id, node, parent_id, internal, ctype, object_id_map=object_id_map)
             elif node.tag == 'packing' and self.target_tk == 'gtk+-3.0':
                 # Gtk 3, packing props are sibling to <object>
                 packing = node
@@ -869,7 +878,7 @@ class CmbDB(GObject.GObject):
 
         c.close()
 
-    def __import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False):
+    def __import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False, object_id_map=None):
         is_template = node.tag == 'template'
 
         if is_template:
@@ -883,6 +892,10 @@ class CmbDB(GObject.GObject):
         if not info:
             self.__collect_error('unknown-type', node, klass)
             return
+
+        # Need to remap object ids on paste
+        if object_id_map:
+            name = object_id_map.get(name, name)
 
         # Insert object
         try:
@@ -908,11 +921,11 @@ class CmbDB(GObject.GObject):
 
         for child in node.iterchildren():
             if child.tag == 'property':
-                self.__import_property(c, info, ui_id, object_id, child)
+                self.__import_property(c, info, ui_id, object_id, child, object_id_map=object_id_map)
             elif child.tag == 'signal':
-                self.__import_signal(c, info, ui_id, object_id, child)
+                self.__import_signal(c, info, ui_id, object_id, child, object_id_map=object_id_map)
             elif child.tag == 'child':
-                self.__import_child(c, info, ui_id, object_id, child)
+                self.__import_child(c, info, ui_id, object_id, child, object_id_map=object_id_map)
             elif child.tag == 'layout' and self.target_tk == 'gtk-4.0':
                 # Gtk 4, layout props are children of <object>
                 self.__import_layout_properties(c, info, ui_id, parent_id, object_id, child)
@@ -972,6 +985,16 @@ class CmbDB(GObject.GObject):
             return ('gtk+', '3.0', True)
 
         return (None, None, None)
+
+    def __fix_object_references(self, ui_id):
+        self.conn.execute('''
+            UPDATE object_property AS op SET value=o.object_id
+            FROM property AS p, object AS o
+            WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND
+                  op.property_id = p.property_id AND o.ui_id = op.ui_id AND
+                  o.name = op.value;
+            ''',
+            (ui_id, ))
 
     def import_file(self, filename, projectdir='.'):
         # Clear parsing errors
@@ -1064,14 +1087,8 @@ class CmbDB(GObject.GObject):
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
 
-        # Do not use UPDATE FROM since its not supported in gnome sdk sqlite
-        #c.execute("UPDATE object_property AS op SET value=o.object_id FROM property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;", (ui_id, ))
-
         # Fix object references!
-        cc = self.conn.cursor()
-        for row in c.execute("SELECT o.object_id, ?, op.object_id, op.owner_id, op.property_id FROM object_property AS op, property AS p, object AS o WHERE op.ui_id=? AND p.is_object AND op.owner_id = p.owner_id AND op.property_id = p.property_id AND o.ui_id = op.ui_id AND o.name = op.value;",
-                             (ui_id, ui_id)):
-            cc.execute("UPDATE object_property SET value=? WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?", row)
+        self.__fix_object_references(ui_id)
 
         # Check for parsing errors and append .cmb if something is not supported
         if len(self.errors):
@@ -1079,7 +1096,6 @@ class CmbDB(GObject.GObject):
             c.execute("UPDATE ui SET filename=? WHERE ui_id=?", (f"{filename}.cmb.ui", ui_id))
 
         self.conn.commit()
-        cc.close()
         c.close()
 
         return ui_id
@@ -1380,18 +1396,62 @@ class CmbDB(GObject.GObject):
 
     def clipboard_copy(self, selection):
         self.clipboard = []
+        self.clipboard_ids = []
+
+        c = self.conn.cursor()
 
         # Copy data for every object in selection
         for ui_id, object_id in selection:
             node = self.__export_object(ui_id, object_id)
             self.clipboard.append(node)
 
+            c.execute('''
+                 WITH RECURSIVE ancestor(object_id, parent_id, name) AS (
+                   SELECT object_id, parent_id, name
+                     FROM object
+                     WHERE ui_id=? AND object_id=?
+                   UNION
+                   SELECT object.object_id, object.parent_id, object.name
+                     FROM object JOIN ancestor ON object.parent_id=ancestor.object_id
+                     WHERE ui_id=?
+                 )
+                 SELECT name FROM ancestor WHERE name IS NOT NULL''',
+                 (ui_id, object_id, ui_id))
+
+            # Object ids that will need to be remapped
+            self.clipboard_ids += tuple([ x[0] for x in c.fetchall() ])
+
+        c.close()
+
     def clipboard_paste(self, ui_id, parent_id):
         c = self.conn.cursor()
+        object_id_map = {}
         retval = {}
 
+        # Generate new object_id mapping
+        for object_id in self.clipboard_ids:
+            object_id_base = object_id
+
+            if '_' in object_id_base:
+                tokens = object_id_base.split('_')
+                if len(tokens) == 2 and tokens[1].isdigit():
+                    object_id_base = tokens[0]
+
+            max_index = 0
+            for row in c.execute('SELECT name FROM object WHERE ui_id=? AND name IS NOT NULL AND name LIKE ?;',
+                                  (ui_id, f'{object_id_base}_%')):
+                tokens = row[0].split('_')
+
+                if len(tokens) == 2 and tokens[0] == object_id_base:
+                    try:
+                        max_index = max(max_index, int(tokens[1]))
+                    except:
+                        pass
+
+            object_id_map[object_id] = f'{object_id_base}_{max_index+1}'
+
         for node in self.clipboard:
-            object_id = self.__import_object(ui_id, node, parent_id)
+            object_id = self.__import_object(ui_id, node, parent_id, object_id_map=object_id_map)
 
             c.execute('''
                  WITH RECURSIVE ancestor(object_id, parent_id) AS (
@@ -1409,6 +1469,9 @@ class CmbDB(GObject.GObject):
             # Object and children ids
             retval[object_id] = tuple([ x[0] for x in c.fetchall() ])
 
+        self.__fix_object_references(ui_id)
+
+        c.close()
         return retval
 
 
