@@ -59,8 +59,16 @@ class CmbUI(CmbBaseUI):
                 c.execute("DELETE FROM ui_library WHERE ui_id=? AND library_id=?;",
                           (self.ui_id, library_id))
             else:
-                c.execute("REPLACE INTO ui_library (ui_id, library_id, version, comment) VALUES (?, ?, ?, ?);",
-                          (self.ui_id, library_id, str(version), comment))
+                # Do not use REPLACE INTO, to make sure both INSERT and UPDATE triggers are used
+                count = self.db_get("SELECT count(version) FROM ui_library WHERE ui_id=? AND library_id=?;", (self.ui_id, library_id))
+
+                if count:
+                    c.execute("UPDATE ui_library SET version=?, comment=? WHERE ui_id=?, library_id=?;",
+                              (str(version), comment, self.ui_id, library_id))
+                else:
+                    c.execute("INSERT INTO ui_library (ui_id, library_id, version, comment) VALUES (?, ?, ?, ?);",
+                              (self.ui_id, library_id, str(version), comment))
+
         except Exception as e:
             logger.warning(f'{self} Error setting library {library_id}={version}: {e}')
 

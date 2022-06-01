@@ -68,8 +68,17 @@ class CmbObjectData(CmbBaseObjectData):
                 c.execute("DELETE FROM object_data_arg WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND key=?;",
                           (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, key))
             else:
-                c.execute("REPLACE INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                          (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, key, str(value)))
+                # Do not use REPLACE INTO, to make sure both INSERT and UPDATE triggers are used
+                count = self.db_get("SELECT count(value) FROM object_data_arg WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND key=?;",
+                                    (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, key))
+
+                if count:
+                    c.execute("UPDATE object_data_arg SET value=? WHERE ui_id=? AND object_id=? AND owner_id=? AND data_id=? AND id=? AND key=?;",
+                              (str(value), self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, key))
+                else:
+                    c.execute("INSERT INTO object_data_arg (ui_id, object_id, owner_id, data_id, id, key, value) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                              (self.ui_id, self.object_id, self.owner_id, self.data_id, self.id, key, str(value)))
+
         except Exception as e:
             logger.warning(f'{self} Error setting arg {key}={value}: {e}')
 
