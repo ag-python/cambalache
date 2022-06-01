@@ -328,7 +328,8 @@ class CmbProject(Gtk.TreeStore):
             c.execute("DELETE FROM ui WHERE filename=?;", (filename, ))
 
         # Import file
-        ui_id = self.db.import_file(filename, os.path.dirname(self.filename))
+        dirname = os.path.dirname(self.filename if self.filename else filename)
+        ui_id = self.db.import_file(filename, dirname)
 
         import_end = time.monotonic()
 
@@ -880,6 +881,9 @@ class CmbProject(Gtk.TreeStore):
     def history_push(self, message):
         if not self.history_enabled:
             return
+
+        # Make sure we clear history on new push
+        self.db.clear_history()
 
         self.db.execute("INSERT INTO history (history_id, command, message) VALUES (?, 'PUSH', ?)",
                           (self.history_index_max + 1, message))
