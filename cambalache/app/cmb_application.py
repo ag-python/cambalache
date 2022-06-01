@@ -27,7 +27,7 @@ import gi
 
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio
+from gi.repository import GLib, Gdk, Gtk, Gio
 
 from cambalache import *
 
@@ -40,6 +40,18 @@ class CmbApplication(Gtk.Application):
     def __init__(self):
         super().__init__(application_id='ar.xjuan.Cambalache',
                          flags=Gio.ApplicationFlags.HANDLES_OPEN)
+
+        self.add_main_option('version', b'v',
+                             GLib.OptionFlags.NONE,
+                             GLib.OptionArg.NONE,
+                             _("Print version"),
+                             None)
+
+        self.add_main_option('export-all', b'E',
+                             GLib.OptionFlags.NONE,
+                             GLib.OptionArg.FILENAME,
+                             _("Export project"),
+                             None)
 
     def __add_window(self):
         window = CmbWindow(application=self)
@@ -110,6 +122,19 @@ class CmbApplication(Gtk.Application):
     def _on_quit_activate(self, action, data):
         self.quit()
 
+    def do_handle_local_options(self, options):
+        if options.contains('version'):
+            print(VERSION)
+            return 0
+
+        if options.contains('export-all'):
+            filename = options.lookup_value('export-all')
+            filename = ''.join([ chr(c) for c in filename.unpack()])
+            project = CmbProject(filename=filename)
+            project.export()
+            return 0
+
+        return -1
 
 if __name__ == '__main__':
     app = CmbApplication()
