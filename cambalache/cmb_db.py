@@ -159,6 +159,7 @@ class CmbDB(GObject.GObject):
             DELETE FROM history WHERE (SELECT value FROM global WHERE key='history_index') > 0 AND history_id > (SELECT value FROM global WHERE key='history_index');
             UPDATE global SET value=-1 WHERE key='history_index' AND value >= 0
         '''
+        self.__clear_history = clear_history
 
         for row in c.execute(f'PRAGMA table_info({table});'):
             col = row[1]
@@ -622,8 +623,17 @@ class CmbDB(GObject.GObject):
         if parent_id and parent_type and inline_property:
             info = self.type_info.get(parent_type, None)
             pinfo = self.__get_property_info(info, inline_property)
-            c.execute("REPLACE INTO object_property(ui_id, object_id, owner_id, property_id, inline_object_id) VALUES(?, ?, ?, ?, ?)",
-                      (ui_id, parent_id, pinfo.owner_id, inline_property, object_id))
+
+            c.execute("SELECT count(object_id) FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id;",
+                      (ui_id, parent_id, pinfo.owner_id, inline_property))
+            count = c.fetchone()[0]
+
+            if count:
+                c.execute("UPDATE object_property SET inline_object_id=? WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id;",
+                          (object_id, ui_id, parent_id, pinfo.owner_id, inline_property))
+            else:
+                c.execute("INSERT INTO object_property(ui_id, object_id, owner_id, property_id, inline_object_id) VALUES(?, ?, ?, ?, ?)",
+                          (ui_id, parent_id, pinfo.owner_id, inline_property, object_id))
 
         c.close()
 
@@ -1473,6 +1483,9 @@ class CmbDB(GObject.GObject):
 
         c.close()
         return retval
+
+    def clear_history(self):
+        self.conn.executescript(self.__clear_history)
 
 
 # Function used in SQLite
