@@ -20,6 +20,56 @@
     </p>
   </description>
   <releases>
+    <release date="2022-05-15" version="0.10.0">
+      <description>
+        <p>3rd party libs release!</p>
+        <ul>
+          <li>Add Adwaita and Handy library support</li>
+          <li>Add inline object properties support (only Gtk 4)</li>
+          <li>Add special child type support (GtkWindow title widget)</li>
+          <li>Improve clipboard functionality</li>
+          <li>Add support for reordering children position</li>
+          <li>Add/Improve worspace support for GtkMenu, GtkNotebook, GtkPopover, GtkStack, GtkAssistant, GtkListBox, GtkMenuItem and GtkCenterBox</li>
+          <li>New property editors for icon name and color properties</li>
+          <li>Add support for GdkPixbuf, Pango, Gio, Gdk and Gsk flags/enums types</li>
+          <li>Add Ukrainian translation (Volodymyr M. Lisivka)</li>
+          <li>Add Italian translation (capaz)</li>
+        </ul>
+      </description>
+      <issues>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/47">Issue #47 "Proper ui file(which compile properly), fails to open in cambalache and show error"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/79">Issue #79 "Change column/row count of GtkBox and GtkGrid"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/81">Issue #81 "No way to add rows to GtkListBox"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/68">Issue #68 "Trouble with GtkHeaderBar"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/82">Issue #82 "Can't change x and y values of widgets in Gtk4 when using GtkFixed"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/62">Issue #62 "Many widget-specific properties appear to be missing"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/83">Issue #83 "Gettext domain is not initialized properly"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/66">Issue #66 "Allow adding new items directly in tree view instead of (only) through preview view"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/86">Issue #86 "Automatically restart merengue when merengue crashes"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/89">Issue #89 "Error `AttributeError: 'NoneType' object has no attribute 'info'` when deleting UI file"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/90">Issue #90 "Cambalache fails to import valid glade/ui files"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/75">Issue #75 "How to use GtkStack"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/78">Issue #78 "How to use GTKAssistant"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/63">Issue #63 "Allow automatically exporting on save (or make it easier to do so)"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/91">Issue #91 "Unable to export"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/85">Issue #85 "Provide icon selection for Button / Image"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/92">Issue #92 "'Debug Project Data' does nothing"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/9">Issue #9 "Support for libadwaita and libhandy"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/59">Issue #59 "Reordering children in a parent"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/100">Issue #100 "Signals get broken"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/105">Issue #105 "Child layout properties not available when parent is a subclass (AdwHeaderBar)"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/102">Issue #102 "Popovers are not visible"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/104">Issue #104 "Error when trying to add children to buttonbox"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/98">Issue #98 "No way to add tab in Notebook"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/108">Issue #108 "Popovers stay on scene after deleting file which contains them"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/109">Issue #109 "Cambalache adds to container GtkRecentChooserMenu even if prints that this won't happen"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/110">Issue #110 "Screen flashing when creating GBinding"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/116">Issue #116 "Error when trying to click at Notebook content"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/117">Issue #117 "Error `'NoneType' object has no attribute 'props'` when changing notebook tab"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/115">Issue #115 "Cannot copy/paste widget"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/69">Issue #69 "Undo and redo operations don't always match up"</issue>
+      </issues>
+    </release>
     <release date="2022-01-14" version="0.8.2">
       <description>
         <p>Bugfix release!</p>
