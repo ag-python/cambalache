@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-11 21:22-0500\n"
+"POT-Creation-Date: 2022-06-02 14:40-0400\n"
 "PO-Revision-Date: 2022-02-19 16:40+0200\n"
 "Last-Translator: Volodymyr M. Lisivka <vlisivka@gmail,com>\n"
 "Language-Team: Ukrainian, https://linux.org.ua\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:6
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:299
 msgid "Cambalache"
 msgstr "Cambalache"
 
@@ -28,8 +28,7 @@ msgstr "Створювач інтерфейсу користувача"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/ar.xjuan.Cambalache.desktop.in:14
 msgid "UI Maker;GUI designer;user interface;ui builder;"
-msgstr ""
-"Створювач ГІК;дизайнер ГІК;інтерфейс користувача;конструктор ГІК;"
+msgstr "Створювач ГІК;дизайнер ГІК;інтерфейс користувача;конструктор ГІК;"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:7
 msgid "Create GTK User Interfaces"
@@ -54,11 +53,60 @@ msgstr ""
 "для підтримки інших версій."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:97
+#, fuzzy
+msgid "3rd party libs release!"
+msgstr "Перший публічний випуск!"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:27
+msgid "Add Adwaita and Handy library support"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+msgid "Add inline object properties support (only Gtk 4)"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:29
+msgid "Add special child type support (GtkWindow title widget)"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:30
+msgid "Improve clipboard functionality"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:31
+#, fuzzy
+msgid "Add support for reordering children position"
+msgstr "Додано підтримку для імпорту кількох файлів одночасно"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:32
+msgid ""
+"Add/Improve worspace support for GtkMenu, GtkNotebook, GtkPopover, GtkStack, "
+"GtkAssistant, GtkListBox, GtkMenuItem and GtkCenterBox"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:33
+msgid "New property editors for icon name and color properties"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:34
+msgid "Add support for GdkPixbuf, Pango, Gio, Gdk and Gsk flags/enums types"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:35
+msgid "Add Ukrainian translation (Volodymyr M. Lisivka)"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:36
+#, fuzzy
+msgid "Add Italian translation (capaz)"
+msgstr "Додано німецький переклад. PhilProg"
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:75
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:147
 msgid "Bugfix release!"
 msgstr "Випуск виправлення помилок!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:27
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:77
 msgid ""
 "GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, "
 "Frame, Revealer, ScrolledWindow, Viewport and Overlay)"
@@ -66,186 +114,185 @@ msgstr ""
 "GTK 4: виправити заповнювачі в контейнерах типу bin (AspectFrame, Expander, "
 "Рамка, Revealer, ScrolledWindow, Viewport і Overlay)"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:28
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:78
 msgid "GTK 4: Fix placeholders in GtkPaned"
 msgstr "GTK 4: Виправлення заповнювачів у GtkPaned"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:29
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:79
 msgid "Fix property editor copy/paste shortcuts"
 msgstr "Виправлення ярликів копіювання/вставки в редакторі властивостей"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:30
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:80
 msgid "Various improvements and minor fixes"
 msgstr "Різні вдосконалення та незначні виправлення"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:42
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:92
 msgid "First bugfix release in 0.8 series!"
 msgstr "Перший випуск із виправленням помилок у серії 0.8!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:44
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:94
 msgid "Add support for importing multiples files at once"
 msgstr "Додано підтримку для імпорту кількох файлів одночасно"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:45
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:95
 msgid "Simplify add new UI file to project"
 msgstr "Спрощено додавання нового файлу ГІК до проєкту"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:46
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:96
 msgid "Import/export UI meta data like license, author etc"
-msgstr ""
-"Імпорт/експорт метаданих ГІК, як-от ліцензія, автор, тощо"
+msgstr "Імпорт/експорт метаданих ГІК, як-от ліцензія, автор, тощо"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:47
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:97
 msgid "Do not create extra placeholders on GtkBox and GtkGrid"
 msgstr "Не створюються додаткові заповнювачі для GtkBox і GtkGrid"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:48
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:98
 msgid "Show toolkit target on type chooser bar"
 msgstr "Показується цільовий інструментарій на панелі вибору типу"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:49
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:99
 msgid "Improve file open handling"
 msgstr "Покращено обробку відкриття файлів"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:50
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:100
 msgid "Automatically import UI file in current or new project on xdg open"
 msgstr ""
-"Автоматично імпортується файл ГІК в поточний або новий "
-"проєкт при відкритті через xdg"
+"Автоматично імпортується файл ГІК в поточний або новий проєкт при відкритті "
+"через xdg"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:65
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:115
 msgid "UX improvements Release!"
 msgstr "Випуск покращень UX!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:67
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:117
 msgid "New Type chooser bar"
 msgstr "Нова панель вибору типу"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:68
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:118
 msgid "Workspace placeholder support"
 msgstr "Підтримка заповнювачів робочого простору"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:69
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:119
 msgid "Translatable properties support (Philipp Unger)"
 msgstr "Підтримка властивостей для перекладу (Філіп Унгер)"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:70
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:120
 msgid "Clipboard actions support (Copy, Paste, Cut)"
 msgstr "Підтримка дій буфера обміну (Копіювати, Вставляти, Вирізати)"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:71
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:121
 msgid "Better unsupported features report"
 msgstr "Кращий звіт про непідтримувані функції"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:72
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:122
 msgid "New Matrix channel #cambalache:gnome.org"
 msgstr "Новий канал Matrix #cambalache:gnome.org"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:73
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:123
 msgid "You can now also support Cambalache on Liberapay"
 msgstr "Тепер ви також можете підтримувати Cambalache на Liberapay"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:99
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:149
 msgid "Add sponsors credit section"
 msgstr "Додано розділ вшанування спонсорів"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:100
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:150
 msgid "Theme workspace background"
 msgstr "Фон робочої області згідно теми"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:101
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:151
 msgid "Fix various bugs and regresions"
 msgstr "Виправлення різних помилок та регресій"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:112
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:162
 msgid "Flathub release!"
 msgstr "Випуск Flathub!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:114
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:164
 msgid "Add basic interactive tutorial"
 msgstr "Додано простий інтерактивний посібник"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:115
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:165
 msgid "Add workspace Gtk theme chooser"
 msgstr "Додано засіб вибору теми Gtk для робочого простору"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:116
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:166
 msgid "Add support for templates"
 msgstr "Додати підтримку шаблонів"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:122
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:172
 msgid "New translations release!"
 msgstr "Випуск нових перекладів!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:124
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:174
 msgid "Add Czech translation. Vojtěch Perník"
 msgstr "Додано чеський переклад. Vojtěch Perník"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:125
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:175
 msgid "Add German translation. PhilProg"
 msgstr "Додано німецький переклад. PhilProg"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:126
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:176
 msgid "Add x-cambalache mimetype with icon"
 msgstr "Додано x-cambalache mimetype зі значком"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:132
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:182
 msgid "First public release!"
 msgstr "Перший публічний випуск!"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:134
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:184
 msgid "Suport for both Gtk 3 and 4 versions"
 msgstr "Підтримка як Gtk версії 3 і 4"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:135
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:185
 msgid "Import and export multiple UI at once"
 msgstr "Імпорт і експорт кількох ГІК одночасно"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:136
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:186
 msgid "Support plain (no custom tags) GtkBuilder features"
 msgstr "Підтримка простих (без спеціальних тегів) функцій GtkBuilder"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:137
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:187
 msgid "Undo / Redo stack"
 msgstr "Стекове скасування/повторення"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:138
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:188
 msgid "LGPL version 2.1"
 msgstr "LGPL версія 2.1"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:147
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:197
 msgid "Cambalache start window"
 msgstr "Початкове вікно Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:151
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:201
 msgid "Cambalache new project page"
 msgstr "Нова сторінка проєкту Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:155
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:205
 msgid "Cambalache workspace"
 msgstr "Робочий простір Cambalache"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:159
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:209
 msgid "Shortcuts window"
 msgstr "Вікно ярликів"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:163
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:213
 msgid "Workspace gtk dark theme"
 msgstr "Темна тема gtk у робочому просторі"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:167
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:217
 msgid "Display type chooser"
 msgstr "Вибір типу відображення"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:171
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:221
 msgid "Right click popover"
 msgstr "Спливні меню по правому кліку"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:175
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:225
 msgid "main menu"
 msgstr "головне меню"
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:180
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:230
 msgid "Juan Pablo Ugarte"
 msgstr "Хуан Пабло Угарте"
 
@@ -271,19 +318,29 @@ msgid "Delete"
 msgstr "Видалити"
 
 #: cambalache/cmb_context_menu.ui:87
+#, fuzzy
+msgid "Add object here"
+msgstr "Додати обʼєкт {name}"
+
+#: cambalache/cmb_context_menu.ui:101
+#, fuzzy
+msgid "Add object as toplevel"
+msgstr "Додати обʼєкт {name}"
+
+#: cambalache/cmb_context_menu.ui:115
 msgid "Clear Properties"
 msgstr "Очистити властивості"
 
-#: cambalache/cmb_context_menu.ui:101
+#: cambalache/cmb_context_menu.ui:129
 msgid "Read Documentation"
 msgstr "Прочитати документацію"
 
-#: cambalache/cmb_context_menu.ui:123
+#: cambalache/cmb_context_menu.ui:151
 msgid "CSS theme"
 msgstr "Тема CSS"
 
 #. Translators: This text will be used in the next two string as {convert}
-#: cambalache/cmb_db.py:897
+#: cambalache/cmb_db.py:1024
 msgid ""
 "\n"
 "Use gtk4-builder-tool first to convert file."
@@ -291,12 +348,12 @@ msgstr ""
 "\n"
 "Спочатку використовуйте gtk4-builder-tool для перетворення файлу."
 
-#: cambalache/cmb_db.py:900
+#: cambalache/cmb_db.py:1027
 msgid "Can not recognize file format"
 msgstr "Не вдається розпізнати формат файлу"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
-#: cambalache/cmb_db.py:904
+#: cambalache/cmb_db.py:1031
 #, python-brace-format
 msgid ""
 "Can not import what looks like a {lib}-{ver} file in a {target_tk} project."
@@ -306,7 +363,7 @@ msgstr ""
 "{target_tk}.{convert}"
 
 #. Translators: {convert} will be replaced with the gtk4-builder-tool string
-#: cambalache/cmb_db.py:907
+#: cambalache/cmb_db.py:1034
 #, python-brace-format
 msgid "Can not import a {lib}-{ver} file in a {target_tk} project.{convert}"
 msgstr ""
@@ -325,210 +382,238 @@ msgstr "Перейти між обʼєктом і шаблоном"
 msgid "Template"
 msgstr "Шаблон"
 
-#: cambalache/cmb_project.py:343
+#: cambalache/cmb_object_editor.py:102
+msgid "Child Type"
+msgstr ""
+
+#: cambalache/cmb_object.py:288
+#, python-brace-format
+msgid "Reorder object {name} from position {old} to {new}"
+msgstr ""
+
+#: cambalache/cmb_project.py:278
 #, python-brace-format
 msgid "one unknown class '{detail}'"
 msgstr "один невідомий клас «{detail}»"
 
-#: cambalache/cmb_project.py:343
+#: cambalache/cmb_project.py:278
 #, python-brace-format
 msgid "{n} unknown classes ({detail})"
 msgstr "{n} невідомі класи ({detail})"
 
-#: cambalache/cmb_project.py:344
+#: cambalache/cmb_project.py:279
 #, python-brace-format
 msgid "one unknown property '{detail}'"
 msgstr "одна невідома властивість «{detail}»"
 
-#: cambalache/cmb_project.py:344
+#: cambalache/cmb_project.py:279
 #, python-brace-format
 msgid "{n} unknown properties ({detail})"
 msgstr "{n} невідомі властивості ({detail})"
 
-#: cambalache/cmb_project.py:345
+#: cambalache/cmb_project.py:280
 #, python-brace-format
 msgid "one unknown signal '{detail}'"
 msgstr "один невідомий сигнал «{detail}»"
 
-#: cambalache/cmb_project.py:345
+#: cambalache/cmb_project.py:280
 #, python-brace-format
 msgid "{n} unknown signals ({detail})"
 msgstr "{n} невідомі сигнали ({detail})"
 
-#: cambalache/cmb_project.py:346
+#: cambalache/cmb_project.py:281
 #, python-brace-format
 msgid "one unknown tag '{detail}'"
 msgstr "один невідомий тег «{detail}»"
 
-#: cambalache/cmb_project.py:346
+#: cambalache/cmb_project.py:281
 #, python-brace-format
 msgid "{n} unknown tags ({detail})"
 msgstr "{n} невідомі теги ({detail})"
 
-#: cambalache/cmb_project.py:347
+#: cambalache/cmb_project.py:282
 #, python-brace-format
 msgid "one unknown attribute '{detail}'"
 msgstr "один невідомий атрибут «{detail}»"
 
-#: cambalache/cmb_project.py:347
+#: cambalache/cmb_project.py:282
 #, python-brace-format
 msgid "{n} unknown attributes ({detail})"
 msgstr "{n} невідомі атрибути ({detail})"
 
-#: cambalache/cmb_project.py:348
+#: cambalache/cmb_project.py:283
 #, python-brace-format
 msgid "one missing attribute '{detail}'"
 msgstr "один відсутній атрибут «{detail}»"
 
-#: cambalache/cmb_project.py:348
+#: cambalache/cmb_project.py:283
 #, python-brace-format
 msgid "{n} missing attributes ({detail})"
 msgstr "{n} відсутні атрибути ({detail})"
 
-#: cambalache/cmb_project.py:352
+#: cambalache/cmb_project.py:287
 #, python-brace-format
 msgid "xml:{line} unknown class '{detail}'"
 msgstr "xml:{line} невідомий клас «{detail}»"
 
-#: cambalache/cmb_project.py:353
+#: cambalache/cmb_project.py:288
 #, python-brace-format
 msgid "xml:{line} unknown property '{detail}'"
 msgstr "xml:{line} невідома властивість «{detail}»"
 
-#: cambalache/cmb_project.py:354
+#: cambalache/cmb_project.py:289
 #, python-brace-format
 msgid "xml:{line} unknown signal '{detail}'"
 msgstr "xml:{line} невідомий сигнал «{detail}»"
 
-#: cambalache/cmb_project.py:355
+#: cambalache/cmb_project.py:290
 #, python-brace-format
 msgid "xml:{line} unknown tag '{detail}'"
 msgstr "xml:{line} невідомий тег «{detail}»"
 
-#: cambalache/cmb_project.py:356
+#: cambalache/cmb_project.py:291
 #, python-brace-format
 msgid "xml:{line} unknown attribute '{detail}'"
 msgstr "xml:{line} невідомий атрибут «{detail}»"
 
-#: cambalache/cmb_project.py:357
+#: cambalache/cmb_project.py:292
 #, python-brace-format
 msgid "xml:{line} missing attribute '{detail}'"
 msgstr "xml:{line} відсутній атрибут «{detail}»"
 
-#: cambalache/cmb_project.py:389
+#: cambalache/cmb_project.py:324
 #, python-brace-format
 msgid "Import file \"{filename}\""
 msgstr "Імпортувати файл «{filename}»"
 
-#: cambalache/cmb_project.py:476
+#: cambalache/cmb_project.py:415
 #, python-brace-format
 msgid "Add UI {basename}"
 msgstr "Додати ГІК {basename}"
 
-#: cambalache/cmb_project.py:495
+#: cambalache/cmb_project.py:434
 #, python-brace-format
 msgid "Remove UI \"{name}\""
 msgstr "Видалити ГІК «{name}»"
 
-#: cambalache/cmb_project.py:553
+#: cambalache/cmb_project.py:492
 #, python-brace-format
 msgid "Add object {name}"
 msgstr "Додати обʼєкт {name}"
 
-#: cambalache/cmb_project.py:573
+#: cambalache/cmb_project.py:519
 #, python-brace-format
 msgid "Remove object {name}"
 msgstr "Видалити обʼєкт {name}"
 
-#: cambalache/cmb_project.py:831
+#: cambalache/cmb_project.py:784
 #, python-brace-format
 msgid "Create UI {ui}"
 msgstr "Створити ГІК {ui}"
 
-#: cambalache/cmb_project.py:832
+#: cambalache/cmb_project.py:785
 #, python-brace-format
 msgid "Remove UI {ui}"
 msgstr "Видалити ГІК {ui}"
 
-#: cambalache/cmb_project.py:833
+#: cambalache/cmb_project.py:786
 #, python-brace-format
 msgid "Update UI {ui}"
 msgstr "Оновити ГІК {ui}"
 
-#: cambalache/cmb_project.py:836
+#: cambalache/cmb_project.py:789
 #, python-brace-format
 msgid "Create object {obj}"
 msgstr "Створити обʼєкт {obj}"
 
-#: cambalache/cmb_project.py:837
+#: cambalache/cmb_project.py:790
 #, python-brace-format
 msgid "Remove object {obj}"
 msgstr "Видалити обʼєкт {obj}"
 
-#: cambalache/cmb_project.py:838
+#: cambalache/cmb_project.py:791
 #, python-brace-format
 msgid "Update object {obj}"
 msgstr "Оновити обʼєкт {obj}"
 
-#: cambalache/cmb_project.py:841
+#: cambalache/cmb_project.py:794
 #, python-brace-format
 msgid "Set property \"{prop}\" of {obj} to {value}"
 msgstr "Встановити властивість «{prop}» для {obj} у {value}"
 
-#: cambalache/cmb_project.py:842
+#: cambalache/cmb_project.py:795
 #, python-brace-format
 msgid "Unset property \"{prop}\" of {obj}"
 msgstr "Скасувати властивість «{prop}» для {obj}"
 
-#: cambalache/cmb_project.py:843
+#: cambalache/cmb_project.py:796
 #, python-brace-format
 msgid "Update property \"{prop}\" of {obj} to {value}"
 msgstr "Оновити властивість «{prop}» для {obj} до {value}"
 
-#: cambalache/cmb_project.py:846
+#: cambalache/cmb_project.py:799
 #, python-brace-format
 msgid "Set layout property \"{prop}\" of {obj} to {value}"
 msgstr "Встановити властивість макета «{prop}» для {obj} у {value}"
 
-#: cambalache/cmb_project.py:847
+#: cambalache/cmb_project.py:800
 #, python-brace-format
 msgid "Unset layout property \"{prop}\" of {obj}"
 msgstr "Скасувати властивість макета «{prop}» для {obj}"
 
-#: cambalache/cmb_project.py:848
+#: cambalache/cmb_project.py:801
 #, python-brace-format
 msgid "Update layout property \"{prop}\" of {obj} to {value}"
 msgstr "Оновити властивість макета «{prop}» для {obj} до {value}"
 
-#: cambalache/cmb_project.py:851
+#: cambalache/cmb_project.py:804
 #, python-brace-format
 msgid "Add {signal} signal to {obj}"
 msgstr "Додати сигнал {signal} до {obj}"
 
-#: cambalache/cmb_project.py:852
+#: cambalache/cmb_project.py:805
 #, python-brace-format
 msgid "Remove {signal} signal from {obj}"
 msgstr "Видалити сигнал {signal} з {obj}"
 
-#: cambalache/cmb_project.py:853
+#: cambalache/cmb_project.py:806
 #, python-brace-format
 msgid "Update {signal} signal of {obj}"
 msgstr "Оновити сигнал {signal} для {obj}"
 
-#: cambalache/cmb_project.py:933
+#: cambalache/cmb_project.py:915
 #, python-brace-format
 msgid "Paste clipboard to {name}"
 msgstr "Вставити буфер обміну в {name}"
 
-#: cambalache/cmb_project.py:962
+#: cambalache/cmb_project.py:948
 #, python-brace-format
 msgid "Cut object {name}"
 msgstr "Вирізати обʼєкт {name}"
 
-#: cambalache/cmb_project.py:964
+#: cambalache/cmb_project.py:950
 #, python-brace-format
 msgid "Cut {n_objects} object"
 msgstr "Вирізати {n_objects} обʼєктів"
+
+#: cambalache/cmb_property_controls.py:333
+#, fuzzy
+msgid "Clear property"
+msgstr "Очистити властивості"
+
+#: cambalache/cmb_property_controls.py:339
+#, fuzzy
+msgid "Add inline object"
+msgstr "Додати новий ГІК до проєкту"
+
+#. Add filters
+#: cambalache/cmb_property_controls.py:636
+msgid "Only standard"
+msgstr ""
+
+#: cambalache/cmb_property_controls.py:637
+msgid "Only symbolic"
+msgstr ""
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -570,42 +655,42 @@ msgstr "Контекст перекладу:"
 msgid "Comments for translators:"
 msgstr "Коментарі для перекладачів:"
 
-#: cambalache/cmb_tree_view.py:89
+#: cambalache/cmb_tree_view.py:104
 msgid "(template)"
 msgstr "(шаблон)"
 
-#: cambalache/cmb_tree_view.py:92
+#: cambalache/cmb_tree_view.py:107
 #, python-brace-format
 msgid "<b>Unnamed {ui_id}</b>"
 msgstr "<b>Неназваний {ui_id}</b>"
 
 #. Widget group for toplevels/windows
-#: cambalache/cmb_type_chooser.ui:92 cambalache/cmb_type_chooser_widget.py:65
+#: cambalache/cmb_type_chooser.ui:92 cambalache/cmb_type_chooser_widget.py:66
 msgid "Toplevel"
 msgstr "Найвищий рівень"
 
 #. Widget group for container widgets liek GtkBox grid
-#: cambalache/cmb_type_chooser.ui:113 cambalache/cmb_type_chooser_widget.py:66
-#: cambalache/app/cmb_window.ui:747
+#: cambalache/cmb_type_chooser.ui:113 cambalache/cmb_type_chooser_widget.py:67
+#: cambalache/app/cmb_window.ui:766
 msgid "Layout"
 msgstr "Макет"
 
 #. Widget group for  control wildget like buttons, entries
-#: cambalache/cmb_type_chooser.ui:134 cambalache/cmb_type_chooser_widget.py:67
+#: cambalache/cmb_type_chooser.ui:134 cambalache/cmb_type_chooser_widget.py:68
 msgid "Control"
 msgstr "Контроль"
 
 #. Widget group for display widgets (label, image)
-#: cambalache/cmb_type_chooser.ui:155 cambalache/cmb_type_chooser_widget.py:68
+#: cambalache/cmb_type_chooser.ui:155 cambalache/cmb_type_chooser_widget.py:69
 msgid "Display"
 msgstr "Показати"
 
 #. Widget group for model objects (ListStore, TextBuffer)
-#: cambalache/cmb_type_chooser.ui:176 cambalache/cmb_type_chooser_widget.py:69
+#: cambalache/cmb_type_chooser.ui:176 cambalache/cmb_type_chooser_widget.py:70
 msgid "Model"
 msgstr "Модель"
 
-#: cambalache/cmb_type_chooser_widget.py:98
+#: cambalache/cmb_type_chooser_widget.py:99
 msgid "Others"
 msgstr "Інші"
 
@@ -645,7 +730,7 @@ msgstr "Шаблон:"
 msgid "Export"
 msgstr "Експортувати"
 
-#: cambalache/cmb_view.py:368
+#: cambalache/cmb_view.py:390
 #, python-brace-format
 msgid ""
 "Workspace not available\n"
@@ -654,13 +739,19 @@ msgstr ""
 "Робоча область недоступна.\n"
 "Виконуваний файл «{bin}» не знайдено"
 
-#: cambalache/cmb_view.py:381
+#: cambalache/cmb_view.py:403
 msgid "Restart workspace"
 msgstr "Перезапустити робочу область"
 
-#: cambalache/cmb_view.py:385
+#: cambalache/cmb_view.py:407
 msgid "Inspect UI definition"
 msgstr "Перевірити визначення ГІК"
+
+#: cambalache/cmb_view.py:422
+msgid ""
+"Workspace process error\n"
+"Stopping auto restart"
+msgstr ""
 
 #: cambalache/cmb_view.ui:36
 msgid "Project View"
@@ -670,43 +761,104 @@ msgstr "Перегляд проєкту"
 msgid "UI Definition"
 msgstr "Визначення ГІК"
 
-#: cambalache/app/cmb_shortcuts.ui:13
+#: cambalache/icon_naming_spec.py:28
+msgid "All"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:29
+#, fuzzy
+msgid "Actions"
+msgstr "Розташування"
+
+#: cambalache/icon_naming_spec.py:30
+msgid "Animations"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:31
+#, fuzzy
+msgid "Applications"
+msgstr "Розташування"
+
+#: cambalache/icon_naming_spec.py:32
+msgid "Categories"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:33
+msgid "Devices"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:34
+msgid "Emblems"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:35
+msgid "Emotes"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:36
+#, fuzzy
+msgid "International"
+msgstr "Інтерактивний вступ"
+
+#: cambalache/icon_naming_spec.py:37
+msgid "MIME Types"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:38
+msgid "Places"
+msgstr ""
+
+#: cambalache/icon_naming_spec.py:39
+msgid "Status"
+msgstr ""
+
+#: cambalache/app/cmb_application.py:47
+#, fuzzy
+msgid "Print version"
+msgstr "LGPL версія 2.1"
+
+#: cambalache/app/cmb_application.py:53
+#, fuzzy
+msgid "Export project"
+msgstr "Закрити проєкт"
+
+#: cambalache/app/cmb_shortcuts.ui:14
 msgid "Project"
 msgstr "Проєкт"
 
-#: cambalache/app/cmb_shortcuts.ui:19
+#: cambalache/app/cmb_shortcuts.ui:20
 msgid "Create new project"
 msgstr "Створити новий проєкт"
 
-#: cambalache/app/cmb_shortcuts.ui:26 cambalache/app/cmb_window.ui:1021
+#: cambalache/app/cmb_shortcuts.ui:27 cambalache/app/cmb_window.ui:1074
 msgid "Open a project"
 msgstr "Відкрити проєкт"
 
-#: cambalache/app/cmb_shortcuts.ui:33
+#: cambalache/app/cmb_shortcuts.ui:34
 msgid "Close the project"
 msgstr "Закрити проєкт"
 
-#: cambalache/app/cmb_shortcuts.ui:40
+#: cambalache/app/cmb_shortcuts.ui:41
 msgid "Save the project"
 msgstr "Зберегти проєкт"
 
-#: cambalache/app/cmb_shortcuts.ui:48
+#: cambalache/app/cmb_shortcuts.ui:55 cambalache/app/cmb_window.ui:832
 msgid "Workspace"
 msgstr "Робоча область"
 
-#: cambalache/app/cmb_shortcuts.ui:54
+#: cambalache/app/cmb_shortcuts.ui:61
 msgid "Add  slot/column"
 msgstr "Додати слот/стовпець"
 
-#: cambalache/app/cmb_shortcuts.ui:61
+#: cambalache/app/cmb_shortcuts.ui:68
 msgid "Remove slot/column"
 msgstr "Видалити слот/стовпець"
 
-#: cambalache/app/cmb_shortcuts.ui:68
+#: cambalache/app/cmb_shortcuts.ui:75
 msgid "Add row"
 msgstr "Додати рядок"
 
-#: cambalache/app/cmb_shortcuts.ui:75
+#: cambalache/app/cmb_shortcuts.ui:82
 msgid "Remove row"
 msgstr "Видалити рядок"
 
@@ -788,7 +940,8 @@ msgstr "або дослідіть, що є в кожній групі"
 
 #: cambalache/app/cmb_tutorial.py:57
 msgid "Now let's add a new UI file"
-msgstr "Тепер давайте додамо новий файл Графічного Інтерфейсу Користувача (ГІК)"
+msgstr ""
+"Тепер давайте додамо новий файл Графічного Інтерфейсу Користувача (ГІК)"
 
 #: cambalache/app/cmb_tutorial.py:59
 msgid "Good, now try to create a window"
@@ -819,9 +972,7 @@ msgstr "Досить легко! Чи не так?"
 
 #: cambalache/app/cmb_tutorial.py:69
 msgid "Once you finish, you can export all UI files to xml here"
-msgstr ""
-"Після завершення, ви можете експортувати всі файли ГІК у "
-"xml тут"
+msgstr "Після завершення, ви можете експортувати всі файли ГІК у xml тут"
 
 #: cambalache/app/cmb_tutorial.py:72
 msgid ""
@@ -835,37 +986,41 @@ msgstr ""
 msgid "Have a nice day!"
 msgstr "Гарного дня!"
 
-#: cambalache/app/cmb_window.py:331
+#: cambalache/app/cmb_window.py:255
+msgid "Hold <alt> to create object in place"
+msgstr ""
+
+#: cambalache/app/cmb_window.py:342
 msgid "<Choose a UI filename to create>"
 msgstr "<Виберіть імʼя файлу ГІК для створення>"
 
-#: cambalache/app/cmb_window.py:409 cambalache/app/cmb_window.ui:1159
+#: cambalache/app/cmb_window.py:424 cambalache/app/cmb_window.ui:1212
 msgid "Start interactive introduction"
 msgstr "Почати інтерактивне введення в інтерфейс"
 
-#: cambalache/app/cmb_window.py:463
+#: cambalache/app/cmb_window.py:490
 msgid "Supporters"
 msgstr "За підтримки"
 
 #. Translators: This is used to create a unordered list of unsupported features to show the user
-#: cambalache/app/cmb_window.py:528 cambalache/app/cmb_window.py:694
+#: cambalache/app/cmb_window.py:555 cambalache/app/cmb_window.py:745
 #, fuzzy, python-brace-format
 msgid "    • {message}"
 msgstr "    • {повідомлення}"
 
 #. Translators: This will be the heading of a list of unsupported features
-#: cambalache/app/cmb_window.py:531 cambalache/app/cmb_window.py:697
+#: cambalache/app/cmb_window.py:558 cambalache/app/cmb_window.py:748
 msgid "Cambalache encounter the following issues:"
 msgstr "Cambalache стикнувся з такими проблемами:"
 
 #. Translators: this is the last message after the list of unsupported features
-#: cambalache/app/cmb_window.py:534 cambalache/app/cmb_window.py:700
+#: cambalache/app/cmb_window.py:561 cambalache/app/cmb_window.py:751
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 "Ваш файл буде експортовано як «{name}.cmb.ui», щоб уникнути втрати даних."
 
-#: cambalache/app/cmb_window.py:539 cambalache/app/cmb_window.py:705
+#: cambalache/app/cmb_window.py:566 cambalache/app/cmb_window.py:756
 #, python-brace-format
 msgid ""
 "Cambalache encounter {unsupported_feature}\n"
@@ -874,37 +1029,51 @@ msgstr ""
 "Cambalache стикнувся з {unsupported_feature}\n"
 "Ваш файл буде експортовано як «{name}.cmb.ui», щоб уникнути втрати даних."
 
-#: cambalache/app/cmb_window.py:541 cambalache/app/cmb_window.py:546
-#: cambalache/app/cmb_window.py:707
+#: cambalache/app/cmb_window.py:568 cambalache/app/cmb_window.py:574
+#: cambalache/app/cmb_window.py:758
 #, python-brace-format
 msgid "Error importing {filename}"
 msgstr "Помилка імпорту {filename}"
 
-#: cambalache/app/cmb_window.py:561
+#: cambalache/app/cmb_window.py:589
 #, python-brace-format
 msgid "Error loading {filename}"
 msgstr "Помилка завантаження {filename}"
 
-#: cambalache/app/cmb_window.py:564
+#: cambalache/app/cmb_window.py:592
 msgid "Choose project to open"
 msgstr "Виберіть проєкт для відкриття"
 
-#: cambalache/app/cmb_window.py:602
+#: cambalache/app/cmb_window.py:630
 msgid "File name already exists, choose a different name."
 msgstr "Назва файлу вже існує, виберіть іншу назву."
 
-#: cambalache/app/cmb_window.py:627
+#: cambalache/app/cmb_window.py:655
 msgid "Choose a new file to save the project"
 msgstr "Виберіть новий файл для збереження проєкту"
 
-#: cambalache/app/cmb_window.py:649
+#: cambalache/app/cmb_window.py:677
 #, python-brace-format
 msgid "Do you really want to remove {filename}?"
 msgstr "Ви дійсно хочете видалити {filename}?"
 
-#: cambalache/app/cmb_window.py:715
+#: cambalache/app/cmb_window.py:766
 msgid "Choose file to import"
 msgstr "Вибрати файл для імпорту"
+
+#: cambalache/app/cmb_window.py:955
+msgid "<Ctrl>+Ins/Del to add/remove placeholders"
+msgstr ""
+
+#: cambalache/app/cmb_window.py:957
+msgid ""
+"<Ctrl>+Ins/Del to add/remove columns\n"
+"<Shift>+<Ctrl>+Ins/Del to add/remove rows"
+msgstr ""
+
+#: cambalache/app/cmb_window.py:959
+msgid "<Ctrl>+Ins/Del to add/remove pages"
+msgstr ""
 
 #: cambalache/app/cmb_window.ui:52
 msgid "Import"
@@ -934,8 +1103,8 @@ msgstr "Звʼяжіться з нами на Matrix!"
 msgid "Contact"
 msgstr "Контакт"
 
-#: cambalache/app/cmb_window.ui:159 cambalache/app/cmb_window.ui:887
-#: cambalache/app/cmb_window.ui:950
+#: cambalache/app/cmb_window.ui:159 cambalache/app/cmb_window.ui:914
+#: cambalache/app/cmb_window.ui:977
 msgid "Donate"
 msgstr "Пожертвувати"
 
@@ -951,7 +1120,7 @@ msgstr "Про"
 msgid "Quit"
 msgstr "Вийти"
 
-#: cambalache/app/cmb_window.ui:307
+#: cambalache/app/cmb_window.ui:311
 msgid ""
 "<b>\n"
 "\n"
@@ -963,59 +1132,59 @@ msgstr ""
 "<span size=\"18000\">Новий проєкт</span>\n"
 "</b>"
 
-#: cambalache/app/cmb_window.ui:335
+#: cambalache/app/cmb_window.ui:339
 msgid "Name"
 msgstr "Імʼя"
 
-#: cambalache/app/cmb_window.ui:347
+#: cambalache/app/cmb_window.ui:351
 msgid "Toolkit target"
 msgstr "Цільовий інструментарій"
 
-#: cambalache/app/cmb_window.ui:359
+#: cambalache/app/cmb_window.ui:363
 msgid "Location"
 msgstr "Розташування"
 
-#: cambalache/app/cmb_window.ui:371
+#: cambalache/app/cmb_window.ui:375
 msgid "<project basename>"
 msgstr "<базова назва проєкту>"
 
-#: cambalache/app/cmb_window.ui:383
+#: cambalache/app/cmb_window.ui:387
 msgid "Create"
 msgstr "Створити"
 
-#: cambalache/app/cmb_window.ui:513
+#: cambalache/app/cmb_window.ui:517
 msgid "Choose a location to save the project"
 msgstr "Виберіть місце для збереження проєкту"
 
-#: cambalache/app/cmb_window.ui:523
+#: cambalache/app/cmb_window.ui:527
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: cambalache/app/cmb_window.ui:540
+#: cambalache/app/cmb_window.ui:544
 msgid "UI Filename"
 msgstr "Імʼя файлу ГІК"
 
-#: cambalache/app/cmb_window.ui:577
+#: cambalache/app/cmb_window.ui:581
 msgid "New Project"
 msgstr "Новий проєкт"
 
-#: cambalache/app/cmb_window.ui:719
+#: cambalache/app/cmb_window.ui:736
 msgid "Properties"
 msgstr "Властивості"
 
-#: cambalache/app/cmb_window.ui:763
+#: cambalache/app/cmb_window.ui:790
 msgid "Signals"
 msgstr "Сигнали"
 
-#: cambalache/app/cmb_window.ui:777
+#: cambalache/app/cmb_window.ui:804
 msgid "Object Editor"
 msgstr "Редактор обʼєктів"
 
-#: cambalache/app/cmb_window.ui:792
+#: cambalache/app/cmb_window.ui:819
 msgid "UI Editor"
 msgstr "Редактор ГІК"
 
-#: cambalache/app/cmb_window.ui:869
+#: cambalache/app/cmb_window.ui:896
 msgid ""
 "• Liberapay is a recurrent donations platform\n"
 "\n"
@@ -1037,7 +1206,7 @@ msgstr ""
 "\n"
 "• ~5% комісія за обробку платежу"
 
-#: cambalache/app/cmb_window.ui:932
+#: cambalache/app/cmb_window.ui:959
 msgid ""
 "• Patreon is a membership platform for creators \n"
 "\n"
@@ -1059,34 +1228,34 @@ msgstr ""
 "\n"
 "• Комісія за обробку платежу ~8%"
 
-#: cambalache/app/cmb_window.ui:1017
+#: cambalache/app/cmb_window.ui:1070
 msgid "_Open"
 msgstr "Відкрити"
 
-#: cambalache/app/cmb_window.ui:1062
+#: cambalache/app/cmb_window.ui:1115
 msgid "Create a new project"
 msgstr "Створити новий проєкт"
 
-#: cambalache/app/cmb_window.ui:1083
+#: cambalache/app/cmb_window.ui:1136
 msgid "Save"
 msgstr "Зберегти"
 
-#: cambalache/app/cmb_window.ui:1087
+#: cambalache/app/cmb_window.ui:1140
 msgid "Save project"
 msgstr "Зберегти проєкт"
 
-#: cambalache/app/cmb_window.ui:1102
+#: cambalache/app/cmb_window.ui:1155
 msgid "Save project with a different file name"
 msgstr "Зберегти проєкт з іншою назвою файлу"
 
-#: cambalache/app/cmb_window.ui:1139
+#: cambalache/app/cmb_window.ui:1192
 msgid "Add new UI to project"
 msgstr "Додати новий ГІК до проєкту"
 
-#: cambalache/app/cmb_window.ui:1236
+#: cambalache/app/cmb_window.ui:1289
 msgid "User Interface Maker"
 msgstr "Створювач Графічного Інтерфейсу Користувача"
 
-#: cambalache/app/cmb_window.ui:1238
+#: cambalache/app/cmb_window.ui:1291
 msgid "Source repository and issue tracker"
 msgstr "Сховище джерел і відстеження проблем"
