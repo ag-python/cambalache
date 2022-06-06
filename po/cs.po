@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-02 14:40-0400\n"
-"PO-Revision-Date: 2022-02-22 11:48+0100\n"
+"PO-Revision-Date: 2022-06-06 16:28+0200\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
-"X-Generator: Gtranslator 41.0\n"
+"X-Generator: Gtranslator 42.0\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:299
@@ -55,53 +55,53 @@ msgstr ""
 "podporoval i jiné verze."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
-#, fuzzy
 msgid "3rd party libs release!"
-msgstr "První veřejné vydání!"
+msgstr "Vydání s knihovnami třetích stran!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
 msgid "Add Adwaita and Handy library support"
-msgstr ""
+msgstr "Přidána podpora knihoven Adwaita a Handy"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
 msgid "Add inline object properties support (only Gtk 4)"
-msgstr ""
+msgstr "Přidána podpora vlastností vložených objektů (pouze Gtk 4)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Add special child type support (GtkWindow title widget)"
 msgstr ""
+"Přidána podpora speciálního typu mateřského widgetu (titlebar GtkWindow)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Improve clipboard functionality"
-msgstr ""
+msgstr "Vylepšena funkce schránky"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
-#, fuzzy
 msgid "Add support for reordering children position"
-msgstr "Přidána podpora pro importování více souborů najednou"
+msgstr "Přidána podpora pro měnění pozic mateřských widgetů"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
 msgid ""
 "Add/Improve worspace support for GtkMenu, GtkNotebook, GtkPopover, GtkStack, "
 "GtkAssistant, GtkListBox, GtkMenuItem and GtkCenterBox"
 msgstr ""
+"Přidána/Vylepšena podpora ploch v GtkMenu, GtkNotebook, GtkPopover, "
+"GtkStack, GtkAssistant, GtkListBox, GtkMenuItem a GtkCenterBox"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:33
 msgid "New property editors for icon name and color properties"
-msgstr ""
+msgstr "Nové editory vlastností pro jméno ikony a barvu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:34
 msgid "Add support for GdkPixbuf, Pango, Gio, Gdk and Gsk flags/enums types"
-msgstr ""
+msgstr "Přidána podpora pro GdkPixbuf, Pango, Gio, Gdk a typy Gsk flags/enums"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:35
 msgid "Add Ukrainian translation (Volodymyr M. Lisivka)"
-msgstr ""
+msgstr "Přidán ukrajinský překlad (Volodymyr M. Lisivka)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:36
-#, fuzzy
 msgid "Add Italian translation (capaz)"
-msgstr "Přidán německý překlad. PhilProg"
+msgstr "Přidán italský překlad (capaz)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:75
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:147
@@ -172,7 +172,7 @@ msgstr "Nový panel pro výběr typu"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:118
 msgid "Workspace placeholder support"
-msgstr "Podpora zástupných ploch prostředí"
+msgstr "Podpora zástupných ploch"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:119
 msgid "Translatable properties support (Philipp Unger)"
@@ -320,14 +320,12 @@ msgid "Delete"
 msgstr "Smazat"
 
 #: cambalache/cmb_context_menu.ui:87
-#, fuzzy
 msgid "Add object here"
-msgstr "Přidat objekt {name}"
+msgstr "Přidat objekt sem"
 
 #: cambalache/cmb_context_menu.ui:101
-#, fuzzy
 msgid "Add object as toplevel"
-msgstr "Přidat objekt {name}"
+msgstr "Přidat objekt jako nejvyšší úroveň"
 
 #: cambalache/cmb_context_menu.ui:115
 msgid "Clear Properties"
@@ -386,12 +384,12 @@ msgstr "Šablona"
 
 #: cambalache/cmb_object_editor.py:102
 msgid "Child Type"
-msgstr ""
+msgstr "Typ mateřského widgetu "
 
 #: cambalache/cmb_object.py:288
 #, python-brace-format
 msgid "Reorder object {name} from position {old} to {new}"
-msgstr ""
+msgstr "Přemístit objekt {name} z pozice {old} na {new}"
 
 #: cambalache/cmb_project.py:278
 #, python-brace-format
@@ -601,23 +599,21 @@ msgid "Cut {n_objects} object"
 msgstr "Vyjmout {n_objects} objektů"
 
 #: cambalache/cmb_property_controls.py:333
-#, fuzzy
 msgid "Clear property"
-msgstr "Vymazat vlastnosti"
+msgstr "Vymazat vlastnost"
 
 #: cambalache/cmb_property_controls.py:339
-#, fuzzy
 msgid "Add inline object"
-msgstr "Přidat do projektu nové UI"
+msgstr "Přidat vložený objekt"
 
 #. Add filters
 #: cambalache/cmb_property_controls.py:636
 msgid "Only standard"
-msgstr ""
+msgstr "Pouze standardní"
 
 #: cambalache/cmb_property_controls.py:637
 msgid "Only symbolic"
-msgstr ""
+msgstr "Pouze symbolické"
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -756,6 +752,8 @@ msgid ""
 "Workspace process error\n"
 "Stopping auto restart"
 msgstr ""
+"Chyba procesu pracovního prostoru\n"
+"Zrušen automatický restart"
 
 #: cambalache/cmb_view.ui:36
 msgid "Project View"
@@ -767,64 +765,59 @@ msgstr "Definice UI"
 
 #: cambalache/icon_naming_spec.py:28
 msgid "All"
-msgstr ""
+msgstr "Vše"
 
 #: cambalache/icon_naming_spec.py:29
-#, fuzzy
 msgid "Actions"
-msgstr "Umístění"
+msgstr "Akce"
 
 #: cambalache/icon_naming_spec.py:30
 msgid "Animations"
-msgstr ""
+msgstr "Animace"
 
 #: cambalache/icon_naming_spec.py:31
-#, fuzzy
 msgid "Applications"
-msgstr "Umístění"
+msgstr "Aplikace"
 
 #: cambalache/icon_naming_spec.py:32
 msgid "Categories"
-msgstr ""
+msgstr "Kategorie"
 
 #: cambalache/icon_naming_spec.py:33
 msgid "Devices"
-msgstr ""
+msgstr "Zařízení"
 
 #: cambalache/icon_naming_spec.py:34
 msgid "Emblems"
-msgstr ""
+msgstr "Emblémy"
 
 #: cambalache/icon_naming_spec.py:35
 msgid "Emotes"
-msgstr ""
+msgstr "Emotikony"
 
 #: cambalache/icon_naming_spec.py:36
-#, fuzzy
 msgid "International"
-msgstr "Interaktivní prohlídka"
+msgstr "Mezinárodní"
 
 #: cambalache/icon_naming_spec.py:37
 msgid "MIME Types"
-msgstr ""
+msgstr "Typy souborů"
 
 #: cambalache/icon_naming_spec.py:38
 msgid "Places"
-msgstr ""
+msgstr "Místa"
 
 #: cambalache/icon_naming_spec.py:39
 msgid "Status"
-msgstr ""
+msgstr "Stav"
 
 #: cambalache/app/cmb_application.py:47
-#, fuzzy
 msgid "Print version"
-msgstr "LGPL version 2.1"
+msgstr "Vypsat verzi"
 
 #: cambalache/app/cmb_application.py:53
-#, fuzzy
 msgid "Export project"
-msgstr "Zavřít projekt"
+msgstr "Exportovat projekt"
 
 #: cambalache/app/cmb_shortcuts.ui:14
 msgid "Project"
@@ -990,7 +983,7 @@ msgstr "Hezký den!"
 
 #: cambalache/app/cmb_window.py:255
 msgid "Hold <alt> to create object in place"
-msgstr ""
+msgstr "Podržením <alt> vytvoříte objekt na místě"
 
 #: cambalache/app/cmb_window.py:342
 msgid "<Choose a UI filename to create>"
@@ -1065,17 +1058,19 @@ msgstr "Vyberte soubor k importu"
 
 #: cambalache/app/cmb_window.py:955
 msgid "<Ctrl>+Ins/Del to add/remove placeholders"
-msgstr ""
+msgstr "<Ctrl>+Ins/Del pro přidání/odstranění zástupných ploch"
 
 #: cambalache/app/cmb_window.py:957
 msgid ""
 "<Ctrl>+Ins/Del to add/remove columns\n"
 "<Shift>+<Ctrl>+Ins/Del to add/remove rows"
 msgstr ""
+"<Ctrl>+Ins/Del pro přidání/odstranění sloupců\n"
+"<Shift>+<Ctrl>+Ins/Del pro přidání/odstranění řádků"
 
 #: cambalache/app/cmb_window.py:959
 msgid "<Ctrl>+Ins/Del to add/remove pages"
-msgstr ""
+msgstr "<Ctrl>+Ins/Del pro přidání/odstranění stránek"
 
 #: cambalache/app/cmb_window.ui:52
 msgid "Import"
