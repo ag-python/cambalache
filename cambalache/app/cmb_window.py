@@ -106,7 +106,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                        'save', 'save_as',
                        'add_ui',
                        'copy', 'paste', 'cut', 'delete',
-                       'add_object', 'add_object_toplevel',
+                       'add_object', 'add_object_toplevel', 'clear',
                        'add_placeholder', 'remove_placeholder',
                        'add_placeholder_row', 'remove_placeholder_row',
                        'import', 'export',
@@ -730,6 +730,13 @@ class CmbWindow(Gtk.ApplicationWindow):
             obj = selection[0]
             self.project.add_object(obj.ui_id, info.type_id)
             return
+
+    def _on_clear_activate(self, action, data):
+        selection = self.project.get_selection()
+        if len(selection) > 0:
+            for obj in selection:
+                if isinstance(obj, CmbObject):
+                    obj.clear_properties()
 
     def __present_import_error(self, filename, msg, detail):
         details = '\n'.join(detail)
