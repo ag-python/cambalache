@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-02 14:40-0400\n"
-"PO-Revision-Date: 2022-01-11 21:41-0500\n"
+"PO-Revision-Date: 2022-06-07 11:29-0400\n"
 "Last-Translator: Juan Pablo Ugarte <juanpablougarte@gmail.com>\n"
 "Language-Team: Spanish; Castilian <>\n"
 "Language: es\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 40.0\n"
+"X-Generator: Gtranslator 41.0\n"
 
 #: data/ar.xjuan.Cambalache.desktop.in:3
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:6 cambalache/app/cmb_window.ui:299
@@ -58,53 +58,55 @@ msgstr ""
 "principio para soportar otras versiones."
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:25
-#, fuzzy
 msgid "3rd party libs release!"
-msgstr "¡Primer lanzamiento público!"
+msgstr "¡Lanzamiento de bibliotecas de terceros!"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:27
 msgid "Add Adwaita and Handy library support"
-msgstr ""
+msgstr "Agrega soportes de las bibliotecas Handy y Adwaita"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:28
 msgid "Add inline object properties support (only Gtk 4)"
 msgstr ""
+"Agrega soporte para propiedades de tipo objetos por valor (solo para Gtk 4)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:29
 msgid "Add special child type support (GtkWindow title widget)"
-msgstr ""
+msgstr "Agrega soporte para tipos especiales de hijos"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:30
 msgid "Improve clipboard functionality"
-msgstr ""
+msgstr "Mejora del portapapeles"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:31
-#, fuzzy
 msgid "Add support for reordering children position"
-msgstr "Soporte para importar varios archivos a la vez"
+msgstr "Agrega soporte para reordenar posición de hijos"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:32
 msgid ""
 "Add/Improve worspace support for GtkMenu, GtkNotebook, GtkPopover, GtkStack, "
 "GtkAssistant, GtkListBox, GtkMenuItem and GtkCenterBox"
 msgstr ""
+"Agrega/mejora soporte en área de trabajo de GtkMenu, GtkNotebook, "
+"GtkPopover, GtkStack, GtkAssistant, GtkListBox, GtkMenuItem y GtkCenterBox"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:33
 msgid "New property editors for icon name and color properties"
-msgstr ""
+msgstr "Nuevos editores para nombres de iconos y colores"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:34
 msgid "Add support for GdkPixbuf, Pango, Gio, Gdk and Gsk flags/enums types"
 msgstr ""
+"Agrega soporte para banderas y enumeraciones de GdkPixbuf, Pango, Gio, Gdk y "
+"Gsk"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:35
 msgid "Add Ukrainian translation (Volodymyr M. Lisivka)"
-msgstr ""
+msgstr "Agrega traducción al Ucraniano (Volodymyr M. Lisivka)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:36
-#, fuzzy
 msgid "Add Italian translation (capaz)"
-msgstr "Agrega traducción Alemán. PhilProg"
+msgstr "Agrega traducción al Italiano (capaz)"
 
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:75
 #: data/ar.xjuan.Cambalache.metainfo.xml.in:147
@@ -325,14 +327,12 @@ msgid "Delete"
 msgstr "Borrar"
 
 #: cambalache/cmb_context_menu.ui:87
-#, fuzzy
 msgid "Add object here"
-msgstr "Agregar object {name}"
+msgstr "Agregar objeto aquí"
 
 #: cambalache/cmb_context_menu.ui:101
-#, fuzzy
 msgid "Add object as toplevel"
-msgstr "Agregar object {name}"
+msgstr "Agregar objeto en raíz"
 
 #: cambalache/cmb_context_menu.ui:115
 msgid "Clear Properties"
@@ -392,12 +392,12 @@ msgstr "Plantilla"
 
 #: cambalache/cmb_object_editor.py:102
 msgid "Child Type"
-msgstr ""
+msgstr "Tipo de Hijo"
 
 #: cambalache/cmb_object.py:288
 #, python-brace-format
 msgid "Reorder object {name} from position {old} to {new}"
-msgstr ""
+msgstr "Reordenar objeto {name} de posición {old} a {new}"
 
 #: cambalache/cmb_project.py:278
 #, python-brace-format
@@ -605,23 +605,21 @@ msgid "Cut {n_objects} object"
 msgstr "Cortar {n_objects} objectos"
 
 #: cambalache/cmb_property_controls.py:333
-#, fuzzy
 msgid "Clear property"
-msgstr "Limpiar Propiedades"
+msgstr "Inicializar Propiedades"
 
 #: cambalache/cmb_property_controls.py:339
-#, fuzzy
 msgid "Add inline object"
-msgstr "Agregar nueva UI al proyecto"
+msgstr "Agregar objeto inline"
 
 #. Add filters
 #: cambalache/cmb_property_controls.py:636
 msgid "Only standard"
-msgstr ""
+msgstr "Solo estándar "
 
 #: cambalache/cmb_property_controls.py:637
 msgid "Only symbolic"
-msgstr ""
+msgstr "Solo simbólico"
 
 #: cambalache/cmb_signal_editor.ui:57
 msgid "Signal"
@@ -760,6 +758,8 @@ msgid ""
 "Workspace process error\n"
 "Stopping auto restart"
 msgstr ""
+"Error en el proceso del área de trabajo\n"
+"Reinicio automático detenido"
 
 #: cambalache/cmb_view.ui:36
 msgid "Project View"
@@ -771,64 +771,59 @@ msgstr "Definición del UI"
 
 #: cambalache/icon_naming_spec.py:28
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 #: cambalache/icon_naming_spec.py:29
-#, fuzzy
 msgid "Actions"
-msgstr "Directorio"
+msgstr "Acciones"
 
 #: cambalache/icon_naming_spec.py:30
 msgid "Animations"
-msgstr ""
+msgstr "Animaciones"
 
 #: cambalache/icon_naming_spec.py:31
-#, fuzzy
 msgid "Applications"
-msgstr "Directorio"
+msgstr "Aplicaciones"
 
 #: cambalache/icon_naming_spec.py:32
 msgid "Categories"
-msgstr ""
+msgstr "Categorias"
 
 #: cambalache/icon_naming_spec.py:33
 msgid "Devices"
-msgstr ""
+msgstr "Dispositivos"
 
 #: cambalache/icon_naming_spec.py:34
 msgid "Emblems"
-msgstr ""
+msgstr "Emblemas"
 
 #: cambalache/icon_naming_spec.py:35
 msgid "Emotes"
-msgstr ""
+msgstr "Emoticones"
 
 #: cambalache/icon_naming_spec.py:36
-#, fuzzy
 msgid "International"
-msgstr "Intro interactiva"
+msgstr "Internacional"
 
 #: cambalache/icon_naming_spec.py:37
 msgid "MIME Types"
-msgstr ""
+msgstr "Tipos MIME"
 
 #: cambalache/icon_naming_spec.py:38
 msgid "Places"
-msgstr ""
+msgstr "Lugares"
 
 #: cambalache/icon_naming_spec.py:39
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
 #: cambalache/app/cmb_application.py:47
-#, fuzzy
 msgid "Print version"
-msgstr "LGPL versión 2.1 "
+msgstr "Imprimir version"
 
 #: cambalache/app/cmb_application.py:53
-#, fuzzy
 msgid "Export project"
-msgstr "Cerrar proyecto"
+msgstr "Exportar proyecto"
 
 #: cambalache/app/cmb_shortcuts.ui:14
 msgid "Project"
@@ -995,7 +990,7 @@ msgstr "Que tenga un buen día!"
 
 #: cambalache/app/cmb_window.py:255
 msgid "Hold <alt> to create object in place"
-msgstr ""
+msgstr "Presiona <alt> para crear objeto en lugar"
 
 #: cambalache/app/cmb_window.py:342
 msgid "<Choose a UI filename to create>"
@@ -1070,17 +1065,19 @@ msgstr "Elija un archivo para importar"
 
 #: cambalache/app/cmb_window.py:955
 msgid "<Ctrl>+Ins/Del to add/remove placeholders"
-msgstr ""
+msgstr "<Ctrl>+Ins/Del para agregar/borrar marcadores de posición "
 
 #: cambalache/app/cmb_window.py:957
 msgid ""
 "<Ctrl>+Ins/Del to add/remove columns\n"
 "<Shift>+<Ctrl>+Ins/Del to add/remove rows"
 msgstr ""
+"<Ctrl>+Ins/Del para agregar/borrar columnas\n"
+"<Shift>+<Ctrl>+Ins/Del para agregar/borrar/ filas"
 
 #: cambalache/app/cmb_window.py:959
 msgid "<Ctrl>+Ins/Del to add/remove pages"
-msgstr ""
+msgstr "<Ctrl>+Ins/Del para agregar/borrar paginas"
 
 #: cambalache/app/cmb_window.ui:52
 msgid "Import"
