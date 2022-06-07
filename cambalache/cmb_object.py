@@ -317,3 +317,26 @@ class CmbObject(CmbBaseObject):
 
         c.close()
         self.project.history_pop()
+
+    def clear_properties(self):
+        c = self.project.db.cursor()
+
+        name = self.name
+        name = name if name is not None else self.type_id
+        self.project.history_push(_('Clear object {name} properties').format(name=name))
+
+        properties = []
+        for row in c.execute("SELECT property_id FROM object_property WHERE ui_id=? AND object_id=?;",
+                             (self.ui_id, self.object_id)):
+            properties.append(row[0])
+
+        # Remove all properties from this object
+        c.execute("DELETE FROM object_property WHERE ui_id=? AND object_id=?;", (self.ui_id, self.object_id))
+
+        self.project.history_pop()
+        c.close()
+
+        for prop_id in properties:
+            prop = self.properties_dict[prop_id]
+            prop.notify('value')
+            self._property_changed(prop)
