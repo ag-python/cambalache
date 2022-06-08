@@ -34,6 +34,7 @@
           <li>Add support for GdkPixbuf, Pango, Gio, Gdk and Gsk flags/enums types</li>
           <li>Add Ukrainian translation (Volodymyr M. Lisivka)</li>
           <li>Add Italian translation (capaz)</li>
+          <li>Add Dutch translation (Gert)</li>
         </ul>
       </description>
       <issues>
