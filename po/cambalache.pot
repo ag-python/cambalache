@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cambalache\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 14:40-0400\n"
+"POT-Creation-Date: 2022-06-08 14:00-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,194 +95,198 @@ msgstr ""
 msgid "Add Italian translation (capaz)"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:75
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:147
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:37
+msgid "Add Dutch translation (Gert)"
+msgstr ""
+
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:76
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:148
 msgid "Bugfix release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:77
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:78
 msgid ""
 "GTK 4: fix placeholders in bin like containers (AspectFrame, Expander, "
 "Frame, Revealer, ScrolledWindow, Viewport and Overlay)"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:78
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:79
 msgid "GTK 4: Fix placeholders in GtkPaned"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:79
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:80
 msgid "Fix property editor copy/paste shortcuts"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:80
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:81
 msgid "Various improvements and minor fixes"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:92
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:93
 msgid "First bugfix release in 0.8 series!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:94
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:95
 msgid "Add support for importing multiples files at once"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:95
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:96
 msgid "Simplify add new UI file to project"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:96
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:97
 msgid "Import/export UI meta data like license, author etc"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:97
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:98
 msgid "Do not create extra placeholders on GtkBox and GtkGrid"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:98
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:99
 msgid "Show toolkit target on type chooser bar"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:99
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:100
 msgid "Improve file open handling"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:100
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:101
 msgid "Automatically import UI file in current or new project on xdg open"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:115
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:116
 msgid "UX improvements Release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:117
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:118
 msgid "New Type chooser bar"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:118
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:119
 msgid "Workspace placeholder support"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:119
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:120
 msgid "Translatable properties support (Philipp Unger)"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:120
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:121
 msgid "Clipboard actions support (Copy, Paste, Cut)"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:121
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:122
 msgid "Better unsupported features report"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:122
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:123
 msgid "New Matrix channel #cambalache:gnome.org"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:123
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:124
 msgid "You can now also support Cambalache on Liberapay"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:149
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:150
 msgid "Add sponsors credit section"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:150
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:151
 msgid "Theme workspace background"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:151
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:152
 msgid "Fix various bugs and regresions"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:162
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:163
 msgid "Flathub release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:164
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:165
 msgid "Add basic interactive tutorial"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:165
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:166
 msgid "Add workspace Gtk theme chooser"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:166
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:167
 msgid "Add support for templates"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:172
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:173
 msgid "New translations release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:174
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:175
 msgid "Add Czech translation. Vojtěch Perník"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:175
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:176
 msgid "Add German translation. PhilProg"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:176
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:177
 msgid "Add x-cambalache mimetype with icon"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:182
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:183
 msgid "First public release!"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:184
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:185
 msgid "Suport for both Gtk 3 and 4 versions"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:185
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:186
 msgid "Import and export multiple UI at once"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:186
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:187
 msgid "Support plain (no custom tags) GtkBuilder features"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:187
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:188
 msgid "Undo / Redo stack"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:188
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:189
 msgid "LGPL version 2.1"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:197
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:198
 msgid "Cambalache start window"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:201
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:202
 msgid "Cambalache new project page"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:205
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:206
 msgid "Cambalache workspace"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:209
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:210
 msgid "Shortcuts window"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:213
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:214
 msgid "Workspace gtk dark theme"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:217
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:218
 msgid "Display type chooser"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:221
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:222
 msgid "Right click popover"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:225
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:226
 msgid "main menu"
 msgstr ""
 
-#: data/ar.xjuan.Cambalache.metainfo.xml.in:230
+#: data/ar.xjuan.Cambalache.metainfo.xml.in:231
 msgid "Juan Pablo Ugarte"
 msgstr ""
 
@@ -372,6 +376,11 @@ msgstr ""
 #: cambalache/cmb_object.py:288
 #, python-brace-format
 msgid "Reorder object {name} from position {old} to {new}"
+msgstr ""
+
+#: cambalache/cmb_object.py:326
+#, python-brace-format
+msgid "Clear object {name} properties"
 msgstr ""
 
 #: cambalache/cmb_project.py:278
@@ -970,23 +979,23 @@ msgid "Supporters"
 msgstr ""
 
 #. Translators: This is used to create a unordered list of unsupported features to show the user
-#: cambalache/app/cmb_window.py:555 cambalache/app/cmb_window.py:745
+#: cambalache/app/cmb_window.py:555 cambalache/app/cmb_window.py:752
 #, python-brace-format
 msgid "    • {message}"
 msgstr ""
 
 #. Translators: This will be the heading of a list of unsupported features
-#: cambalache/app/cmb_window.py:558 cambalache/app/cmb_window.py:748
+#: cambalache/app/cmb_window.py:558 cambalache/app/cmb_window.py:755
 msgid "Cambalache encounter the following issues:"
 msgstr ""
 
 #. Translators: this is the last message after the list of unsupported features
-#: cambalache/app/cmb_window.py:561 cambalache/app/cmb_window.py:751
+#: cambalache/app/cmb_window.py:561 cambalache/app/cmb_window.py:758
 #, python-brace-format
 msgid "Your file will be exported as '{name}.cmb.ui' to avoid data loss."
 msgstr ""
 
-#: cambalache/app/cmb_window.py:566 cambalache/app/cmb_window.py:756
+#: cambalache/app/cmb_window.py:566 cambalache/app/cmb_window.py:763
 #, python-brace-format
 msgid ""
 "Cambalache encounter {unsupported_feature}\n"
@@ -994,7 +1003,7 @@ msgid ""
 msgstr ""
 
 #: cambalache/app/cmb_window.py:568 cambalache/app/cmb_window.py:574
-#: cambalache/app/cmb_window.py:758
+#: cambalache/app/cmb_window.py:765
 #, python-brace-format
 msgid "Error importing {filename}"
 msgstr ""
@@ -1021,21 +1030,21 @@ msgstr ""
 msgid "Do you really want to remove {filename}?"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:766
+#: cambalache/app/cmb_window.py:773
 msgid "Choose file to import"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:955
+#: cambalache/app/cmb_window.py:962
 msgid "<Ctrl>+Ins/Del to add/remove placeholders"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:957
+#: cambalache/app/cmb_window.py:964
 msgid ""
 "<Ctrl>+Ins/Del to add/remove columns\n"
 "<Shift>+<Ctrl>+Ins/Del to add/remove rows"
 msgstr ""
 
-#: cambalache/app/cmb_window.py:959
+#: cambalache/app/cmb_window.py:966
 msgid "<Ctrl>+Ins/Del to add/remove pages"
 msgstr ""
 
