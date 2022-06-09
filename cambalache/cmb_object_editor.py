@@ -121,17 +121,26 @@ class CmbObjectEditor(Gtk.Box):
 
         parent = self.__object.parent
 
-        if self.layout and parent and parent.info.has_child_types():
-            # Child Type input
-            self.add(self.__create_child_type_editor())
+        if self.layout:
+            if parent is None:
+                return
 
-        if not self.layout:
+            # Child Type input
+            if parent.info.has_child_types():
+                self.add(self.__create_child_type_editor())
+        else:
             # ID
             self.add(self.__create_id_editor())
 
-        info = self.__object.info
+        info = parent.info if self.layout and parent else self.__object.info
         for owner_id in [info.type_id] + info.hierarchy:
+            if self.layout:
+                owner_id = f'{owner_id}LayoutChild'
+
             info = self.__object.project.type_info.get(owner_id, None)
+
+            if info is None:
+                continue
 
             # Editor count
             i = 0
