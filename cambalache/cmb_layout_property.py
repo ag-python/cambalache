@@ -54,7 +54,7 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
         if value is None or value == self.info.default_value:
             c.execute("DELETE FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=? AND owner_id=? AND property_id=?;",
                       (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id))
-            value = 0
+            value = None
         else:
             # Do not use REPLACE INTO, to make sure both INSERT and UPDATE triggers are used
             count = self.db_get("SELECT count(value) FROM object_layout_property WHERE ui_id=? AND object_id=? AND child_id=? AND owner_id=? AND property_id=?;",
@@ -67,11 +67,9 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
                 c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
                           (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id, value))
 
-            value = int(value)
-
         # Update object position if this is a position property
         if self.info.is_position:
-            self.object.position = value
+            self.object.position = int(value) if value else 0
 
         if not self.__on_init:
             self.object._layout_property_changed(self)
