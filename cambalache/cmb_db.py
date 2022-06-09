@@ -1442,23 +1442,24 @@ class CmbDB(GObject.GObject):
         for object_id in self.clipboard_ids:
             object_id_base = object_id
 
-            if '_' in object_id_base:
-                tokens = object_id_base.split('_')
-                if len(tokens) == 2 and tokens[1].isdigit():
-                    object_id_base = tokens[0]
+            tokens = object_id_base.rsplit('_', 1)
+            if len(tokens) == 2 and tokens[1].isdigit():
+                object_id_base = tokens[0]
 
             max_index = 0
             for row in c.execute('SELECT name FROM object WHERE ui_id=? AND name IS NOT NULL AND name LIKE ?;',
-                                  (ui_id, f'{object_id_base}_%')):
-                tokens = row[0].split('_')
+                                  (ui_id, f'{object_id_base}%')):
+                tokens = row[0].rsplit('_', 1)
 
                 if len(tokens) == 2 and tokens[0] == object_id_base:
                     try:
                         max_index = max(max_index, int(tokens[1]))
                     except:
                         pass
+                elif row[0] == object_id_base:
+                    max_index = 1
 
-            object_id_map[object_id] = f'{object_id_base}_{max_index+1}'
+            object_id_map[object_id] = f'{object_id_base}_{max_index+1}' if max_index else object_id
 
         for node in self.clipboard:
             object_id = self.__import_object(ui_id, node, parent_id, object_id_map=object_id_map)
