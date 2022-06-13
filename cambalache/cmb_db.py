@@ -68,14 +68,13 @@ class CmbDB(GObject.GObject):
     target_tk = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
 
     def __init__(self, **kwargs):
+        self.version = self.__parse_version(VERSION)
+
         self.type_info = None
 
-        self.ui_tables = [
+        self.__tables = [
             'ui',
-            'ui_library'
-        ]
-
-        self.object_tables = [
+            'ui_library',
             'object',
             'object_property',
             'object_layout_property',
@@ -271,7 +270,7 @@ class CmbDB(GObject.GObject):
         c.executescript(HISTORY_SQL)
 
         # Create history tables for each tracked table
-        for table in self.ui_tables + self.object_tables:
+        for table in self.__tables:
             self.__create_support_table(c,table)
 
         self.conn.commit()
@@ -410,6 +409,9 @@ class CmbDB(GObject.GObject):
 
         version = self.__parse_version(root.get('version', None))
 
+        if version > self.version:
+            raise Exception(f'Can not open file version {version}')
+
         c = self.conn.cursor()
 
         # Avoid circular dependencies errors
@@ -530,9 +532,7 @@ class CmbDB(GObject.GObject):
                     version=VERSION,
                     target_tk=self.target_tk)
 
-        for table in ['ui', 'ui_library', 'object', 'object_property',
-                      'object_layout_property', 'object_signal',
-                      'object_data', 'object_data_arg']:
+        for table in self.__tables:
             data = _dump_table(c, table)
 
             if data is None:
