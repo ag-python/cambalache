@@ -624,7 +624,7 @@ class CmbDB(GObject.GObject):
             info = self.type_info.get(parent_type, None)
             pinfo = self.__get_property_info(info, inline_property)
 
-            c.execute("SELECT count(object_id) FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id;",
+            c.execute("SELECT count(object_id) FROM object_property WHERE ui_id=? AND object_id=? AND owner_id=? AND property_id=?;",
                       (ui_id, parent_id, pinfo.owner_id, inline_property))
             count = c.fetchone()[0]
 
