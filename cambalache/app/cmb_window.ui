@@ -1285,15 +1285,18 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
     <property name="type-hint">dialog</property>
     <property name="transient-for">CmbWindow</property>
     <property name="program-name">Cambalache</property>
-    <property name="copyright">© 2020-2021 Juan Pablo Ugarte</property>
+    <property name="copyright">© 2020-2022 Juan Pablo Ugarte</property>
     <property name="comments" translatable="yes">User Interface Maker</property>
     <property name="website">https://gitlab.gnome.org/jpu/cambalache</property>
     <property name="website-label" translatable="yes">Source repository and issue tracker</property>
     <property name="authors">Juan Pablo Ugarte</property>
-    <property name="translator-credits">Vojtěch Perník
-PhilProg
+    <property name="translator-credits">capaz
+Gert
+Juan Pablo Ugarte
 Philipp Unger
-Juan Pablo Ugarte</property>
+PhilProg
+Vojtěch Perník
+Volodymyr M. Lisivka</property>
     <property name="artists">Franco Dodorico
 Juan Pablo Ugarte</property>
     <property name="logo-icon-name">ar.xjuan.Cambalache</property>
