@@ -1061,6 +1061,9 @@ class CmbProject(Gtk.TreeStore):
         drag_obj.parent.reorder_child(drag_obj, indices[-1])
         self.__reordering_children = False
 
+        # Manually emmit signal since we disable it by setting __reordering_children flag
+        self.emit('object-changed', drag_obj, 'position')
+
         self.set_selection([drag_obj])
 
         return False
