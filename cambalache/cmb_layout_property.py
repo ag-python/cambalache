@@ -61,7 +61,7 @@ class CmbLayoutProperty(CmbBaseLayoutProperty):
                                 (self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id))
 
             if count:
-                c.execute("UPDATE object_layout_property SET value=? WHERE ui_id=? AND object_i=? AND child_id=? AND owner_id=? AND property_id=?);",
+                c.execute("UPDATE object_layout_property SET value=? WHERE ui_id=? AND object_id=? AND child_id=? AND owner_id=? AND property_id=?;",
                           (value, self.ui_id, self.object_id, self.child_id, self.owner_id, self.property_id))
             else:
                 c.execute("INSERT INTO object_layout_property (ui_id, object_id, child_id, owner_id, property_id, value) VALUES (?, ?, ?, ?, ?, ?);",
