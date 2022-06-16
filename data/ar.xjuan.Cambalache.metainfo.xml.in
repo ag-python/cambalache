@@ -20,6 +20,23 @@
     </p>
   </description>
   <releases>
+    <release date="2022-06-16" version="0.10.2">
+      <description>
+        <p>New bugfix release!</p>
+        <ul>
+          <li>Fix reordering workspace update on gtk 4 projects</li>
+          <li>Fix metainfo version</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2022-06-15" version="0.10.1">
+      <description>
+        <p>Fix bugfix release!</p>
+        <ul>
+          <li>Fix inline object regression</li>
+        </ul>
+      </description>
+    </release>
     <release date="2022-06-15" version="0.10.0">
       <description>
         <p>3rd party libs release!</p>
