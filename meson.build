@@ -22,6 +22,8 @@ modules = [
     ['gi.repository.Gtk', '>= 3.24.0', '3.0'],
     ['gi.repository.Gtk', '>= 4.0.0', '4.0'],
     ['gi.repository.WebKit2', '>= 2.32.0', '4.0'],
+    ['gi.repository.Handy'],
+    ['gi.repository.Adw'],
 ]
 
 # Python script to check for gi repository module
@@ -43,13 +45,19 @@ foreach mod_ver: modules
 
     if mod.startswith('gi.repository.')
         mod = mod.split('.')[2]
-        m = run_command('python3', '-c', gi_check_py.format(mod, gi_req))
+        m = run_command('python3', '-c', gi_check_py.format(mod, gi_req), check: false)
     else
-        m = run_command('python3', '-c', 'import @0@\nprint(@0@.__version__)'.format(mod))
+        m = run_command('python3', '-c', 'import @0@\nprint(@0@.__version__)'.format(mod), check: false)
     endif
 
     ver = m.stdout().strip()
-    found = m.returncode() == 0 and ver.version_compare(version)
+
+    if version != ''
+        found = m.returncode() == 0 and ver.version_compare(version)
+    else
+        found = m.returncode() == 0
+    endif
+
     found_msg = found ? '\u001b[32mYES\u001b[0m' : '\u001b[31mNO\u001b[0m'
 
     message('Python module \u001b[1m@0@\u001b[0m @1@ found: @2@ @3@'.format(mod, version, found_msg, ver))
@@ -67,6 +75,9 @@ find_program('gtk4-broadwayd', required: true)
 
 gtk3_dep = dependency('gtk+-3.0', version: '>= 3.24.0')
 gtk4_dep = dependency('gtk4', version: '>= 4.4.0')
+
+handy_dep = dependency('libhandy-1', version: '>= 1.6.2')
+adw_dep = dependency('libadwaita-1', version: '>= 1.1.2')
 
 subdir('data')
 subdir('cambalache')
