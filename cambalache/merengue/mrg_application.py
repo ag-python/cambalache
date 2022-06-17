@@ -210,9 +210,11 @@ class MrgApplication(Gtk.Application):
         if version:
             gi.require_version(namespace, version)
 
-        mod = importlib.import_module(f'gi.repository.{namespace}')
-
-        if mod is None:
+        try:
+            namespace= 'jajajaj'
+            mod = importlib.import_module(f'gi.repository.{namespace}')
+        except Exception as e:
+            logger.warning(e)
             return
 
         # Load merengue plugin if any
