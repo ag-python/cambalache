@@ -374,11 +374,16 @@ class CmbProject(Gtk.TreeStore):
 
         dirname = os.path.dirname(self.filename)
 
+        n_files = 0
+
         for row in c.execute('SELECT ui_id, filename FROM ui WHERE filename IS NOT NULL;'):
             ui_id, filename = row
             self.__export(ui_id, filename, dirname=dirname)
+            n_files += 1
 
         c.close()
+
+        return n_files
 
     def __selection_remove(self, obj):
         try:
