@@ -37,12 +37,33 @@ class MrgPlaceholder(Gtk.Box):
     controller = GObject.Property(type=MrgController, flags=GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
+        self.__binding = None
+
         super().__init__(**kwargs)
 
         self.props.can_focus = True
         self.props.hexpand = True
         self.props.vexpand = True
         self.set_size_request(32, 32)
+
+        self.connect("notify::controller", self.__on_controller_notify)
+        self.__update_preview_binding()
+
+    def __on_controller_notify(self, obj, pspec):
+        self.__update_preview_binding()
+
+    def __update_preview_binding(self):
+        if self.__binding:
+            self.__binding.unbind()
+            self.__binding = None
+
+        if not self.controller:
+            return
+
+        self.__binding = GObject.Object.bind_property(self.controller.app, 'preview',
+                                                      self, 'visible',
+                                                      GObject.BindingFlags.SYNC_CREATE |
+                                                      GObject.BindingFlags.BIDIRECTIONAL)
 
     def selected(self):
         if self.controller:
