@@ -798,9 +798,14 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.__update_action_save()
 
     def _on_export_activate(self, action, data):
-        if self.project is not None:
-            self.__save_project()
-            self.project.export()
+        if self.project is None:
+            return
+
+        self.__save_project()
+
+        n = self.project.export()
+
+        self._show_message(_('{n} files exported').format(n=n) if n > 1 else _('File exported'))
 
     def _on_close_activate(self, action, data):
         self.project = None
