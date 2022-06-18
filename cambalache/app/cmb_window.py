@@ -73,6 +73,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     view = Gtk.Template.Child()
     tree_view = Gtk.Template.Child()
     type_chooser = Gtk.Template.Child()
+    preview_button = Gtk.Template.Child()
     editor_stack = Gtk.Template.Child()
     ui_editor = Gtk.Template.Child()
     object_editor = Gtk.Template.Child()
@@ -184,6 +185,13 @@ class CmbWindow(Gtk.ApplicationWindow):
         settings = Gtk.Settings.get_default()
         settings.connect('notify::gtk-theme-name', lambda o, p: self.__update_dark_mode())
         self.__update_dark_mode()
+
+        # Bind preview
+        GObject.Object.bind_property(self.preview_button, 'active',
+                                     self.view, 'preview',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL |
+                                     GObject.BindingFlags.INVERT_BOOLEAN)
 
     @GObject.Property(type=CmbProject)
     def project(self):

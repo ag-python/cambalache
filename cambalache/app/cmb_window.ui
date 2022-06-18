@@ -637,9 +637,30 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="border-width">4</property>
+                            <property name="spacing">2</property>
                             <signal name="chooser-popdown" handler="on_type_chooser_chooser_popdown" swapped="no"/>
                             <signal name="chooser-popup" handler="on_type_chooser_chooser_popup" swapped="no"/>
                             <signal name="type-selected" handler="on_type_chooser_type_selected" swapped="no"/>
+                            <child>
+                              <object class="GtkToggleButton" id="preview_button">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">True</property>
+                                <property name="tooltip-text" translatable="yes">Preview mode</property>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="icon-name">system-run-symbolic</property>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">3</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
