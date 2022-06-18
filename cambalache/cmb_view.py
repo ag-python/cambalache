@@ -123,6 +123,8 @@ class CmbView(Gtk.Stack):
         'placeholder-activated': (GObject.SignalFlags.RUN_LAST, None, (int, int, object, int, str))
     }
 
+    preview = GObject.Property(type=bool, default=False, flags=GObject.ParamFlags.READWRITE)
+
     webview = Gtk.Template.Child()
     buffer = Gtk.Template.Child()
 
@@ -160,6 +162,8 @@ class CmbView(Gtk.Stack):
                                      self.menu, 'gtk-theme',
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.BIDIRECTIONAL)
+
+        self.connect("notify::preview", self.__on_preview_notify)
 
     def do_destroy(self):
         if self.__merengue:
@@ -452,6 +456,13 @@ window.setupDocument = function (document) {
                                         'version': info.version,
                                         'object_types': info.object_types,
                                     })
+
+    def __on_preview_notify(self, obj, pspec):
+        self.__merengue_command('set_app_property',
+                                args={
+                                    'property': 'preview',
+                                    'value': self.preview
+                                })
 
     def __on_merengue_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
