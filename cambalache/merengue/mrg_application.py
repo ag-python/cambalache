@@ -39,6 +39,10 @@ logger = getLogger(__name__)
 
 
 class MrgApplication(Gtk.Application):
+
+    preview = GObject.Property(type=bool, default=False,
+                               flags=GObject.ParamFlags.READWRITE)
+
     def __init__(self):
         self.stdin = None
 
@@ -211,7 +215,6 @@ class MrgApplication(Gtk.Application):
             gi.require_version(namespace, version)
 
         try:
-            namespace= 'jajajaj'
             mod = importlib.import_module(f'gi.repository.{namespace}')
         except Exception as e:
             logger.warning(e)
@@ -229,6 +232,9 @@ class MrgApplication(Gtk.Application):
         for type in object_types:
             if hasattr(mod, type):
                 GObject.type_ensure(getattr(mod, type).__gtype__)
+
+    def set_app_property(self, property, value):
+        self.set_property(property, value)
 
     def run_command(self, command, args, payload):
         logger.debug(f'{command} {args}')
@@ -253,6 +259,8 @@ class MrgApplication(Gtk.Application):
             self.remove_placeholder(**args)
         elif command == 'load_namespace':
             self.load_namespace(**args)
+        elif command == 'set_app_property':
+            self.set_app_property(**args)
         else:
             logger.warning(f'Unknown command {command}')
 
