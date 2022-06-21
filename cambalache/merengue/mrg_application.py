@@ -30,6 +30,7 @@ import importlib
 from gi.repository import GLib, GObject, Gio, Gdk, Gtk
 
 from .mrg_controller_registry import MrgControllerRegistry
+from .mrg_css_provider import MrgCssProvider
 from .mrg_placeholder import MrgPlaceholder
 from . import utils
 
@@ -55,6 +56,12 @@ class MrgApplication(Gtk.Application):
         # Dict of controllers
         self.controllers = {}
 
+        # Dict of CSS providers
+        self.css_providers = {}
+
+        # Current UI ID
+        self.ui_id = None
+
         # The widget that got the last button press this is used to select
         # a widget on button release
         self.preselected_widget = None
@@ -69,6 +76,7 @@ class MrgApplication(Gtk.Application):
         return self.controllers.get(object_id, None)
 
     def clear_all(self):
+        self.ui_id = None
         self.preselected_widget = None
 
         # Unset controllers objects
@@ -82,6 +90,8 @@ class MrgApplication(Gtk.Application):
 
         if payload == None:
             return
+
+        self.ui_id = ui_id
 
         # Build everything
         builder = Gtk.Builder()
@@ -130,6 +140,8 @@ class MrgApplication(Gtk.Application):
             obj.controller = self.controllers.get(parent_id, None)
 
         self.set_selection(ui_id, selection)
+
+        self.__update_css_providers()
 
     def object_property_changed(self, ui_id, object_id, property_id, is_object, value):
         controller = self.get_controller(ui_id, object_id)
@@ -236,6 +248,32 @@ class MrgApplication(Gtk.Application):
     def set_app_property(self, property, value):
         self.set_property(property, value)
 
+    def add_css_provider(self, css_id, filename, priority, is_global, provider_for):
+        css = MrgCssProvider(filename=filename,
+                             priority=priority,
+                             is_global=is_global,
+                             ui_id=self.ui_id if self.ui_id else 0)
+
+        self.css_providers[css_id] = css
+
+    def remove_css_provider(self, css_id):
+        css = self.css_providers.get(css_id, None)
+
+        if css:
+            css.remove()
+            self.css_providers.pop(css_id)
+
+    def __update_css_providers(self):
+        for css_id in self.css_providers:
+            provider = self.css_providers[css_id]
+            provider.ui_id = self.ui_id
+
+    def update_css_provider(self, css_id, field, value):
+        css = self.css_providers.get(css_id, None)
+
+        if css:
+            css.set_property(field, value)
+
     def run_command(self, command, args, payload):
         logger.debug(f'{command} {args}')
 
@@ -261,6 +299,12 @@ class MrgApplication(Gtk.Application):
             self.load_namespace(**args)
         elif command == 'set_app_property':
             self.set_app_property(**args)
+        elif command == 'add_css_provider':
+            self.add_css_provider(**args)
+        elif command == 'remove_css_provider':
+            self.remove_css_provider(**args)
+        elif command == 'update_css_provider':
+            self.update_css_provider(**args)
         else:
             logger.warning(f'Unknown command {command}')
 
