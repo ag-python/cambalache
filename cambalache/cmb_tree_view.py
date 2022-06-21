@@ -28,6 +28,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gdk, Gtk
 
 from .cmb_ui import CmbUI
+from .cmb_css import CmbCSS
 from .cmb_object import CmbObject
 from .cmb_context_menu import CmbContextMenu
 
@@ -103,8 +104,8 @@ class CmbTreeView(Gtk.TreeView):
             name = f'{obj.name} ' if obj.name else ''
             extra = _('(template)') if not obj.parent_id and obj.ui.template_id == obj.object_id else obj.type_id
             text = f'{inline_prop}{name}<i>{extra}</i>'
-        elif type(obj) == CmbUI:
-            text = f'<b>{obj.filename}</b>' if obj.filename else _('<b>Unnamed {ui_id}</b>').format(ui_id=obj.ui_id)
+        else:
+            text = f'<b>{obj.get_display_name()}</b>'
 
         cell.set_property('markup', text)
 
@@ -151,7 +152,8 @@ class CmbTreeView(Gtk.TreeView):
         self.__in_selection_change = True
 
         if len(selection) > 0:
-            _iter = project.get_iter_from_object(selection[0])
+            obj = selection[0]
+            _iter = project.get_iter_from_object(obj)
             path = project.get_path(_iter)
             self.expand_to_path(path)
             self._selection.select_iter(_iter)
