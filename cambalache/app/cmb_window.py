@@ -79,6 +79,7 @@ class CmbWindow(Gtk.ApplicationWindow):
     object_editor = Gtk.Template.Child()
     object_layout_editor = Gtk.Template.Child()
     signal_editor = Gtk.Template.Child()
+    css_editor = Gtk.Template.Child()
 
     about_dialog = Gtk.Template.Child()
 
@@ -105,7 +106,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         for action in ['open', 'create_new', 'new',
                        'undo', 'redo', 'intro',
                        'save', 'save_as',
-                       'add_ui',
+                       'add_ui', 'add_css',
                        'copy', 'paste', 'cut', 'delete',
                        'add_object', 'add_object_toplevel', 'clear',
                        'add_placeholder', 'remove_placeholder',
@@ -248,13 +249,16 @@ class CmbWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback('on_type_chooser_type_selected')
     def __on_type_chooser_type_selected(self, popover, info):
         selection = self.project.get_selection()
+        obj = selection[0] if len(selection) else None
+
+        if obj and type(obj) not in [CmbObject, CmbUI]:
+            return
 
         valid, state = Gtk.get_current_event_state()
 
         # If alt is pressed, force adding object to selection
         if valid and bool(state & Gdk.ModifierType.MOD1_MASK):
-            if len(selection) > 0:
-                obj = selection[0]
+            if obj:
                 parent_id = obj.object_id if isinstance(obj, CmbObject) else None
                 self.project.add_object(obj.ui_id, info.type_id, None, parent_id)
                 return
@@ -264,8 +268,7 @@ class CmbWindow(Gtk.ApplicationWindow):
             # Select type and let user choose which placeholder to use
             self.type_chooser.props.selected_type = info
             self.__update_action_add_object()
-        elif len(selection) > 0:
-            obj = selection[0]
+        elif obj:
             # Create toplevel object/window
             self.project.add_object(obj.ui_id, info.type_id)
 
@@ -318,7 +321,12 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     @Gtk.Template.Callback('on_ui_editor_remove_ui')
     def __on_ui_editor_remove_ui(self, editor):
-        self.__remove_ui_with_confirmation(editor.object)
+        self.__remove_object_with_confirmation(editor.object)
+        return True
+
+    @Gtk.Template.Callback('on_css_editor_remove_ui')
+    def __on_ui_editor_remove_ui(self, editor):
+        self.__remove_object_with_confirmation(editor.object)
         return True
 
     @Gtk.Template.Callback('on_window_set_focus')
@@ -425,10 +433,14 @@ class CmbWindow(Gtk.ApplicationWindow):
             self.ui_editor.object = obj
             self.editor_stack.set_visible_child_name('ui')
             obj = None
-        else:
+        elif type(obj) == CmbObject:
             self.editor_stack.set_visible_child_name('object')
             if obj:
                 self.__user_message_by_type(obj.info)
+        elif type(obj) == CmbCSS:
+            self.css_editor.object = obj
+            self.editor_stack.set_visible_child_name('css')
+            obj = None
 
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
@@ -461,7 +473,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         has_project = self.__is_project_visible()
 
         for action in ['save_as',
-                       'add_ui', 'delete',
+                       'add_ui', 'add_css', 'delete',
                        'import', 'export',
                        'close', 'debug']:
             self.actions[action].set_enabled(has_project)
@@ -686,18 +698,27 @@ class CmbWindow(Gtk.ApplicationWindow):
         ui = self.project.add_ui()
         self.project.set_selection([ui])
 
-    def __remove_ui_with_confirmation(self, ui):
-        filename = ui.filename
+    def _on_add_css_activate(self, action, data):
+        if self.project is None:
+            return
+
+        css = self.project.add_css()
+        self.project.set_selection([css])
+
+    def __remove_object_with_confirmation(self, obj):
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=0,
             message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.YES_NO,
-            text=_("Do you really want to remove {filename}?").format(filename=filename),
+            text=_("Do you really want to remove {name}?").format(name=obj.get_display_name()),
         )
 
         if dialog.run() == Gtk.ResponseType.YES:
-            self.project.remove_ui(ui)
+            if type(obj) == CmbUI:
+                self.project.remove_ui(obj)
+            elif type(obj) == CmbCSS:
+                self.project.remove_css(obj)
 
         dialog.destroy()
 
@@ -722,10 +743,10 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         selection = self.project.get_selection()
         for obj in selection:
-            if type(obj) == CmbUI:
-                self.__remove_ui_with_confirmation(obj)
-            elif type(obj) == CmbObject:
+            if type(obj) == CmbObject:
                 self.project.remove_object(obj)
+            else:
+                self.__remove_object_with_confirmation(obj)
 
     def _on_add_object_activate(self, action, data):
         info = self.type_chooser.props.selected_type
