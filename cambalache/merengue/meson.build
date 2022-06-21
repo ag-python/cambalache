@@ -33,6 +33,7 @@ install_data([
   'mrg_application.py',
   'mrg_controller.py',
   'mrg_controller_registry.py',
+  'mrg_css_provider.py',
   'mrg_placeholder.py',
   'utils.py',
   '__init__.py',
