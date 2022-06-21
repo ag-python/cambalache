@@ -26,7 +26,8 @@ import gi
 import math
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, GObject, Gdk, Gtk, Pango, GdkPixbuf
+gi.require_version('GtkSource', '3.0')
+from gi.repository import GLib, GObject, Gdk, Gtk, Pango, GdkPixbuf, GtkSource
 
 from .cmb_object import CmbObject
 from .cmb_ui import CmbUI
@@ -711,4 +712,18 @@ class CmbColorEntry(Gtk.Box):
                 valid = rgba.parse(value)
 
             self.button.set_rgba(rgba if valid else self.__default_rgba)
+
+
+class CmbSourceView(GtkSource.View):
+    __gtype_name__ = 'CmbSourceView'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.manager = GtkSource.LanguageManager.get_default()
+
+        self.buffer = GtkSource.Buffer()
+        self.props.buffer = self.buffer
+        self.buffer.set_language(self.manager.get_language('css'))
+
 

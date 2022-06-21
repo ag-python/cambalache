@@ -25,6 +25,8 @@ configure_file(
 install_data([
     'cmb_base.py',
     'cmb_context_menu.py',
+    'cmb_css.py',
+    'cmb_css_editor.py',
     'cmb_db.py',
     'cmb_db_migration.py',
     'cmb_layout_property.py',
