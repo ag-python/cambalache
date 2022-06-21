@@ -62,6 +62,27 @@ CREATE TABLE ui_library (
 ) WITHOUT ROWID;
 
 
+/* CSS
+ *
+ */
+CREATE TABLE css (
+  css_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  filename TEXT UNIQUE,
+  priority INTEGER,
+  is_global BOOLEAN
+);
+
+
+/* CSS UI mapping
+ *
+ */
+CREATE TABLE css_ui (
+  css_id INTEGER REFERENCES css ON DELETE CASCADE,
+  ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
+  PRIMARY KEY(css_id, ui_id)
+) WITHOUT ROWID;
+
+
 /* Object
  *
  * TODO: check type_id is an object

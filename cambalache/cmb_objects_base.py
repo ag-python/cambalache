@@ -311,6 +311,50 @@ class CmbBaseUI(CmbBase):
                     (self.ui_id, ), value)
 
 
+class CmbBaseCSS(CmbBase):
+    __gtype_name__ = 'CmbBaseCSS'
+
+    css_id = GObject.Property(type=int, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def from_row(cls, project, css_id, filename, priority, is_global):
+        return cls(project=project,
+                   css_id=css_id)
+
+    @GObject.Property(type=str)
+    def filename(self):
+        return self.db_get('SELECT filename FROM css WHERE (css_id) IS (?);',
+                           (self.css_id, ))
+
+    @filename.setter
+    def _set_filename(self, value):
+        self.db_set('UPDATE css SET filename=? WHERE (css_id) IS (?);',
+                    (self.css_id, ), value)
+
+    @GObject.Property(type=int)
+    def priority(self):
+        return self.db_get('SELECT priority FROM css WHERE (css_id) IS (?);',
+                           (self.css_id, ))
+
+    @priority.setter
+    def _set_priority(self, value):
+        self.db_set('UPDATE css SET priority=? WHERE (css_id) IS (?);',
+                    (self.css_id, ), value)
+
+    @GObject.Property(type=bool, default = False)
+    def is_global(self):
+        return self.db_get('SELECT is_global FROM css WHERE (css_id) IS (?);',
+                           (self.css_id, ))
+
+    @is_global.setter
+    def _set_is_global(self, value):
+        self.db_set('UPDATE css SET is_global=? WHERE (css_id) IS (?);',
+                    (self.css_id, ), value)
+
+
 class CmbBaseProperty(CmbBase):
     __gtype_name__ = 'CmbBaseProperty'
 

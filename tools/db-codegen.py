@@ -179,6 +179,8 @@ from .cmb_base import *
             # Project Objects
             self.dump_table(fd, 'ui', 'CmbBaseUI',
                             mutable=True)
+            self.dump_table(fd, 'css', 'CmbBaseCSS',
+                            mutable=True)
             self.dump_table(fd, 'object_property', 'CmbBaseProperty',
                             mutable=True)
             self.dump_table(fd, 'object_layout_property', 'CmbBaseLayoutProperty',
