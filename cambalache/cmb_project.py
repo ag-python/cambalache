@@ -33,6 +33,7 @@ from lxml import etree
 
 from .cmb_db import CmbDB
 from .cmb_ui import CmbUI
+from .cmb_css import CmbCSS
 from .cmb_object import CmbObject
 from .cmb_property import CmbProperty
 from .cmb_layout_property import CmbLayoutProperty
@@ -57,6 +58,15 @@ class CmbProject(Gtk.TreeStore):
 
         'ui-removed': (GObject.SignalFlags.RUN_FIRST, None,
                        (CmbUI,)),
+
+        'css-added': (GObject.SignalFlags.RUN_FIRST, None,
+                     (CmbCSS,)),
+
+        'css-removed': (GObject.SignalFlags.RUN_FIRST, None,
+                       (CmbCSS,)),
+
+        'css-changed': (GObject.SignalFlags.RUN_FIRST, None,
+                        (CmbCSS, str)),
 
         'object-added': (GObject.SignalFlags.RUN_FIRST, None,
                          (CmbObject,)),
@@ -100,6 +110,7 @@ class CmbProject(Gtk.TreeStore):
 
         # Create TreeModel store
         self.__object_id = {}
+        self.__css_id = {}
 
         self.__reordering_children = False
 
@@ -252,12 +263,21 @@ class CmbProject(Gtk.TreeStore):
 
         # Populate tree view
         for row in rows:
-            ui_id = row[0]
+            row_ui_id = row[0]
             self.__add_ui(False, *row)
 
             # Update UI objects
-            for obj in cc.execute('SELECT * FROM object WHERE ui_id=? ORDER BY parent_id, position;', (ui_id, )):
+            for obj in cc.execute('SELECT * FROM object WHERE ui_id=? ORDER BY parent_id, position;', (row_ui_id, )):
                 self.__add_object(False, *obj)
+
+        # Populate CSS
+        if ui_id is None:
+            rows = c.execute('SELECT * FROM css;')
+
+            # Populate tree view
+            for row in rows:
+                css_id = row[0]
+                self.__add_css(False, *row)
 
         c.close()
         cc.close()
@@ -393,6 +413,23 @@ class CmbProject(Gtk.TreeStore):
         else:
             self.emit('selection-changed')
 
+    def __get_basename_relpath(self, filename):
+        if filename is None:
+            return (None, None)
+
+        basename = os.path.basename(filename)
+        if self.filename:
+            dirname = os.path.dirname(self.filename)
+
+            if filename != basename:
+                relpath = os.path.relpath(filename, dirname)
+            else:
+                relpath = basename
+        else:
+            relpath = None
+
+        return (basename, relpath)
+
     def __add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
         ui = CmbUI(project=self, ui_id=ui_id)
 
@@ -404,17 +441,7 @@ class CmbProject(Gtk.TreeStore):
         return ui
 
     def add_ui(self, filename=None, requirements={}):
-
-        if filename is None:
-            basename = None
-            relpath = None
-        else:
-            basename = os.path.basename(filename)
-            if self.filename:
-                dirname = os.path.dirname(self.filename)
-                relpath = os.path.relpath(filename, dirname)
-            else:
-                relpath = None
+        basename, relpath = self.__get_basename_relpath(filename)
 
         try:
             self.history_push(_("Add UI {basename}").format(basename=basename))
@@ -443,6 +470,67 @@ class CmbProject(Gtk.TreeStore):
             self.__remove_ui(ui);
         except:
             pass
+
+    def get_ui_list(self):
+        c = self.db.cursor()
+
+        retval = []
+        for row in c.execute("SELECT ui_id FROM ui ORDER BY ui_id;"):
+            ui = self.get_object_by_id(row[0])
+            retval.append(ui)
+
+        c.close()
+        return retval
+
+    def __add_css(self, emit, css_id, filename=None, priority=None, is_global=None):
+        css = CmbCSS(project=self, css_id=css_id)
+
+        self.__css_id[css_id] = self.append(None, [css])
+
+        if emit:
+            self.emit('css-added', css)
+
+        return css
+
+    def add_css(self, filename=None):
+        basename, relpath = self.__get_basename_relpath(filename)
+
+        try:
+            self.history_push(_("Add CSS {basename}").format(basename=basename))
+            css_id = self.db.add_css(relpath)
+            self.db.commit()
+            self.history_pop()
+        except:
+            return None
+        else:
+            return self.__add_css(True, css_id, relpath)
+
+    def __remove_css(self, css):
+        iter_ = self.__css_id.pop(css.css_id, None)
+
+        if iter_ is not None:
+            self.__selection_remove(css)
+            self.remove(iter_)
+            self.emit('css-removed', css)
+
+    def remove_css(self, css):
+        try:
+            self.history_push(_('Remove CSS "{name}"').format(name=os.path.basename(css.filename)))
+            self.db.execute("DELETE FROM css WHERE css_id=?;", (css.css_id, ))
+            self.history_pop()
+            self.db.commit()
+            self.__remove_css(css);
+        except Exception as e:
+            print(e)
+
+    def get_css_providers(self):
+        retval = []
+
+        for css_id in self.__css_id:
+            css = self.get_css_by_id(css_id)
+            retval.append(css)
+
+        return retval
 
     def __add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=0):
         obj = CmbObject(project=self,
@@ -539,7 +627,7 @@ class CmbProject(Gtk.TreeStore):
             return
 
         for obj in selection:
-            if type(obj) != CmbUI and type(obj) != CmbObject:
+            if type(obj) not in [CmbUI, CmbCSS, CmbObject]:
                 return
 
         self.__selection = selection
@@ -550,6 +638,8 @@ class CmbProject(Gtk.TreeStore):
             return self.__object_id.get(f'{obj.ui_id}.{obj.object_id}', None)
         elif type(obj) == CmbUI:
             return self.__object_id.get(obj.ui_id, None)
+        elif type(obj) == CmbCSS:
+            return self.__css_id.get(obj.css_id, None)
 
     def get_object_by_key(self, key):
         _iter = self.__object_id.get(key, None)
@@ -573,6 +663,10 @@ class CmbProject(Gtk.TreeStore):
                             (relpath, ))
         row = c.fetchone()
         return self.get_object_by_key(row[0]) if row else None
+
+    def get_css_by_id(self, css_id):
+        _iter = self.__css_id.get(css_id, None)
+        return self.get_value(_iter, 0) if _iter else None
 
     def __undo_redo_property_notify(self, obj, layout, prop, owner_id, property_id):
         # FIXME:use a dict instead of walking the array
@@ -648,6 +742,10 @@ class CmbProject(Gtk.TreeStore):
                 self.__undo_redo_property_notify(child, True, column, pk[3], pk[4])
             elif table == 'object_signal':
                 pass
+            elif table == 'css':
+                obj = self.get_css_by_id(pk[0])
+                if obj:
+                    obj.notify(column)
         elif command == 'INSERT' or command == 'DELETE':
             if table == 'object_property':
                 obj = self.get_object_by_id(pk[0], pk[1])
@@ -655,17 +753,20 @@ class CmbProject(Gtk.TreeStore):
             elif table == 'object_layout_property':
                 child = self.get_object_by_id(pk[0], pk[2])
                 self.__undo_redo_property_notify(child, True, 'value', pk[3], pk[4])
-            elif table =='object' or table == 'ui':
+            elif table in ['object', 'ui', 'css']:
                 c.execute(commands['COUNT'], (self.history_index, ))
                 count = c.fetchone()
 
                 if count[0] == 0:
-                    obj = self.get_object_by_id(pk[0], pk[1] if len(pk) > 1 else None)
-
                     if table =='object':
+                        obj = self.get_object_by_id(pk[0], pk[1])
                         self.__remove_object(obj)
                     elif table == 'ui':
+                        obj = self.get_object_by_id(pk[0])
                         self.__remove_ui(obj)
+                    elif table == 'css':
+                        obj = self.get_css_by_id(pk[0])
+                        self.__remove_css(obj)
                 else:
                     c.execute(commands['DATA'], (self.history_index, ))
                     row = c.fetchone()
@@ -673,6 +774,8 @@ class CmbProject(Gtk.TreeStore):
                         self.__add_ui(True, *row)
                     elif table == 'object':
                         self.__add_object(True, *row)
+                    elif table == 'css':
+                        self.__add_css(True, *row)
             elif table == 'object_signal':
                 c.execute(commands['COUNT'], (self.history_index, ))
                 count = c.fetchone()
@@ -689,6 +792,10 @@ class CmbProject(Gtk.TreeStore):
                             break
                 else:
                     obj._add_signal(row[0], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
+            elif table == 'css_ui':
+                obj = self.get_css_by_id(pk[0])
+                if obj:
+                    obj.notify('provider-for')
 
         c.close()
 
@@ -732,6 +839,7 @@ class CmbProject(Gtk.TreeStore):
         def get_msg_vars(table, index):
             retval = {
                 'ui': '',
+                'css': '',
                 'obj': '',
                 'prop': '',
                 'value': ''
@@ -746,6 +854,17 @@ class CmbProject(Gtk.TreeStore):
 
             if table == 'ui':
                 retval['ui'] = data[3]
+            elif table == 'css':
+                retval['css'] = data[1]
+            elif table == 'css_ui':
+                css_id = data[0]
+                ui_id = data[1]
+
+                css = self.get_css_by_id(css_id)
+                ui = self.get_object_by_id(ui_id)
+
+                retval['css'] = css.get_display_name()
+                retval['ui'] = ui.get_display_name()
             else:
                 if table == 'object_signal':
                     ui_id = data[1]
@@ -789,6 +908,15 @@ class CmbProject(Gtk.TreeStore):
                     'INSERT': _('Create UI {ui}'),
                     'DELETE': _('Remove UI {ui}'),
                     'UPDATE': _('Update UI {ui}')
+                },
+                'css': {
+                    'INSERT': _('Add CSS provider {css}'),
+                    'DELETE': _('Remove CSS provider {css}'),
+                    'UPDATE': _('Update CSS provider {css}')
+                },
+                'css_ui': {
+                    'INSERT': _('Add {ui} to CSS provider {css}'),
+                    'DELETE': _('Remove {ui} from CSS provider {css}')
                 },
                 'object': {
                     'INSERT': _('Create object {obj}'),
@@ -879,6 +1007,14 @@ class CmbProject(Gtk.TreeStore):
 
     def _object_signal_added(self, obj, signal):
         self.emit('object-signal-added', obj, signal)
+
+    def _css_changed(self, obj, field):
+        iter = self.get_iter_from_object(obj)
+
+        path = self.get_path(iter)
+        self.row_changed(path, iter)
+
+        self.emit('css-changed', obj, field)
 
     def db_backup(self, filename):
         self.db.backup(filename)
@@ -991,6 +1127,15 @@ class CmbProject(Gtk.TreeStore):
         self.emit('changed')
 
     def do_ui_removed(self, ui):
+        self.emit('changed')
+
+    def do_css_added(self, css):
+        self.emit('changed')
+
+    def do_css_removed(self, css):
+        self.emit('changed')
+
+    def do_css_changed(self, css, field):
         self.emit('changed')
 
     def do_object_added(self, obj):
