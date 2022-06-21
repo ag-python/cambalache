@@ -75,6 +75,8 @@ class CmbDB(GObject.GObject):
         self.__tables = [
             'ui',
             'ui_library',
+            'css',
+            'css_ui',
             'object',
             'object_property',
             'object_layout_property',
@@ -583,6 +585,16 @@ class CmbDB(GObject.GObject):
             req = requirements[key]
             c.execute('INSERT INTO ui_library (ui_id, library_id, version, comment) VALUES (?, ?, ?, ?);',
                       (ui_id, key, req['version'], req['comment']))
+        c.close()
+
+        return ui_id
+
+    def add_css(self, filename=None, priority=None, is_global=None):
+        c = self.conn.cursor()
+
+        c.execute("INSERT INTO css (filename, priority, is_global) VALUES (?, ?, ?);",
+                  (filename, priority, is_global))
+        ui_id = c.lastrowid
         c.close()
 
         return ui_id
