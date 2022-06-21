@@ -73,3 +73,6 @@ class CmbUI(CmbBaseUI):
             logger.warning(f'{self} Error setting library {library_id}={version}: {e}')
 
         c.close()
+
+    def get_display_name(self):
+        return self.filename if self.filename else _('Unnamed {ui_id}').format(ui_id=self.ui_id)
