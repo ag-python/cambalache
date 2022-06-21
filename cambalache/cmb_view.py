@@ -32,6 +32,7 @@ gi.require_version('WebKit2', '4.0')
 from gi.repository import GObject, GLib, Gio, Gdk, Gtk, WebKit2
 
 from . import config
+from .cmb_ui import CmbUI
 from .cmb_object import CmbObject
 from .cmb_project import CmbProject
 from .cmb_context_menu import CmbContextMenu
@@ -300,7 +301,12 @@ window.setupDocument = function (document) {
         selection = project.get_selection()
 
         if len(selection) > 0:
-            ui_id = selection[0].ui_id
+            obj = selection[0]
+
+            if type(obj) not in [CmbUI, CmbObject]:
+                return
+
+            ui_id = obj.ui_id
 
             if self.__ui_id != ui_id:
                 self.__ui_id = ui_id
@@ -313,6 +319,37 @@ window.setupDocument = function (document) {
             self.__ui_id = 0
             self.__update_view()
             self.__merengue_update_ui(0)
+
+    def __on_css_added(self, project, obj):
+        dirname = os.path.dirname(self.project.filename)
+
+        filename = os.path.join(dirname, obj.filename) if obj.filename else None
+
+        self.__merengue_command('add_css_provider', args={
+            'css_id': obj.css_id,
+            'filename': filename,
+            'priority': obj.priority,
+            'is_global': obj.is_global,
+            'provider_for': obj.provider_for
+        })
+
+    def __on_css_removed(self, project, obj):
+        self.__merengue_command('remove_css_provider', args={
+            'css_id': obj.css_id
+        })
+
+    def __on_css_changed(self, project, obj, field):
+        value = obj.get_property(field)
+
+        if field == 'filename' and value:
+            dirname = os.path.dirname(self.project.filename)
+            value = os.path.join(dirname, value)
+
+        self.__merengue_command('update_css_provider', args={
+            'css_id': obj.css_id,
+            'field': field,
+            'value': value
+        })
 
     @GObject.Property(type=GObject.GObject)
     def project(self):
@@ -328,6 +365,9 @@ window.setupDocument = function (document) {
             self.__project.disconnect_by_func(self.__on_object_layout_property_changed)
             self.__project.disconnect_by_func(self.__on_project_selection_changed)
             self.__merengue.disconnect_by_func(self.__on_merengue_stdout)
+            self.__project.disconnect_by_func(self.__on_css_added)
+            self.__project.disconnect_by_func(self.__on_css_removed)
+            self.__project.disconnect_by_func(self.__on_css_changed)
             self.__merengue.stop()
             self.__broadwayd.stop()
 
@@ -342,6 +382,9 @@ window.setupDocument = function (document) {
             project.connect('object-property-changed', self.__on_object_property_changed)
             project.connect('object-layout-property-changed', self.__on_object_layout_property_changed)
             project.connect('selection-changed', self.__on_project_selection_changed)
+            project.connect('css-added', self.__on_css_added)
+            project.connect('css-removed', self.__on_css_removed)
+            project.connect('css-changed', self.__on_css_changed)
 
             self.__merengue = CmbProcess(file=self.__merengue_bin)
             self.__merengue.connect('stdout', self.__on_merengue_stdout)
@@ -464,6 +507,12 @@ window.setupDocument = function (document) {
                                     'value': self.preview
                                 })
 
+    def __load_css_providers(self):
+        providers = self.project.get_css_providers()
+
+        for css in providers:
+            self.__on_css_added(self.project, css)
+
     def __on_merengue_stdout(self, process, condition):
         if condition == GLib.IOCondition.HUP:
             self.__merengue.stop()
@@ -487,6 +536,8 @@ window.setupDocument = function (document) {
                                         args={ 'property': 'gtk-theme-name' })
 
                 self.__load_namespaces()
+
+                self.__load_css_providers()
 
                 self.__on_project_selection_changed(self.__project)
             elif command == 'placeholder_selected':
