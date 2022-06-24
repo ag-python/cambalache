@@ -133,10 +133,22 @@ class CmbWindow(Gtk.ApplicationWindow):
             ("win.delete",     ["Delete"]),
             ("win.create_new", ["<Primary>n"]),
             ("win.open",       ["<Primary>o"]),
-            ("win.add_placeholder",        ["<Primary>Insert"]),
-            ("win.remove_placeholder",     ["<Primary>Delete"]),
-            ("win.add_placeholder_row",    ["<Primary><shift>Insert"]),
-            ("win.remove_placeholder_row", ["<Primary><shift>Delete"]),
+            ("win.add_placeholder", [
+                "<Primary>Insert", "<Primary>KP_Insert",
+                "<Primary>KP_Add", "<Primary>plus"
+            ]),
+            ("win.remove_placeholder", [
+                "<Primary>Delete", "<Primary>KP_Delete",
+                "<Primary>KP_Subtract", "<Primary>minus"
+            ]),
+            ("win.add_placeholder_row", [
+                "<Primary><shift>Insert", "<Primary><shift>KP_Insert",
+                "<Primary><shift>KP_Add", "<Primary><shift>plus"
+            ]),
+            ("win.remove_placeholder_row", [
+                "<Primary><shift>Delete", "<Primary><shift>KP_Delete",
+                 "<Primary><shift>KP_Subtract", "<Primary><shift>minus"
+            ]),
             ("win.show-help-overlay",      ["<Primary>question"])
         ]
 
