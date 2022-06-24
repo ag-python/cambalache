@@ -63,7 +63,8 @@ class MrgPlaceholder(Gtk.Box):
         self.__binding = GObject.Object.bind_property(self.controller.app, 'preview',
                                                       self, 'visible',
                                                       GObject.BindingFlags.SYNC_CREATE |
-                                                      GObject.BindingFlags.BIDIRECTIONAL)
+                                                      GObject.BindingFlags.BIDIRECTIONAL |
+                                                      GObject.BindingFlags.INVERT_BOOLEAN)
 
     def selected(self):
         if self.controller:

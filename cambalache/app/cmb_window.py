@@ -202,8 +202,7 @@ class CmbWindow(Gtk.ApplicationWindow):
         GObject.Object.bind_property(self.preview_button, 'active',
                                      self.view, 'preview',
                                      GObject.BindingFlags.SYNC_CREATE |
-                                     GObject.BindingFlags.BIDIRECTIONAL |
-                                     GObject.BindingFlags.INVERT_BOOLEAN)
+                                     GObject.BindingFlags.BIDIRECTIONAL)
 
     @GObject.Property(type=CmbProject)
     def project(self):
