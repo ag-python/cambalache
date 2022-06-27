@@ -57,7 +57,7 @@ intro = [
     (_('Now let\'s add a new UI file'), 'add_button', 5, 'add-ui'),
 
     (_('Good, now try to create a window'), 'intro_button', 4, 'add-window'),
-    (_('Excelent!'), 'intro_button', 2),
+    (_('Excellent!'), 'intro_button', 2),
 
     (_('BTW, did you know you can double click on any placeholder to create widgets?'),
       'intro_button', 5),
