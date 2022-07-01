@@ -59,6 +59,9 @@ class CmbProject(Gtk.TreeStore):
         'ui-removed': (GObject.SignalFlags.RUN_FIRST, None,
                        (CmbUI,)),
 
+        'ui-changed': (GObject.SignalFlags.RUN_FIRST, None,
+                       (CmbUI, str)),
+
         'css-added': (GObject.SignalFlags.RUN_FIRST, None,
                      (CmbCSS,)),
 
@@ -89,7 +92,16 @@ class CmbProject(Gtk.TreeStore):
         'object-signal-removed': (GObject.SignalFlags.RUN_FIRST, None,
                                   (CmbObject, CmbSignal)),
 
-        'selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ())
+        'selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
+
+        'type-info-added': (GObject.SignalFlags.RUN_FIRST, None,
+                            (CmbTypeInfo, )),
+
+        'type-info-removed': (GObject.SignalFlags.RUN_FIRST, None,
+                              (CmbTypeInfo, )),
+
+        'type-info-changed': (GObject.SignalFlags.RUN_FIRST, None,
+                              (CmbTypeInfo, ))
     }
 
     target_tk = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT)
@@ -112,6 +124,7 @@ class CmbProject(Gtk.TreeStore):
         self.__object_id = {}
         self.__css_id = {}
 
+        self.__template_info = {}
         self.__reordering_children = False
 
         super().__init__(**kwargs)
@@ -261,13 +274,17 @@ class CmbProject(Gtk.TreeStore):
         else:
             rows = c.execute('SELECT * FROM ui;')
 
-        # Populate tree view
-        for row in rows:
-            row_ui_id = row[0]
-            self.__add_ui(False, *row)
+        uis = []
 
+        # Populate tree view ui first
+        for row in rows:
+            uis.append(self.__add_ui(False, *row))
+
+        # Populate tree view objects
+        for ui in uis:
             # Update UI objects
-            for obj in cc.execute('SELECT * FROM object WHERE ui_id=? ORDER BY parent_id, position;', (row_ui_id, )):
+            for obj in cc.execute('SELECT * FROM object WHERE ui_id=? ORDER BY parent_id, position;',
+                                  (ui.ui_id, )):
                 self.__add_object(False, *obj)
 
         # Populate CSS
@@ -434,6 +451,8 @@ class CmbProject(Gtk.TreeStore):
         ui = CmbUI(project=self, ui_id=ui_id)
 
         self.__object_id[ui_id] = self.append(None, [ui])
+
+        self.__update_template_type_info(ui)
 
         if emit:
             self.emit('ui-added', ui)
@@ -742,6 +761,10 @@ class CmbProject(Gtk.TreeStore):
                 self.__undo_redo_property_notify(child, True, column, pk[3], pk[4])
             elif table == 'object_signal':
                 pass
+            elif table == 'ui':
+                obj = self.get_object_by_id(pk[0])
+                if obj:
+                    obj.notify(column)
             elif table == 'css':
                 obj = self.get_css_by_id(pk[0])
                 if obj:
@@ -971,6 +994,60 @@ class CmbProject(Gtk.TreeStore):
         info = self.type_info.get(name, None)
         return info.properties if info else None
 
+    def __update_template_type_info(self, ui):
+        template_info = self.__template_info.get(ui.ui_id, None)
+
+        if ui.template_id:
+            c = self.db.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;',
+                                (ui.ui_id, ui.template_id))
+            parent_id, type_id = c.fetchone()
+
+            if template_info is None:
+                info = CmbTypeInfo(project=self,
+                                   type_id=type_id,
+                                   parent_id=parent_id,
+                                   library_id=None,
+                                   version=None,
+                                   deprecated_version=None,
+                                   abstract=None,
+                                   layout=None,
+                                   category=None,
+                                   workspace_type=None)
+
+                # Set parent back reference
+                info.parent = self.type_info.get(parent_id, None)
+
+                self.type_info[type_id] = info
+                self.__template_info[ui.ui_id] = type_id
+
+                self.emit('type-info-added', info)
+            elif template_info != type_id:
+                # name changed
+                info = self.type_info.pop(template_info)
+                self.type_info[type_id] = info
+                self.__template_info[ui.ui_id] = type_id
+
+                # Update object property since its not read from DB each time
+                info.type_id = type_id
+                info.parent_id = parent_id
+                info.parent = self.type_info.get(parent_id, None)
+                self.emit('type-info-changed', info)
+        elif template_info:
+            info = self.type_info.pop(template_info)
+            self.__template_info.pop(ui.ui_id)
+            self.emit('type-info-removed', info)
+
+    def _ui_changed(self, ui, field):
+        iter = self.get_iter_from_object(ui)
+
+        if field == 'template-id':
+            self.__update_template_type_info(ui)
+
+        path = self.get_path(iter)
+        self.row_changed(path, iter)
+
+        self.emit('ui-changed', ui, field)
+
     def _object_changed(self, obj, field):
         iter = self.get_iter_from_object(obj)
 
@@ -994,6 +1071,12 @@ class CmbProject(Gtk.TreeStore):
             path = self.get_path(iter)
             self.row_changed(path, iter)
 
+        # Update template type id
+        if field == 'name':
+            ui = obj.ui
+            if obj.object_id == ui.template_id:
+                self.__update_template_type_info(ui)
+
         self.emit('object-changed', obj, field)
 
     def _object_property_changed(self, obj, prop):
@@ -1016,8 +1099,8 @@ class CmbProject(Gtk.TreeStore):
 
         self.emit('css-changed', obj, field)
 
-    def db_backup(self, filename):
-        self.db.backup(filename)
+    def db_move_to_fs(self, filename):
+        self.db.move_to_fs(filename)
 
     def history_push(self, message):
         if not self.history_enabled:
@@ -1127,6 +1210,9 @@ class CmbProject(Gtk.TreeStore):
         self.emit('changed')
 
     def do_ui_removed(self, ui):
+        self.emit('changed')
+
+    def do_ui_changed(self, ui, field):
         self.emit('changed')
 
     def do_css_added(self, css):
