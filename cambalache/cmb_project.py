@@ -515,7 +515,7 @@ class CmbProject(Gtk.TreeStore):
 
     def remove_css(self, css):
         try:
-            self.history_push(_('Remove CSS "{name}"').format(name=os.path.basename(css.filename)))
+            self.history_push(_('Remove CSS "{name}"').format(name=css.get_display_name()))
             self.db.execute("DELETE FROM css WHERE css_id=?;", (css.css_id, ))
             self.history_pop()
             self.db.commit()
