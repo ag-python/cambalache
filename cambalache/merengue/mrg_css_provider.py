@@ -71,17 +71,36 @@ class MrgCssProvider(Gtk.CssProvider):
         self.monitor.connect('changed', self.__on_css_file_changed)
 
     def load(self):
-        screen = Gdk.Screen.get_default()
         try:
             self.load_from_path(self.filename)
-        except:
+        except Exception as e:
+            # TODO: return exception to main app to show the user
             pass
 
-        Gtk.StyleContext.add_provider_for_screen (screen, self, self.priority)
+        if Gtk.MAJOR_VERSION == 4:
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(),
+                self,
+                self.priority
+            )
+        elif Gtk.MAJOR_VERSION == 3:
+            Gtk.StyleContext.add_provider_for_screen(
+                Gdk.Screen.get_default(),
+                self,
+                self.priority
+            )
 
     def remove(self):
-        screen = Gdk.Screen.get_default()
-        Gtk.StyleContext.remove_provider_for_screen (screen, self)
+        if Gtk.MAJOR_VERSION == 4:
+            Gtk.StyleContext.remove_provider_for_display(
+                Gdk.Display.get_default(),
+                self
+            )
+        elif Gtk.MAJOR_VERSION == 3:
+            Gtk.StyleContext.remove_provider_for_screen(
+                Gdk.Screen.get_default(),
+                self
+            )
 
         if self.monitor:
             self.monitor.cancel()
