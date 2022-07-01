@@ -56,6 +56,8 @@ class CmbCSSEditor(Gtk.Grid):
 
         super().__init__(**kwargs)
 
+        self.save_button.set_sensitive(False)
+
         self.priority.set_range(0, 10000)
         self.priority.set_increments(10, 100)
 
