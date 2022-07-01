@@ -109,16 +109,27 @@ class CmbCSS(CmbBaseCSS):
 
                 return True
         else:
-            self.css = ''
             self._path = None
 
         return False
 
     def save_css(self):
-        if self._path:
-            self.__saving = True
-            with open(self._path, 'w') as fd:
-                fd.write(self.css)
+        if not self.project or not self.filename:
+            return
+
+        needs_load = False
+
+        if self._path is None:
+            dirname = os.path.dirname(self.project.filename)
+            self._path = os.path.join(dirname, self.filename)
+            needs_load = True
+
+        self.__saving = True
+        with open(self._path, 'w') as fd:
+            fd.write(self.css)
+
+        if needs_load:
+            self.notify('filename')
 
     def add_ui(self, ui):
         c = self.project.db.cursor()
