@@ -26,7 +26,7 @@ import gi
 import math
 
 gi.require_version('Gtk', '3.0')
-gi.require_version('GtkSource', '3.0')
+gi.require_version('GtkSource', '4')
 from gi.repository import GLib, GObject, Gdk, Gtk, Pango, GdkPixbuf, GtkSource
 
 from .cmb_object import CmbObject
