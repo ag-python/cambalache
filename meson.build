@@ -1,6 +1,6 @@
 project(
     'cambalache', 'c',
-    version: '0.10.2',
+    version: '0.11.0',
     meson_version: '>= 0.50.0'
 )
 
@@ -22,6 +22,7 @@ modules = [
     ['gi.repository.Gtk', '>= 3.24.0', '3.0'],
     ['gi.repository.Gtk', '>= 4.0.0', '4.0'],
     ['gi.repository.WebKit2', '>= 2.32.0', '4.0'],
+    ['gi.repository.GtkSource', '', '4'],
     ['gi.repository.Handy'],
     ['gi.repository.Adw'],
 ]
