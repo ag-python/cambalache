@@ -85,13 +85,17 @@ class MrgApplication(Gtk.Application):
             controller.object = None
             controller.selected = False
 
-    def update_ui(self, ui_id, toplevels=[], selection=[], payload=None):
+    def update_ui(self, ui_id, dirname=None, toplevels=[], selection=[], payload=None):
         self.clear_all()
 
         if payload == None:
             return
 
         self.ui_id = ui_id
+
+        # Change CWD for builder to pick relative paths
+        if dirname:
+            os.chdir(dirname)
 
         # Build everything
         builder = Gtk.Builder()

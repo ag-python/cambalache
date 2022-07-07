@@ -246,6 +246,7 @@ window.setupDocument = function (document) {
                                 payload=ui,
                                 args={
                                     'ui_id': ui_id,
+                                    'dirname': os.path.dirname(self.__project.filename),
                                     'toplevels': toplevels,
                                     'selection': objects
                                 })
