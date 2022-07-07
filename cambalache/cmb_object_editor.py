@@ -305,6 +305,10 @@ class CmbObjectEditor(Gtk.Box):
             editor = CmbColorEntry()
         elif type_id == 'GdkColor':
             editor = CmbColorEntry(use_color=True)
+        elif type_id == 'GdkPixbuf':
+            dirname = os.path.dirname(self.object.project.filename)
+            editor = CmbPixbufEntry(hexpand=True,
+                                    dirname=dirname)
         elif type_id == 'CmbIconName':
             editor = CmbIconNameEntry(hexpand=True,
                                       placeholder_text=f'<Icon Name>')

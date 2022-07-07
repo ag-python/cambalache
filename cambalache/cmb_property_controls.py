@@ -278,6 +278,55 @@ class CmbFlagsEntry(Gtk.Entry):
                     self.flags[flag_id] = val
 
 
+class CmbPixbufEntry(Gtk.Entry):
+    __gtype_name__ = 'CmbPixbufEntry'
+
+    dirname = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.props.placeholder_text='<GdkPixbuf>'
+        self.connect('notify::text', self.__on_text_notify)
+
+        self.props.secondary_icon_name = 'document-open-symbolic'
+        self.connect("icon-press", self.__on_icon_pressed)
+
+    def __on_icon_pressed(self, widget, icon_pos, event):
+        # Only show images formats supported by GdkPixbuf
+        filter_obj = Gtk.FileFilter()
+        filter_obj.add_pixbuf_formats()
+
+        # Create Open Dialog
+        dialog = Gtk.FileChooserDialog(
+            title=_('Select Image'),
+            parent=self.get_toplevel(),
+            action=Gtk.FileChooserAction.OPEN,
+            filter=filter_obj
+        )
+        dialog.add_buttons('_Cancel', Gtk.ResponseType.CANCEL,
+                           '_Open', Gtk.ResponseType.OK)
+
+        if self.dirname is not None:
+            dialog.set_current_folder(self.dirname)
+
+        if dialog.run() == Gtk.ResponseType.OK:
+            self.props.text = os.path.relpath(dialog.get_filename(),
+                                              start=self.dirname)
+
+        dialog.destroy()
+
+    def __on_text_notify(self, obj, pspec):
+        self.notify('cmb-value')
+
+    @GObject.Property(type=str)
+    def cmb_value(self):
+        return self.props.text if self.props.text != '' else None
+
+    @cmb_value.setter
+    def _set_cmb_value(self, value):
+        self.props.text = value if value is not None else ''
+
+
 class CmbObjectChooser(Gtk.Entry):
     __gtype_name__ = 'CmbObjectChooser'
 
