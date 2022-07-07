@@ -277,6 +277,14 @@ class CmbFlagsEntry(Gtk.Entry):
                     self.flags[flag_id] = val
 
 
+class CmbPixbufEntry(CmbEntry):
+    __gtype_name__ = 'CmbPixbufEntry'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.props.placeholder_text='<GdkPixbuf>'
+
+
 class CmbObjectChooser(Gtk.Entry):
     __gtype_name__ = 'CmbObjectChooser'
 
