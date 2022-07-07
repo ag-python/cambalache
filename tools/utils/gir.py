@@ -162,7 +162,7 @@ class GirData:
         if type == is_a_type:
             return True
 
-        parent = self.types[type]
+        parent = self.types.get(type, None)
 
         while parent:
             if parent['parent'] == is_a_type:
@@ -257,6 +257,7 @@ class GirData:
 
                 retval[pspec.name] = {
                     'type': type_name,
+                    'is_object': 'GParamObject' == GObject.type_name(pspec),
                     'version': None,
                     'deprecated_version': None,
                     'construct': 1 if pspec.flags & GObject.ParamFlags.CONSTRUCT_ONLY else None,
@@ -336,6 +337,7 @@ class GirData:
                 self.ignored_types.add(type_name)
                 continue
 
+            is_object = type_name == 'object'
             if type_name == 'object' or type_name == 'enum' or type_name == 'flags':
                 type_name = type_node.get('name', 'GObject')
 
@@ -358,6 +360,7 @@ class GirData:
 
             retval[name] = {
                 'type': type_name,
+                'is_object': is_object,
                 'version': child.get('version'),
                 'deprecated_version': child.get('deprecated-version'),
                 'construct': child.get('construct-only'),
@@ -592,8 +595,11 @@ class GirData:
                    prop_type not in self.ifaces:
                     continue
 
-                conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                             (name, prop, prop_type,
+                conn.execute(f"INSERT INTO property (owner_id, property_id, type_id, is_object, construct_only, default_value, minimum, maximum, version, deprecated_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                             (name,
+                              prop,
+                              prop_type,
+                              p['is_object'] if prop_type != 'GdkPixbuf' else False,
                               p['construct'],
                               p.get('default_value', None),
                               p.get('minimum', None),
