@@ -301,6 +301,8 @@ class CmbObjectEditor(Gtk.Box):
 
             editor = CmbSpinButton(digits=digits,
                                    adjustment=adjustment)
+        elif type_id == 'GStrv':
+            editor = CmbTextView(hexpand=True)
         elif type_id == 'GdkRGBA':
             editor = CmbColorEntry()
         elif type_id == 'GdkColor':
