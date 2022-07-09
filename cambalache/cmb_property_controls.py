@@ -84,6 +84,28 @@ class CmbTextBuffer(Gtk.TextBuffer):
         self.props.text = value if value is not None else ''
 
 
+class CmbTextView(Gtk.ScrolledWindow):
+    __gtype_name__ = 'CmbTextView'
+
+    cmb_value = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.props.shadow_type = Gtk.ShadowType.IN
+        self.props.height_request = 64
+        self.buffer = CmbTextBuffer()
+        self.view = Gtk.TextView(visible=True,
+                                 buffer=self.buffer)
+
+        GObject.Object.bind_property(self, 'cmb-value',
+                                     self.buffer, 'cmb-value',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.BIDIRECTIONAL)
+
+        self.add(self.view)
+
+
 class CmbSpinButton(Gtk.SpinButton):
     __gtype_name__ = 'CmbSpinButton'
 
