@@ -1422,8 +1422,11 @@
 	("GtkWindow","titlebar",1,None)
   </type_child_type>
   <property>
+	("GtkAboutDialog","artists","GStrv",None,None,None,None,None,None,None,None,None,None,None),
+	("GtkAboutDialog","authors","GStrv",None,None,None,None,None,None,None,None,None,None,None),
 	("GtkAboutDialog","comments","gchararray",None,None,None,None,None,None,None,None,1,None,None),
 	("GtkAboutDialog","copyright","gchararray",None,None,None,None,None,None,None,None,1,None,None),
+	("GtkAboutDialog","documenters","GStrv",None,None,None,None,None,None,None,None,None,None,None),
 	("GtkAboutDialog","license","gchararray",None,None,None,None,None,None,None,None,1,None,None),
 	("GtkAboutDialog","license-type","GtkLicense",None,None,None,"unknown",None,None,"3.0",None,None,None,None),
 	("GtkAboutDialog","logo","GdkPixbuf",None,None,None,None,None,None,None,None,None,None,None),
@@ -2042,6 +2045,7 @@
 	("GtkScale","has-origin","gboolean",None,None,None,"True",None,None,None,None,None,None,None),
 	("GtkScale","value-pos","GtkPositionType",None,None,None,"top",None,None,None,None,None,None,None),
 	("GtkScaleButton","adjustment","GtkAdjustment",1,None,None,None,None,None,None,None,None,None,None),
+	("GtkScaleButton","icons","GStrv",None,None,None,None,None,None,None,None,None,None,None),
 	("GtkScaleButton","size","GtkIconSize",None,None,None,"small-toolbar",None,None,None,None,None,None,None),
 	("GtkScaleButton","value","gdouble",None,None,None,"0.0","-1.79769313486232e+308","1.79769313486232e+308",None,None,None,None,None),
 	("GtkScrollable","hadjustment","GtkAdjustment",1,None,None,None,None,None,"3.0",None,None,None,None),

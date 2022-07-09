@@ -320,10 +320,17 @@ class GirData:
                 pspecs[p.name] = p
 
         for child in element.iterfind('property', nsmap):
+            if child.get('writable') != '1':
+                continue
+
             name = child.get('name')
             type_node = child.find('type', nsmap)
 
-            if type_node is None or child.get('writable') != '1':
+            # <type> might be inside an <array>
+            if type_node is None:
+                type_node = child.find('array', nsmap)
+
+            if type_node is None:
                 continue
 
             # Property pspec
