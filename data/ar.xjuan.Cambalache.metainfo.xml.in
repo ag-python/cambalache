@@ -244,7 +244,23 @@
       <image>https://gitlab.gnome.org/jpu/cambalache/-/raw/screenshots/cambalache8.png</image>
     </screenshot>
   </screenshots>
-  <content_rating type="oars-1.1"/>
+  <requires>
+    <display_length compare="ge">720</display_length>
+  </requires>
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
+  <content_rating type="oars-1.1" />
+  <keywords>
+    <keyword translate="no">GTK</keyword>
+    <keyword translate="no">libadwaita</keyword>
+    <keyword translate="no">libhandy</keyword>
+    <keyword>GUI Designer</keyword>
+    <keyword>UI Maker</keyword>
+    <keyword>user interface</keyword>
+    <keyword>UI Builder</keyword>
+  </keywords>
   <developer_name>Juan Pablo Ugarte</developer_name>
   <update_contact>juanpablougarte@gmail.com</update_contact>
   <url type="homepage">https://gitlab.gnome.org/jpu/cambalache</url>
@@ -252,4 +268,5 @@
   <url type="donation">https://liberapay.com/xjuan</url>
   <url type="donation">https://www.patreon.com/cambalache</url>
   <url type="contact">https://matrix.to/#/#cambalache:gnome.org</url>
+  <url type="vcs-browser">https://gitlab.gnome.org/jpu/cambalache</url>
 </component>
