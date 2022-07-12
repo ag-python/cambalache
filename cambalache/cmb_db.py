@@ -1350,7 +1350,7 @@ class CmbDB(GObject.GObject):
 
         return obj
 
-    def export_ui(self, ui_id, merengue=False):
+    def export_ui(self, ui_id, merengue=False, toplevel_id=None):
         c = self.conn.cursor()
 
         node = E.interface()
@@ -1397,6 +1397,10 @@ class CmbDB(GObject.GObject):
         for row in c.execute('SELECT object_id, comment FROM object WHERE parent_id IS NULL AND ui_id=?;',
                              (ui_id,)):
             object_id, comment = row
+
+            if toplevel_id and toplevel_id != object_id:
+                continue
+
             child = self.__export_object(ui_id, object_id, merengue=merengue, template_id=template_id)
             node.append(child)
             self.__node_add_comment(child, comment)
@@ -1405,8 +1409,10 @@ class CmbDB(GObject.GObject):
 
         return etree.ElementTree(node)
 
-    def tostring(self, ui_id, merengue=False):
-        ui = self.export_ui(ui_id, merengue=merengue)
+    def tostring(self, ui_id, merengue=False, toplevel_id=None):
+        ui = self.export_ui(ui_id,
+                            merengue=merengue,
+                            toplevel_id=toplevel_id)
 
         if ui is None:
             return None

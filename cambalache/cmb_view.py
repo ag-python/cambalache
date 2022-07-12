@@ -223,8 +223,10 @@ window.setupDocument = function (document) {
         # Flush
         self.__merengue.stdin.flush()
 
-    def __get_ui_xml(self, ui_id, merengue=False):
-        return self.__project.db.tostring(ui_id, merengue=merengue)
+    def __get_ui_xml(self, ui_id, merengue=False, toplevel_id=None):
+        return self.__project.db.tostring(ui_id,
+                                          merengue=merengue,
+                                          toplevel_id=toplevel_id)
 
     def __update_view(self):
         if self.__project is not None and self.__ui_id > 0:
@@ -251,24 +253,42 @@ window.setupDocument = function (document) {
                                     'selection': objects
                                 })
 
+    def __merengue_update_object(self, obj):
+
+
+        ui = self.__get_ui_xml(toplevel.ui_id,
+                               merengue=True,
+                               toplevel_id=toplevel.object_id)
+
+        selection = self.__project.get_selection()
+        objects = self.__get_selection_objects(selection, ui_id)
+
+        self.__merengue_command('update_toplevel',
+                                payload=ui,
+                                args={
+                                    'ui_id': ui_id,
+                                    'toplevel_id': toplevel.object_id,
+                                    'selection': objects
+                                })
+
     def __on_object_added(self, project, obj):
         self.__update_view()
-        self.__merengue_update_ui(obj.ui_id)
+        self.__merengue_update_object(obj)
 
     def __on_object_removed(self, project, obj):
         self.__update_view()
-        self.__merengue_update_ui(obj.ui_id)
+        self.__merengue_update_object(obj)
 
     def __on_object_changed(self, project, obj, field):
         if field in ['type', 'position']:
             self.__update_view()
-            self.__merengue_update_ui(obj.ui_id)
+            self.__merengue_update_object(obj)
 
     def __on_object_property_changed(self, project, obj, prop):
         self.__update_view()
 
         if obj.info.workspace_type is None and prop.info.construct_only:
-            self.__merengue_update_ui(obj.ui_id)
+            self.__merengue_update_object(obj)
             return
 
         self.__merengue_command('object_property_changed', args={
