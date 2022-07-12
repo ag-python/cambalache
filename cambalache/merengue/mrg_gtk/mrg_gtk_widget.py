@@ -52,31 +52,41 @@ class MrgGtkWidget(MrgController):
             self.property_ignore_list.add('no-show-all')
 
     def on_object_changed(self):
+        def window_remove_child(window):
+            if window is None:
+                return
+
+            if Gtk.MAJOR_VERSION == 4:
+                window.set_child(None)
+            else:
+                child = window.get_child()
+                if child:
+                    window.remove(child)
+
         super().on_object_changed()
 
         self.on_selected_changed()
 
         if self.object is None:
-            if self.window:
-                self.window.destroy()
-                self.window = None
+            window_remove_child(self.window)
             return
 
         if not self.toplevel or issubclass(type(self.object), Gtk.Window):
             return
 
         if self.window is None:
-            type_name = GObject.type_name(self.object.__gtype__)
-            self.window = Gtk.Window(deletable=False, title=type_name)
+            self.window = Gtk.Window(deletable=False)
             self.selection = MrgSelection(app=self.app, container=self.window)
+
+        # Update title
+        self.window.set_title(GObject.type_name(self.object.__gtype__))
+
+        window_remove_child(self.window)
 
         if Gtk.MAJOR_VERSION == 4:
             self.window.set_child(self.object)
             self.window.show()
         else:
-            child = self.window.get_child()
-            if child:
-                self.window.remove(child)
             self.window.add(self.object)
             self.window.show_all()
 
