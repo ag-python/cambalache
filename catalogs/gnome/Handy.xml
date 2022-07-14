@@ -10,6 +10,7 @@
     <HdyActionRow>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="subtitle" translatable="True"/>
       </properties>
     </HdyActionRow>
 
@@ -22,20 +23,58 @@
     <HdyExpanderRow>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="subtitle" translatable="True"/>
       </properties>
     </HdyExpanderRow>
+
+    <HdyHeaderBar>
+      <properties>
+        <property id="subtitle" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </HdyHeaderBar>
+
+    <HdyPreferencesGroup>
+      <properties>
+        <property id="description" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </HdyPreferencesGroup>
 
     <HdyPreferencesPage>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="title" translatable="True"/>
       </properties>
     </HdyPreferencesPage>
+
+    <HdyPreferencesRow>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </HdyPreferencesRow>
 
     <HdyStatusPage>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="description" translatable="True"/>
+        <property id="title" translatable="True"/>
       </properties>
     </HdyStatusPage>
+
+    <HdyTabPage>
+      <properties>
+        <property id="title" translatable="True"/>
+        <property id="tooltip" translatable="True"/>
+      </properties>
+    </HdyTabPage>
+
+    <HdyViewSwitcherTitle>
+      <properties>
+        <property id="subtitle" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </HdyViewSwitcherTitle>
 
   </types>
 </meta>
