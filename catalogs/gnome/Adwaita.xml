@@ -18,6 +18,7 @@
     <AdwActionRow>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="subtitle" translatable="True"/>
       </properties>
     </AdwActionRow>
 
@@ -30,38 +31,101 @@
     <AdwButtonContent>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="label" translatable="True"/>
       </properties>
     </AdwButtonContent>
 
     <AdwExpanderRow>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="subtitle" translatable="True"/>
       </properties>
     </AdwExpanderRow>
+
+    <AdwLeafletPage>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </AdwLeafletPage>
+
+    <AdwSqueezerPage>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+      </properties>
+    </AdwSqueezerPage>
 
     <AdwPreferencesPage>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="title" translatable="True"/>
       </properties>
     </AdwPreferencesPage>
+
+    <AdwPreferencesRow>
+      <properties>
+        <property id="title" translatable="True"/>
+      </properties>
+    </AdwPreferencesRow>
 
     <AdwSplitButton>
       <properties>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="label" translatable="True"/>
       </properties>
     </AdwSplitButton>
 
     <AdwStatusPage>
       <properties>
+        <property id="child" is-inline-object="True"/>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="description" translatable="True"/>
+        <property id="title" translatable="True"/>
       </properties>
     </AdwStatusPage>
 
     <AdwViewStackPage>
       <properties>
+        <property id="child" is-inline-object="True"/>
         <property id="icon-name" type="CmbIconName"/>
+        <property id="title" translatable="True"/>
       </properties>
     </AdwViewStackPage>
+
+    <AdwPreferencesGroup>
+      <properties>
+        <property id="description" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </AdwPreferencesGroup>
+
+    <AdwTabPage>
+      <properties>
+        <property id="child" is-inline-object="True"/>
+        <property id="title" translatable="True"/>
+        <property id="tooltip" translatable="True"/>
+      </properties>
+    </AdwTabPage>
+
+    <AdwToast>
+      <properties>
+        <property id="button-label" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </AdwToast>
+
+    <AdwViewSwitcherTitle>
+      <properties>
+        <property id="subtitle" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </AdwViewSwitcherTitle>
+
+    <AdwViewSwitcherTitle>
+      <properties>
+        <property id="subtitle" translatable="True"/>
+        <property id="title" translatable="True"/>
+      </properties>
+    </AdwViewSwitcherTitle>
 
   </types>
 </meta>
