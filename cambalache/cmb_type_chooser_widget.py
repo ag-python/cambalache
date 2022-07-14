@@ -50,13 +50,35 @@ class CmbTypeChooserWidget(Gtk.Box):
     treeview = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
+        self.__project = None
+        self.__model = None
         self._search_text = ''
         self._filter = None
 
         super().__init__(**kwargs)
 
-        self.connect('notify::project', self.__on_project_notify)
         self.connect('map', self.__on_map)
+
+    def __type_info_should_append(self, info):
+        retval = False
+
+        if not info.instantiable or info.layout not in [None, 'container']:
+            return False
+
+        if self.parent_type_id != '':
+            retval = self.project._check_can_add(info.type_id, self.parent_type_id)
+        else:
+            retval = info.category is None if self.uncategorized_only else \
+                     (self.category != '' and info.category == self.category) or  self.category == ''
+
+        if retval and self.derived_type_id != '':
+            retval = info.is_a(self.derived_type_id)
+
+        return retval
+
+    def __store_append_info(self, store, info):
+        if store:
+            store.append([info.type_id, info.type_id.lower(), info, True])
 
     def __model_from_project(self, project):
         if project is None:
@@ -83,10 +105,7 @@ class CmbTypeChooserWidget(Gtk.Box):
         infos = []
 
         for key in project.type_info:
-            i = project.type_info[key]
-
-            if i.instantiable and i.layout in [None, 'container']:
-                infos.append(i)
+            infos.append(project.type_info[key])
 
         infos = sorted(infos, key=lambda i: (order.get(i.category, 99), i.type_id))
         show_categories = self.show_categories
@@ -99,28 +118,36 @@ class CmbTypeChooserWidget(Gtk.Box):
                 category = categories.get(i.category, _('Others'))
                 store.append([f'<i>▾ {category}</i>', '', None, False])
 
-            if self.parent_type_id != '':
-                append = self.project._check_can_add(i.type_id, self.parent_type_id)
-            else:
-                append = i.category is None if self.uncategorized_only else \
-                         (self.category != '' and i.category == self.category) or  self.category == ''
-
-            if append and self.derived_type_id != '':
-                append = i.is_a(self.derived_type_id)
-
-            if append:
-                store.append([i.type_id, i.type_id.lower(), i, True])
+            if self.__type_info_should_append(i):
+                self.__store_append_info(store, i)
 
         return store
 
-    def __on_project_notify(self, object, pspec):
-        model = self.__model_from_project(self.project)
-        self._filter = Gtk.TreeModelFilter(child_model=model) if model else None
+    @GObject.Property(type=GObject.GObject)
+    def project(self):
+        return self.__project
+
+    @project.setter
+    def _set_project(self, project):
+        if self.__project is not None:
+            self.__project.disconnect_by_func(self.__on_type_info_added)
+            self.__project.disconnect_by_func(self.__on_type_info_removed)
+            self.__project.disconnect_by_func(self.__on_type_info_changed)
+
+        self.__project = project
+
+        self.__model = self.__model_from_project(project)
+        self._filter = Gtk.TreeModelFilter(child_model=self.__model) if self.__model else None
         if self._filter:
             self._filter.set_visible_func(self.__visible_func)
 
-        self.entrycompletion.props.model = model
+        self.entrycompletion.props.model = self.__model
         self.treeview.props.model = self._filter
+
+        if project is not None:
+            project.connect('type-info-added', self.__on_type_info_added)
+            project.connect('type-info-removed', self.__on_type_info_removed)
+            project.connect('type-info-changed', self.__on_type_info_changed)
 
     @Gtk.Template.Callback('on_searchentry_activate')
     def __on_searchentry_activate(self, entry):
@@ -163,6 +190,42 @@ class CmbTypeChooserWidget(Gtk.Box):
             self.scrolledwindow.set_max_content_height(height)
         return False
 
+    def __on_type_info_added(self, project, info):
+        if self.__model is None:
+            return
+
+        # Append new type info
+        # TODO: insert in order
+        if self.__type_info_should_append(info):
+            self.__store_append_info(self.__model, info)
+
+    def __on_type_info_removed(self, project, info):
+        if self.__model is None:
+            return
+
+        # Find info and remove it from model
+        for row in self.__model:
+            if info == row[2]:
+                self.__model.remove(row.iter)
+
+    def __on_type_info_changed(self, project, info):
+        if self.__model is None:
+            return
+
+        info_row = None
+
+        # Find info and update it from model
+        for row in self.__model:
+            if info == row[2]:
+                info_row = row
+                break
+
+        if info_row is None:
+            return
+
+        # Update Type Name
+        info_row[0] = info.type_id
+        info_row[1] = info.type_id.lower()
 
 Gtk.WidgetClass.set_css_name(CmbTypeChooserWidget, 'CmbTypeChooserWidget')
 
