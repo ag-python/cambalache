@@ -400,9 +400,10 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">False</property>
+                            <property name="tooltip-text" translatable="yes">Old stable version</property>
                             <property name="halign">center</property>
-                            <property name="active">True</property>
                             <property name="draw-indicator">False</property>
+                            <property name="group">np_gtk4_radiobutton</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -448,9 +449,10 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">False</property>
+                            <property name="tooltip-text" translatable="yes">Recommended for new projects</property>
                             <property name="halign">center</property>
+                            <property name="active">True</property>
                             <property name="draw-indicator">False</property>
-                            <property name="group">np_gtk3_radiobutton</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
