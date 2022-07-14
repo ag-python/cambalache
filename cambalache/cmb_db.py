@@ -72,6 +72,8 @@ class CmbDB(GObject.GObject):
 
         self.type_info = None
 
+        self.__db_filename = None
+
         self.__tables = [
             'ui',
             'ui_library',
@@ -90,10 +92,7 @@ class CmbDB(GObject.GObject):
         self.clipboard = []
         self.clipboard_ids = []
 
-        self.conn = sqlite3.connect(':memory:')
-
-        self.conn.create_function('VERSION_CMP', 2, sqlite_version_cmp)
-        self.conn.create_aggregate('MAX_VERSION', 1, MaxVersion)
+        self.conn = self.__sqlite_connect(':memory:')
 
         super().__init__(**kwargs)
 
@@ -131,6 +130,15 @@ class CmbDB(GObject.GObject):
         fk = 'ON' if value else 'OFF'
         self.conn.commit()
         self.conn.execute(f"PRAGMA foreign_keys={fk};")
+
+    def __sqlite_connect(self, path):
+        conn = sqlite3.connect(path)
+
+        conn.create_function('VERSION_CMP', 2, sqlite_version_cmp)
+        conn.create_aggregate('MAX_VERSION', 1, MaxVersion)
+        conn.create_function('CMB_PRINT', 1, cmb_print)
+
+        return conn
 
     def __create_support_table(self, c, table):
         _table = table.replace('_', '-')
@@ -557,14 +565,26 @@ class CmbDB(GObject.GObject):
 
         c.close()
 
-    def backup(self, filename):
+    def move_to_fs(self, filename):
         self.conn.commit()
-        bck = sqlite3.connect(filename)
 
-        with bck:
-            self.conn.backup(bck)
+        if self.__db_filename == filename:
+            return
 
-        bck.close()
+        # Open new location
+        conn = self.__sqlite_connect(filename)
+
+        self.__db_filename = filename
+
+        # Dump to file
+        with conn:
+            self.conn.backup(conn)
+
+        # Close current connection
+        self.conn.close()
+
+        # Update current connection
+        self.conn = conn
 
     def cursor(self):
         return self.conn.cursor()
@@ -1126,7 +1146,12 @@ class CmbDB(GObject.GObject):
         if comment:
             node.addprevious(etree.Comment(comment))
 
-    def __export_object(self, ui_id, object_id, merengue=False, template_id=None):
+    def __export_object(self,
+                        ui_id,
+                        object_id,
+                        merengue=False,
+                        template_id=None,
+                        ignore_id=False):
 
         def node_set(node, attr, val):
             if val is not None:
@@ -1140,20 +1165,48 @@ class CmbDB(GObject.GObject):
 
         info = self.type_info.get(type_id, None)
 
-        if not merengue and template_id == object_id:
-            obj = E.template()
-            node_set(obj, 'class', name)
-            node_set(obj, 'parent', type_id)
-        else:
-            obj = E.object()
+        # Check if this is a custom template object
+        # For custom templates we simply export the template object instead
+        # this way we do not really need to instantiate a real type with a
+        # template
+        if info.library_id is None and info.parent_id is not None:
+            # Keep real merengue id
+            name = f'__cmb__{ui_id}.{object_id}'
 
-            if merengue:
-                workspace_type = info.workspace_type
-                node_set(obj, 'class', workspace_type if workspace_type else type_id)
-                node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
-            else:
-                node_set(obj, 'class', type_id)
+            # Get ui_id and object_id from template object
+            c.execute('SELECT u.ui_id, u.template_id, o.type_id FROM ui AS u, object AS o WHERE u.template_id IS NOT NULL AND u.ui_id=o.ui_id AND u.template_id=o.object_id AND o.name=?;',
+                      (type_id, ))
+            ui_id, object_id, type_id = c.fetchone()
+
+            # Use template info and object_id from now on
+            info = self.type_info.get(type_id, None)
+
+            # From now own all output should be production since there is nothing
+            # to edit in a template instance
+            merengue = False
+
+            obj = E.object()
+            node_set(obj, 'class', type_id)
+
+            if not ignore_id:
                 node_set(obj, 'id', name)
+
+            ignore_id = True
+        else:
+            if not merengue and template_id == object_id:
+                obj = E.template()
+                node_set(obj, 'class', name)
+                node_set(obj, 'parent', type_id)
+            else:
+                obj = E.object()
+
+                if merengue:
+                    workspace_type = info.workspace_type
+                    node_set(obj, 'class', workspace_type if workspace_type else type_id)
+                    node_set(obj, 'id', f'__cmb__{ui_id}.{object_id}')
+                else:
+                    node_set(obj, 'class', type_id)
+                    node_set(obj, 'id', name)
 
         # Create class hierarchy list
         hierarchy = [type_id] + info.hierarchy if info else [type_id]
@@ -1182,12 +1235,20 @@ class CmbDB(GObject.GObject):
             val, property_id, inline_object_id, comment, translatable, translation_context, translation_comments, is_object, is_inline_object = row
 
             if is_object:
+                # Ignore references to object in template mode since the object
+                # could not exists in this UI
+                if ignore_id:
+                    continue
+
                 # Ignore object properties with 0/null ID
                 if val is not None and int(val) == 0:
                     continue
 
                 if inline_object_id and is_inline_object:
-                    value = self.__export_object(ui_id, inline_object_id, merengue=merengue)
+                    value = self.__export_object(ui_id,
+                                                 inline_object_id,
+                                                 merengue=merengue,
+                                                 ignore_id=ignore_id)
                 else:
                     if merengue:
                         value = f'__cmb__{ui_id}.{val}'
@@ -1256,7 +1317,10 @@ class CmbDB(GObject.GObject):
 
                 child_position += 1
 
-            child_obj = self.__export_object(ui_id, child_id, merengue=merengue)
+            child_obj = self.__export_object(ui_id,
+                                             child_id,
+                                             merengue=merengue,
+                                             ignore_id=ignore_id)
             child = E.child(child_obj)
             node_set(child, 'internal-child', internal)
             node_set(child, 'type', ctype)
@@ -1540,3 +1604,6 @@ class MaxVersion:
 
     def finalize(self):
         return self.max_ver_str
+
+def cmb_print(msg):
+    print(msg, file=sys.stderr)
