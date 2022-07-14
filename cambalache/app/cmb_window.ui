@@ -217,31 +217,6 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
             <property name="position">12</property>
           </packing>
         </child>
-        <child>
-          <object class="GtkSeparator">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">13</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkModelButton">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="action-name">app.quit</property>
-            <property name="text" translatable="yes">Quit</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">14</property>
-          </packing>
-        </child>
       </object>
       <packing>
         <property name="submenu">main</property>
@@ -856,7 +831,6 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                       </packing>
                     </child>
                     <child>
-                      <!-- n-columns=2 n-rows=7 -->
                       <object class="CmbCSSEditor" id="css_editor">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
