@@ -34,6 +34,8 @@ class CmbUI(CmbBaseUI):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.connect('notify', self.__on_notify)
+
     @GObject.Property(type=int)
     def template_id(self):
         retval = self.db_get('SELECT template_id FROM ui WHERE (ui_id) IS (?);',
@@ -44,6 +46,9 @@ class CmbUI(CmbBaseUI):
     def _set_template_id(self, value):
         self.db_set('UPDATE ui SET template_id=? WHERE (ui_id) IS (?);',
                     (self.ui_id, ), value if value != 0 else None)
+
+    def __on_notify(self, obj, pspec):
+        self.project._ui_changed(self, pspec.name)
 
     def get_library(self, library_id):
         c = self.project.db.execute("SELECT version FROM ui_library WHERE ui_id=? AND library_id=?;",
@@ -76,3 +81,4 @@ class CmbUI(CmbBaseUI):
 
     def get_display_name(self):
         return self.filename if self.filename else _('Unnamed {ui_id}').format(ui_id=self.ui_id)
+
