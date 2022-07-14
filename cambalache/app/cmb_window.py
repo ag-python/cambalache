@@ -613,6 +613,7 @@ class CmbWindow(Gtk.ApplicationWindow):
                 ui = self.project.add_ui(uiname)
                 self.project.set_selection([ui])
 
+            self.__last_saved_index = self.project.history_index
             self.__set_page('workspace')
             self.__update_actions()
         except Exception as e:
@@ -845,7 +846,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
     def _on_debug_activate(self, action, data):
         filename = self.project.filename + '.db'
-        self.project.db_backup(filename)
+        self.project.db_move_to_fs(filename)
         Gtk.show_uri_on_window(self, f'file://{filename}', Gdk.CURRENT_TIME)
 
     def _on_about_activate(self, action, data):
