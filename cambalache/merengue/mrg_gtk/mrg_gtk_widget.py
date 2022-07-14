@@ -69,6 +69,9 @@ class MrgGtkWidget(MrgController):
 
         if self.object is None:
             window_remove_child(self.window)
+
+            if self.window:
+                self.window.hide()
             return
 
         if not self.toplevel or issubclass(type(self.object), Gtk.Window):
