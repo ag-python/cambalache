@@ -56,6 +56,7 @@ class CmbApplication(Gtk.Application):
     def __add_window(self):
         window = CmbWindow(application=self)
         window.connect('open-project', self.__on_open_project)
+        window.connect('delete-event', self.__on_window_delete_event)
         self.add_window(window)
         return window
 
@@ -119,8 +120,95 @@ class CmbApplication(Gtk.Application):
         else:
             self.open(filename, target_tk, uiname)
 
+    def __check_can_quit(self, windows):
+        unsaved_windows = []
+        projects2save = []
+
+        # Gather projects that needs saving
+        for win in windows:
+            if win.project is None:
+                continue
+
+            if win.actions['save'].get_enabled():
+                unsaved_windows.append(win)
+
+        unsaved_windows_len = len(unsaved_windows)
+        if unsaved_windows_len == 0:
+            return True
+
+        # Create Dialog
+        text = _('Save changes before closing?')
+        dialog = Gtk.MessageDialog(
+            transient_for=windows[0],
+            flags=0,
+            message_type=Gtk.MessageType.QUESTION,
+            text=f'<b><big>{text}</big></b>',
+            use_markup=True
+        )
+
+        # Add buttons
+        dialog.add_buttons(_('Close without Saving'), Gtk.ResponseType.CLOSE,
+                           _('Cancel'), Gtk.ResponseType.CANCEL,
+                           _('Save'), Gtk.ResponseType.ACCEPT)
+
+        dialog.set_default_response(Gtk.ResponseType.ACCEPT)
+
+        if unsaved_windows_len > 1:
+            # Add checkbox for each unsaved project
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            box.add(Gtk.Label(label=_('Select which files:'),
+                              halign=Gtk.Align.START))
+
+            for win in unsaved_windows:
+                path = win.project.filename.replace(GLib.get_home_dir(), '~')
+                check = Gtk.CheckButton(label=path,
+                                        active=True,
+                                        margin_start=8,
+                                        can_focus=False)
+                projects2save.append((win.project, check))
+                box.add(check)
+
+            box.show_all()
+            dialog.props.message_area.add(box)
+
+        # Run Dialog
+        response = dialog.run()
+        dialog.destroy()
+
+        # Handle response
+        if response == Gtk.ResponseType.ACCEPT:
+            if unsaved_windows_len > 1:
+                for project, check in projects2save:
+                    if check is None or check.props.active:
+                        project.save()
+            elif unsaved_windows_len:
+                unsaved_windows[0].project.save()
+        elif response == Gtk.ResponseType.CANCEL:
+            return False
+
+        return True
+
+    def __get_windows(self):
+        retval = []
+
+        for win in self.get_windows():
+            if win.props.application is not None:
+                retval.append(win)
+
+        return retval
+
+    def __on_window_delete_event(self, window, event):
+        return not self.__check_can_quit([window])
+
+    def do_window_removed(self, window):
+        windows = self.__get_windows()
+
+        if len(windows) == 0:
+            self.activate_action('quit')
+
     def _on_quit_activate(self, action, data):
-        self.quit()
+        if self.__check_can_quit(self.__get_windows()):
+            self.quit()
 
     def do_handle_local_options(self, options):
         if options.contains('version'):
