@@ -48,25 +48,13 @@ class CmbObjectEditor(Gtk.Box):
         self.props.orientation = Gtk.Orientation.VERTICAL
 
     def __create_id_editor(self):
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
-                      spacing=6)
+        grid = Gtk.Grid(hexpand=True,
+                        row_spacing=4,
+                        column_spacing=4)
 
         # Label
-        self.__id_label = Gtk.Label(label=_('Object Id'), width_chars=8)
-
-        # Template check
-        if self.__object and not self.__object.parent_id:
-            is_template = self.__object.object_id == self.__object.ui.template_id
-
-            check = Gtk.CheckButton(active=is_template,
-                                    tooltip_text=_('Switch between object and template'))
-            check.connect('toggled', self.__on_template_check_toggled)
-            self.__update_template_label()
-
-            check.add(self.__id_label)
-            box.add(check)
-        else:
-            box.add(self.__id_label)
+        self.__id_label = Gtk.Label(label=_('Object Id'),
+                                    halign=Gtk.Align.START)
 
         # Id/Class entry
         entry = CmbEntry()
@@ -74,15 +62,36 @@ class CmbObjectEditor(Gtk.Box):
                                      entry, 'cmb-value',
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.BIDIRECTIONAL)
-        box.pack_start(entry, True, True, 0)
-        return box
+
+        grid.attach(self.__id_label, 0, 0, 1, 1)
+        grid.attach(entry, 1, 0, 1, 1)
+
+        # Template check
+        if self.__object and not self.__object.parent_id:
+            is_template = self.__object.object_id == self.__object.ui.template_id
+            tooltip_text=_('Switch between object and template')
+
+            label = Gtk.Label(label=_('Template'),
+                              halign=Gtk.Align.START,
+                              tooltip_text=tooltip_text)
+            switch = Gtk.Switch(active=is_template,
+                                halign=Gtk.Align.START,
+                                tooltip_text=tooltip_text)
+
+            switch.connect('notify::active', self.__on_template_switch_notify)
+            self.__update_template_label()
+
+            grid.attach(label, 0, 1, 1, 1)
+            grid.attach(switch, 1, 1, 1, 1)
+
+        return grid
 
     def __update_template_label(self):
         istmpl = self.__object.ui.template_id == self.__object.object_id
-        self.__id_label.props.label = _('Template') if istmpl else _('Object Id')
+        self.__id_label.props.label = _('Type Name') if istmpl else _('Object Id')
 
-    def __on_template_check_toggled(self, button):
-        self.__object.ui.template_id = self.__object.object_id if button.props.active else 0
+    def __on_template_switch_notify(self, switch, pspec):
+        self.__object.ui.template_id = self.__object.object_id if switch.props.active else 0
         self.__update_template_label()
 
     def __on_expander_expanded(self, expander, pspec, revealer):
