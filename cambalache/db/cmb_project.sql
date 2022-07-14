@@ -35,7 +35,7 @@ CREATE TABLE global (
  */
 CREATE TABLE ui (
   ui_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  template_id INTEGER,
+  template_id INTEGER DEFAULT NULL,
 
   name TEXT,
   filename TEXT UNIQUE,
@@ -45,8 +45,29 @@ CREATE TABLE ui (
   license_id TEXT,
   translation_domain TEXT,
   comment TEXT,
-  FOREIGN KEY(ui_id, template_id) REFERENCES object(ui_id, object_id) ON DELETE SET NULL
+  FOREIGN KEY(ui_id, template_id) REFERENCES object(ui_id, object_id)
 );
+
+/* Remove old template type on update */
+CREATE TRIGGER on_ui_template_id_update_remove_type AFTER UPDATE OF template_id ON ui
+WHEN
+  OLD.template_id IS NOT NULL AND
+  (SELECT name FROM object WHERE ui_id=OLD.ui_id AND object_id=OLD.template_id) IS NOT NULL
+BEGIN
+  DELETE FROM type WHERE library_id IS NULL AND type_id=(SELECT name FROM object
+      WHERE ui_id=OLD.ui_id AND object_id=OLD.template_id);
+END;
+
+/* Add new template type on update */
+CREATE TRIGGER on_ui_template_id_update_add_type AFTER UPDATE OF template_id ON ui
+WHEN
+  NEW.template_id IS NOT NULL AND
+  (SELECT name FROM object WHERE ui_id=NEW.ui_id AND object_id=NEW.template_id) IS NOT NULL
+BEGIN
+  INSERT INTO type (type_id, parent_id)
+    SELECT name, type_id FROM object
+      WHERE ui_id=NEW.ui_id AND object_id=NEW.template_id;
+END;
 
 
 /* UI library version target
@@ -91,7 +112,7 @@ CREATE TABLE object (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
 
-  type_id TEXT NOT NULL REFERENCES type,
+  type_id TEXT NOT NULL REFERENCES type ON UPDATE CASCADE,
   name TEXT,
   parent_id INTEGER,
   internal TEXT,
@@ -105,6 +126,54 @@ CREATE TABLE object (
 CREATE INDEX object_type_id_fk ON object (type_id);
 CREATE INDEX object_parent_id_fk ON object (ui_id, parent_id);
 
+/* Update template name:
+ * References to type will be automatically updated because of ON UPDATE CASCADE
+ */
+CREATE TRIGGER on_object_name_update_add_type AFTER UPDATE OF name ON object
+WHEN
+  OLD.name IS NULL AND
+  NEW.name IS NOT NULL AND
+  NEW.object_id IS (SELECT template_id FROM ui WHERE ui_id=NEW.ui_id)
+BEGIN
+  INSERT INTO type(type_id, parent_id) VALUES (NEW.name, NEW.type_id);
+END;
+
+CREATE TRIGGER on_object_name_update_rename_type AFTER UPDATE OF name ON object
+WHEN
+  OLD.name IS NOT NULL AND
+  NEW.name IS NOT NULL AND
+  OLD.name IS NOT NEW.name AND
+  NEW.object_id IS (SELECT template_id FROM ui WHERE ui_id=NEW.ui_id)
+BEGIN
+  UPDATE type SET type_id=NEW.name WHERE library_id IS NULL AND type_id=OLD.name;
+END;
+
+CREATE TRIGGER on_object_name_update_remove_type AFTER UPDATE OF name ON object
+WHEN
+  OLD.name IS NOT NULL AND
+  NEW.name IS NULL AND
+  NEW.object_id IS (SELECT template_id FROM ui WHERE ui_id=NEW.ui_id)
+BEGIN
+  DELETE FROM type WHERE library_id IS NULL AND type_id=OLD.name;
+END;
+
+CREATE TRIGGER on_object_insert_add_type AFTER INSERT ON object
+WHEN
+  NEW.name IS NOT NULL AND
+  NEW.object_id IS (SELECT template_id FROM ui WHERE ui_id=NEW.ui_id)
+BEGIN
+  INSERT INTO type(type_id, parent_id) VALUES (NEW.name, NEW.type_id);
+END;
+
+CREATE TRIGGER on_object_delete_remove_type AFTER DELETE ON object
+WHEN
+  OLD.name IS NOT NULL AND
+  OLD.object_id IS (SELECT template_id FROM ui WHERE ui_id=OLD.ui_id)
+BEGIN
+  DELETE FROM type WHERE library_id IS NULL AND type_id=OLD.name;
+  UPDATE ui SET template_id=NULL WHERE ui_id=OLD.ui_id AND template_id=OLD.object_id;
+END;
+
 
 /* Object Property
  *
@@ -113,7 +182,7 @@ CREATE INDEX object_parent_id_fk ON object (ui_id, parent_id);
 CREATE TABLE object_property (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   property_id TEXT,
 
   value TEXT,
@@ -140,7 +209,7 @@ CREATE TABLE object_layout_property (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
   child_id INTEGER,
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   property_id TEXT,
 
   value TEXT,
@@ -165,7 +234,7 @@ CREATE TABLE object_signal (
   signal_pk INTEGER PRIMARY KEY AUTOINCREMENT,
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   signal_id TEXT,
 
   handler TEXT NOT NULL,
@@ -190,7 +259,7 @@ CREATE INDEX object_signal_signal_fk ON object_signal (owner_id, signal_id);
 CREATE TABLE object_data (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   data_id INTEGER,
   id INTEGER,
   value TEXT,
@@ -208,7 +277,7 @@ CREATE TABLE object_data (
 CREATE TABLE object_data_arg (
   ui_id INTEGER REFERENCES ui ON DELETE CASCADE,
   object_id INTEGER,
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   data_id INTEGER,
   id INTEGER,
   key TEXT,
