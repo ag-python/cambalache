@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS library_version (
 CREATE TABLE IF NOT EXISTS type (
   type_id TEXT PRIMARY KEY,
 
-  parent_id TEXT REFERENCES type,
+  parent_id TEXT REFERENCES type ON UPDATE CASCADE,
   library_id TEXT REFERENCES library,
   version TEXT,
   deprecated_version TEXT,
@@ -92,8 +92,8 @@ INSERT INTO type (type_id) VALUES
  * Keep a list of interfaces implemented by type
  */
 CREATE TABLE IF NOT EXISTS type_iface (
-  type_id TEXT,
-  iface_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
+  iface_id TEXT REFERENCES type ON UPDATE CASCADE,
   PRIMARY KEY(type_id, iface_id)
 ) WITHOUT ROWID;
 
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS type_iface (
  *
  */
 CREATE TABLE IF NOT EXISTS type_enum (
-  type_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
   name TEXT,
   nick TEXT,
   value INTEGER,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS type_enum (
  *
  */
 CREATE TABLE IF NOT EXISTS type_flags (
-  type_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
   name TEXT,
   nick TEXT,
   value INTEGER,
@@ -131,11 +131,11 @@ CREATE TABLE IF NOT EXISTS type_flags (
  * of the editor to create a valid structure.
  */
 CREATE TABLE IF NOT EXISTS type_data (
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   data_id INTEGER,
   parent_id INTEGER,
   key TEXT NOT NULL,
-  type_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
   PRIMARY KEY(owner_id, data_id),
   FOREIGN KEY(owner_id, parent_id) REFERENCES type_data(owner_id, data_id)
 ) WITHOUT ROWID;
@@ -145,10 +145,10 @@ CREATE TABLE IF NOT EXISTS type_data (
  *
  */
 CREATE TABLE IF NOT EXISTS type_data_arg (
-  owner_id TEXT,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   data_id INTEGER,
   key TEXT NOT NULL,
-  type_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
   PRIMARY KEY(owner_id, data_id, key),
   FOREIGN KEY(owner_id, data_id) REFERENCES type_data(owner_id, data_id)
 ) WITHOUT ROWID;
@@ -182,10 +182,10 @@ ORDER BY type_id,generation;
  *
  */
 CREATE TABLE IF NOT EXISTS property (
-  owner_id TEXT REFERENCES type,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   property_id TEXT NOT NULL,
 
-  type_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
   is_object BOOLEAN,
   construct_only BOOLEAN,
   save_always BOOLEAN,
@@ -217,7 +217,7 @@ END;
  *
  */
 CREATE TABLE IF NOT EXISTS signal (
-  owner_id TEXT REFERENCES type,
+  owner_id TEXT REFERENCES type ON UPDATE CASCADE,
   signal_id TEXT NOT NULL,
 
   version TEXT,
@@ -241,7 +241,7 @@ END;
  *
  */
 CREATE TABLE IF NOT EXISTS type_child_type (
-  type_id TEXT REFERENCES type,
+  type_id TEXT REFERENCES type ON UPDATE CASCADE,
   child_type TEXT,
   max_children INTEGER,
   linked_property_id TEXT,
