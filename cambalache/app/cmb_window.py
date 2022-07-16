@@ -76,6 +76,8 @@ class CmbWindow(Gtk.ApplicationWindow):
     preview_button = Gtk.Template.Child()
     editor_stack = Gtk.Template.Child()
     ui_editor = Gtk.Template.Child()
+    ui_fragment_editor = Gtk.Template.Child()
+    fragment_editor = Gtk.Template.Child()
     object_editor = Gtk.Template.Child()
     object_layout_editor = Gtk.Template.Child()
     signal_editor = Gtk.Template.Child()
@@ -223,9 +225,11 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         # Clear Editors
         self.ui_editor.object = None
+        self.ui_fragment_editor.object = None
         self.object_editor.object = None
         self.object_layout_editor.object = None
         self.signal_editor.object = None
+        self.fragment_editor.object = None
 
         if project is not None:
             self.__on_project_filename_notify(None, None)
@@ -431,6 +435,7 @@ class CmbWindow(Gtk.ApplicationWindow):
 
         if type(obj) == CmbUI:
             self.ui_editor.object = obj
+            self.ui_fragment_editor.object = obj
             self.editor_stack.set_visible_child_name('ui')
             obj = None
         elif type(obj) == CmbObject:
@@ -445,6 +450,8 @@ class CmbWindow(Gtk.ApplicationWindow):
         self.object_editor.object = obj
         self.object_layout_editor.object = obj
         self.signal_editor.object = obj
+        self.fragment_editor.object = obj
+
         self.__update_action_add_object()
 
     def __update_action_intro(self):

@@ -701,6 +701,9 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                             <property name="halign">center</property>
                             <property name="border-width">4</property>
                             <property name="stack">property_stack</property>
+                            <style>
+                              <class name="compact"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -783,24 +786,31 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                               <object class="CmbSignalEditor" id="signal_editor">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-left">4</property>
-                                <property name="margin-right">4</property>
                                 <property name="margin-start">4</property>
                                 <property name="margin-end">4</property>
                                 <property name="margin-bottom">4</property>
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">4</property>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                               </object>
                               <packing>
                                 <property name="name">signals</property>
                                 <property name="title" translatable="yes">Signals</property>
                                 <property name="position">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="CmbFragmentEditor" id="fragment_editor">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="margin-start">4</property>
+                                <property name="margin-end">4</property>
+                                <property name="margin-bottom">4</property>
+                                <property name="orientation">vertical</property>
+                              </object>
+                              <packing>
+                                <property name="name">fragment</property>
+                                <property name="title" translatable="yes">&lt;/&gt;</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                           </object>
@@ -817,14 +827,65 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                       </packing>
                     </child>
                     <child>
-                      <!-- n-columns=2 n-rows=7 -->
-                      <object class="CmbUIEditor" id="ui_editor">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="hexpand">True</property>
-                        <property name="vexpand">True</property>
                         <property name="border-width">4</property>
-                        <signal name="remove-ui" handler="on_ui_editor_remove_ui" swapped="no"/>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">4</property>
+                        <child>
+                          <object class="GtkStackSwitcher">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">center</property>
+                            <property name="stack">ui_stack</property>
+                            <style>
+                              <class name="compact"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkStack" id="ui_stack">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <!-- n-columns=2 n-rows=7 -->
+                              <object class="CmbUIEditor" id="ui_editor">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <signal name="remove-ui" handler="on_ui_editor_remove_ui" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="name">properties</property>
+                                <property name="title" translatable="yes">Properties</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="CmbFragmentEditor" id="ui_fragment_editor">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="orientation">vertical</property>
+                              </object>
+                              <packing>
+                                <property name="name">fragment</property>
+                                <property name="title" translatable="yes">&lt;/&gt;</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="name">ui</property>
@@ -833,6 +894,7 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                       </packing>
                     </child>
                     <child>
+                      <!-- n-columns=3 n-rows=6 -->
                       <object class="CmbCSSEditor" id="css_editor">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
@@ -840,6 +902,24 @@ Author: Juan Pablo Ugarte <juanpablougarte@gmail.com>
                         <property name="vexpand">True</property>
                         <property name="border-width">4</property>
                         <signal name="remove-css" handler="on_css_editor_remove_ui" swapped="no"/>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                       </object>
                       <packing>
                         <property name="name">css</property>

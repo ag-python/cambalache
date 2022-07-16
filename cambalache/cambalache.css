@@ -30,6 +30,10 @@ CmbObjectEditor label.modified {
   font-style: italic;
 }
 
+CmbWindow stackswitcher.compact > button {
+  min-width: unset;
+}
+
 popover.cmb-icon-chooser iconview:not(:selected) {
   background-color: unset;
 }
