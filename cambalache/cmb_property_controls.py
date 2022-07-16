@@ -795,6 +795,24 @@ class CmbSourceView(GtkSource.View):
 
         self.buffer = GtkSource.Buffer()
         self.props.buffer = self.buffer
-        self.buffer.set_language(self.manager.get_language('css'))
+        self.buffer.connect('changed', self.__on_buffer_changed)
 
+    @GObject.Property(type=str)
+    def lang(self):
+        return self.buffer.get_language()
 
+    @lang.setter
+    def _set_lang(self, value):
+        lang = self.manager.get_language(value)
+        self.buffer.set_language(lang)
+
+    @GObject.Property(type=str)
+    def text(self):
+        return self.buffer.props.text
+
+    @text.setter
+    def _set_text(self, value):
+        self.buffer.set_text(value if value else '')
+
+    def __on_buffer_changed(self, buffer):
+        self.notify('text')
