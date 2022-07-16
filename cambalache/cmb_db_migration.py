@@ -78,3 +78,10 @@ def migrate_table_data_to_0_9_0(c, table, data):
                             AND is_object)
                     IS NOT NULL;
         ''')
+
+def ensure_columns_for_0_11_2(table, data):
+    if table in ['object', 'ui']:
+        # Append custom_text column
+        return [row + (None, ) for row in data]
+
+    return data

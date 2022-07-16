@@ -447,7 +447,7 @@ class CmbProject(Gtk.TreeStore):
 
         return (basename, relpath)
 
-    def __add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
+    def __add_ui(self, emit, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment, custom_fragment):
         ui = CmbUI(project=self, ui_id=ui_id)
 
         self.__object_id[ui_id] = self.append(None, [ui])
@@ -470,7 +470,7 @@ class CmbProject(Gtk.TreeStore):
         except:
             return None
         else:
-            return self.__add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None, None)
+            return self.__add_ui(True, ui_id, None, basename, relpath, None, None, None, None, None, None, None)
 
     def __remove_ui(self, ui):
         iter_ = self.__object_id.pop(ui.ui_id, None)
@@ -551,7 +551,7 @@ class CmbProject(Gtk.TreeStore):
 
         return retval
 
-    def __add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=0):
+    def __add_object(self, emit, ui_id, object_id, obj_type, name=None, parent_id=None, internal_child=None, child_type=None, comment=None, position=0, custom_fragment=None):
         obj = CmbObject(project=self,
                         ui_id=ui_id,
                         object_id=object_id,

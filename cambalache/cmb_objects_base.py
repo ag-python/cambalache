@@ -216,7 +216,7 @@ class CmbBaseUI(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment):
+    def from_row(cls, project, ui_id, template_id, name, filename, description, copyright, authors, license_id, translation_domain, comment, custom_fragment):
         return cls(project=project,
                    ui_id=ui_id)
 
@@ -308,6 +308,16 @@ class CmbBaseUI(CmbBase):
     @comment.setter
     def _set_comment(self, value):
         self.db_set('UPDATE ui SET comment=? WHERE (ui_id) IS (?);',
+                    (self.ui_id, ), value)
+
+    @GObject.Property(type=str)
+    def custom_fragment(self):
+        return self.db_get('SELECT custom_fragment FROM ui WHERE (ui_id) IS (?);',
+                           (self.ui_id, ))
+
+    @custom_fragment.setter
+    def _set_custom_fragment(self, value):
+        self.db_set('UPDATE ui SET custom_fragment=? WHERE (ui_id) IS (?);',
                     (self.ui_id, ), value)
 
 
@@ -631,7 +641,7 @@ class CmbBaseObject(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, internal, type, comment, position):
+    def from_row(cls, project, ui_id, object_id, type_id, name, parent_id, internal, type, comment, position, custom_fragment):
         return cls(project=project,
                    ui_id=ui_id,
                    object_id=object_id)
@@ -704,6 +714,16 @@ class CmbBaseObject(CmbBase):
     @position.setter
     def _set_position(self, value):
         self.db_set('UPDATE object SET position=? WHERE (ui_id, object_id) IS (?, ?);',
+                    (self.ui_id, self.object_id, ), value)
+
+    @GObject.Property(type=str)
+    def custom_fragment(self):
+        return self.db_get('SELECT custom_fragment FROM object WHERE (ui_id, object_id) IS (?, ?);',
+                           (self.ui_id, self.object_id, ))
+
+    @custom_fragment.setter
+    def _set_custom_fragment(self, value):
+        self.db_set('UPDATE object SET custom_fragment=? WHERE (ui_id, object_id) IS (?, ?);',
                     (self.ui_id, self.object_id, ), value)
 
 

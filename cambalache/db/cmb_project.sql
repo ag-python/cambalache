@@ -45,6 +45,7 @@ CREATE TABLE ui (
   license_id TEXT,
   translation_domain TEXT,
   comment TEXT,
+  custom_fragment TEXT,
   FOREIGN KEY(ui_id, template_id) REFERENCES object(ui_id, object_id)
 );
 
@@ -119,6 +120,7 @@ CREATE TABLE object (
   type TEXT,
   comment TEXT,
   position INTEGER NOT NULL ON CONFLICT REPLACE DEFAULT 0,
+  custom_fragment TEXT,
   PRIMARY KEY(ui_id, object_id),
   FOREIGN KEY(ui_id, parent_id) REFERENCES object(ui_id, object_id) ON DELETE CASCADE
 ) WITHOUT ROWID;

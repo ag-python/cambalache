@@ -374,6 +374,9 @@ class CmbDB(GObject.GObject):
         if version < (0, 9, 0):
             return cmb_db_migration.ensure_columns_for_0_9_0(table, data)
 
+        if version < (0, 11, 2):
+            return cmb_db_migration.ensure_columns_for_0_11_2(table, data)
+
         return data
 
     def __migrate_table_data(self, c, version, table, data):
