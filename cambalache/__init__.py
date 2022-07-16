@@ -76,6 +76,7 @@ from .cmb_object_editor import CmbObjectEditor
 from .cmb_signal_editor import CmbSignalEditor
 from .cmb_ui_editor import CmbUIEditor
 from .cmb_css_editor import CmbCSSEditor
+from .cmb_fragment_editor import CmbFragmentEditor
 from .cmb_type_chooser import CmbTypeChooser
 from .cmb_type_chooser_widget import CmbTypeChooserWidget
 from .cmb_type_chooser_popover import CmbTypeChooserPopover
