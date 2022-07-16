@@ -20,6 +20,22 @@
     </p>
   </description>
   <releases>
+    <release date="2022-07-16" version="0.10.3">
+      <description>
+        <p>New bugfix release!</p>
+        <ul>
+          <li>Add support for Gstrv properties</li>
+          <li>Fix support for GdkPixbuf properties</li>
+          <li>Mark Adwaita and Handy translatable strings</li>
+          <li>Add French translation (rene-coty)</li>
+        </ul>
+      </description>
+      <issues>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/130">Issue #130 "GtkAboutDialog missing properties"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/133">Issue #133 "Gtk.Grid Collapses so Not All Children Can be Seen"</issue>
+        <issue url="https://gitlab.gnome.org/jpu/cambalache/-/issues/135">Issue #135 "List of string properties that should be translatable in Adw"</issue>
+      </issues>
+    </release>
     <release date="2022-06-16" version="0.10.2">
       <description>
         <p>New bugfix release!</p>
@@ -31,7 +47,7 @@
     </release>
     <release date="2022-06-15" version="0.10.1">
       <description>
-        <p>Fix bugfix release!</p>
+        <p>First bugfix release!</p>
         <ul>
           <li>Fix inline object regression</li>
         </ul>
