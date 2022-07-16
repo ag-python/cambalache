@@ -26,7 +26,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
    <glade-widget-class title="CmbProject" name="CmbProject" generic-name="cmbproject" toplevel="True"/>
    <glade-widget-class title="CmbTreeView" name="CmbTreeView" generic-name="cmbtreeview"/>
    <glade-widget-class title="CmbView" name="CmbView" generic-name="cmbview"/>
-   <glade-widget-class title="CmbUIEditor" name="CmbUIEditor" generic-name="cmbuiditor"/>
+   <glade-widget-class title="CmbFragmentEditor" name="CmbFragmentEditor" generic-name="cmbfragmenteditor"/>
+   <glade-widget-class title="CmbCSSEditor" name="CmbCSSEditor" generic-name="cmbcsseditor"/>
+   <glade-widget-class title="CmbUIEditor" name="CmbUIEditor" generic-name="cmbuieditor"/>
    <glade-widget-class title="CmbObjectEditor" name="CmbObjectEditor" generic-name="cmbobjecteditor"/>
    <glade-widget-class title="CmbSignalEditor" name="CmbSignalEditor" generic-name="cmbsignaleditor"/>
    <glade-widget-class title="CmbTypeChooser" name="CmbTypeChooser" generic-name="typechooser"/>
@@ -36,17 +38,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
    <glade-widget-class title="CmbEntry" name="CmbEntry" generic-name="cmbentry" parent="GtkEntry"/>
    <glade-widget-class title="CmbToplevelChooser" name="CmbToplevelChooser" generic-name="CmbToplevelChooser" parent="GtkComboBoxText"/>
    <glade-widget-class title="CmbTextBuffer" name="CmbTextBuffer" generic-name="cmbtextbuffer" parent="GtkTextBuffer"/>
+   <glade-widget-class title="CmbSourceView" name="CmbSourceView" generic-name="cmbsourceview" parent="GtkTextView"/>
+
  </glade-widget-classes>
 
  <glade-widget-group name="cambalache" title="Cambalache">
    <glade-widget-class-ref name="CmbProject"/>
    <glade-widget-class-ref name="CmbView"/>
    <glade-widget-class-ref name="CmbTreeView"/>
+   <glade-widget-class-ref name="CmbFragmentEditor"/>
+   <glade-widget-class-ref name="CmbCSSEditor"/>
    <glade-widget-class-ref name="CmbUIEditor"/>
    <glade-widget-class-ref name="CmbObjectEditor"/>
    <glade-widget-class-ref name="CmbSignalEditor"/>
    <glade-widget-class-ref name="CmbTypeChooser"/>
    <glade-widget-class-ref name="CmbTypeChooserWidget"/>
    <glade-widget-class-ref name="CmbTypeChooserPopover"/>
+
+   <glade-widget-class-ref name="CmbEntry"/>
+   <glade-widget-class-ref name="CmbToplevelChooser"/>
+   <glade-widget-class-ref name="CmbTextBuffer"/>
+   <glade-widget-class-ref name="CmbSourceView"/>
+
  </glade-widget-group>
 </glade-catalog>
