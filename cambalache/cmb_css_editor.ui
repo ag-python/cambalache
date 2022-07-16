@@ -273,12 +273,16 @@
               </packing>
             </child>
             <child>
-              <object class="GtkScrolledWindow" id="sw">
+              <object class="GtkScrolledWindow">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="vexpand">True</property>
                 <child>
-                  <placeholder/>
+                  <object class="CmbSourceView" id="view">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="lang">css</property>
+                  </object>
                 </child>
               </object>
               <packing>

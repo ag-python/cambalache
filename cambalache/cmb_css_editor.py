@@ -42,7 +42,7 @@ class CmbCSSEditor(Gtk.Grid):
     ui_box = Gtk.Template.Child()
     infobar = Gtk.Template.Child()
     save_button = Gtk.Template.Child()
-    sw = Gtk.Template.Child()
+    view = Gtk.Template.Child()
 
     fields = [
         ('filename', 'cmb-value'),
@@ -60,9 +60,6 @@ class CmbCSSEditor(Gtk.Grid):
 
         self.priority.set_range(0, 10000)
         self.priority.set_increments(10, 100)
-
-        self.view = CmbSourceView(visible=True)
-        self.sw.add(self.view)
 
     @GObject.Property(type=CmbCSS)
     def object(self):
@@ -100,7 +97,7 @@ class CmbCSSEditor(Gtk.Grid):
             self._bindings.append(binding)
 
         binding = GObject.Object.bind_property(obj, 'css',
-                                               self.view.buffer, 'text',
+                                               self.view, 'text',
                                                GObject.BindingFlags.SYNC_CREATE |
                                                GObject.BindingFlags.BIDIRECTIONAL)
         self._bindings.append(binding)
