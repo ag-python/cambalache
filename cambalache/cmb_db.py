@@ -924,6 +924,8 @@ class CmbDB(GObject.GObject):
         c.close()
 
     def __import_object(self, ui_id, node, parent_id, internal_child=None, child_type=None, is_template=False, object_id_map=None):
+        custom_fragments = []
+
         is_template = node.tag == 'template'
 
         if is_template:
@@ -974,6 +976,8 @@ class CmbDB(GObject.GObject):
             elif child.tag == 'layout' and self.target_tk == 'gtk-4.0':
                 # Gtk 4, layout props are children of <object>
                 self.__import_layout_properties(c, info, ui_id, parent_id, object_id, child)
+            elif child.tag is etree.Comment:
+                pass
             else:
                 # Custom buildable tags
                 taginfo = info.get_data_info(child.tag)
@@ -981,11 +985,28 @@ class CmbDB(GObject.GObject):
                 if taginfo is not None:
                     self.__import_object_data(ui_id, object_id, taginfo.owner_id, taginfo, child, None)
                 else:
-                    self.__unknown_tag(child, klass, child.tag)
+                    custom_fragments.append(child)
+                    #self.__unknown_tag(child, klass, child.tag)
+
+        fragment = self.__custom_fragments_tostring(custom_fragments)
+        if fragment:
+            c.execute("UPDATE object SET custom_fragment=? WHERE ui_id=? AND object_id=?",
+                      (fragment, ui_id, object_id))
 
         c.close()
 
         return object_id
+
+    def __custom_fragments_tostring(self, custom_fragments):
+        if len(custom_fragments) == 0:
+            return None
+
+        fragment = ''
+
+        for node in custom_fragments:
+            fragment += etree.tostring(node).decode('utf-8').strip()
+
+        return fragment
 
     def __node_get_comment(self, node):
         prev = node.getprevious()
@@ -1042,6 +1063,8 @@ class CmbDB(GObject.GObject):
             (ui_id, ))
 
     def import_file(self, filename, projectdir='.'):
+        custom_fragments = []
+
         # Clear parsing errors
         self.errors = {}
 
@@ -1127,13 +1150,20 @@ class CmbDB(GObject.GObject):
                         if column is not None:
                             c.execute(f"UPDATE ui SET {column}=? WHERE ui_id=?", (value, ui_id))
             else:
-                self.__unknown_tag(child, None, child.tag)
+                print(child)
+                custom_fragments.append(child)
+                #self.__unknown_tag(child, None, child.tag)
 
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
 
         # Fix object references!
         self.__fix_object_references(ui_id)
+
+        fragment = self.__custom_fragments_tostring(custom_fragments)
+        if fragment:
+            c.execute("UPDATE ui SET custom_fragment=? WHERE ui_id=?",
+                      (fragment, ui_id))
 
         # Check for parsing errors and append .cmb if something is not supported
         if len(self.errors):
@@ -1163,8 +1193,8 @@ class CmbDB(GObject.GObject):
         c = self.conn.cursor()
         cc = self.conn.cursor()
 
-        c.execute('SELECT type_id, name FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
-        type_id, name = c.fetchone()
+        c.execute('SELECT type_id, name, custom_fragment FROM object WHERE ui_id=? AND object_id=?;', (ui_id, object_id))
+        type_id, name, custom_fragment = c.fetchone()
 
         info = self.type_info.get(type_id, None)
 
@@ -1412,10 +1442,25 @@ class CmbDB(GObject.GObject):
             pinfo = self.type_info[parent]
             export_type_data(parent, pinfo, obj)
 
+        # Dump custom fragments
+        self.__export_custom_fragment(obj, custom_fragment)
+
         c.close()
         cc.close()
 
         return obj
+
+    def __export_custom_fragment(self, node, custom_fragment):
+        if custom_fragment is None:
+            return
+        try:
+            root = etree.fromstring(f'<root>{custom_fragment}</root>')
+        except:
+            pass
+        else:
+            node.append(etree.Comment(' Custom fragments '))
+            for child in root:
+                node.append(child)
 
     def export_ui(self, ui_id, merengue=False):
         c = self.conn.cursor()
@@ -1423,13 +1468,13 @@ class CmbDB(GObject.GObject):
         node = E.interface()
         node.addprevious(etree.Comment(f" Created with Cambalache {VERSION} "))
 
-        c.execute('SELECT comment, template_id FROM ui WHERE ui_id=?;', (ui_id,))
+        c.execute('SELECT comment, template_id, custom_fragment FROM ui WHERE ui_id=?;', (ui_id,))
         row = c.fetchone()
 
         if row is None:
             return None
 
-        comment, template_id = row
+        comment, template_id, custom_fragment = row
         self.__node_add_comment(node, comment)
 
         # Export UI data as comments
@@ -1467,6 +1512,9 @@ class CmbDB(GObject.GObject):
             child = self.__export_object(ui_id, object_id, merengue=merengue, template_id=template_id)
             node.append(child)
             self.__node_add_comment(child, comment)
+
+        # Dump custom fragments
+        self.__export_custom_fragment(node, custom_fragment)
 
         c.close()
 
