@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <!-- interface-name custom_fragment.ui -->
+  <requires lib="gtk+" version="3.0"/>
+  <object class="GtkWindow">
+    <property name="title">Hola Mundo</property>
+    <!-- Custom fragments -->
+    <mycustomtag>
+      <any tag="is allowed"/>
+      <even>
+        <if it="breaks">
+          <gtkbuilder/>
+        </if>
+      </even>
+    </mycustomtag>
+  </object>
+  <!-- Custom fragments -->
+  <roottag>
+    <because custom="types" can="implement">
+      <any custom="tags"/>
+    </because>
+  </roottag>
+</interface>

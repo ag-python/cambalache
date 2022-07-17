@@ -67,6 +67,10 @@ def test_gtk3_treestore():
     assert_original_and_exported("gtk+-3.0", "treestore.ui")
 
 
+def test_gtk3_custom_fragment():
+    assert_original_and_exported("gtk+-3.0", "custom_fragment.ui")
+
+
 #
 # Gtk 4.0 Tests
 #
@@ -93,3 +97,6 @@ def test_gtk4_stack_page():
 
 def test_gtk4_liststore():
     assert_original_and_exported("gtk-4.0", "liststore.ui")
+
+def test_gtk4_custom_fragment():
+    assert_original_and_exported("gtk-4.0", "custom_fragment.ui")
