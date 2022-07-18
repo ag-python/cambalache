@@ -251,6 +251,11 @@ window.setupDocument = function (document) {
                                     'selection': objects
                                 })
 
+    def __on_ui_changed(self, project, ui, field):
+        if field in ['custom-fragment']:
+            self.__update_view()
+            self.__merengue_update_ui(ui.ui_id)
+
     def __on_object_added(self, project, obj):
         self.__update_view()
         self.__merengue_update_ui(obj.ui_id)
@@ -260,7 +265,7 @@ window.setupDocument = function (document) {
         self.__merengue_update_ui(obj.ui_id)
 
     def __on_object_changed(self, project, obj, field):
-        if field in ['type', 'position']:
+        if field in ['type', 'position', 'custom-fragment']:
             self.__update_view()
             self.__merengue_update_ui(obj.ui_id)
 
@@ -359,6 +364,7 @@ window.setupDocument = function (document) {
     @project.setter
     def _set_project(self, project):
         if self.__project is not None:
+            self.__project.disconnect_by_func(self.__on_ui_changed)
             self.__project.disconnect_by_func(self.__on_object_added)
             self.__project.disconnect_by_func(self.__on_object_removed)
             self.__project.disconnect_by_func(self.__on_object_changed)
@@ -377,6 +383,7 @@ window.setupDocument = function (document) {
         self.__update_view()
 
         if project is not None:
+            project.connect('ui-changed', self.__on_ui_changed)
             project.connect('object-added', self.__on_object_added)
             project.connect('object-removed', self.__on_object_removed)
             project.connect('object-changed', self.__on_object_changed)
