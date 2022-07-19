@@ -2,12 +2,12 @@
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
 <cambalache-catalog name="gdkpixbuf" namespace="GdkPixbuf" prefix="Gdk" version="2.0" targets="2.0" depends="gobject-2.0">
   <type>
-	("GdkColorspace","enum","gdkpixbuf",None,None,None,None,None,None),
-	("GdkInterpType","enum","gdkpixbuf",None,None,None,None,None,None),
-	("GdkPixbuf","GObject","gdkpixbuf",None,None,None,None,None,None),
-	("GdkPixbufAlphaMode","enum","gdkpixbuf",None,None,None,None,None,None),
-	("GdkPixbufError","enum","gdkpixbuf",None,None,None,None,None,None),
-	("GdkPixbufRotation","enum","gdkpixbuf",None,None,None,None,None,None)
+	("GdkColorspace","enum","gdkpixbuf",None,None,None,None,None,None,None),
+	("GdkInterpType","enum","gdkpixbuf",None,None,None,None,None,None,None),
+	("GdkPixbuf","GObject","gdkpixbuf",None,None,None,None,None,None,None),
+	("GdkPixbufAlphaMode","enum","gdkpixbuf",None,None,None,None,None,None,None),
+	("GdkPixbufError","enum","gdkpixbuf",None,None,None,None,None,None,None),
+	("GdkPixbufRotation","enum","gdkpixbuf",None,None,None,None,None,None,None)
   </type>
   <type_enum>
 	("GdkColorspace","GDK_COLORSPACE_RGB","rgb",None,"Indicates a red/green/blue additive color space."),

@@ -2,14 +2,14 @@
 <!DOCTYPE cambalache-catalog SYSTEM "cambalache-catalog.dtd">
 <cambalache-catalog name="gsk" namespace="Gsk" prefix="Gsk" version="4.0" targets="4.0" depends="gobject-2.0">
   <type>
-	("GskBlendMode","enum","gsk",None,None,None,None,None,None),
-	("GskCorner","enum","gsk",None,None,None,None,None,None),
-	("GskGLUniformType","enum","gsk",None,None,None,None,None,None),
-	("GskRenderNodeType","enum","gsk",None,None,None,None,None,None),
-	("GskScalingFilter","enum","gsk",None,None,None,None,None,None),
-	("GskSerializationError","enum","gsk",None,None,None,None,None,None),
-	("GskTransform","boxed","gsk",None,None,None,None,None,None),
-	("GskTransformCategory","enum","gsk",None,None,None,None,None,None)
+	("GskBlendMode","enum","gsk",None,None,None,None,None,None,None),
+	("GskCorner","enum","gsk",None,None,None,None,None,None,None),
+	("GskGLUniformType","enum","gsk",None,None,None,None,None,None,None),
+	("GskRenderNodeType","enum","gsk",None,None,None,None,None,None,None),
+	("GskScalingFilter","enum","gsk",None,None,None,None,None,None,None),
+	("GskSerializationError","enum","gsk",None,None,None,None,None,None,None),
+	("GskTransform","boxed","gsk",None,None,None,None,None,None,None),
+	("GskTransformCategory","enum","gsk",None,None,None,None,None,None,None)
   </type>
   <type_enum>
 	("GskBlendMode","GSK_BLEND_MODE_COLOR","color",12,"Creates a color with the hue and saturation of the source color and the luminosity of the destination color"),
