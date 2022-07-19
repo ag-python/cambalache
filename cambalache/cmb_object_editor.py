@@ -69,14 +69,20 @@ class CmbObjectEditor(Gtk.Box):
         # Template check
         if self.__object and not self.__object.parent_id:
             is_template = self.__object.object_id == self.__object.ui.template_id
-            tooltip_text=_('Switch between object and template')
+            tooltip_text = _('Switch between object and template')
+            derivable = self.__object.info.derivable
+
+            if not derivable:
+                tooltip_text = _('{type} is not derivable.').format(type=self.__object.info.type_id)
 
             label = Gtk.Label(label=_('Template'),
                               halign=Gtk.Align.START,
-                              tooltip_text=tooltip_text)
+                              tooltip_text=tooltip_text,
+                              sensitive=derivable)
             switch = Gtk.Switch(active=is_template,
                                 halign=Gtk.Align.START,
-                                tooltip_text=tooltip_text)
+                                tooltip_text=tooltip_text,
+                                sensitive=derivable)
 
             switch.connect('notify::active', self.__on_template_switch_notify)
             self.__update_template_label()
