@@ -652,6 +652,12 @@ class CmbProject(Gtk.TreeStore):
         self.__selection = selection
         self.emit('selection-changed')
 
+    def get_iter_from_object_id(self, ui_id, object_id=None):
+        if object_id:
+            return self.__object_id.get(f'{ui_id}.{object_id}', None)
+        else:
+            return self.__object_id.get(ui_id, None)
+
     def get_iter_from_object(self, obj):
         if type(obj) == CmbObject:
             return self.__object_id.get(f'{obj.ui_id}.{obj.object_id}', None)

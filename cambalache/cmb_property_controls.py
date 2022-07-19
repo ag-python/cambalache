@@ -441,18 +441,37 @@ class CmbObjectChooser(Gtk.Entry):
             chooser.popup()
 
 
-class CmbToplevelChooser(Gtk.ComboBoxText):
+class CmbToplevelChooser(Gtk.ComboBox):
     __gtype_name__ = 'CmbToplevelChooser'
 
     object = GObject.Property(type=CmbUI, flags = GObject.ParamFlags.READWRITE)
 
     def __init__(self, **kwargs):
+        self.filter = None
+
         super().__init__(**kwargs)
         self.connect('notify::object', self.__on_object_notify)
         self.connect('changed', self.__on_changed)
 
-    def _filter_func(self, model, iter, data):
+        renderer = Gtk.CellRendererText()
+        self.pack_start(renderer, True)
+        self.set_cell_data_func(renderer, self.__name_cell_data_func, None)
+
+    def __name_cell_data_func(self, column, cell, model, iter_, data):
+        obj = model.get_value(iter_, 0)
+
+        if type(obj) != CmbObject:
+            return
+
+        name = f'{obj.name} ' if obj.name else ''
+        extra = _('(template)') if not obj.parent_id and obj.ui.template_id == obj.object_id else obj.type_id
+        cell.set_property('markup', f'{name}<i>{extra}</i>')
+
+    def __filter_func(self, model, iter, data):
         obj = model[iter][0]
+
+        if self.object.ui_id != obj.ui_id:
+            return False
 
         if type(obj) == CmbObject:
             return obj.parent_id == 0
@@ -460,36 +479,37 @@ class CmbToplevelChooser(Gtk.ComboBoxText):
         return False
 
     def __on_object_notify(self, obj, pspec):
-        self.remove_all()
+        self.props.model = None
 
         if self.object is None:
             return
 
-        self.append('0', '(None)')
+        project = self.object.project
+        iter = project.get_iter_from_object(self.object)
+        path = project.get_path(iter)
 
-        # TODO: add api to get toplevels in CmbUI
-        # TODO: update model on project change
-        for ui in self.object.project:
-            if ui[0] == self.object:
-                for child in ui.iterchildren():
-                    obj = child[0]
-                    name = obj.name or ''
-                    self.append(f'{obj.object_id}', f'{name}({obj.type_id})')
+        self.filter = project.filter_new(path)
+
+        self.props.model = self.filter
+        self.filter.set_visible_func(self.__filter_func)
 
     def __on_changed(self, combo):
+        print('')
         self.notify('cmb-value')
 
     @GObject.Property(type=int)
     def cmb_value(self):
-        active_id = self.get_active_id()
-        return int(active_id) if active_id is not None else None
+        iter = self.object.project.self.get_active_iter()
+        return self.filter[iter][0].object_id
 
     @cmb_value.setter
     def _set_cmb_value(self, value):
         if self.object is None:
             return
 
-        self.set_active_id(str(value) if value is not None else None)
+        iter = self.object.project.get_iter_from_object_id(self.object.ui_id, value)
+        valid, filter_iter = self.filter.convert_child_iter_to_iter(iter)
+        self.set_active_iter(filter_iter if valid else None)
 
 
 class CmbChildTypeComboBox(Gtk.ComboBox):
