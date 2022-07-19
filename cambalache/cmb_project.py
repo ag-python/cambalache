@@ -1021,9 +1021,11 @@ class CmbProject(Gtk.TreeStore):
                 self.__template_info[ui.ui_id] = type_id
 
                 self.emit('type-info-added', info)
-            elif template_info != type_id:
+                return
+            elif type_id and template_info != type_id:
                 # name changed
                 info = self.type_info.pop(template_info)
+
                 self.type_info[type_id] = info
                 self.__template_info[ui.ui_id] = type_id
 
@@ -1032,7 +1034,9 @@ class CmbProject(Gtk.TreeStore):
                 info.parent_id = parent_id
                 info.parent = self.type_info.get(parent_id, None)
                 self.emit('type-info-changed', info)
-        elif template_info:
+                return
+
+        if template_info:
             info = self.type_info.pop(template_info)
             self.__template_info.pop(ui.ui_id)
             self.emit('type-info-removed', info)
