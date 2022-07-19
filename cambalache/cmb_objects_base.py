@@ -124,6 +124,7 @@ class CmbBaseTypeInfo(CmbBase):
     version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     deprecated_version = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     abstract = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
+    derivable = GObject.Property(type=bool, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, default = False)
     layout = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     category = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
     workspace_type = GObject.Property(type=str, flags = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY)
@@ -132,7 +133,7 @@ class CmbBaseTypeInfo(CmbBase):
         super().__init__(**kwargs)
 
     @classmethod
-    def from_row(cls, project, type_id, parent_id, library_id, version, deprecated_version, abstract, layout, category, workspace_type):
+    def from_row(cls, project, type_id, parent_id, library_id, version, deprecated_version, abstract, derivable, layout, category, workspace_type):
         return cls(project=project,
                    type_id=type_id,
                    parent_id=parent_id,
@@ -140,6 +141,7 @@ class CmbBaseTypeInfo(CmbBase):
                    version=version,
                    deprecated_version=deprecated_version,
                    abstract=abstract,
+                   derivable=derivable,
                    layout=layout,
                    category=category,
                    workspace_type=workspace_type)

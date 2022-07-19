@@ -427,9 +427,9 @@ class GirData:
 
         return {
             'parent': parent,
-            'is_container': is_container,
             'layout': 'container' if is_container else None,
             'abstract': element.get('abstract'),
+            'derivable': True if element.get(ns('glib','type-struct')) else None,
             'version': constructor.get('version'),
             'deprecated_version': constructor.get('deprecated-version'),
             'properties': self._type_get_properties(element, props),
@@ -443,7 +443,6 @@ class GirData:
         for name in boxed_types:
             retval[name] = {
                 'parent': 'boxed',
-                'is_container': 0,
                 'abstract': 0,
             }
 
@@ -581,11 +580,12 @@ class GirData:
             if parent and parent.find('.') >= 0:
                 parent = 'object'
 
-            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, version, deprecated_version, abstract, layout) VALUES (?, ?, ?, ?, ?, ?, ?);",
+            conn.execute(f"INSERT INTO type (library_id, type_id, parent_id, version, deprecated_version, abstract, derivable, layout) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
                          (self.lib, name, parent,
                           clean_ver(data.get('version', None)),
                           clean_ver(data.get('deprecated_version', None)),
                           data.get('abstract', None),
+                          data.get('derivable', None),
                           data.get('layout', None)))
 
         def db_insert_type_data(conn, name, data):

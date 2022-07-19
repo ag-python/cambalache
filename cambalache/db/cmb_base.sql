@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS type (
   version TEXT,
   deprecated_version TEXT,
   abstract BOOLEAN,
+  derivable BOOLEAN,
   layout TEXT CHECK (layout IN ('container', 'manager', 'child')),
   category TEXT CHECK (category IN ('toplevel', 'layout', 'control', 'display', 'model')),
   workspace_type TEXT
