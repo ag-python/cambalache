@@ -268,5 +268,6 @@
   <url type="donation">https://liberapay.com/xjuan</url>
   <url type="donation">https://www.patreon.com/cambalache</url>
   <url type="contact">https://matrix.to/#/#cambalache:gnome.org</url>
-  <url type="vcs-browser">https://gitlab.gnome.org/jpu/cambalache</url>
+  <!-- Uncomment when moving to new SDK -->
+  <!-- <url type="vcs-browser">https://gitlab.gnome.org/jpu/cambalache</url> -->
 </component>
